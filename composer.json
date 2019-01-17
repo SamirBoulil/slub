@@ -1,13 +1,26 @@
 {
-    "name": "samir/slub",
-    "description": "Improve feedback from Github pull requests into Slack",
-    "type": "project",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Samir Boulil",
-            "email": "samir.boulil@akeneo.com"
-        }
-    ],
-    "require": {}
+  "name": "samir/slub",
+  "description": "Improve feedback from Github pull requests into Slack",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Samir Boulil",
+      "email": "samir.boulil@akeneo.com"
+    }
+  ],
+  "require": {},
+  "require-dev": {
+    "behat/behat": "^3.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
 }

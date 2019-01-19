@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\Acceptance;
+namespace Tests\Acceptance;
 
 use Behat\Behat\Context\Context;
 

@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\Persistence\FileBased;
+namespace Tests\Integration\Infrastructure\Persistence\FileBased\Repository;
 
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Infrastructure\Persistence\FileBased\FileBasedPRRepository;
+use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Tests\Integration\Infrastructure\Persistence\FileBased\PersistenceTestCase;
 
 class FileBasedPRRepositoryTest extends PersistenceTestCase
 {
-    /** @var FileBasedPRRepository */
+    /** @var \Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository */
     private $fileBasedPRRepository;
 
     public function setUp(): void

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Persistence\FileBased;
+namespace Slub\Infrastructure\Persistence\FileBased\Repository;
 
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;

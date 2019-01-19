@@ -6,10 +6,11 @@ namespace Slub\Infrastructure\Common;
 
 use Psr\Container\ContainerInterface;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Persistence\FileBased\FileBasedPRRepository;
+use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -50,6 +51,7 @@ class SlubApplicationContainer implements ContainerInterface
          */
         $containerBuilder->register(PutPRToReviewHandler::class, PutPRToReviewHandler::class)
             ->addArgument(new Reference(PRRepositoryInterface::class))
+            ->addArgument(new Reference(IsSupportedInterface::class))
             ->setPublic(true);
 
         /**
@@ -58,6 +60,11 @@ class SlubApplicationContainer implements ContainerInterface
         $containerBuilder->register(PRRepositoryInterface::class, FileBasedPRRepository::class)
             ->addArgument($this->getPersistencePath($containerBuilder) . '/pr_repository.json')
             ->setPublic(true);
+
+        $containerBuilder->register(IsSupportedInterface::class, InMemoryIsSupported::class)
+            ->addArgument(['akeneo/pim-community-dev'])
+            ->setPublic(true);
+
 
         $containerBuilder->compile();
 

@@ -32,8 +32,22 @@ class FeatureContext implements Context
      */
     public function anAuthorPutsAPRToReview()
     {
-        $pr = new PutPRToReview('akeneo', 'pim-community-dev', '1111');
+        $pr = new PutPRToReview('akeneo', 'akeneo/pim-community-dev', '1111');
         $this->putPRToReviewHandler->handle($pr);
+    }
+
+    /**
+     * @When /^an author puts a PR belonging to an unsupported repository  to review$/
+     */
+    public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
+    {
+        $pr = new PutPRToReview('akeneo', 'unknown', '1111');
+        $exception = null;
+        try {
+            $this->putPRToReviewHandler->handle($pr);
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
     }
 
     /**
@@ -41,10 +55,18 @@ class FeatureContext implements Context
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        $this->assertPRRepositoryContains('akeneo', 'pim-community-dev', '1111');
+        Assert::assertTrue($this->prExists('akeneo', 'pim-community-dev', '1111'));
     }
 
-    private function assertPRRepositoryContains(string $organization, string $repository, string $externalId): void
+    /**
+     * @Then /^the PR is not added to the list of followed PRs$/
+     */
+    public function thePRIsNotAddedToTheListOfFollowedPRs()
+    {
+        Assert::assertFalse($this->prExists('akeneo', 'unknown', '1111'));
+    }
+
+    private function prExists(string $organization, string $repository, string $externalId): bool
     {
         $found = true;
         try {
@@ -53,6 +75,6 @@ class FeatureContext implements Context
             $found = false;
         }
 
-        Assert::assertTrue($found, 'PR was not found');
+        return $found;
     }
 }

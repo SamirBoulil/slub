@@ -26,18 +26,20 @@ class PutPRToReviewHandler
 
     public function handle(PutPRToReview $putPRToReview)
     {
-        $this->checkIsSupported($putPRToReview);
+        if ($this->isUnsupported($putPRToReview)) {
+            return;
+        }
+
         $pr = PR::create(
             PRIdentifier::create($putPRToReview->repository, $putPRToReview->pullRequest)
         );
         $this->prRepository->save($pr);
     }
 
-    private function checkIsSupported(PutPRToReview $putPRToReview): void
+    private function isUnsupported(PutPRToReview $putPRToReview):bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repository);
-        if (!$this->isSupported->repository($repositoryIdentifier)) {
-            throw new \Exception('Unsupported repository');
-        }
+
+        return !$this->isSupported->repository($repositoryIdentifier);
     }
 }

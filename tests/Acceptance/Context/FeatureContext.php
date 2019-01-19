@@ -42,12 +42,7 @@ class FeatureContext implements Context
     public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
     {
         $pr = new PutPRToReview('akeneo/pim-community-dev', '1111');
-        $exception = null;
-        try {
-            $this->putPRToReviewHandler->handle($pr);
-        } catch (\Exception $e) {
-            $exception = $e;
-        }
+        $this->putPRToReviewHandler->handle($pr);
     }
 
     /**

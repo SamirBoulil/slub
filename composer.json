@@ -9,9 +9,14 @@
       "email": "samir.boulil@akeneo.com"
     }
   ],
-  "require": {},
+  "require": {
+    "symfony/dependency-injection": "^4.2",
+    "matthiasnoback/convenient-immutability": "^0.2.1"
+  },
   "require-dev": {
-    "behat/behat": "^3.5"
+    "behat/behat": "^3.5",
+    "phpunit/phpunit": "^7.5",
+    "friendsofphp/php-cs-fixer": "^2.14"
   },
   "autoload": {
     "psr-4": {

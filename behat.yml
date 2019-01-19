@@ -1,7 +1,7 @@
 default:
     suites:
-        acceptance:
+        default:
             paths:
-                - "%paths.base%/tests/Acceptance"
+                - "%paths.base%/tests/Acceptance/features"
             contexts:
-                - Tests\Acceptance\FeatureContext
+                - Tests\Acceptance\Context\FeatureContext

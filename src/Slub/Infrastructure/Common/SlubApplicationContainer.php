@@ -62,7 +62,7 @@ class SlubApplicationContainer implements ContainerInterface
             ->setPublic(true);
 
         $containerBuilder->register(IsSupportedInterface::class, InMemoryIsSupported::class)
-            ->addArgument(['akeneo/pim-community-dev'])
+            ->addArgument('%slub.repositories%')
             ->setPublic(true);
 
 

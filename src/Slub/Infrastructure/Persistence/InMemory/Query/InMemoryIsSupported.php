@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\Persistence\InMemory\Query;
 
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
+use Webmozart\Assert\Assert;
 
 class InMemoryIsSupported implements IsSupportedInterface
 {
@@ -14,6 +15,7 @@ class InMemoryIsSupported implements IsSupportedInterface
 
     public function __construct(array $supportedRepositories)
     {
+        Assert::allString($supportedRepositories);
         $this->supportedRepositories = $this->createIdentifiers($supportedRepositories);
     }
 

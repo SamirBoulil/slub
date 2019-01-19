@@ -7,7 +7,7 @@ namespace Tests\Unit\Domain\Entity\Channel;
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 
-class ChannelTest extends TestCase
+class ChannelIdentifierTest extends TestCase
 {
     /**
      * @test

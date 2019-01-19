@@ -10,14 +10,18 @@
         <testsuite name="Integration tests">
             <directory suffix="Test.php">./tests/Integration</directory>
         </testsuite>
-        <testsuite name="Acceptance tests">
-            <directory suffix="Test.php">./tests/Acceptance</directory>
-        </testsuite>
     </testsuites>
     <filter>
-        <whitelist>
-            <directory>src/</directory>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory>src/Slub/Domain</directory>
+            <directory>src/Slub/Infrastructure</directory>
+            <exclude>
+                <directory>./vendor</directory>
+            </exclude>
         </whitelist>
     </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 </phpunit>
 

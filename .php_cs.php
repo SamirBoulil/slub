@@ -15,4 +15,3 @@ return PhpCsFixer\Config::create()
             ->in(__DIR__ . '/src')
             ->in(__DIR__ . '/tests')
     );
-

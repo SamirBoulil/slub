@@ -7,8 +7,8 @@ namespace Slub\Application\PutPRToReview;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
-use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Domain\Query\IsSupportedInterface;
+use Slub\Domain\Repository\PRRepositoryInterface;
 
 class PutPRToReviewHandler
 {
@@ -28,7 +28,7 @@ class PutPRToReviewHandler
     {
         $this->checkIsSupported($putPRToReview);
         $pr = PR::create(
-            PRIdentifier::create($putPRToReview->organization, $putPRToReview->repository, $putPRToReview->pullRequest)
+            PRIdentifier::create($putPRToReview->repository, $putPRToReview->pullRequest)
         );
         $this->prRepository->save($pr);
     }

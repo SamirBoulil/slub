@@ -26,7 +26,7 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
      */
     public function it_saves_a_pr_and_returns_it()
     {
-        $identifier = PRIdentifier::create('akeneo', 'pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('pim-community-dev', '1111');
         $savedPR = PR::create($identifier);
 
         $this->fileBasedPRRepository->save($savedPR);

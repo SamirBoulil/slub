@@ -15,7 +15,7 @@ class PRTest extends TestCase
      */
     public function it_creates_a_PR()
     {
-        $identifier = PRIdentifier::create('akeneo', 'pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('pim-community-dev', '1111');
 
         $pr = PR::create($identifier);
 
@@ -39,7 +39,7 @@ class PRTest extends TestCase
      */
     public function it_normalizes_itself()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo', 'pim-community-dev', '1111'));
+        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev', '1111'));
 
         $this->assertSame(['identifier' => 'akeneo/pim-community-dev/1111'], $pr->normalize());
     }

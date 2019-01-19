@@ -29,4 +29,3 @@ class RepositoryIdentifierTest extends TestCase
         $this->assertFalse($identifier->equals($anotherIdentifier));
     }
 }
-

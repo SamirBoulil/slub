@@ -32,7 +32,7 @@ class FeatureContext implements Context
      */
     public function anAuthorPutsAPRToReview()
     {
-        $pr = new PutPRToReview('akeneo', 'akeneo/pim-community-dev', '1111');
+        $pr = new PutPRToReview('akeneo/pim-community-dev', '1111');
         $this->putPRToReviewHandler->handle($pr);
     }
 
@@ -41,7 +41,7 @@ class FeatureContext implements Context
      */
     public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
     {
-        $pr = new PutPRToReview('akeneo', 'unknown', '1111');
+        $pr = new PutPRToReview('akeneo/pim-community-dev', '1111');
         $exception = null;
         try {
             $this->putPRToReviewHandler->handle($pr);
@@ -55,7 +55,7 @@ class FeatureContext implements Context
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        Assert::assertTrue($this->prExists('akeneo', 'pim-community-dev', '1111'));
+        Assert::assertTrue($this->prExists('akeneo/pim-community-dev', '1111'));
     }
 
     /**
@@ -63,14 +63,14 @@ class FeatureContext implements Context
      */
     public function thePRIsNotAddedToTheListOfFollowedPRs()
     {
-        Assert::assertFalse($this->prExists('akeneo', 'unknown', '1111'));
+        Assert::assertFalse($this->prExists('akeneo/unknown', '1111'));
     }
 
-    private function prExists(string $organization, string $repository, string $externalId): bool
+    private function prExists(string $repository, string $externalId): bool
     {
         $found = true;
         try {
-            $this->prRepository->getBy(PRIdentifier::create($organization, $repository, $externalId));
+            $this->prRepository->getBy(PRIdentifier::create($repository, $externalId));
         } catch (PRNotFoundException $notFoundException) {
             $found = false;
         }

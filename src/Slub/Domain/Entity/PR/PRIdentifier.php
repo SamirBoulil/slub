@@ -14,9 +14,9 @@ class PRIdentifier
         $this->identifier = $identifier;
     }
 
-    public static function create(string $organization, string $repository, string $externalIdentifier): self
+    public static function create(string $repository, string $externalIdentifier): self
     {
-        $identifier = sprintf('%s/%s/%s', $organization, $repository, $externalIdentifier);
+        $identifier = sprintf('%s/%s', $repository, $externalIdentifier);
 
         return new self($identifier);
     }

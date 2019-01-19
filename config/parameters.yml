@@ -1,2 +1,3 @@
 parameters:
     slub.repositories: [akeneo/pim-community-dev]
+    slub.channels: [squad-raccoons, squad-chipmunks]

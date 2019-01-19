@@ -21,14 +21,25 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SlubApplicationContainer implements ContainerInterface
 {
+    private const TEST_ENV = 'test';
+    private const PROD_ENV = 'prod';
+
     /** @var ContainerInterface */
     private $container;
 
-    const PERSISTENCE_ROOT_DIR_PARAMETER = 'persistence.file_based.root_dir';
-
-    public function __construct()
+    private function __construct(string $env)
     {
-        $this->container = $this->buildContainer();
+        $this->container = $this->buildContainer($env);
+    }
+
+    public static function buildApplication()
+    {
+        return new self(self::PROD_ENV);
+    }
+
+    public static function buildForTest()
+    {
+        return new self(self::TEST_ENV);
     }
 
     public function get($id)
@@ -41,10 +52,12 @@ class SlubApplicationContainer implements ContainerInterface
         return $this->container->has($id);
     }
 
-    private function buildContainer(): ContainerInterface
+    private function buildContainer(string $env): ContainerInterface
     {
         $containerBuilder = new ContainerBuilder();
         $this->loadConfigFiles($containerBuilder);
+
+        $repositoryFilePath = $this->getRepositoryFilePath($env, $containerBuilder);
 
         /**
          * Handler
@@ -58,13 +71,13 @@ class SlubApplicationContainer implements ContainerInterface
          * Persistence
          */
         $containerBuilder->register(PRRepositoryInterface::class, FileBasedPRRepository::class)
-            ->addArgument($this->getPersistencePath($containerBuilder) . '/pr_repository.json')
+            ->addArgument($repositoryFilePath)
             ->setPublic(true);
 
         $containerBuilder->register(IsSupportedInterface::class, InMemoryIsSupported::class)
             ->addArgument('%slub.repositories%')
+            ->addArgument('%slub.channels%')
             ->setPublic(true);
-
 
         $containerBuilder->compile();
 
@@ -81,13 +94,26 @@ class SlubApplicationContainer implements ContainerInterface
         return __DIR__ . '/../../../..';
     }
 
-    /**
-     * @param $containerBuilder
-     *
-     */
     private function loadConfigFiles(ContainerBuilder $containerBuilder): void
     {
         $loader = new YamlFileLoader($containerBuilder, new FileLocator($this->getProjectDir()));
         $loader->load($this->getProjectDir() . '/config/parameters.yml');
+    }
+
+    private function getRepositoryFilePath(string $env, $containerBuilder): string
+    {
+        $repositoryFilePath = '';
+        if (self::PROD_ENV === $env) {
+            $repositoryFilePath = $this->getPersistencePath($containerBuilder) . '/pr_repository.json';
+        }
+        if (self::TEST_ENV === $env) {
+            $repositoryFilePath = tempnam('', 'slub');
+            if (false === $repositoryFilePath) {
+                throw new \Exception('Impossible to create temporary file');
+            }
+        }
+
+
+        return $repositoryFilePath;
     }
 }

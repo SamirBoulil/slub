@@ -10,10 +10,10 @@ Feature: Collect the pull requests put to review
 
   @secondary
   Scenario: Put a PR belonging to an unsupported repository to review
-    When an author puts a PR belonging to an unsupported repository  to review
+    When an author puts a PR belonging to an unsupported repository to review
     Then the PR is not added to the list of followed PRs
-#
-#  @secondary
-#  Scenario: Put a PR to review on an unsupported chat
-#    When an author puts a PR to review on an unsupported chat
-#    Then the PR is not added to the list of followed PRs
+
+  @secondary
+  Scenario: Put a PR to review on an unsupported channel
+    When an author puts a PR to review on an unsupported channel
+    Then the PR is not added to the list of followed PRs

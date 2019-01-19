@@ -23,14 +23,10 @@ abstract class PersistenceTestCase extends TestCase
         unlink($this->filePath);
     }
 
-    /**
-     * @return bool|string
-     *
-     */
-    private function createTemporaryFile()
+    private function createTemporaryFile(): string
     {
         $temporaryFilePath = tempnam('', 'slub_');
-        if (!$temporaryFilePath) {
+        if (false === $temporaryFilePath) {
             throw new \Exception('Temporary file could not be created.');
         }
 

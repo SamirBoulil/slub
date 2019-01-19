@@ -38,6 +38,11 @@ class FileBasedPRRepository implements PRRepositoryInterface
         return $result;
     }
 
+    public function resetFiles(): void
+    {
+        unlink($this->filePath);
+    }
+
     /**
      * @return PR[]
      */
@@ -107,7 +112,14 @@ class FileBasedPRRepository implements PRRepositoryInterface
         }
 
         $fp = fopen($this->filePath, 'w');
-        fwrite($fp, json_encode($normalizedAllPRs));
+        if (false === $fp) {
+            throw new \Exception(sprintf('Impossible to open the file at path "%s"', $this->filePath));
+        }
+        $serializedAllPRs = json_encode($normalizedAllPRs);
+        if (false === $serializedAllPRs) {
+            throw new \Exception('Impossible to serialize all PRs');
+        }
+        fwrite($fp, $serializedAllPRs);
         fclose($fp);
     }
 

@@ -9,4 +9,6 @@ use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 interface IsSupportedInterface
 {
     public function repository(RepositoryIdentifier $repositoryIdentifier): bool;
+
+    public function channel($channelIdentifier): bool;
 }

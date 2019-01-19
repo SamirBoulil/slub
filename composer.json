@@ -16,7 +16,8 @@
   "require-dev": {
     "behat/behat": "^3.5",
     "phpunit/phpunit": "^7.5",
-    "friendsofphp/php-cs-fixer": "^2.14"
+    "friendsofphp/php-cs-fixer": "^2.14",
+    "phpstan/phpstan": "^0.11.0"
   },
   "autoload": {
     "psr-4": {

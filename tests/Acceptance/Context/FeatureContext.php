@@ -3,7 +3,6 @@
 namespace Tests\Acceptance\Context;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
@@ -14,6 +13,9 @@ use Slub\Infrastructure\Common\SlubApplicationContainer;
 
 class FeatureContext implements Context
 {
+    /** @var string */
+    private $currentRepository;
+
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
@@ -22,9 +24,10 @@ class FeatureContext implements Context
 
     public function __construct()
     {
-        $slub = new SlubApplicationContainer();
+        $slub = SlubApplicationContainer::buildForTest();
         $this->putPRToReviewHandler = $slub->get(PutPRToReviewHandler::class);
         $this->prRepository = $slub->get(PRRepositoryInterface::class);
+        $this->currentRepository = '';
     }
 
     /**
@@ -32,17 +35,29 @@ class FeatureContext implements Context
      */
     public function anAuthorPutsAPRToReview()
     {
-        $pr = new PutPRToReview('akeneo/pim-community-dev', '1111');
-        $this->putPRToReviewHandler->handle($pr);
+        $this->currentRepository ='akeneo/pim-community-dev';
+        $putToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
+        $this->putPRToReviewHandler->handle($putToReview);
     }
 
     /**
-     * @When /^an author puts a PR belonging to an unsupported repository  to review$/
+     * @When /^an author puts a PR belonging to an unsupported repository to review$/
      */
     public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
     {
-        $pr = new PutPRToReview('akeneo/pim-community-dev', '1111');
-        $this->putPRToReviewHandler->handle($pr);
+        $this->currentRepository ='unknown/unknown';
+        $putToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
+        $this->putPRToReviewHandler->handle($putToReview);
+    }
+
+    /**
+     * @When /^an author puts a PR to review on an unsupported channel$/
+     */
+    public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel()
+    {
+        $this->currentRepository = 'akeneo/pim-community-dev';
+        $putToReview = new PutPRToReview('unsupported-channel', $this->currentRepository, '1111');
+        $this->putPRToReviewHandler->handle($putToReview);
     }
 
     /**
@@ -50,7 +65,7 @@ class FeatureContext implements Context
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        Assert::assertTrue($this->prExists('akeneo/pim-community-dev', '1111'));
+        Assert::assertTrue($this->prExists($this->currentRepository, '1111'));
     }
 
     /**
@@ -58,7 +73,7 @@ class FeatureContext implements Context
      */
     public function thePRIsNotAddedToTheListOfFollowedPRs()
     {
-        Assert::assertFalse($this->prExists('akeneo/unknown', '1111'));
+        Assert::assertFalse($this->prExists($this->currentRepository, '1111'));
     }
 
     private function prExists(string $repository, string $externalId): bool

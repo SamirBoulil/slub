@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit\Domain\Entity\Channel;
+
+use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
+
+class ChannelTest extends TestCase
+{
+    /**
+     * @test
+     */
+    public function it_creates_an_identifier_from_its_string_value()
+    {
+        $identifier = ChannelIdentifier::fromString('squad-raccoons');
+        $this->assertEquals('squad-raccoons', $identifier->stringValue());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_if_it_is_equal_to_another_identifier()
+    {
+        $identifier = ChannelIdentifier::fromString('squad-raccoons');
+        $anotherIdentifier = ChannelIdentifier::fromString('unknown/unknown/unknown');
+        $this->assertTrue($identifier->equals($identifier));
+        $this->assertFalse($identifier->equals($anotherIdentifier));
+    }
+}

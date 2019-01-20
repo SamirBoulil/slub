@@ -16,6 +16,8 @@
             <directory>src/Slub/Domain</directory>
             <directory>src/Slub/Infrastructure</directory>
             <exclude>
+                <directory suffix="Interface.php">src/Slub/Domain</directory>
+                <directory suffix="Interface.php">src/Slub/Infrastructure</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>

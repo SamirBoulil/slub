@@ -5,16 +5,3 @@ default:
                 - "%paths.base%/tests/Acceptance/features"
             contexts:
                 - Tests\Acceptance\Context\FeatureContext
-    extensions:
-        LeanPHP\Behat\CodeCoverage\Extension:
-            drivers:
-                - local
-            filter:
-                whitelist:
-                    include:
-                        directories:
-                            "src/Slub/Application": ~
-            report:
-                format: html
-                options:
-                    target: build/behat-coverage

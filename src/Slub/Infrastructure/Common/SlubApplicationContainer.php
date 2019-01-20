@@ -106,6 +106,7 @@ class SlubApplicationContainer implements ContainerInterface
         if (self::PROD_ENV === $env) {
             $repositoryFilePath = $this->getPersistencePath($containerBuilder) . '/pr_repository.json';
         }
+
         if (self::TEST_ENV === $env) {
             $repositoryFilePath = tempnam('', 'slub');
             if (false === $repositoryFilePath) {

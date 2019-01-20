@@ -19,10 +19,10 @@ class PutPRToReview
     /** @var string  */
     public $channel;
 
-    public function __construct(string $channel, string $repository, string $pullRequest)
+    public function __construct(string $channel, string $repository, string $prIdentifier)
     {
         $this->repository = $repository;
-        $this->prIdentifier = $pullRequest;
+        $this->prIdentifier = $prIdentifier;
         $this->channel = $channel;
     }
 }

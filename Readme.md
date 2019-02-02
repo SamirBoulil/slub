@@ -10,3 +10,6 @@ Botman: https://github.com/botman/botman
 # Todo:
 - Remove interfaces from test coverage in phpunit
 - Add test coverage 100% ?
+
+# Later
+- get notified who GTMed a PR

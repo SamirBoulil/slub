@@ -4,4 +4,5 @@ default:
             paths:
                 - "%paths.base%/tests/Acceptance/features"
             contexts:
-                - Tests\Acceptance\Context\FeatureContext
+                - Tests\Acceptance\Context\PutPRToReviewContext
+                - Tests\Acceptance\Context\GTMPRContext

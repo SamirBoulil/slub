@@ -22,7 +22,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
     public function save(PR $pr): void
     {
         $allPRs = $this->all();
-        $allPRs[] = $pr;
+        $allPRs[$pr->identifier()->stringValue()] = $pr;
         $this->saveAll($allPRs);
     }
 
@@ -59,12 +59,13 @@ class FileBasedPRRepository implements PRRepositoryInterface
      */
     private function denormalizePRs(array $normalizedPRs): array
     {
-        return array_map(
-            function (array $normalizedPR) {
-                return PR::fromNormalized($normalizedPR);
-            },
-            $normalizedPRs
-        );
+        $result = [];
+        foreach ($normalizedPRs as $normalizedPR) {
+            $PR = PR::fromNormalized($normalizedPR);
+            $result[$PR->identifier()->stringValue()] = $PR;
+        }
+
+        return $result;
     }
 
     /**
@@ -83,12 +84,12 @@ class FileBasedPRRepository implements PRRepositoryInterface
      */
     private function normalizePRs(array $prs): array
     {
-        return array_map(
-            function (PR $pr) {
-                return $pr->normalize();
-            },
-            $prs
-        );
+        $result = [];
+        foreach ($prs as $pr) {
+            $result[$pr->identifier()->stringValue()] = $pr->normalize();
+        }
+
+        return $result;
     }
 
     private function readFile(): array

@@ -11,7 +11,7 @@ use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Common\SlubApplicationContainer;
 
-class FeatureContext implements Context
+class PutPRToReviewContext implements Context
 {
     /** @var string */
     private $currentRepository;

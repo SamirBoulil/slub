@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Common;
 
 use Psr\Container\ContainerInterface;
+use Slub\Application\GTMPR\GTMPRHandler;
+use Slub\Application\GTMPR\PRGTMedNotifyMany;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
+use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -67,6 +70,26 @@ class SlubApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(IsSupportedInterface::class))
             ->setPublic(true);
 
+        $containerBuilder->register(GTMPRHandler::class, GTMPRHandler::class)
+            ->addArgument(new Reference(PRRepositoryInterface::class))
+            ->addArgument(new Reference(IsSupportedInterface::class))
+            ->addArgument(new Reference(PRGTMedNotifyMany::class))
+            ->setPublic(true);
+
+        /** Subscribers */
+        $PRGTMedSubscribers = [];
+        if (self::TEST_ENV === $env) {
+            $containerBuilder->register(PRGTMedSubscriberSpy::class, PRGTMedSubscriberSpy::class)
+                ->setPublic(true);
+            $PRGTMedSubscribers[] = new Reference(PRGTMedSubscriberSpy::class);
+        }
+        if (self::PROD_ENV === $env) {
+        }
+
+        $containerBuilder->register(PRGTMedNotifyMany::class, PRGTMedNotifyMany::class)
+            ->addArgument($PRGTMedSubscribers)
+            ->setPublic(true);
+
         /**
          * Persistence
          */
@@ -113,7 +136,6 @@ class SlubApplicationContainer implements ContainerInterface
                 throw new \Exception('Impossible to create temporary file');
             }
         }
-
 
         return $repositoryFilePath;
     }

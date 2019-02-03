@@ -20,13 +20,13 @@ class PutPRToReviewContext implements Context
     private $putPRToReviewHandler;
 
     /** @var PRRepositoryInterface */
-    private $prRepository;
+    private $PRRepository;
 
     public function __construct()
     {
         $slub = SlubApplicationContainer::buildForTest();
         $this->putPRToReviewHandler = $slub->get(PutPRToReviewHandler::class);
-        $this->prRepository = $slub->get(PRRepositoryInterface::class);
+        $this->PRRepository = $slub->get(PRRepositoryInterface::class);
         $this->currentRepository = '';
     }
 
@@ -46,8 +46,8 @@ class PutPRToReviewContext implements Context
     public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
     {
         $this->currentRepository ='unknown/unknown';
-        $putToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
-        $this->putPRToReviewHandler->handle($putToReview);
+        $putPRToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
+        $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
@@ -56,8 +56,8 @@ class PutPRToReviewContext implements Context
     public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel()
     {
         $this->currentRepository = 'akeneo/pim-community-dev';
-        $putToReview = new PutPRToReview('unsupported-channel', $this->currentRepository, '1111');
-        $this->putPRToReviewHandler->handle($putToReview);
+        $putPRToReview = new PutPRToReview('unsupported-channel', $this->currentRepository, '1111');
+        $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
@@ -65,7 +65,7 @@ class PutPRToReviewContext implements Context
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        Assert::assertTrue($this->prExists($this->currentRepository, '1111'));
+        Assert::assertTrue($this->PRExists($this->currentRepository, '1111'));
     }
 
     /**
@@ -73,14 +73,14 @@ class PutPRToReviewContext implements Context
      */
     public function thePRIsNotAddedToTheListOfFollowedPRs()
     {
-        Assert::assertFalse($this->prExists($this->currentRepository, '1111'));
+        Assert::assertFalse($this->PRExists($this->currentRepository, '1111'));
     }
 
-    private function prExists(string $repository, string $externalId): bool
+    private function PRExists(string $repository, string $externalId): bool
     {
         $found = true;
         try {
-            $this->prRepository->getBy(PRIdentifier::create($repository, $externalId));
+            $this->PRRepository->getBy(PRIdentifier::create($repository, $externalId));
         } catch (PRNotFoundException $notFoundException) {
             $found = false;
         }

@@ -13,6 +13,7 @@ class InMemoryIsSupported implements IsSupportedInterface
 {
     /** @var array */
     private $supportedRepositories;
+
     /** @var array */
     private $supportedChannels;
 

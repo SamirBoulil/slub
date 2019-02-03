@@ -12,20 +12,20 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 class PRGTMed
 {
     /** @var PRIdentifier */
-    private $identifier;
+    private $PRIdentifier;
 
-    private function __construct(PRIdentifier $identifier)
+    private function __construct(PRIdentifier $PRIdentifier)
     {
-        $this->identifier = $identifier;
+        $this->PRIdentifier = $PRIdentifier;
     }
 
-    public static function withIdentifier(PRIdentifier $identifier): self
+    public static function withIdentifier(PRIdentifier $PRIdentifier): self
     {
-        return new self($identifier);
+        return new self($PRIdentifier);
     }
 
-    public function identifier(): PRIdentifier
+    public function PRIdentifier(): PRIdentifier
     {
-        return $this->identifier;
+        return $this->PRIdentifier;
     }
 }

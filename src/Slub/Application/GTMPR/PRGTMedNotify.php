@@ -7,5 +7,5 @@ use Slub\Domain\Event\PRGTMed;
 
 interface PRGTMedNotify
 {
-    public function PRGTMed(PRGTMed $PRGTMed): void;
+    public function notifyPRGTMed(PRGTMed $PRGTMed): void;
 }

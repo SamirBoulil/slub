@@ -68,6 +68,6 @@ class PRTest extends TestCase
 
         $pr = PR::create($identifier);
 
-        $this->assertTrue($pr->identifier()->equals($identifier));
+        $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
 }

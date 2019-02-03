@@ -11,18 +11,18 @@ class PutPRToReview
     use Immutable;
 
     /** @var string */
-    public $repository;
+    public $repositoryIdentifier;
 
     /** @var string */
-    public $prIdentifier;
+    public $PRIdentifier;
 
     /** @var string  */
-    public $channel;
+    public $channelIdentifier;
 
-    public function __construct(string $channel, string $repository, string $prIdentifier)
+    public function __construct(string $channelIdentifier, string $repositoryIdentifier, string $PRIdentifier)
     {
-        $this->repository = $repository;
-        $this->prIdentifier = $prIdentifier;
-        $this->channel = $channel;
+        $this->repositoryIdentifier = $repositoryIdentifier;
+        $this->PRIdentifier = $PRIdentifier;
+        $this->channelIdentifier = $channelIdentifier;
     }
 }

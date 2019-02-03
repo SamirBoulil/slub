@@ -12,7 +12,7 @@ use Tests\Integration\Infrastructure\Persistence\FileBased\PersistenceTestCase;
 
 class FileBasedPRRepositoryTest extends PersistenceTestCase
 {
-    /** @var \Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository */
+    /** @var FileBasedPRRepository */
     private $fileBasedPRRepository;
 
     public function setUp(): void
@@ -37,9 +37,25 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
 
     /**
      * @test
+     * @throws PRNotFoundException
      */
     public function it_throws_if_it_does_not_find_the_pr()
     {
+        $this->expectException(PRNotFoundException::class);
+        $this->fileBasedPRRepository->getBy(PRIdentifier::fromString('unknown/unknown/unknown'));
+    }
+
+    /**
+     * @test
+     * @throws PRNotFoundException
+     */
+    public function it_resets_itself()
+    {
+        $identifier = PRIdentifier::create('pim-community-dev', '1111');
+        $savedPR = PR::create($identifier);
+        $this->fileBasedPRRepository->save($savedPR);
+        $this->fileBasedPRRepository->resetFile();
+
         $this->expectException(PRNotFoundException::class);
         $this->fileBasedPRRepository->getBy(PRIdentifier::fromString('unknown/unknown/unknown'));
     }

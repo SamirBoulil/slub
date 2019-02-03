@@ -7,11 +7,11 @@ namespace Slub\Domain\Entity\PR;
 class PRIdentifier
 {
     /** @var string */
-    private $identifier;
+    private $PRIdentifier;
 
-    public function __construct(string $identifier)
+    private function __construct(string $PRIdentifier)
     {
-        $this->identifier = $identifier;
+        $this->PRIdentifier = $PRIdentifier;
     }
 
     public static function create(string $repository, string $externalIdentifier): self
@@ -28,11 +28,11 @@ class PRIdentifier
 
     public function stringValue(): string
     {
-        return $this->identifier;
+        return $this->PRIdentifier;
     }
 
     public function equals(PRIdentifier $identifier): bool
     {
-        return $identifier->identifier === $this->identifier;
+        return $identifier->PRIdentifier === $this->PRIdentifier;
     }
 }

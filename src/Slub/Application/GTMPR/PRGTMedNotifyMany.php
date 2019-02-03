@@ -21,11 +21,11 @@ class PRGTMedNotifyMany implements PRGTMedNotify
         $this->subscribers = $subscribers;
     }
 
-    public function PRGTMed(PRGTMed $PRGTMed):void
+    public function notifyPRGTMed(PRGTMed $PRGTMed):void
     {
         array_map(
             function (PRGTMedNotify $subscriber) use ($PRGTMed) {
-                $subscriber->PRGTMed($PRGTMed);
+                $subscriber->notifyPRGTMed($PRGTMed);
             },
             $this->subscribers
         );

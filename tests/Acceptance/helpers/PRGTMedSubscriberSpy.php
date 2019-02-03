@@ -15,7 +15,7 @@ class PRGTMedSubscriberSpy implements PRGTMedNotify
     /** @var bool */
     private $hasBeenCalled = false;
 
-    public function PRGTMed(PRGTMed $PRGTMed): void
+    public function notifyPRGTMed(PRGTMed $PRGTMed): void
     {
         $this->hasBeenCalled = true;
     }

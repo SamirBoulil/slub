@@ -15,8 +15,8 @@ class GTMPR
     use Immutable;
 
     /** @var string */
-    public $repository;
+    public $repositoryIdentifier;
 
     /** @var string */
-    public $prIdentifier;
+    public $PRIdentifier;
 }

@@ -9,24 +9,23 @@ use Webmozart\Assert\Assert;
 class PR
 {
     private const IDENTIFIER_KEY = 'identifier';
+    private const GTM_KEY = 'GTM';
 
     /** @var PRIdentifier */
-    private $identifier;
-
-    const GTM_KEY = 'GTM';
+    private $PRIdentifier;
 
     /** @var int */
     private $GTMCount;
 
-    private function __construct(PRIdentifier $identifier, int $GTMCount)
+    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount)
     {
-        $this->identifier = $identifier;
+        $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
     }
 
-    public static function create(PRIdentifier $identifier): self
+    public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($identifier, 0);
+        return new self($PRIdentifier, 0);
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -39,15 +38,15 @@ class PR
         return new self($identifier, $GTM);
     }
 
-    public function identifier(): PRIdentifier
+    public function PRIdentifier(): PRIdentifier
     {
-        return $this->identifier;
+        return $this->PRIdentifier;
     }
 
     public function normalize(): array
     {
         return [
-            self::IDENTIFIER_KEY => $this->identifier()->stringValue(),
+            self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
         ];
     }

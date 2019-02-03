@@ -15,7 +15,7 @@ class PRNotFoundExceptionTest extends TestCase
      */
     public function it_is_able_to_create_itself_with_an_error_message()
     {
-        $identifier = PRIdentifier::create('akeneo/pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
         $exception = PRNotFoundException::create($identifier);
 

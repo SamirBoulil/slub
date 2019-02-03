@@ -12,7 +12,7 @@ use Tests\Integration\Infrastructure\Persistence\FileBased\PersistenceTestCase;
 
 class FileBasedPRRepositoryTest extends PersistenceTestCase
 {
-    /** @var \Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository */
+    /** @var FileBasedPRRepository */
     private $fileBasedPRRepository;
 
     public function setUp(): void
@@ -26,7 +26,7 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
      */
     public function it_saves_a_pr_and_returns_it()
     {
-        $identifier = PRIdentifier::create('pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create($identifier);
 
         $this->fileBasedPRRepository->save($savedPR);
@@ -37,10 +37,25 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
 
     /**
      * @test
+     * @throws PRNotFoundException
      */
     public function it_throws_if_it_does_not_find_the_pr()
     {
         $this->expectException(PRNotFoundException::class);
         $this->fileBasedPRRepository->getBy(PRIdentifier::fromString('unknown/unknown/unknown'));
+    }
+
+    /**
+     * @test
+     * @throws PRNotFoundException
+     */
+    public function it_resets_itself()
+    {
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $this->fileBasedPRRepository->save(PR::create($identifier));
+        $this->fileBasedPRRepository->resetFile();
+
+        $this->expectException(PRNotFoundException::class);
+        $this->fileBasedPRRepository->getBy($identifier);
     }
 }

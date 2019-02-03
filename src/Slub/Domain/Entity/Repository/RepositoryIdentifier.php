@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\Repository;
 
+use Webmozart\Assert\Assert;
+
 class RepositoryIdentifier
 {
     /** @var string */
-    private $identifier;
+    private $repositoryIdentifier;
 
-    private function __construct(string $identifier)
+    private function __construct(string $repositoryIdentifier)
     {
-        $this->identifier = $identifier;
+        Assert::notEmpty($repositoryIdentifier);
+        $this->repositoryIdentifier = $repositoryIdentifier;
     }
 
-    public static function fromString(string $identifier): self
+    public static function fromString(string $repositoryIdentifier): self
     {
-        return new self($identifier);
+        return new self($repositoryIdentifier);
     }
 
     public function equals(RepositoryIdentifier $repositoryIdentifier): bool
     {
-        return $this->identifier === $repositoryIdentifier->identifier;
+        return $this->repositoryIdentifier === $repositoryIdentifier->repositoryIdentifier;
     }
 }

@@ -16,7 +16,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 class GTMPRHandler
 {
     /** @var PRRepositoryInterface */
-    private $prRepository;
+    private $PRRepository;
 
     /** @var IsSupportedInterface */
     private $isSupported;
@@ -25,20 +25,20 @@ class GTMPRHandler
     private $PRGTMedNotifyMany;
 
     public function __construct(
-        PRRepositoryInterface $prRepository,
-        IsSupportedInterface $isRepositorySupported,
+        PRRepositoryInterface $PRRepository,
+        IsSupportedInterface $isSupported,
         PRGTMedNotifyMany $PRGTMedNotifyMany
     ) {
-        $this->prRepository = $prRepository;
-        $this->isSupported = $isRepositorySupported;
+        $this->PRRepository = $PRRepository;
+        $this->isSupported = $isSupported;
         $this->PRGTMedNotifyMany = $PRGTMedNotifyMany;
     }
 
     public function handle(GTMPR $command)
     {
-        $pr = $this->prRepository->getBy(PRIdentifier::create($command->repository, $command->prIdentifier));
-        $pr->GTM();
-        $this->prRepository->save($pr);
-        $this->PRGTMedNotifyMany->PRGTMed(PRGTMed::withIdentifier($pr->identifier()));
+        $PR = $this->PRRepository->getBy(PRIdentifier::create($command->PRIdentifier));
+        $PR->GTM();
+        $this->PRRepository->save($PR);
+        $this->PRGTMedNotifyMany->notifyPRGTMed(PRGTMed::withIdentifier($PR->PRIdentifier()));
     }
 }

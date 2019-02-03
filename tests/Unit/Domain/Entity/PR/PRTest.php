@@ -15,7 +15,7 @@ class PRTest extends TestCase
      */
     public function it_creates_a_PR()
     {
-        $identifier = PRIdentifier::create('pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
         $pr = PR::create($identifier);
 
@@ -39,7 +39,7 @@ class PRTest extends TestCase
      */
     public function it_can_be_GTM_multiple_times()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev', '1111'));
+        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
         $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0], $pr->normalize());
 
         $pr->GTM();
@@ -54,7 +54,7 @@ class PRTest extends TestCase
      */
     public function it_normalizes_itself()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev', '1111'));
+        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
 
         $this->assertSame(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0], $pr->normalize());
     }
@@ -64,10 +64,10 @@ class PRTest extends TestCase
      */
     public function it_returns_its_identifier()
     {
-        $identifier = PRIdentifier::create('pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
         $pr = PR::create($identifier);
 
-        $this->assertTrue($pr->identifier()->equals($identifier));
+        $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
 }

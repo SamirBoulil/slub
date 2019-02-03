@@ -4,28 +4,31 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\Channel;
 
+use Webmozart\Assert\Assert;
+
 class ChannelIdentifier
 {
     /** @var string */
-    private $identifier;
+    private $channelIdentifier;
 
-    public function __construct(string $identifier)
+    private function __construct(string $channelIdentifier)
     {
-        $this->identifier = $identifier;
+        Assert::notEmpty($channelIdentifier);
+        $this->channelIdentifier = $channelIdentifier;
     }
 
-    public static function fromString(string $identifier): self
+    public static function fromString(string $channelIdentifier): self
     {
-        return new self($identifier);
+        return new self($channelIdentifier);
     }
 
     public function stringValue(): string
     {
-        return $this->identifier;
+        return $this->channelIdentifier;
     }
 
     public function equals(ChannelIdentifier $identifier): bool
     {
-        return $identifier->identifier === $this->identifier;
+        return $identifier->channelIdentifier === $this->channelIdentifier;
     }
 }

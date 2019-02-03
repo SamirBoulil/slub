@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Webmozart\Assert\Assert;
+
 class PRIdentifier
 {
     /** @var string */
-    private $identifier;
+    private $PRIdentifier;
 
-    public function __construct(string $identifier)
+    private function __construct(string $PRIdentifier)
     {
-        $this->identifier = $identifier;
+        Assert::notEmpty($PRIdentifier);
+        $this->PRIdentifier = $PRIdentifier;
     }
 
-    public static function create(string $repository, string $externalIdentifier): self
+    public static function create(string $PRIdentifier): self
     {
-        $identifier = sprintf('%s/%s', $repository, $externalIdentifier);
-
-        return new self($identifier);
+        return new self($PRIdentifier);
     }
 
     public static function fromString(string $identifier): self
@@ -28,11 +29,11 @@ class PRIdentifier
 
     public function stringValue(): string
     {
-        return $this->identifier;
+        return $this->PRIdentifier;
     }
 
     public function equals(PRIdentifier $identifier): bool
     {
-        return $identifier->identifier === $this->identifier;
+        return $identifier->PRIdentifier === $this->PRIdentifier;
     }
 }

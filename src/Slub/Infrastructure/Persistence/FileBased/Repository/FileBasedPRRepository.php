@@ -22,23 +22,23 @@ class FileBasedPRRepository implements PRRepositoryInterface
     public function save(PR $pr): void
     {
         $allPRs = $this->all();
-        $allPRs[$pr->identifier()->stringValue()] = $pr;
+        $allPRs[$pr->PRIdentifier()->stringValue()] = $pr;
         $this->saveAll($allPRs);
     }
 
-    public function getBy(PRIdentifier $identifier): PR
+    public function getBy(PRIdentifier $PRidentifier): PR
     {
         $allPRs = $this->all();
-        $result = $this->findPR($identifier, $allPRs);
+        $result = $this->findPR($PRidentifier, $allPRs);
 
         if (null === $result) {
-            throw PRNotFoundException::create($identifier);
+            throw PRNotFoundException::create($PRidentifier);
         }
 
         return $result;
     }
 
-    public function resetFiles(): void
+    public function resetFile(): void
     {
         unlink($this->filePath);
     }
@@ -62,7 +62,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
         $result = [];
         foreach ($normalizedPRs as $normalizedPR) {
             $PR = PR::fromNormalized($normalizedPR);
-            $result[$PR->identifier()->stringValue()] = $PR;
+            $result[$PR->PRIdentifier()->stringValue()] = $PR;
         }
 
         return $result;
@@ -86,7 +86,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
     {
         $result = [];
         foreach ($prs as $pr) {
-            $result[$pr->identifier()->stringValue()] = $pr->normalize();
+            $result[$pr->PRIdentifier()->stringValue()] = $pr->normalize();
         }
 
         return $result;
@@ -133,7 +133,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
             array_filter(
                 $allPRs,
                 function (PR $pr) use ($identifier) {
-                    return $pr->identifier()->equals($identifier);
+                    return $pr->PRIdentifier()->equals($identifier);
                 }
             )
         );

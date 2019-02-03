@@ -13,21 +13,25 @@ use Slub\Infrastructure\Common\SlubApplicationContainer;
 
 class PutPRToReviewContext implements Context
 {
-    /** @var string */
-    private $currentRepository;
-
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
     /** @var PRRepositoryInterface */
-    private $prRepository;
+    private $PRRepository;
+
+    /** @var string */
+    private $currentPRIdentifier;
+
+    /** @var string */
+    private $currentRepositoryIdentifier;
 
     public function __construct()
     {
         $slub = SlubApplicationContainer::buildForTest();
         $this->putPRToReviewHandler = $slub->get(PutPRToReviewHandler::class);
-        $this->prRepository = $slub->get(PRRepositoryInterface::class);
-        $this->currentRepository = '';
+        $this->PRRepository = $slub->get(PRRepositoryInterface::class);
+        $this->currentRepositoryIdentifier = '';
+        $this->currentPRIdentifier = '';
     }
 
     /**
@@ -35,9 +39,12 @@ class PutPRToReviewContext implements Context
      */
     public function anAuthorPutsAPRToReview()
     {
-        $this->currentRepository ='akeneo/pim-community-dev';
-        $putToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
-        $this->putPRToReviewHandler->handle($putToReview);
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'akeneo/pim-community-dev',
+            'akeneo/pim-community-dev/1111',
+            'squad-raccoons'
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
@@ -45,9 +52,12 @@ class PutPRToReviewContext implements Context
      */
     public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
     {
-        $this->currentRepository ='unknown/unknown';
-        $putToReview = new PutPRToReview('squad-raccoons', $this->currentRepository, '1111');
-        $this->putPRToReviewHandler->handle($putToReview);
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'unknown/unknown',
+            'unknown/unknown/1111',
+            'squad-raccoons'
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
@@ -55,9 +65,12 @@ class PutPRToReviewContext implements Context
      */
     public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel()
     {
-        $this->currentRepository = 'akeneo/pim-community-dev';
-        $putToReview = new PutPRToReview('unsupported-channel', $this->currentRepository, '1111');
-        $this->putPRToReviewHandler->handle($putToReview);
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'akeneo/pim-community-dev',
+            'akeneo/pim-community-dev/1111',
+            'unsupported-channel'
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
@@ -65,7 +78,7 @@ class PutPRToReviewContext implements Context
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        Assert::assertTrue($this->prExists($this->currentRepository, '1111'));
+        Assert::assertTrue($this->PRExists($this->currentPRIdentifier));
     }
 
     /**
@@ -73,18 +86,34 @@ class PutPRToReviewContext implements Context
      */
     public function thePRIsNotAddedToTheListOfFollowedPRs()
     {
-        Assert::assertFalse($this->prExists($this->currentRepository, '1111'));
+        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
     }
 
-    private function prExists(string $repository, string $externalId): bool
+    private function PRExists(string $PRIdentifier): bool
     {
         $found = true;
         try {
-            $this->prRepository->getBy(PRIdentifier::create($repository, $externalId));
+            $this->PRRepository->getBy(PRIdentifier::create($PRIdentifier));
         } catch (PRNotFoundException $notFoundException) {
             $found = false;
         }
 
         return $found;
+    }
+
+    private function createPutPRToReviewCommand(
+        string $repositoryIdentifier,
+        string $PRIdentifier,
+        string $channelIdentifier
+    ): PutPRToReview {
+        $this->currentRepositoryIdentifier = $repositoryIdentifier;
+        $this->currentPRIdentifier = $PRIdentifier;
+        $putPRToReview = new PutPRToReview(
+            $channelIdentifier,
+            $this->currentRepositoryIdentifier,
+            $this->currentPRIdentifier
+        );
+
+        return $putPRToReview;
     }
 }

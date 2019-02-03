@@ -14,14 +14,14 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 class PutPRToReviewHandler
 {
     /** @var PRRepositoryInterface */
-    private $prRepository;
+    private $PRRepository;
 
     /** @var IsSupportedInterface */
     private $isSupported;
 
-    public function __construct(PRRepositoryInterface $prRepository, IsSupportedInterface $isRepositorySupported)
+    public function __construct(PRRepositoryInterface $PRRepository, IsSupportedInterface $isRepositorySupported)
     {
-        $this->prRepository = $prRepository;
+        $this->PRRepository = $PRRepository;
         $this->isSupported = $isRepositorySupported;
     }
 
@@ -33,10 +33,10 @@ class PutPRToReviewHandler
         $this->createPr($command);
     }
 
-    private function isUnsupported(PutPRToReview $command):bool
+    private function isUnsupported(PutPRToReview $putPRToReview):bool
     {
-        $repositoryIdentifier = RepositoryIdentifier::fromString($command->repository);
-        $channelIdentifier = ChannelIdentifier::fromString($command->channel);
+        $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
+        $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
 
         return !$this->isSupported->repository($repositoryIdentifier)
             || !$this->isSupported->channel($channelIdentifier);
@@ -44,9 +44,8 @@ class PutPRToReviewHandler
 
     private function createPr(PutPRToReview $putPRToReview): void
     {
-        $pr = PR::create(
-            PRIdentifier::create($putPRToReview->repository, $putPRToReview->prIdentifier)
+        $this->PRRepository->save(
+            PR::create(PRIdentifier::create($putPRToReview->PRIdentifier))
         );
-        $this->prRepository->save($pr);
     }
 }

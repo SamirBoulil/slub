@@ -28,4 +28,13 @@ class ChannelIdentifierTest extends TestCase
         $this->assertTrue($identifier->equals($identifier));
         $this->assertFalse($identifier->equals($anotherIdentifier));
     }
+
+    /**
+     * @test
+     */
+    public function it_cannot_be_created_out_of_an_empty_string()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        ChannelIdentifier::fromString('');
+    }
 }

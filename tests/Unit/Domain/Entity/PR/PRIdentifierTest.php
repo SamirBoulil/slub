@@ -14,7 +14,7 @@ class PRIdentifierTest extends TestCase
      */
     public function it_creates_an_identifier()
     {
-        $identifier = PRIdentifier::create('akeneo/pim-community-dev', '1111');
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $this->assertEquals('akeneo/pim-community-dev/1111', $identifier->stringValue());
     }
 
@@ -45,5 +45,14 @@ class PRIdentifierTest extends TestCase
         $anotherIdentifier = PRIdentifier::fromString('unknown/unknown/unknown');
         $this->assertTrue($identifier->equals($identifier));
         $this->assertFalse($identifier->equals($anotherIdentifier));
+    }
+
+    /**
+     * @test
+     */
+    public function it_cannot_be_created_out_of_an_empty_string()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        PRIdentifier::fromString('');
     }
 }

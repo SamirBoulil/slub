@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Webmozart\Assert\Assert;
+
 class PRIdentifier
 {
     /** @var string */
@@ -11,6 +13,7 @@ class PRIdentifier
 
     private function __construct(string $PRIdentifier)
     {
+        Assert::notEmpty($PRIdentifier);
         $this->PRIdentifier = $PRIdentifier;
     }
 

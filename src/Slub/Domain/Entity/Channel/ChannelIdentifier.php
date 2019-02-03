@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\Channel;
 
+use Webmozart\Assert\Assert;
+
 class ChannelIdentifier
 {
     /** @var string */
@@ -11,6 +13,7 @@ class ChannelIdentifier
 
     private function __construct(string $channelIdentifier)
     {
+        Assert::notEmpty($channelIdentifier);
         $this->channelIdentifier = $channelIdentifier;
     }
 

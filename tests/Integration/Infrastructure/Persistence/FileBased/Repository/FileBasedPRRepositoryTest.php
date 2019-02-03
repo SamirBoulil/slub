@@ -52,11 +52,10 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
     public function it_resets_itself()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $savedPR = PR::create($identifier);
-        $this->fileBasedPRRepository->save($savedPR);
+        $this->fileBasedPRRepository->save(PR::create($identifier));
         $this->fileBasedPRRepository->resetFile();
 
         $this->expectException(PRNotFoundException::class);
-        $this->fileBasedPRRepository->getBy(PRIdentifier::fromString('unknown/unknown/unknown'));
+        $this->fileBasedPRRepository->getBy($identifier);
     }
 }

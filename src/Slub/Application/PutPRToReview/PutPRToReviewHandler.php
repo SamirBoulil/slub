@@ -45,7 +45,7 @@ class PutPRToReviewHandler
     private function createPr(PutPRToReview $putPRToReview): void
     {
         $this->PRRepository->save(
-            PR::create(PRIdentifier::create($putPRToReview->repositoryIdentifier, $putPRToReview->PRIdentifier))
+            PR::create(PRIdentifier::create($putPRToReview->PRIdentifier))
         );
     }
 }

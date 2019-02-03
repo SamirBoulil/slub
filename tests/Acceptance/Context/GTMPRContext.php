@@ -39,7 +39,7 @@ class GTMPRContext implements Context
      */
     public function aPullRequestInReview()
     {
-        $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev', '1010');
+        $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->PRRepository->save(PR::create($this->currentPRIdentifier));
     }
 
@@ -50,7 +50,7 @@ class GTMPRContext implements Context
     {
         $command = new GTMPR();
         $command->repositoryIdentifier = 'akeneo/pim-community-dev';
-        $command->PRIdentifier = '1010';
+        $command->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $this->GTMPRHandler->handle($command);
     }
 

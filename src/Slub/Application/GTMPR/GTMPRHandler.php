@@ -36,7 +36,7 @@ class GTMPRHandler
 
     public function handle(GTMPR $command)
     {
-        $PR = $this->PRRepository->getBy(PRIdentifier::create($command->repositoryIdentifier, $command->PRIdentifier));
+        $PR = $this->PRRepository->getBy(PRIdentifier::create($command->PRIdentifier));
         $PR->GTM();
         $this->PRRepository->save($PR);
         $this->PRGTMedNotifyMany->notifyPRGTMed(PRGTMed::withIdentifier($PR->PRIdentifier()));

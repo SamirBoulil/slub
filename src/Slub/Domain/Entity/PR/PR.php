@@ -10,6 +10,7 @@ class PR
 {
     private const IDENTIFIER_KEY = 'identifier';
     private const GTM_KEY = 'GTM';
+    private const NOTGTM_KEY = 'NOT_GTM';
 
     /** @var PRIdentifier */
     private $PRIdentifier;
@@ -17,15 +18,19 @@ class PR
     /** @var int */
     private $GTMCount;
 
-    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount)
+    /** @var int */
+    private $notGTMCount;
+
+    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount)
     {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
+        $this->notGTMCount = $notGTMCount;
     }
 
     public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($PRIdentifier, 0);
+        return new self($PRIdentifier, 0, 0);
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -34,8 +39,9 @@ class PR
         $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         $GTM = $normalizedPR[self::GTM_KEY];
+        $NOTGTM = $normalizedPR[self::NOTGTM_KEY];
 
-        return new self($identifier, $GTM);
+        return new self($identifier, $GTM, $NOTGTM);
     }
 
     public function PRIdentifier(): PRIdentifier
@@ -48,11 +54,17 @@ class PR
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
+            self::NOTGTM_KEY     => $this->notGTMCount,
         ];
     }
 
     public function GTM(): void
     {
         $this->GTMCount++;
+    }
+
+    public function notGTM(): void
+    {
+        $this->notGTMCount++;
     }
 }

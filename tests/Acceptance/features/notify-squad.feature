@@ -4,12 +4,6 @@
 #  We want to be notified when pull request status changes
 #
 #  @nominal
-#  Scenario: Notify the squad when the pull request is GTMed
-#    Given a pull request put to review
-#    When the pull request is GTMed
-#    Then the squad should be notified that the pull request has one more GTM
-#
-#  @nominal
 #  Scenario: Notify the squad when the pull request is not GTMed
 #    Given a pull request put to review
 #    When the pull request NOT GTMED

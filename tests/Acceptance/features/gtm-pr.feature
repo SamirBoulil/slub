@@ -8,3 +8,9 @@ Feature: Improve the communication between the author of the PR and it's reviewe
     Given a pull request in review
     When the pull request is GTMed
     Then the squad should be notified that the pull request has one more GTM
+
+  @nominal
+  Scenario: Notify the squad when the pull request is not GTMed
+    Given a pull request in review
+    When the pull request is NOT GTMED
+    Then the squad should be notified that the pull request has one more NOT GTM

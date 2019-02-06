@@ -10,7 +10,7 @@ use ConvenientImmutability\Immutable;
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
  */
-class GTMPR
+class Review
 {
     use Immutable;
 
@@ -19,4 +19,7 @@ class GTMPR
 
     /** @var string */
     public $PRIdentifier;
+
+    /** @var bool */
+    public $isGTM;
 }

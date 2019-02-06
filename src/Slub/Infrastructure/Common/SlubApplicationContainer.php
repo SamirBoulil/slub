@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Common;
 
 use Psr\Container\ContainerInterface;
-use Slub\Application\GTMPR\GTMPRHandler;
 use Slub\Application\GTMPR\PRGTMedNotifyMany;
+use Slub\Application\GTMPR\PRNotGTMedNotifyMany;
+use Slub\Application\GTMPR\ReviewHandler;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
+use Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -70,10 +72,11 @@ class SlubApplicationContainer implements ContainerInterface
             ->addArgument(new Reference(IsSupportedInterface::class))
             ->setPublic(true);
 
-        $containerBuilder->register(GTMPRHandler::class, GTMPRHandler::class)
+        $containerBuilder->register(ReviewHandler::class, ReviewHandler::class)
             ->addArgument(new Reference(PRRepositoryInterface::class))
             ->addArgument(new Reference(IsSupportedInterface::class))
             ->addArgument(new Reference(PRGTMedNotifyMany::class))
+            ->addArgument(new Reference(PRNotGTMedNotifyMany::class))
             ->setPublic(true);
 
         /** Subscribers */
@@ -85,9 +88,20 @@ class SlubApplicationContainer implements ContainerInterface
         }
         if (self::PROD_ENV === $env) {
         }
-
         $containerBuilder->register(PRGTMedNotifyMany::class, PRGTMedNotifyMany::class)
             ->addArgument($PRGTMedSubscribers)
+            ->setPublic(true);
+
+        $PRNotGTMedSubscribers = [];
+        if (self::TEST_ENV === $env) {
+            $containerBuilder->register(PRNotGTMedSubscriberSpy::class, PRNotGTMedSubscriberSpy::class)
+                ->setPublic(true);
+            $PRNotGTMedSubscribers[] = new Reference(PRNotGTMedSubscriberSpy::class);
+        }
+        if (self::PROD_ENV === $env) {
+        }
+        $containerBuilder->register(PRNotGTMedNotifyMany::class, PRNotGTMedNotifyMany::class)
+            ->addArgument($PRNotGTMedSubscribers)
             ->setPublic(true);
 
         /**

@@ -55,7 +55,8 @@
   "scripts": {
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
-      "assets:install %PUBLIC_DIR%": "symfony-cmd"
+      "assets:install %PUBLIC_DIR%": "symfony-cmd",
+      "mkdir -p var/persistence/prod var/persistence/test": "script"
     },
     "post-install-cmd": [
       "@auto-scripts"

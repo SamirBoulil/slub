@@ -8,22 +8,28 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FileBasedPRRepository implements PRRepositoryInterface
 {
     /** @var string */
     private $filePath;
 
-    public function __construct(string $filePath)
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher, string $filePath)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->filePath = $filePath;
     }
 
-    public function save(PR $pr): void
+    public function save(PR $PR): void
     {
         $allPRs = $this->all();
-        $allPRs[$pr->PRIdentifier()->stringValue()] = $pr;
+        $allPRs[$PR->PRIdentifier()->stringValue()] = $PR;
         $this->saveAll($allPRs);
+        $this->dispatchEvents($PR);
     }
 
     /**
@@ -144,5 +150,12 @@ class FileBasedPRRepository implements PRRepositoryInterface
     {
         touch($this->filePath);
         unlink($this->filePath);
+    }
+
+    private function dispatchEvents(PR $PR): void
+    {
+        foreach ($PR->getEvents() as $event) {
+            $this->eventDispatcher->dispatch(get_class($event), $event);
+        }
     }
 }

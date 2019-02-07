@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRNotGTMed;
+use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
 class PR
@@ -11,6 +14,9 @@ class PR
     private const IDENTIFIER_KEY = 'identifier';
     private const GTM_KEY = 'GTM';
     private const NOTGTM_KEY = 'NOT_GTM';
+
+    /** @var Event[] */
+    private $events = [];
 
     /** @var PRIdentifier */
     private $PRIdentifier;
@@ -61,10 +67,20 @@ class PR
     public function GTM(): void
     {
         $this->GTMCount++;
+        $this->events[] = PRGTMed::withIdentifier($this->PRIdentifier);
     }
 
     public function notGTM(): void
     {
         $this->notGTMCount++;
+        $this->events[] = PRNotGTMed::withIdentifier($this->PRIdentifier);
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
     }
 }

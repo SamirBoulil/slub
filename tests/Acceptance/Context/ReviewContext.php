@@ -3,15 +3,15 @@
 namespace Tests\Acceptance\Context;
 
 use PHPUnit\Framework\Assert;
-use Slub\Application\GTMPR\Review;
-use Slub\Application\GTMPR\ReviewHandler;
+use Slub\Application\Review\Review;
+use Slub\Application\Review\ReviewHandler;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
 use Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy;
 
-class GTMPRContext extends FeatureContext
+class ReviewContext extends FeatureContext
 {
     /** @var ReviewHandler */
     private $ReviewHandler;

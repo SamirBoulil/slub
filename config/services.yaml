@@ -31,17 +31,17 @@ services:
             - "@slub.infrastructure.query.is_supported"
 
     slub.application.gtm_pr.gtm_pr_handler:
-        class: Slub\Application\GTMPR\ReviewHandler
+        class: Slub\Application\Review\ReviewHandler
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
-            - "@event_dispatcher"
 
     # Infrastructure
     # Persistence
     slub.infrastructure.persistence.pr_repository:
         class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
         arguments:
+            - "@event_dispatcher"
             - "%env(PERSISTENCE_PR_REPOSITORY_FILE_PATH)%"
 
     slub.infrastructure.query.is_supported:

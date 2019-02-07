@@ -9,7 +9,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 
 interface PRRepositoryInterface
 {
-    public function save(PR $pr): void;
+    public function save(PR $PR): void;
 
     /**
      * @throws PRNotFoundException

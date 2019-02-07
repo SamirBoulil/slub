@@ -7,7 +7,7 @@ default:
                 - Tests\Acceptance\Context\PutPRToReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.put_pr_to_review.put_pr_to_review_handler"
-                - Tests\Acceptance\Context\GTMPRContext:
+                - Tests\Acceptance\Context\ReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.gtm_pr.gtm_pr_handler"
                     - "@helpers.pr_gtmed_subscriber_spy"

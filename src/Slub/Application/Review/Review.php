@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\GTMPR;
+namespace Slub\Application\Review;
 
 use ConvenientImmutability\Immutable;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
- * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
  */
 class Review
 {

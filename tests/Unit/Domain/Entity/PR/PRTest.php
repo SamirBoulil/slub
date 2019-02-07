@@ -40,13 +40,16 @@ class PRTest extends TestCase
     public function it_can_be_GTM_multiple_times()
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
+            $pr->normalize());
 
         $pr->GTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 1, 'NOT_GTM' => 0], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 1, 'NOT_GTM' => 0],
+            $pr->normalize());
 
         $pr->GTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 2, 'NOT_GTM' => 0], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 2, 'NOT_GTM' => 0],
+            $pr->normalize());
     }
 
     /**
@@ -55,13 +58,16 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTM_multiple_times()
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
+            $pr->normalize());
 
         $pr->notGTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 1], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 1],
+            $pr->normalize());
 
         $pr->notGTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 2], $pr->normalize());
+        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 2],
+            $pr->normalize());
     }
 
     /**
@@ -71,7 +77,8 @@ class PRTest extends TestCase
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
 
-        $this->assertSame(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0], $pr->normalize());
+        $this->assertSame(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
+            $pr->normalize());
     }
 
     /**

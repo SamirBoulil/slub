@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
-use Slub\Application\GTMPR\PRNotGTMedNotify;
 use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author Samir Boulil <samir.boulil@akeneo.com>
  */
-class PRNotGTMedSubscriberSpy implements PRNotGTMedNotify, EventSubscriberInterface
+class PRNotGTMedSubscriberSpy implements EventSubscriberInterface
 {
     /** @var bool */
     private $hasBeenCalled = false;
@@ -19,7 +18,7 @@ class PRNotGTMedSubscriberSpy implements PRNotGTMedNotify, EventSubscriberInterf
     public static function getSubscribedEvents()
     {
         return [
-            PRNotGTMed::class => 'notifyPRNotGTMed'
+            PRNotGTMed::class => 'notifyPRNotGTMed',
         ];
     }
 

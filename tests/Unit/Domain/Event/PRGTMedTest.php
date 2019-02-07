@@ -21,6 +21,7 @@ class PRGTMedTest extends TestCase
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $event = PRGTMed::withIdentifier($expectedIdentifier);
-        $this->assertTrue($event->PRIdentifier()->equals($expectedIdentifier), 'Expected identifier to be the same than the one the event was created with, found different.');
+        $this->assertTrue($event->PRIdentifier()->equals($expectedIdentifier),
+            'Expected identifier to be the same than the one the event was created with, found different.');
     }
 }

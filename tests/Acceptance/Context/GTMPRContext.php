@@ -3,8 +3,6 @@
 namespace Tests\Acceptance\Context;
 
 use PHPUnit\Framework\Assert;
-use Slub\Application\GTMPR\PRGTMedNotify;
-use Slub\Application\GTMPR\PRNotGTMedNotify;
 use Slub\Application\GTMPR\Review;
 use Slub\Application\GTMPR\ReviewHandler;
 use Slub\Domain\Entity\PR\PR;
@@ -24,14 +22,14 @@ class GTMPRContext extends FeatureContext
     /** @var PRNotGTMedSubscriberSpy */
     private $PRNotGTMedSubscriberSpy;
 
-    /** @var PRIdentifier $currentPRIdentifier */
+    /** @var PRIdentifier */
     private $currentPRIdentifier;
 
     public function __construct(
         FileBasedPRRepository $PRRepository,
         ReviewHandler $reviewHandler,
-        PRGTMedNotify $PRGTMedNotify,
-        PRNotGTMedNotify $PRNotGTMedNotify
+        PRGTMedSubscriberSpy $PRGTMedNotify,
+        PRNotGTMedSubscriberSpy $PRNotGTMedNotify
     ) {
         parent::__construct($PRRepository);
 

@@ -16,7 +16,7 @@ class PutPRToReview
     /** @var string */
     public $PRIdentifier;
 
-    /** @var string  */
+    /** @var string */
     public $channelIdentifier;
 
     public function __construct(string $channelIdentifier, string $repositoryIdentifier, string $PRIdentifier)

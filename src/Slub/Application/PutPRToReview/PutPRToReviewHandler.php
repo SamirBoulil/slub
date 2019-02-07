@@ -33,7 +33,7 @@ class PutPRToReviewHandler
         $this->createPr($command);
     }
 
-    private function isUnsupported(PutPRToReview $putPRToReview):bool
+    private function isUnsupported(PutPRToReview $putPRToReview): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
         $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);

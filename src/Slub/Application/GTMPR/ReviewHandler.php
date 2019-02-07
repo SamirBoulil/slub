@@ -54,8 +54,5 @@ class ReviewHandler
 
     private function dispatchEvents(PR $PR): void
     {
-        foreach ([] as $event) {
-            $this->eventDispatcher->dispatch($event->getName(), $event);
-        }
     }
 }

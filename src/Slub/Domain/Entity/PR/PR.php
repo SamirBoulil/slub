@@ -44,11 +44,6 @@ class PR
         return new self($identifier, $GTM, $NOTGTM);
     }
 
-    public function PRIdentifier(): PRIdentifier
-    {
-        return $this->PRIdentifier;
-    }
-
     public function normalize(): array
     {
         return [
@@ -56,6 +51,11 @@ class PR
             self::GTM_KEY        => $this->GTMCount,
             self::NOTGTM_KEY     => $this->notGTMCount,
         ];
+    }
+
+    public function PRIdentifier(): PRIdentifier
+    {
+        return $this->PRIdentifier;
     }
 
     public function GTM(): void

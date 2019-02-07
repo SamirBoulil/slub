@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
-use Slub\Application\GTMPR\PRGTMedNotify;
 use Slub\Domain\Event\PRGTMed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author Samir Boulil <samir.boulil@akeneo.com>
  */
-class PRGTMedSubscriberSpy implements PRGTMedNotify, EventSubscriberInterface
+class PRGTMedSubscriberSpy implements EventSubscriberInterface
 {
     /** @var bool */
     private $hasBeenCalled = false;
@@ -19,7 +18,7 @@ class PRGTMedSubscriberSpy implements PRGTMedNotify, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            PRGTMed::class => 'notifyPRGTMed'
+            PRGTMed::class => 'notifyPRGTMed',
         ];
     }
 

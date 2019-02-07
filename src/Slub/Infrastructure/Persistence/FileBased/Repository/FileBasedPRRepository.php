@@ -26,24 +26,6 @@ class FileBasedPRRepository implements PRRepositoryInterface
         $this->saveAll($allPRs);
     }
 
-    public function getBy(PRIdentifier $PRidentifier): PR
-    {
-        $allPRs = $this->all();
-        $result = $this->findPR($PRidentifier, $allPRs);
-
-        if (null === $result) {
-            throw PRNotFoundException::create($PRidentifier);
-        }
-
-        return $result;
-    }
-
-    public function resetFile(): void
-    {
-        touch($this->filePath);
-        unlink($this->filePath);
-    }
-
     /**
      * @return PR[]
      */
@@ -51,6 +33,20 @@ class FileBasedPRRepository implements PRRepositoryInterface
     {
         $normalizedPRs = $this->readFile();
         $result = $this->denormalizePRs($normalizedPRs);
+
+        return $result;
+    }
+
+    private function readFile(): array
+    {
+        if (!file_exists($this->filePath)) {
+            return [];
+        }
+        $fileContent = file_get_contents($this->filePath);
+        if (empty($fileContent)) {
+            return [];
+        }
+        $result = json_decode($fileContent, true);
 
         return $result;
     }
@@ -93,20 +89,6 @@ class FileBasedPRRepository implements PRRepositoryInterface
         return $result;
     }
 
-    private function readFile(): array
-    {
-        if (!file_exists($this->filePath)) {
-            return [];
-        }
-        $fileContent = file_get_contents($this->filePath);
-        if (empty($fileContent)) {
-            return [];
-        }
-        $result = json_decode($fileContent, true);
-
-        return $result;
-    }
-
     private function writeFile(array $normalizedAllPRs): void
     {
         if (!file_exists($this->filePath)) {
@@ -123,6 +105,18 @@ class FileBasedPRRepository implements PRRepositoryInterface
         }
         fwrite($fp, $serializedAllPRs);
         fclose($fp);
+    }
+
+    public function getBy(PRIdentifier $PRidentifier): PR
+    {
+        $allPRs = $this->all();
+        $result = $this->findPR($PRidentifier, $allPRs);
+
+        if (null === $result) {
+            throw PRNotFoundException::create($PRidentifier);
+        }
+
+        return $result;
     }
 
     /**
@@ -144,5 +138,11 @@ class FileBasedPRRepository implements PRRepositoryInterface
         }
 
         return $result;
+    }
+
+    public function resetFile(): void
+    {
+        touch($this->filePath);
+        unlink($this->filePath);
     }
 }

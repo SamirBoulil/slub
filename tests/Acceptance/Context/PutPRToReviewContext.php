@@ -44,6 +44,22 @@ class PutPRToReviewContext extends FeatureContext
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
+    private function createPutPRToReviewCommand(
+        string $repositoryIdentifier,
+        string $PRIdentifier,
+        string $channelIdentifier
+    ): PutPRToReview {
+        $this->currentRepositoryIdentifier = $repositoryIdentifier;
+        $this->currentPRIdentifier = $PRIdentifier;
+        $putPRToReview = new PutPRToReview(
+            $channelIdentifier,
+            $this->currentRepositoryIdentifier,
+            $this->currentPRIdentifier
+        );
+
+        return $putPRToReview;
+    }
+
     /**
      * @When /^an author puts a PR belonging to an unsupported repository to review$/
      */
@@ -78,14 +94,6 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertTrue($this->PRExists($this->currentPRIdentifier));
     }
 
-    /**
-     * @Then /^the PR is not added to the list of followed PRs$/
-     */
-    public function thePRIsNotAddedToTheListOfFollowedPRs()
-    {
-        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
-    }
-
     private function PRExists(string $PRIdentifier): bool
     {
         $found = true;
@@ -98,19 +106,11 @@ class PutPRToReviewContext extends FeatureContext
         return $found;
     }
 
-    private function createPutPRToReviewCommand(
-        string $repositoryIdentifier,
-        string $PRIdentifier,
-        string $channelIdentifier
-    ): PutPRToReview {
-        $this->currentRepositoryIdentifier = $repositoryIdentifier;
-        $this->currentPRIdentifier = $PRIdentifier;
-        $putPRToReview = new PutPRToReview(
-            $channelIdentifier,
-            $this->currentRepositoryIdentifier,
-            $this->currentPRIdentifier
-        );
-
-        return $putPRToReview;
+    /**
+     * @Then /^the PR is not added to the list of followed PRs$/
+     */
+    public function thePRIsNotAddedToTheListOfFollowedPRs()
+    {
+        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
     }
 }

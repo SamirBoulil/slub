@@ -9,6 +9,7 @@ parameters:
     slub.supported_channels:
         - "squad-raccoons"
         - "squad-chipmunks"
+    locale: 'en'
 
 services:
     # default configuration for services in *this* file

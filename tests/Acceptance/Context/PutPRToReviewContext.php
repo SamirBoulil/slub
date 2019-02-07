@@ -2,23 +2,17 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Common\SlubApplicationContainer;
+use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 
-class PutPRToReviewContext implements Context
+class PutPRToReviewContext extends FeatureContext
 {
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
-
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
 
     /** @var string */
     private $currentPRIdentifier;
@@ -26,11 +20,13 @@ class PutPRToReviewContext implements Context
     /** @var string */
     private $currentRepositoryIdentifier;
 
-    public function __construct()
-    {
-        $slub = SlubApplicationContainer::buildForTest();
-        $this->putPRToReviewHandler = $slub->get(PutPRToReviewHandler::class);
-        $this->PRRepository = $slub->get(PRRepositoryInterface::class);
+    public function __construct(
+        FileBasedPRRepository $PRRepository,
+        PutPRToReviewHandler $putPRToReviewHandler
+    ) {
+        parent::__construct($PRRepository);
+
+        $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->currentRepositoryIdentifier = '';
         $this->currentPRIdentifier = '';
     }
@@ -46,6 +42,22 @@ class PutPRToReviewContext implements Context
             'squad-raccoons'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
+    }
+
+    private function createPutPRToReviewCommand(
+        string $repositoryIdentifier,
+        string $PRIdentifier,
+        string $channelIdentifier
+    ): PutPRToReview {
+        $this->currentRepositoryIdentifier = $repositoryIdentifier;
+        $this->currentPRIdentifier = $PRIdentifier;
+        $putPRToReview = new PutPRToReview(
+            $channelIdentifier,
+            $this->currentRepositoryIdentifier,
+            $this->currentPRIdentifier
+        );
+
+        return $putPRToReview;
     }
 
     /**
@@ -82,14 +94,6 @@ class PutPRToReviewContext implements Context
         Assert::assertTrue($this->PRExists($this->currentPRIdentifier));
     }
 
-    /**
-     * @Then /^the PR is not added to the list of followed PRs$/
-     */
-    public function thePRIsNotAddedToTheListOfFollowedPRs()
-    {
-        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
-    }
-
     private function PRExists(string $PRIdentifier): bool
     {
         $found = true;
@@ -102,19 +106,11 @@ class PutPRToReviewContext implements Context
         return $found;
     }
 
-    private function createPutPRToReviewCommand(
-        string $repositoryIdentifier,
-        string $PRIdentifier,
-        string $channelIdentifier
-    ): PutPRToReview {
-        $this->currentRepositoryIdentifier = $repositoryIdentifier;
-        $this->currentPRIdentifier = $PRIdentifier;
-        $putPRToReview = new PutPRToReview(
-            $channelIdentifier,
-            $this->currentRepositoryIdentifier,
-            $this->currentPRIdentifier
-        );
-
-        return $putPRToReview;
+    /**
+     * @Then /^the PR is not added to the list of followed PRs$/
+     */
+    public function thePRIsNotAddedToTheListOfFollowedPRs()
+    {
+        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
     }
 }

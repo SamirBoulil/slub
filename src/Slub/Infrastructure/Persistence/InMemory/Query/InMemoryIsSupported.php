@@ -25,30 +25,6 @@ class InMemoryIsSupported implements IsSupportedInterface
         $this->supportedChannels = $this->createChannels($supportedChannels);
     }
 
-    public function repository(RepositoryIdentifier $repositoryIdentifierToCheck): bool
-    {
-        $repositoriesFound = array_filter(
-            $this->supportedRepositories,
-            function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
-                return $supportedRepository->equals($repositoryIdentifierToCheck);
-            }
-        );
-
-        return \count($repositoriesFound) === 1;
-    }
-
-    public function channel($channelIdentifierToCheck): bool
-    {
-        $channelsFound = array_filter(
-            $this->supportedChannels,
-            function (ChannelIdentifier $supportedChannel) use ($channelIdentifierToCheck) {
-                return $supportedChannel->equals($channelIdentifierToCheck);
-            }
-        );
-
-        return \count($channelsFound) === 1;
-    }
-
     /**
      * @return RepositoryIdentifier[]
      */
@@ -73,5 +49,29 @@ class InMemoryIsSupported implements IsSupportedInterface
             },
             $normalizedChannels
         );
+    }
+
+    public function repository(RepositoryIdentifier $repositoryIdentifierToCheck): bool
+    {
+        $repositoriesFound = array_filter(
+            $this->supportedRepositories,
+            function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
+                return $supportedRepository->equals($repositoryIdentifierToCheck);
+            }
+        );
+
+        return \count($repositoriesFound) === 1;
+    }
+
+    public function channel(ChannelIdentifier $channelIdentifierToCheck): bool
+    {
+        $channelsFound = array_filter(
+            $this->supportedChannels,
+            function (ChannelIdentifier $supportedChannel) use ($channelIdentifierToCheck) {
+                return $supportedChannel->equals($channelIdentifierToCheck);
+            }
+        );
+
+        return \count($channelsFound) === 1;
     }
 }

@@ -4,5 +4,16 @@ default:
             paths:
                 - "%paths.base%/tests/Acceptance/features"
             contexts:
-                - Tests\Acceptance\Context\PutPRToReviewContext
-                - Tests\Acceptance\Context\GTMPRContext
+                - Tests\Acceptance\Context\PutPRToReviewContext:
+                    - "@slub.infrastructure.persistence.pr_repository"
+                    - "@slub.application.put_pr_to_review.put_pr_to_review_handler"
+                - Tests\Acceptance\Context\ReviewContext:
+                    - "@slub.infrastructure.persistence.pr_repository"
+                    - "@slub.application.gtm_pr.gtm_pr_handler"
+                    - "@helpers.pr_gtmed_subscriber_spy"
+                    - "@helpers.pr_not_gtmed_subscriber_spy"
+    extensions:
+        Behat\Symfony2Extension:
+            kernel:
+                bootstrap: tests/Acceptance/bootstrap/bootstrap.php
+                class: Slub\Kernel

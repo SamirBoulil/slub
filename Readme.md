@@ -11,9 +11,7 @@ Botman: https://github.com/botman/botman
 - Remove interfaces from test coverage in phpunit
 - Add test coverage 100% ?
 
-# To refactor
-1 Should build the kernel using configuration files
-2 Should use symfony's event dispatcher to dispatch events instead of using custom *NotifyMany classes
-
 # Later
 - get notified who GTMed a PR
+
+# To refactor

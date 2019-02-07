@@ -8,6 +8,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Symfony\Component\Dotenv\Dotenv;
 use Tests\Integration\Infrastructure\Persistence\FileBased\PersistenceTestCase;
 
 class FileBasedPRRepositoryTest extends PersistenceTestCase
@@ -18,7 +19,8 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->fileBasedPRRepository = new FileBasedPRRepository($this->filePath);
+        $this->fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
+        $this->fileBasedPRRepository->resetFile();
     }
 
     /**

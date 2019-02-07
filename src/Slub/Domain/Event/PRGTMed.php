@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Slub\Domain\Event;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class PRGTMed
+class PRGTMed extends Event
 {
     /** @var PRIdentifier */
     private $PRIdentifier;

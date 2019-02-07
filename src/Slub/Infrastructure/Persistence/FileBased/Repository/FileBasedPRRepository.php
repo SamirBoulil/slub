@@ -40,6 +40,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
 
     public function resetFile(): void
     {
+        touch($this->filePath);
         unlink($this->filePath);
     }
 

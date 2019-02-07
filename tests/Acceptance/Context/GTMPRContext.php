@@ -2,22 +2,19 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
+use Slub\Application\GTMPR\PRGTMedNotify;
+use Slub\Application\GTMPR\PRNotGTMedNotify;
 use Slub\Application\GTMPR\Review;
 use Slub\Application\GTMPR\ReviewHandler;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Common\SlubApplicationContainer;
+use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
 use Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy;
 
-class GTMPRContext implements Context
+class GTMPRContext extends FeatureContext
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
-
     /** @var ReviewHandler */
     private $ReviewHandler;
 
@@ -30,13 +27,17 @@ class GTMPRContext implements Context
     /** @var PRIdentifier $currentPRIdentifier */
     private $currentPRIdentifier;
 
-    public function __construct()
-    {
-        $slub = SlubApplicationContainer::buildForTest();
-        $this->PRRepository = $slub->get(PRRepositoryInterface::class);
-        $this->ReviewHandler = $slub->get(ReviewHandler::class);
-        $this->PRGTMedSubscriberSpy = $slub->get(PRGTMedSubscriberSpy::class);
-        $this->PRNotGTMedSubscriberSpy = $slub->get(PRNotGTMedSubscriberSpy::class);
+    public function __construct(
+        FileBasedPRRepository $PRRepository,
+        ReviewHandler $reviewHandler,
+        PRGTMedNotify $PRGTMedNotify,
+        PRNotGTMedNotify $PRNotGTMedNotify
+    ) {
+        parent::__construct($PRRepository);
+
+        $this->ReviewHandler = $reviewHandler;
+        $this->PRGTMedSubscriberSpy = $PRGTMedNotify;
+        $this->PRNotGTMedSubscriberSpy = $PRNotGTMedNotify;
     }
 
     /**

@@ -1,0 +1,24 @@
+parameters:
+    slub.repositories:
+        - "akeneo/pim-community-dev"
+    slub.channels:
+        - "squad-raccoons"
+        - "squad-chipmunks"
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        public: false
+
+    helpers.pr_gtmed_subscriber_spy:
+        class: Tests\Acceptance\helpers\PRGTMedSubscriberSpy
+        tags:
+            - { name: kernel.event_subscriber }
+        public: true
+
+    helpers.pr_not_gtmed_subscriber_spy:
+        class: Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy
+        tags:
+            - { name: kernel.event_subscriber }
+        public: true
+

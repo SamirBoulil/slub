@@ -46,3 +46,7 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+###> behat/symfony2-extension ###
+behat.yml
+###< behat/symfony2-extension ###

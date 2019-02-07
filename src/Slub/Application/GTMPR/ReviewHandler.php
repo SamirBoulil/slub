@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Slub\Application\GTMPR;
 
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -22,22 +24,17 @@ class ReviewHandler
     /** @var IsSupportedInterface */
     private $isSupported;
 
-    /** @var PRGTMedNotifyMany */
-    private $PRGTMedNotifyMany;
-
-    /** @var PRNotGTMedNotifyMany */
-    private $PRNotGTMedNotifyMany;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
         IsSupportedInterface $isSupported,
-        PRGTMedNotifyMany $PRGTMedNotifyMany,
-        PRNotGTMedNotifyMany $PRNotGTMedNotifyMany
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isSupported;
-        $this->PRGTMedNotifyMany = $PRGTMedNotifyMany;
-        $this->PRNotGTMedNotifyMany = $PRNotGTMedNotifyMany;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function handle(Review $review)
@@ -45,12 +42,20 @@ class ReviewHandler
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         if ($review->isGTM) {
             $PR->GTM();
-            $this->PRGTMedNotifyMany->notifyPRGTMed(PRGTMed::withIdentifier($PR->PRIdentifier()));
+            $this->eventDispatcher->dispatch(PRGTMed::class, PRGTMed::withIdentifier($PR->PRIdentifier()));
         } else {
             $PR->notGTM();
-            $this->PRNotGTMedNotifyMany->notifyPRNotGTMed(PRNotGTMed::withIdentifier($PR->PRIdentifier()));
+            $this->eventDispatcher->dispatch(PRNotGTMed::class, PRNotGTMed::withIdentifier($PR->PRIdentifier()));
         }
 
         $this->PRRepository->save($PR);
+        $this->dispatchEvents($PR);
+    }
+
+    private function dispatchEvents(PR $PR): void
+    {
+        foreach ([] as $event) {
+            $this->eventDispatcher->dispatch($event->getName(), $event);
+        }
     }
 }

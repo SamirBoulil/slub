@@ -1,0 +1,51 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    slub.supported_repositories:
+        - "akeneo/pim-community-dev"
+    slub.supported_channels:
+        - "squad-raccoons"
+        - "squad-chipmunks"
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: false      # Automatically injects dependencies in your services.
+        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
+        public: "%env(IS_TESTING)%"
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    #Slub\:
+    #    resource: '../src/Slub/*'
+    #    exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # Handlers
+    slub.application.put_pr_to_review.put_pr_to_review_handler:
+        class: Slub\Application\PutPRToReview\PutPRToReviewHandler
+        arguments:
+            - "@slub.infrastructure.persistence.pr_repository"
+            - "@slub.infrastructure.query.is_supported"
+
+    slub.application.gtm_pr.gtm_pr_handler:
+        class: Slub\Application\GTMPR\ReviewHandler
+        arguments:
+            - "@slub.infrastructure.persistence.pr_repository"
+            - "@slub.infrastructure.query.is_supported"
+            - "@event_dispatcher"
+
+    # Infrastructure
+    # Persistence
+    slub.infrastructure.persistence.pr_repository:
+        class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
+        arguments:
+            - "%env(PERSISTENCE_PR_REPOSITORY_FILE_PATH)%"
+
+    slub.infrastructure.query.is_supported:
+        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
+        arguments:
+            - "%slub.supported_repositories%"
+            - "%slub.supported_channels%"

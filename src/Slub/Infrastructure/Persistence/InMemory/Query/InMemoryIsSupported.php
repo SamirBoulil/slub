@@ -37,7 +37,7 @@ class InMemoryIsSupported implements IsSupportedInterface
         return \count($repositoriesFound) === 1;
     }
 
-    public function channel($channelIdentifierToCheck): bool
+    public function channel(ChannelIdentifier $channelIdentifierToCheck): bool
     {
         $channelsFound = array_filter(
             $this->supportedChannels,

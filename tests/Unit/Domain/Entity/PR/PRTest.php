@@ -9,6 +9,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\Merged;
 
 class PRTest extends TestCase
 {
@@ -123,7 +124,7 @@ class PRTest extends TestCase
         $pr->merged();
         $this->assertEquals($pr->normalize()['IS_MERGED'], true);
         $this->assertCount(1, $pr->getEvents());
-        $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+        $this->assertInstanceOf(Merged::class, current($pr->getEvents()));
     }
 
     /**

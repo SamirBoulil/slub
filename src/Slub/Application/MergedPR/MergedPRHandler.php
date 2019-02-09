@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\MergedPR;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -26,6 +27,21 @@ class MergedPRHandler
     }
 
     public function handle(MergedPR $mergedPR): void
+    {
+        if ($this->isUnsupported($mergedPR)) {
+            return;
+        }
+        $this->PRMerged($mergedPR);
+    }
+
+    private function isUnsupported(MergedPR $mergedPR): bool
+    {
+        $repositoryIdentifier = RepositoryIdentifier::fromString($mergedPR->repositoryIdentifier);
+
+        return $this->isSupported->repository($repositoryIdentifier) === false;
+    }
+
+    private function PRMerged(MergedPR $mergedPR): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($mergedPR->PRIdentifier));
         $PR->merged();

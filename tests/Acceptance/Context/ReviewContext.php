@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\Review\Review;
 use Slub\Application\Review\ReviewHandler;

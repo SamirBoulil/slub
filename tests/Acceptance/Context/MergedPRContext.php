@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
-use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -71,6 +69,10 @@ class MergedPRContext extends FeatureContext
      */
     public function theAPRBelongingToAnUnsupportedRepositoryIsMerged()
     {
-        throw new PendingException();
+        $mergedPR = new MergedPR();
+        $mergedPR->repositoryIdentifier = 'unsupported_repository';
+        $mergedPR->PRIdentifier = '1010';
+        $this->currentPRIdentifier = PRIdentifier::fromString($mergedPR->PRIdentifier);
+        $this->mergedPRHandler->handle($mergedPR);
     }
 }

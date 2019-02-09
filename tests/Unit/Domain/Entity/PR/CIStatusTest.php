@@ -60,6 +60,6 @@ class CIStatusTest extends TestCase
     {
         $this->assertEquals(CIStatus::green()->stringValue(), 'GREEN');
         $this->assertEquals(CIStatus::pending()->stringValue(), 'PENDING');
-        $this->assertEquals(CIStatus::Red()->stringValue(), 'RED');
+        $this->assertEquals(CIStatus::red()->stringValue(), 'RED');
     }
 }

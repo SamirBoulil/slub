@@ -13,4 +13,4 @@ Feature: Improve the signal VS noise of the list of pull requests that needs a r
   @secondary
   Scenario: It does not notify when a PR of an unsupported repository is merged
     When the a PR belonging to an unsupported repository is merged
-    Then it does not notify the squad
+    Then the squad should not be not notified

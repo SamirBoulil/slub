@@ -19,7 +19,7 @@ class EventsSpy implements EventSubscriberInterface
     /** @var array */
     public $events = [];
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             GTMed::class    => 'notifyPRGTMed',

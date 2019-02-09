@@ -15,10 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EventsSpy implements EventSubscriberInterface
 {
     /** @var bool */
-    private $hasBeenGTMed = false;
+    private $GTMedDispatched = false;
 
     /** @var bool */
-    private $hasNotBeenGTMed = false;
+    private $NotGTMedDispatched = false;
 
     /** @var bool */
     private $CIGreenDispatched = false;
@@ -34,22 +34,22 @@ class EventsSpy implements EventSubscriberInterface
 
     public function notifyPRGTMed(PRGTMed $PRGTMed): void
     {
-        $this->hasBeenGTMed = true;
+        $this->GTMedDispatched = true;
     }
 
-    public function PRhasBeenGMTed(): bool
+    public function PRGMTedDispatched(): bool
     {
-        return $this->hasBeenGTMed;
+        return $this->GTMedDispatched;
     }
 
     public function notifyPRNotGTMed(PRNotGTMed $PRNotGTMed): void
     {
-        $this->hasNotBeenGTMed = true;
+        $this->NotGTMedDispatched = true;
     }
 
-    public function PRhasNotBeenGMTed(): bool
+    public function PRNotGMTedDispatched(): bool
     {
-        return $this->hasNotBeenGTMed;
+        return $this->NotGTMedDispatched;
     }
 
     public function notifyCIGreen()
@@ -64,6 +64,6 @@ class EventsSpy implements EventSubscriberInterface
 
     public function hasEvents(): bool
     {
-        return $this->hasBeenGTMed || $this->hasNotBeenGTMed;
+        return $this->GTMedDispatched || $this->NotGTMedDispatched || $this->CIGreenDispatched;
     }
 }

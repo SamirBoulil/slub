@@ -63,7 +63,7 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $GTMCount = $PR->normalize()['GTM'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
-        Assert::assertTrue($this->eventSpy->PRhasBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
     }
 
     /**
@@ -87,7 +87,7 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $notGTMCount = $PR->normalize()['NOT_GTM'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
-        Assert::assertTrue($this->eventSpy->PRhasNotBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
     }
 
     /**
@@ -112,7 +112,7 @@ class ReviewContext extends FeatureContext
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
-        Assert::assertFalse($this->eventSpy->PRhasNotBeenGMTed(), 'Event has been thrown, while none was expected.');
+        Assert::assertFalse($this->eventSpy->PRNotGMTedDispatched(), 'Event has been thrown, while none was expected.');
     }
 
     private function PRExists(PRIdentifier $PRIdentifier): bool

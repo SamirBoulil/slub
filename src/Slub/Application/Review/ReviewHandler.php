@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Slub\Application\Review;
 
-use Slub\Domain\Entity\PR\PR;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Event\PRGTMed;
-use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -34,6 +31,10 @@ class ReviewHandler
 
     public function handle(Review $review)
     {
+        if ($this->isUnsupported($review)) {
+            return;
+        }
+
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         if ($review->isGTM) {
             $PR->GTM();
@@ -41,5 +42,12 @@ class ReviewHandler
             $PR->notGTM();
         }
         $this->PRRepository->save($PR);
+    }
+
+    private function isUnsupported(Review $review): bool
+    {
+        $channelIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
+
+        return $this->isSupported->repository($channelIdentifier) === false;
     }
 }

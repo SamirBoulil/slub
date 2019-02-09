@@ -10,8 +10,7 @@ default:
                 - Tests\Acceptance\Context\ReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.gtm_pr.gtm_pr_handler"
-                    - "@helpers.pr_gtmed_subscriber_spy"
-                    - "@helpers.pr_not_gtmed_subscriber_spy"
+                    - "@helpers.event_spy"
     extensions:
         Behat\Symfony2Extension:
             kernel:

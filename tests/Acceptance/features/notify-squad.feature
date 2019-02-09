@@ -14,6 +14,18 @@
 #    Given a pull request put to review
 #    When the CI fails
 #    Then the squad should be notified the pull request broke some tests
+
+#  @secondary
+#  Scenario: It does not notify CI status changes for unsupported repositories
+#    Given a pull request belonging to an unsupported repository
+#    When the CI status changes of the pull request changes
+#    Then it does not notify the squad
+#
+#  @secondary
+#  Scenario: It does not notify CI status changes for unsupported chat channels
+#    Given a pull request is put to review in an unsupported chat channel
+#    When the CI status changes of the pull request changes
+#    Then it does not notify the squad
 #
 #  @nominal
 #  Scenario: Notify the squad when the pull request is merged
@@ -22,27 +34,9 @@
 #    Then the squad should be notified the pull request has been merged
 #
 #  @secondary
-#  Scenario: It does not notify CI status changes for unsupported repositories
-#    Given a pull request belonging to an unsupported repository
-#    When the CI status changes of the pull request changes
-#    Then it does not notify the squad
-#
-#  @secondary
 #  Scenario: It does not notify pull requests merge for unsupported repositories
 #    Given a pull request belonging to an unsupported repository
 #    When the pull request is merged
-#    Then it does not notify the squad
-#
-#  @secondary
-#  Scenario: It does not notify the new reviews on unsupported chat channels
-#    Given a pull request is put to review in an unsupported chat channel
-#    When the pull request is reviewed
-#    Then it does not notify the squad
-#
-#  @secondary
-#  Scenario: It does not notify CI status changes for unsupported chat channels
-#    Given a pull request is put to review in an unsupported chat channel
-#    When the CI status changes of the pull request changes
 #    Then it does not notify the squad
 #
 #  @secondary

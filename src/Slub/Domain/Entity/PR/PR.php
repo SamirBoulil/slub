@@ -6,8 +6,8 @@ namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
-use Slub\Domain\Event\PRGTMed;
-use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\GTMed;
+use Slub\Domain\Event\NotGTMed;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -76,13 +76,13 @@ class PR
     public function GTM(): void
     {
         $this->GTMCount++;
-        $this->events[] = PRGTMed::withIdentifier($this->PRIdentifier);
+        $this->events[] = GTMed::forPR($this->PRIdentifier);
     }
 
     public function notGTM(): void
     {
         $this->notGTMCount++;
-        $this->events[] = PRNotGTMed::withIdentifier($this->PRIdentifier);
+        $this->events[] = NotGTMed::forPR($this->PRIdentifier);
     }
 
     public function green(): void

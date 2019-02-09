@@ -20,5 +20,5 @@ Botman: https://github.com/botman/botman
 - Ok: Refactor EventsSpy
     - Ok: Add unit tests
     - Ok: Use array instead of 1 property / event
-- Rename NO_STATUS to PENDING
+- OK: Rename NO_STATUS to PENDING
 - Remove prefix PR in PRGTMed and PRNotGTMed

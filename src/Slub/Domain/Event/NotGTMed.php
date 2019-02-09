@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class PRNotGTMed extends Event
+class NotGTMed extends Event
 {
     /** @var PRIdentifier */
     private $PRIdentifier;
@@ -20,7 +20,7 @@ class PRNotGTMed extends Event
         $this->PRIdentifier = $PRIdentifier;
     }
 
-    public static function withIdentifier(PRIdentifier $PRIdentifier): self
+    public static function forPR(PRIdentifier $PRIdentifier): self
     {
         return new self($PRIdentifier);
     }

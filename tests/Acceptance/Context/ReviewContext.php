@@ -35,7 +35,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Given /^a pull request in review$/
+     * @Given /^a PR in review$/
      */
     public function aPullRequestInReview()
     {
@@ -44,7 +44,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^the pull request is GTMed$/
+     * @When /^the PR is GTMed$/
      */
     public function thePullRequestIsGTMed()
     {
@@ -56,7 +56,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the pull request should be GTMed$/
+     * @Then /^the PR should be GTMed$/
      */
     public function thePullRequestShouldBeGTMed()
     {
@@ -65,7 +65,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the pull request has one more GTM$/
+     * @Then /^the squad should be notified that the PR has one more GTM$/
      */
     public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreGTM()
     {
@@ -77,7 +77,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^the pull request is NOT GTMED$/
+     * @When /^the PR is NOT GTMED$/
      */
     public function thePullRequestIsNOTGTMED()
     {
@@ -89,7 +89,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the pull request should be NOT GTMed$/
+     * @Then /^the PR should be NOT GTMed$/
      */
     public function thePullRequestShouldBeNOTGTMed()
     {
@@ -98,7 +98,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the pull request has one more NOT GTM$/
+     * @Then /^the squad should be notified that the PR has one more NOT GTM$/
      */
     public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreNOTGTM()
     {
@@ -110,7 +110,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^a pull request is reviewed on an unsupported repository$/
+     * @When /^a PR is reviewed on an unsupported repository$/
      */
     public function aPullRequestIsReviewedOnAnUnsupportedRepository()
     {

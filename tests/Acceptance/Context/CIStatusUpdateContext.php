@@ -37,7 +37,7 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @When /^the CI is green for the pull request$/
+     * @When /^the CI is green for the PR$/
      */
     public function theCIIsGreenForThePullRequest()
     {
@@ -60,7 +60,7 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the ci is green for the pull request$/
+     * @Then /^the squad should be notified that the ci is green for the PR$/
      */
     public function theSquadShouldBeNotifiedThatTheCiIsGreenForThePullRequest()
     {
@@ -71,7 +71,7 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @When /^the CI is red for the pull request$/
+     * @When /^the CI is red for the PR$/
      */
     public function theCIIsRedForThePullRequest()
     {
@@ -94,7 +94,7 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @Given /^the squad should be notified that the ci is red for the pull request$/
+     * @Given /^the squad should be notified that the ci is red for the PR$/
      */
     public function theSquadShouldBeNotifiedThatTheCiIsRedForThePullRequest()
     {

@@ -15,8 +15,4 @@ Botman: https://github.com/botman/botman
 - get notified who GTMed a PR
 
 # To refactor
-- Add step: then the PR should be GTMed/notGTMed check in acceptance tests
-- Rename all "pull request" into "PR" in all acceptance tests
-
-
 - Only at the end of application layer: Rethink naming of application services (should it make the author appear?)

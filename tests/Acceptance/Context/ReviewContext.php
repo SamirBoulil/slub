@@ -9,19 +9,15 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
-use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
-use Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy;
+use Tests\Acceptance\helpers\EventsSpy;
 
 class ReviewContext extends FeatureContext
 {
     /** @var ReviewHandler */
     private $ReviewHandler;
 
-    /** @var PRGTMedSubscriberSpy */
-    private $PRGTMedSubscriberSpy;
-
-    /** @var PRNotGTMedSubscriberSpy */
-    private $PRNotGTMedSubscriberSpy;
+    /** @var EventsSpy */
+    private $eventSpy;
 
     /** @var PRIdentifier */
     private $currentPRIdentifier;
@@ -29,14 +25,12 @@ class ReviewContext extends FeatureContext
     public function __construct(
         FileBasedPRRepository $PRRepository,
         ReviewHandler $reviewHandler,
-        PRGTMedSubscriberSpy $PRGTMedNotify,
-        PRNotGTMedSubscriberSpy $PRNotGTMedNotify
+        EventsSpy $eventSpy
     ) {
         parent::__construct($PRRepository);
 
         $this->ReviewHandler = $reviewHandler;
-        $this->PRGTMedSubscriberSpy = $PRGTMedNotify;
-        $this->PRNotGTMedSubscriberSpy = $PRNotGTMedNotify;
+        $this->eventSpy = $eventSpy;
     }
 
     /**
@@ -69,7 +63,7 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $GTMCount = $PR->normalize()['GTM'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
-        Assert::assertTrue($this->PRGTMedSubscriberSpy->PRhasBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRhasBeenGMTed());
     }
 
     /**
@@ -93,7 +87,7 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $notGTMCount = $PR->normalize()['NOT_GTM'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
-        Assert::assertTrue($this->PRNotGTMedSubscriberSpy->PRhasNotBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRhasNotBeenGMTed());
     }
 
     /**
@@ -118,7 +112,7 @@ class ReviewContext extends FeatureContext
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
-        Assert::assertFalse($this->PRNotGTMedSubscriberSpy->PRhasNotBeenGMTed(), 'Event has been thrown, while none was expected.');
+        Assert::assertFalse($this->eventSpy->PRhasNotBeenGMTed(), 'Event has been thrown, while none was expected.');
     }
 
     private function PRExists(PRIdentifier $PRIdentifier): bool

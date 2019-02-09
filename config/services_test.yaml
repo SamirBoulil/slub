@@ -10,14 +10,8 @@ services:
     _defaults:
         public: false
 
-    helpers.pr_gtmed_subscriber_spy:
-        class: Tests\Acceptance\helpers\PRGTMedSubscriberSpy
-        tags:
-            - { name: kernel.event_subscriber }
-        public: true
-
-    helpers.pr_not_gtmed_subscriber_spy:
-        class: Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy
+    helpers.event_spy:
+        class: Tests\Acceptance\helpers\EventsSpy
         tags:
             - { name: kernel.event_subscriber }
         public: true

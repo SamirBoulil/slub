@@ -2,6 +2,7 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\Review\Review;
 use Slub\Application\Review\ReviewHandler;
@@ -55,6 +56,15 @@ class ReviewContext extends FeatureContext
     }
 
     /**
+     * @Then /^the pull request should be GTMed$/
+     */
+    public function thePullRequestShouldBeGTMed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals(1, $PR->normalize()['GTM']);
+    }
+
+    /**
      * @Then /^the squad should be notified that the pull request has one more GTM$/
      */
     public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreGTM()
@@ -76,6 +86,15 @@ class ReviewContext extends FeatureContext
         $notGTM->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $notGTM->isGTM = false;
         $this->ReviewHandler->handle($notGTM);
+    }
+
+    /**
+     * @Then /^the pull request should be NOT GTMed$/
+     */
+    public function thePullRequestShouldBeNOTGTMed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals(1, $PR->normalize()['NOT_GTM']);
     }
 
     /**

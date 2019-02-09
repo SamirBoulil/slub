@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Application\Review;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;

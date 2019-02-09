@@ -64,7 +64,7 @@ class PR
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
             self::NOTGTM_KEY     => $this->notGTMCount,
-            self::CI_STATUS_KEY => $this->CIStatus->stringValue()
+            self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
         ];
     }
 

@@ -33,7 +33,7 @@ class EventsSpy implements EventSubscriberInterface
             PRGTMed::class    => 'notifyPRGTMed',
             PRNotGTMed::class => 'notifyPRNotGTMed',
             CIGreen::class    => 'notifyCIGreen',
-            CIRed::class    => 'notifyCIRed',
+            CIRed::class      => 'notifyCIRed',
         ];
     }
 

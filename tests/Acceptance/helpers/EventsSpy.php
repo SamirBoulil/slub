@@ -8,6 +8,7 @@ use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -27,6 +28,9 @@ class EventsSpy implements EventSubscriberInterface
     /** @var bool */
     private $CIRedDispatched = false;
 
+    /** @var array */
+    public $events;
+
     public static function getSubscribedEvents()
     {
         return [
@@ -39,12 +43,12 @@ class EventsSpy implements EventSubscriberInterface
 
     public function notifyPRGTMed(PRGTMed $PRGTMed): void
     {
-        $this->GTMedDispatched = true;
+        $this->events[PRGTMed::class] = true;
     }
 
     public function PRGMTedDispatched(): bool
     {
-        return $this->GTMedDispatched;
+        return $this->events[PRGTMed::class] ?? false;
     }
 
     public function notifyPRNotGTMed(PRNotGTMed $PRNotGTMed): void
@@ -57,7 +61,7 @@ class EventsSpy implements EventSubscriberInterface
         return $this->NotGTMedDispatched;
     }
 
-    public function notifyCIGreen(): void
+    public function notifyCIGreen(CIGreen $CIGreen): void
     {
         $this->CIGreenDispatched = true;
     }
@@ -67,7 +71,7 @@ class EventsSpy implements EventSubscriberInterface
         return $this->CIGreenDispatched;
     }
 
-    public function notifyCIRed(): void
+    public function notifyCIRed(CIRed $CIRed): void
     {
         $this->CIRedDispatched = true;
     }

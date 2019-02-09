@@ -15,8 +15,10 @@ Botman: https://github.com/botman/botman
 - get notified who GTMed a PR
 
 # To refactor
-- Remove isRed() and isGreen() they are only used for tests => use normalize()['CI_STATUS'] instead
-- Rename CIIsRed, CIIsGreen for Green, Red
-- Refactor EventsSpy
-    - Add unit tests
-    - Use array instead of 1 property / event
+- OK: Remove isRed() and isGreen() they are only used for tests => use normalize()['CI_STATUS'] instead
+- Ok: Rename CIIsRed, CIIsGreen for Green, Red => should probably something else
+- Ok: Refactor EventsSpy
+    - Ok: Add unit tests
+    - Ok: Use array instead of 1 property / event
+- Rename NO_STATUS to PENDING
+- Remove prefix PR in PRGTMed and PRNotGTMed

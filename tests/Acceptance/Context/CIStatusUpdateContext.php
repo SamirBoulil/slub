@@ -55,7 +55,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function thePRShouldBeGreen()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertTrue($PR->isGreen(), 'PR is expected to be green, but it wasn\'t');
+        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'GREEN', 'PR is expected to be green, but it wasn\'t');
     }
 
     /**

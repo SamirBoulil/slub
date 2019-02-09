@@ -132,8 +132,8 @@ class PRTest extends TestCase
                 'CI_STATUS'  => 'GREEN',
             ]
         );
-        $pr->CIIsGreen();
-        $this->assertTrue($pr->isGreen());
+        $pr->green();
+        $this->assertEquals($pr->normalize()['CI_STATUS'], 'GREEN');
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIGreen::class, current($pr->getEvents()));
     }
@@ -151,8 +151,8 @@ class PRTest extends TestCase
                 'CI_STATUS'  => 'GREEN',
             ]
         );
-        $pr->CIIsRed();
-        $this->assertTrue($pr->isRed());
+        $pr->red();
+        $this->assertEquals($pr->normalize()['CI_STATUS'], 'RED');
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIRed::class, current($pr->getEvents()));
     }

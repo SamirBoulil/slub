@@ -85,33 +85,23 @@ class PR
         $this->events[] = PRNotGTMed::withIdentifier($this->PRIdentifier);
     }
 
+    public function green(): void
+    {
+        $this->CIStatus = CIStatus::green();
+        $this->events[] = CIGreen::ForPR($this->PRIdentifier);
+    }
+
+    public function red(): void
+    {
+        $this->CIStatus = CIStatus::red();
+        $this->events[] = CIRed::ForPR($this->PRIdentifier);
+    }
+
     /**
      * @return Event[]
      */
     public function getEvents(): array
     {
         return $this->events;
-    }
-
-    public function CIIsGreen(): void
-    {
-        $this->CIStatus = CIStatus::green();
-        $this->events[] = CIGreen::ForPR($this->PRIdentifier);
-    }
-
-    public function isGreen(): bool
-    {
-        return $this->CIStatus->isGreen();
-    }
-
-    public function CIIsRed(): void
-    {
-        $this->CIStatus = CIStatus::red();
-        $this->events[] = CIRed::ForPR($this->PRIdentifier);
-    }
-
-    public function isRed(): bool
-    {
-        return $this->CIStatus->isRed();
     }
 }

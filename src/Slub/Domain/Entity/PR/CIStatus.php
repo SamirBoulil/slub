@@ -50,14 +50,4 @@ class CIStatus
     {
         return $this->status;
     }
-
-    public function isGreen(): bool
-    {
-        return $this->status === self::GREEN;
-    }
-
-    public function isRed(): bool
-    {
-        return $this->status === self::RED;
-    }
 }

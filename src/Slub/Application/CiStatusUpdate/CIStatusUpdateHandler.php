@@ -29,10 +29,10 @@ class CIStatusUpdateHandler
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
         if ($CIStatusUpdate->isGreen) {
-            $PR->CIIsGreen();
+            $PR->green();
         }
         if (!$CIStatusUpdate->isGreen) {
-            $PR->CIIsRed();
+            $PR->red();
         }
         $this->PRRepository->save($PR);
     }

@@ -58,8 +58,8 @@ class CIStatusTest extends TestCase
      */
     public function it_tells_if_it_is_green()
     {
-        $this->assertTrue(CIStatus::green()->isGreen());
-        $this->assertFalse(CIStatus::noStatus()->isGreen());
-        $this->assertFalse(CIStatus::Red()->isGreen());
+        $this->assertEquals(CIStatus::green()->stringValue(), 'GREEN');
+        $this->assertEquals(CIStatus::noStatus()->stringValue(), 'NO_STATUS');
+        $this->assertEquals(CIStatus::Red()->stringValue(), 'RED');
     }
 }

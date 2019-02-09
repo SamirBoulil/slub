@@ -8,6 +8,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\GTMed;
+use Slub\Domain\Event\Merged;
 use Slub\Domain\Event\NotGTMed;
 
 class EventsSpyTest extends TestCase
@@ -81,6 +82,7 @@ class EventsSpyTest extends TestCase
                 NotGTMed::class => 'notifyPRNotGTMed',
                 CIGreen::class  => 'notifyCIGreen',
                 CIRed::class    => 'notifyCIRed',
+                Merged::class   => 'notifyPRMerged',
             ],
             EventsSpy::getSubscribedEvents()
         );

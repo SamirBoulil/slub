@@ -7,6 +7,7 @@ namespace Slub\Domain\Entity\PR;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\GTMed;
+use Slub\Domain\Event\Merged;
 use Slub\Domain\Event\NotGTMed;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
@@ -106,6 +107,12 @@ class PR
     {
         $this->CIStatus = CIStatus::red();
         $this->events[] = CIRed::ForPR($this->PRIdentifier);
+    }
+
+    public function merged(): void
+    {
+        $this->isMerged = true;
+        $this->events[] = Merged::ForPR($this->PRIdentifier);
     }
 
     /**

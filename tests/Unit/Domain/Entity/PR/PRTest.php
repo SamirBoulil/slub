@@ -117,6 +117,18 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_can_be_merged()
+    {
+        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'));
+        $pr->merged();
+        $this->assertEquals($pr->normalize()['IS_MERGED'], true);
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_its_identifier()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');

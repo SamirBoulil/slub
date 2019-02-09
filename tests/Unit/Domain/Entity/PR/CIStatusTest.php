@@ -44,14 +44,13 @@ class CIStatusTest extends TestCase
         $this->assertEquals('GREEN', $noStatus->stringValue());
     }
 
-
     /**
      * @test
      */
     public function it_throws_if_it_does_not_support_a_status()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $noStatus = CIStatus::fromNormalized('UNSUPPORTED');
+        CIStatus::fromNormalized('UNSUPPORTED');
     }
 
     /**

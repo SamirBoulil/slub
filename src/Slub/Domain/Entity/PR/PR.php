@@ -15,8 +15,9 @@ class PR
 {
     private const IDENTIFIER_KEY = 'identifier';
     private const GTM_KEY = 'GTM';
-    private const NOTGTM_KEY = 'NOT_GTM';
+    private const NOT_GTM_KEY = 'NOT_GTM';
     private const CI_STATUS_KEY = 'CI_STATUS';
+    private const IS_MERGED_KEY = 'IS_MERGED';
 
     /** @var Event[] */
     private $events = [];
@@ -33,29 +34,38 @@ class PR
     /** @var CIStatus */
     private $CIStatus;
 
-    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus)
+    /** @var bool */
+    private $isMerged;
+
+    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus, bool $isMerged)
     {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
         $this->CIStatus = $CIStatus;
+        $this->isMerged = $isMerged;
     }
 
     public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($PRIdentifier, 0, 0, CIStatus::pending());
+        return new self($PRIdentifier, 0, 0, CIStatus::pending(), false);
     }
 
     public static function fromNormalized(array $normalizedPR): self
     {
         Assert::keyExists($normalizedPR, self::IDENTIFIER_KEY);
-        $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
-        $GTM = $normalizedPR[self::GTM_KEY];
-        $NOTGTM = $normalizedPR[self::NOTGTM_KEY];
-        $CIStatus = $normalizedPR[self::CI_STATUS_KEY] ?? '';
+        Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
+        Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
+        Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
 
-        return new self($identifier, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus));
+        $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
+        $GTM = $normalizedPR[self::GTM_KEY];
+        $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
+        $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
+        $isMerged = $normalizedPR[self::IS_MERGED_KEY];
+
+        return new self($identifier, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus), $isMerged);
     }
 
     public function normalize(): array
@@ -63,8 +73,9 @@ class PR
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
-            self::NOTGTM_KEY     => $this->notGTMCount,
+            self::NOT_GTM_KEY    => $this->notGTMCount,
             self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
+            self::IS_MERGED_KEY  => $this->isMerged,
         ];
     }
 

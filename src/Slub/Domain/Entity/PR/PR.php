@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\Event;
@@ -29,6 +30,7 @@ class PR
     /** @var int */
     private $notGTMCount;
 
+    /** @var CIStatus */
     private $CIStatus;
 
     private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus)
@@ -100,5 +102,16 @@ class PR
     public function isGreen(): bool
     {
         return $this->CIStatus->isGreen();
+    }
+
+    public function CIIsRed(): void
+    {
+        $this->CIStatus = CIStatus::red();
+        $this->events[] = CIRed::ForPR($this->PRIdentifier);
+    }
+
+    public function isRed(): bool
+    {
+        return $this->CIStatus->isRed();
     }
 }

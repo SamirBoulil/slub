@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIRed;
 
 class PRTest extends TestCase
 {
@@ -121,7 +122,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_have_its_ci_status_updated()
+    public function it_can_become_green()
     {
         $pr = PR::fromNormalized(
             [
@@ -135,6 +136,25 @@ class PRTest extends TestCase
         $this->assertTrue($pr->isGreen());
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIGreen::class, current($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_become_red()
+    {
+        $pr = PR::fromNormalized(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 2,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'GREEN',
+            ]
+        );
+        $pr->CIIsRed();
+        $this->assertTrue($pr->isRed());
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(CIRed::class, current($pr->getEvents()));
     }
 
     /**

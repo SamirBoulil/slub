@@ -27,7 +27,12 @@ class CIStatusUpdateHandler
     public function handle(CIStatusUpdate $CIStatusUpdate): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
-        $PR->CIIsGreen();
+        if ($CIStatusUpdate->isGreen) {
+            $PR->CIIsGreen();
+        }
+        if (!$CIStatusUpdate->isGreen) {
+            $PR->CIIsRed();
+        }
         $this->PRRepository->save($PR);
     }
 }

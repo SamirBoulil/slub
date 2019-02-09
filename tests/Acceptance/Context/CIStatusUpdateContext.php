@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
@@ -66,6 +65,40 @@ class CIStatusUpdateContext extends FeatureContext
     {
         Assert::assertTrue(
             $this->eventSpy->CIGreenEventDispatched(),
+            'Expected CIGreenEvent to be dispatched, but was not found'
+        );
+    }
+
+    /**
+     * @When /^the CI is red for the pull request$/
+     */
+    public function theCIIsRedForThePullRequest()
+    {
+        $CIStatusUpdate = new CIStatusUpdate();
+        $CIStatusUpdate->repository = 'akeneo/pim-community-dev';
+        $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $CIStatusUpdate->isGreen = false;
+        $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
+
+        $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
+    }
+
+    /**
+     * @Then /^the PR should be red$/
+     */
+    public function thePRShouldBeRed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'RED', 'PR is expected to be red, but it wasn\'t');
+    }
+
+    /**
+     * @Given /^the squad should be notified that the ci is red for the pull request$/
+     */
+    public function theSquadShouldBeNotifiedThatTheCiIsRedForThePullRequest()
+    {
+        Assert::assertTrue(
+            $this->eventSpy->CIRedEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
     }

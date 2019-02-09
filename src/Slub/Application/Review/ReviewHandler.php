@@ -33,14 +33,7 @@ class ReviewHandler
         if ($this->isUnsupported($review)) {
             return;
         }
-
-        $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
-        if ($review->isGTM) {
-            $PR->GTM();
-        } else {
-            $PR->notGTM();
-        }
-        $this->PRRepository->save($PR);
+        $this->updatePRWithReview($review);
     }
 
     private function isUnsupported(Review $review): bool
@@ -48,5 +41,16 @@ class ReviewHandler
         $repositoryIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
 
         return $this->isSupported->repository($repositoryIdentifier) === false;
+    }
+
+    private function updatePRWithReview(Review $review): void
+    {
+        $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
+        if ($review->isGTM) {
+            $PR->GTM();
+        } else {
+            $PR->notGTM();
+        }
+        $this->PRRepository->save($PR);
     }
 }

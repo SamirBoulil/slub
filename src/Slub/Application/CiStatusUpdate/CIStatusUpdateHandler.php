@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Application\CIStatusUpdate;
 
-use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -32,8 +31,7 @@ class CIStatusUpdateHandler
         if ($this->isUnsupported($CIStatusUpdate)) {
             return;
         }
-        $PR = $this->updateCIStatus($CIStatusUpdate);
-        $this->PRRepository->save($PR);
+        $this->updateCIStatus($CIStatusUpdate);
     }
 
     private function isUnsupported(CIStatusUpdate $CIStatusUpdate): bool
@@ -43,7 +41,7 @@ class CIStatusUpdateHandler
         return $this->isSupported->repository($repositoryIdentifier) === false;
     }
 
-    private function updateCIStatus(CIStatusUpdate $CIStatusUpdate): PR
+    private function updateCIStatus(CIStatusUpdate $CIStatusUpdate): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
         if ($CIStatusUpdate->isGreen) {
@@ -52,7 +50,6 @@ class CIStatusUpdateHandler
         if (!$CIStatusUpdate->isGreen) {
             $PR->red();
         }
-
-        return $PR;
+        $this->PRRepository->save($PR);
     }
 }

@@ -6,13 +6,13 @@ namespace Tests\Unit\Domain\Event;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\CIGreen;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
  */
-class PRGTMedTest extends TestCase
+class CIGreenTest extends TestCase
 {
     /**
      * @test
@@ -20,7 +20,7 @@ class PRGTMedTest extends TestCase
     public function it_is_created_with_a_pr_identifier_and_returns_it()
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
-        $event = PRGTMed::withIdentifier($expectedIdentifier);
+        $event = CIGreen::forPR($expectedIdentifier);
         $this->assertTrue(
             $event->PRIdentifier()->equals($expectedIdentifier),
             'Expected identifier to be the same than the one the event was created with, found different.'

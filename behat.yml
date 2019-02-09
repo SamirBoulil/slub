@@ -11,6 +11,10 @@ default:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.gtm_pr.gtm_pr_handler"
                     - "@helpers.event_spy"
+                - Tests\Acceptance\Context\CIStatusUpdateContext:
+                    - "@slub.infrastructure.persistence.pr_repository"
+                    - "@slub.application.ci_status_update.ci_status_update_handler"
+                    - "@helpers.event_spy"
     extensions:
         Behat\Symfony2Extension:
             kernel:

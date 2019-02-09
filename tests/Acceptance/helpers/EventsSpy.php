@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
+use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,13 +16,19 @@ class EventsSpy implements EventSubscriberInterface
 {
     /** @var bool */
     private $hasBeenGTMed = false;
+
+    /** @var bool */
     private $hasNotBeenGTMed = false;
+
+    /** @var bool */
+    private $CIGreenDispatched = false;
 
     public static function getSubscribedEvents()
     {
         return [
-            PRGTMed::class => 'notifyPRGTMed',
+            PRGTMed::class    => 'notifyPRGTMed',
             PRNotGTMed::class => 'notifyPRNotGTMed',
+            CIGreen::class    => 'notifyCIGreen',
         ];
     }
 
@@ -43,6 +50,16 @@ class EventsSpy implements EventSubscriberInterface
     public function PRhasNotBeenGMTed(): bool
     {
         return $this->hasNotBeenGTMed;
+    }
+
+    public function notifyCIGreen()
+    {
+        $this->CIGreenDispatched = true;
+    }
+
+    public function CIGreenEventDispatched(): bool
+    {
+        return $this->CIGreenDispatched;
     }
 
     public function hasEvents(): bool

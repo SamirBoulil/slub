@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\Event;
@@ -14,6 +15,7 @@ class PR
     private const IDENTIFIER_KEY = 'identifier';
     private const GTM_KEY = 'GTM';
     private const NOTGTM_KEY = 'NOT_GTM';
+    private const CI_STATUS_KEY = 'CI_STATUS';
 
     /** @var Event[] */
     private $events = [];
@@ -27,16 +29,19 @@ class PR
     /** @var int */
     private $notGTMCount;
 
-    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount)
+    private $CIStatus;
+
+    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus)
     {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
+        $this->CIStatus = $CIStatus;
     }
 
     public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($PRIdentifier, 0, 0);
+        return new self($PRIdentifier, 0, 0, CIStatus::noStatus());
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -46,8 +51,9 @@ class PR
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         $GTM = $normalizedPR[self::GTM_KEY];
         $NOTGTM = $normalizedPR[self::NOTGTM_KEY];
+        $CIStatus = $normalizedPR[self::CI_STATUS_KEY] ?? '';
 
-        return new self($identifier, $GTM, $NOTGTM);
+        return new self($identifier, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus));
     }
 
     public function normalize(): array
@@ -56,6 +62,7 @@ class PR
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
             self::NOTGTM_KEY     => $this->notGTMCount,
+            self::CI_STATUS_KEY => $this->CIStatus->stringValue()
         ];
     }
 
@@ -82,5 +89,16 @@ class PR
     public function getEvents(): array
     {
         return $this->events;
+    }
+
+    public function CIIsGreen(): void
+    {
+        $this->CIStatus = CIStatus::green();
+        $this->events[] = CIGreen::ForPR($this->PRIdentifier);
+    }
+
+    public function isGreen(): bool
+    {
+        return $this->CIStatus->isGreen();
     }
 }

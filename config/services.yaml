@@ -37,6 +37,12 @@ services:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
 
+    slub.application.ci_status_update.ci_status_update_handler:
+        class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler
+        arguments:
+            - "@slub.infrastructure.persistence.pr_repository"
+            - "@slub.infrastructure.query.is_supported"
+
     # Infrastructure
     # Persistence
     slub.infrastructure.persistence.pr_repository:

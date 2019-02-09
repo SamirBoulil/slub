@@ -7,6 +7,7 @@ namespace Tests\Unit\Domain\Entity\PR;
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Event\CIGreen;
 
 class PRTest extends TestCase
 {
@@ -27,7 +28,12 @@ class PRTest extends TestCase
      */
     public function it_is_created_from_normalized()
     {
-        $normalizedPR = ['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 2, 'NOT_GTM' => 0];
+        $normalizedPR = [
+            'identifier' => 'akeneo/pim-community-dev/1111',
+            'GTM'        => 2,
+            'NOT_GTM'    => 0,
+            'CI_STATUS'  => 'GREEN',
+        ];
 
         $pr = PR::fromNormalized($normalizedPR);
 
@@ -40,16 +46,37 @@ class PRTest extends TestCase
     public function it_can_be_GTM_multiple_times()
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 0,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
 
         $pr->GTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 1, 'NOT_GTM' => 0],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 1,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
 
         $pr->GTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 2, 'NOT_GTM' => 0],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 2,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
     }
 
     /**
@@ -58,16 +85,56 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTM_multiple_times()
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 0,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
 
         $pr->notGTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 1],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 0,
+                'NOT_GTM'    => 1,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
 
         $pr->notGTM();
-        $this->assertEquals(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 2],
-            $pr->normalize());
+        $this->assertEquals(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 0,
+                'NOT_GTM'    => 2,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_have_its_ci_status_updated()
+    {
+        $pr = PR::fromNormalized(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 2,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'GREEN',
+            ]
+        );
+        $pr->CIIsGreen();
+        $this->assertTrue($pr->isGreen());
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(CIGreen::class, current($pr->getEvents()));
     }
 
     /**
@@ -77,8 +144,15 @@ class PRTest extends TestCase
     {
         $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
 
-        $this->assertSame(['identifier' => 'akeneo/pim-community-dev/1111', 'GTM' => 0, 'NOT_GTM' => 0],
-            $pr->normalize());
+        $this->assertSame(
+            [
+                'identifier' => 'akeneo/pim-community-dev/1111',
+                'GTM'        => 0,
+                'NOT_GTM'    => 0,
+                'CI_STATUS'  => 'NO_STATUS',
+            ],
+            $pr->normalize()
+        );
     }
 
     /**

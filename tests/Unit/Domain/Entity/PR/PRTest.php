@@ -52,7 +52,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 0,
                 'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -63,7 +63,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 1,
                 'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -74,7 +74,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 2,
                 'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -91,7 +91,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 0,
                 'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -102,7 +102,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 0,
                 'NOT_GTM'    => 1,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -113,7 +113,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 0,
                 'NOT_GTM'    => 2,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );
@@ -169,7 +169,7 @@ class PRTest extends TestCase
                 'identifier' => 'akeneo/pim-community-dev/1111',
                 'GTM'        => 0,
                 'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'NO_STATUS',
+                'CI_STATUS'  => 'PENDING',
             ],
             $pr->normalize()
         );

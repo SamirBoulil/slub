@@ -12,7 +12,7 @@ use Webmozart\Assert\Assert;
  */
 class CIStatus
 {
-    private const NO_STATUS = 'NO_STATUS';
+    private const PENDING = 'PENDING';
     private const GREEN = 'GREEN';
     private const RED = 'RED';
 
@@ -24,9 +24,9 @@ class CIStatus
         $this->status = $status;
     }
 
-    public static function noStatus(): self
+    public static function pending(): self
     {
-        return new self(self::NO_STATUS);
+        return new self(self::PENDING);
     }
 
     public static function green(): self
@@ -41,7 +41,7 @@ class CIStatus
 
     public static function fromNormalized(string $ciStatus): self
     {
-        Assert::oneOf($ciStatus, [self::NO_STATUS, self::GREEN, self::RED]);
+        Assert::oneOf($ciStatus, [self::PENDING, self::GREEN, self::RED]);
 
         return new self($ciStatus);
     }

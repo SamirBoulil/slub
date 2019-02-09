@@ -43,7 +43,7 @@ class PR
 
     public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($PRIdentifier, 0, 0, CIStatus::noStatus());
+        return new self($PRIdentifier, 0, 0, CIStatus::pending());
     }
 
     public static function fromNormalized(array $normalizedPR): self

@@ -11,10 +11,10 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_without_status_and_normalizes_itself()
+    public function it_can_be_constructed_with_status_pending_and_normalizes_itself()
     {
-        $noStatus = CIStatus::noStatus();
-        $this->assertEquals('NO_STATUS', $noStatus->stringValue());
+        $noStatus = CIStatus::pending();
+        $this->assertEquals('PENDING', $noStatus->stringValue());
     }
 
     /**
@@ -59,7 +59,7 @@ class CIStatusTest extends TestCase
     public function it_tells_if_it_is_green()
     {
         $this->assertEquals(CIStatus::green()->stringValue(), 'GREEN');
-        $this->assertEquals(CIStatus::noStatus()->stringValue(), 'NO_STATUS');
+        $this->assertEquals(CIStatus::pending()->stringValue(), 'PENDING');
         $this->assertEquals(CIStatus::Red()->stringValue(), 'RED');
     }
 }

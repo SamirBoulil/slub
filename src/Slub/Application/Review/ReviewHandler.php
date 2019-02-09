@@ -45,8 +45,8 @@ class ReviewHandler
 
     private function isUnsupported(Review $review): bool
     {
-        $channelIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
+        $repositoryIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
 
-        return $this->isSupported->repository($channelIdentifier) === false;
+        return $this->isSupported->repository($repositoryIdentifier) === false;
     }
 }

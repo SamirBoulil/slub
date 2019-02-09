@@ -15,10 +15,8 @@ Botman: https://github.com/botman/botman
 - get notified who GTMed a PR
 
 # To refactor
-- OK: Remove isRed() and isGreen() they are only used for tests => use normalize()['CI_STATUS'] instead
-- Ok: Rename CIIsRed, CIIsGreen for Green, Red => should probably something else
-- Ok: Refactor EventsSpy
-    - Ok: Add unit tests
-    - Ok: Use array instead of 1 property / event
-- OK: Rename NO_STATUS to PENDING
-- Remove prefix PR in PRGTMed and PRNotGTMed
+- Add step: then the PR should be GTMed/notGTMed check in acceptance tests
+- Rename all "pull request" into "PR" in all acceptance tests
+
+
+- Only at the end of application layer: Rethink naming of application services (should it make the author appear?)

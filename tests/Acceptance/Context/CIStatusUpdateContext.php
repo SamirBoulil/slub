@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
@@ -41,7 +42,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function theCIIsGreenForThePullRequest()
     {
         $CIStatusUpdate = new CIStatusUpdate();
-        $CIStatusUpdate->repository = 'akeneo/pim-community-dev';
+        $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $CIStatusUpdate->isGreen = true;
         $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
@@ -75,7 +76,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function theCIIsRedForThePullRequest()
     {
         $CIStatusUpdate = new CIStatusUpdate();
-        $CIStatusUpdate->repository = 'akeneo/pim-community-dev';
+        $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $CIStatusUpdate->isGreen = false;
         $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
@@ -101,5 +102,27 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
+    }
+
+    /**
+     * @When /^the CI status changes for a PR belonging to an unsupported repository$/
+     */
+    public function theCIStatusChangesForAPRBelongingToAnUnsupportedRepository()
+    {
+        $CIStatusUpdate = new CIStatusUpdate();
+        $CIStatusUpdate->repositoryIdentifier = 'unsupported_repository';
+        $CIStatusUpdate->PRIdentifier = 'unsupported_repository/1010';
+        $CIStatusUpdate->isGreen = true;
+        $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
+
+        $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
+    }
+
+    /**
+     * @Then /^the squad should not be not notified$/
+     */
+    public function theSquadShouldNotBeNotNotified()
+    {
+        Assert::assertFalse($this->eventSpy->hasEvents(), 'Expected to have no events, but some were found');
     }
 }

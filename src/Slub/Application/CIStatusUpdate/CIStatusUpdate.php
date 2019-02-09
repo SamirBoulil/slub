@@ -14,7 +14,7 @@ class CIStatusUpdate
     use Immutable;
 
     /** @var string */
-    public $repository;
+    public $repositoryIdentifier;
 
     /** @var string */
     public $PRIdentifier;

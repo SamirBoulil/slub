@@ -14,3 +14,9 @@ Feature: Improve the communication between the author of the PR and it's reviewe
     Given a pull request in review
     When the pull request is NOT GTMED
     Then the squad should be notified that the pull request has one more NOT GTM
+
+  @secondary
+  Scenario: It does not notify the new reviews on unsupported repositories
+    When a pull request is reviewed on an unsupported repository
+    Then it does not notify the squad
+

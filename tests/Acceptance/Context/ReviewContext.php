@@ -7,6 +7,7 @@ use Slub\Application\Review\Review;
 use Slub\Application\Review\ReviewHandler;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 use Tests\Acceptance\helpers\PRGTMedSubscriberSpy;
 use Tests\Acceptance\helpers\PRNotGTMedSubscriberSpy;
@@ -93,5 +94,42 @@ class ReviewContext extends FeatureContext
         $notGTMCount = $PR->normalize()['NOT_GTM'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
         Assert::assertTrue($this->PRNotGTMedSubscriberSpy->PRhasNotBeenGMTed());
+    }
+
+    /**
+     * @When /^a pull request is reviewed on an unsupported repository$/
+     */
+    public function aPullRequestIsReviewedOnAnUnsupportedRepository()
+    {
+        $this->currentPRIdentifier = PRIdentifier::fromString('1010');
+
+        $notGTM = new Review();
+        $notGTM->repositoryIdentifier = 'unsupported_repository';
+        $notGTM->PRIdentifier = '1010';
+        $notGTM->isGTM = false;
+
+        $this->ReviewHandler->handle($notGTM);
+    }
+
+    /**
+     * @Then /^it does not notify the squad$/
+     */
+    public function itDoesNotNotifyTheSquad()
+    {
+        Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
+        Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
+        Assert::assertFalse($this->PRNotGTMedSubscriberSpy->PRhasNotBeenGMTed(), 'Event has been thrown, while none was expected.');
+    }
+
+    private function PRExists(PRIdentifier $PRIdentifier): bool
+    {
+        $found = true;
+        try {
+            $this->PRRepository->getBy($PRIdentifier);
+        } catch (PRNotFoundException $notFoundException) {
+            $found = false;
+        }
+
+        return $found;
     }
 }

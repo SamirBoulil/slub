@@ -4,12 +4,6 @@
 #  We want to be notified when pull request status changes
 #
 #  @nominal
-#  Scenario: Notify the squad when the pull request is not GTMed
-#    Given a pull request put to review
-#    When the pull request NOT GTMED
-#    Then the squad should be notified that the pull request has one more NOT GTM
-#
-#  @nominal
 #  Scenario: Notify the squad when the continuous integration (CI) passes
 #    Given a pull request put to review
 #    When the CI passes
@@ -26,12 +20,6 @@
 #    Given a pull request put to review
 #    When the pull request is merged
 #    Then the squad should be notified the pull request has been merged
-#
-#  @secondary
-#  Scenario: It does not notify the new reviews on unsupported repositories
-#    Given a pull request belonging to an unspported repository
-#    When the pull request is reviewed
-#    Then it does not notify the squad
 #
 #  @secondary
 #  Scenario: It does not notify CI status changes for unsupported repositories

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\Review;
+namespace Slub\Application\NewReview;
 
 use ConvenientImmutability\Immutable;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class Review
+class NewReview
 {
     use Immutable;
 

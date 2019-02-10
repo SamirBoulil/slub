@@ -31,8 +31,8 @@ services:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
 
-    slub.application.review.review_handler:
-        class: Slub\Application\Review\ReviewHandler
+    slub.application.new_review.new_review_handler:
+        class: Slub\Application\NewReview\NewReviewHandler
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"

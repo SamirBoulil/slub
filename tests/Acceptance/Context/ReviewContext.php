@@ -3,8 +3,8 @@
 namespace Tests\Acceptance\Context;
 
 use PHPUnit\Framework\Assert;
-use Slub\Application\Review\Review;
-use Slub\Application\Review\ReviewHandler;
+use Slub\Application\NewReview\NewReview;
+use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
@@ -13,7 +13,7 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class ReviewContext extends FeatureContext
 {
-    /** @var ReviewHandler */
+    /** @var NewReviewHandler */
     private $ReviewHandler;
 
     /** @var EventsSpy */
@@ -24,7 +24,7 @@ class ReviewContext extends FeatureContext
 
     public function __construct(
         FileBasedPRRepository $PRRepository,
-        ReviewHandler $reviewHandler,
+        NewReviewHandler $reviewHandler,
         EventsSpy $eventSpy
     ) {
         parent::__construct($PRRepository);
@@ -47,7 +47,7 @@ class ReviewContext extends FeatureContext
      */
     public function thePullRequestIsGTMed()
     {
-        $gtm = new Review();
+        $gtm = new NewReview();
         $gtm->repositoryIdentifier = 'akeneo/pim-community-dev';
         $gtm->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $gtm->isGTM = true;
@@ -80,7 +80,7 @@ class ReviewContext extends FeatureContext
      */
     public function thePullRequestIsNOTGTMED()
     {
-        $notGTM = new Review();
+        $notGTM = new NewReview();
         $notGTM->repositoryIdentifier = 'akeneo/pim-community-dev';
         $notGTM->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $notGTM->isGTM = false;
@@ -115,7 +115,7 @@ class ReviewContext extends FeatureContext
     {
         $this->currentPRIdentifier = PRIdentifier::fromString('1010');
 
-        $notGTM = new Review();
+        $notGTM = new NewReview();
         $notGTM->repositoryIdentifier = 'unsupported_repository';
         $notGTM->PRIdentifier = '1010';
         $notGTM->isGTM = false;

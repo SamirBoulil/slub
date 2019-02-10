@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\Review;
+namespace Slub\Application\NewReview;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
@@ -12,7 +12,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class ReviewHandler
+class NewReviewHandler
 {
     /** @var PRRepositoryInterface */
     private $PRRepository;
@@ -28,7 +28,7 @@ class ReviewHandler
         $this->isSupported = $isSupported;
     }
 
-    public function handle(Review $review)
+    public function handle(NewReview $review)
     {
         if ($this->isUnsupported($review)) {
             return;
@@ -36,14 +36,14 @@ class ReviewHandler
         $this->updatePRWithReview($review);
     }
 
-    private function isUnsupported(Review $review): bool
+    private function isUnsupported(NewReview $review): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
 
         return $this->isSupported->repository($repositoryIdentifier) === false;
     }
 
-    private function updatePRWithReview(Review $review): void
+    private function updatePRWithReview(NewReview $review): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         if ($review->isGTM) {

@@ -9,7 +9,7 @@ default:
                     - "@slub.application.put_pr_to_review.put_pr_to_review_handler"
                 - Tests\Acceptance\Context\ReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
-                    - "@slub.application.review.review_handler"
+                    - "@slub.application.new_review.new_review_handler"
                     - "@helpers.event_spy"
                 - Tests\Acceptance\Context\CIStatusUpdateContext:
                     - "@slub.infrastructure.persistence.pr_repository"

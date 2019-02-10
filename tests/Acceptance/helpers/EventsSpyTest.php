@@ -7,9 +7,9 @@ use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
-use Slub\Domain\Event\GTMed;
-use Slub\Domain\Event\Merged;
-use Slub\Domain\Event\NotGTMed;
+use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRMerged;
+use Slub\Domain\Event\PRNotGTMed;
 
 class EventsSpyTest extends TestCase
 {
@@ -27,7 +27,7 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_gtm_event_has_been_thrown()
     {
         $this->assertFalse($this->eventSpy->PRGMTedDispatched());
-        $this->eventSpy->notifyPRGTMed(GTMed::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyPRGTMed(PRGTMed::forPR(PRIdentifier::fromString('1010')));
         $this->assertTrue($this->eventSpy->PRGMTedDispatched());
     }
 
@@ -37,7 +37,7 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_not_gtm_event_has_been_thrown()
     {
         $this->assertFalse($this->eventSpy->PRNotGMTedDispatched());
-        $this->eventSpy->notifyPRNotGTMed(NotGTMed::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyPRNotGTMed(PRNotGTMed::forPR(PRIdentifier::fromString('1010')));
         $this->assertTrue($this->eventSpy->PRNotGMTedDispatched());
     }
 
@@ -78,11 +78,11 @@ class EventsSpyTest extends TestCase
     {
         $this->assertEquals(
             [
-                GTMed::class    => 'notifyPRGTMed',
-                NotGTMed::class => 'notifyPRNotGTMed',
-                CIGreen::class  => 'notifyCIGreen',
-                CIRed::class    => 'notifyCIRed',
-                Merged::class   => 'notifyPRMerged',
+                PRGTMed::class    => 'notifyPRGTMed',
+                PRNotGTMed::class => 'notifyPRNotGTMed',
+                CIGreen::class    => 'notifyCIGreen',
+                CIRed::class      => 'notifyCIRed',
+                PRMerged::class   => 'notifyPRMerged',
             ],
             EventsSpy::getSubscribedEvents()
         );

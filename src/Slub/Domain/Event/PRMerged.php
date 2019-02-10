@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class Merged extends Event
+class PRMerged extends Event
 {
     /** @var PRIdentifier */
     private $PRIdentifier;

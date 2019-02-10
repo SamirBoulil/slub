@@ -6,9 +6,9 @@ namespace Tests\Acceptance\helpers;
 
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
-use Slub\Domain\Event\GTMed;
-use Slub\Domain\Event\Merged;
-use Slub\Domain\Event\NotGTMed;
+use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRMerged;
+use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -22,32 +22,32 @@ class EventsSpy implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            GTMed::class    => 'notifyPRGTMed',
-            NotGTMed::class => 'notifyPRNotGTMed',
-            CIGreen::class  => 'notifyCIGreen',
-            CIRed::class    => 'notifyCIRed',
-            Merged::class   => 'notifyPRMerged',
+            PRGTMed::class    => 'notifyPRGTMed',
+            PRNotGTMed::class => 'notifyPRNotGTMed',
+            CIGreen::class    => 'notifyCIGreen',
+            CIRed::class      => 'notifyCIRed',
+            PRMerged::class   => 'notifyPRMerged',
         ];
     }
 
-    public function notifyPRGTMed(GTMed $PRGTMed): void
+    public function notifyPRGTMed(PRGTMed $PRGTMed): void
     {
-        $this->events[GTMed::class] = true;
+        $this->events[PRGTMed::class] = true;
     }
 
     public function PRGMTedDispatched(): bool
     {
-        return $this->events[GTMed::class] ?? false;
+        return $this->events[PRGTMed::class] ?? false;
     }
 
-    public function notifyPRNotGTMed(NotGTMed $PRNotGTMed): void
+    public function notifyPRNotGTMed(PRNotGTMed $PRNotGTMed): void
     {
-        $this->events[NotGTMed::class] = true;
+        $this->events[PRNotGTMed::class] = true;
     }
 
     public function PRNotGMTedDispatched(): bool
     {
-        return $this->events[NotGTMed::class] ?? false;
+        return $this->events[PRNotGTMed::class] ?? false;
     }
 
     public function notifyCIGreen(CIGreen $CIGreen): void
@@ -70,14 +70,14 @@ class EventsSpy implements EventSubscriberInterface
         return $this->events[CIRed::class] ?? false;
     }
 
-    public function notifyPRMerged(Merged $merged): void
+    public function notifyPRMerged(PRMerged $merged): void
     {
-        $this->events[Merged::class] = true;
+        $this->events[PRMerged::class] = true;
     }
 
     public function PRMergedDispatched(): bool
     {
-        return $this->events[Merged::class] ?? false;
+        return $this->events[PRMerged::class] ?? false;
     }
 
     public function hasEvents(): bool

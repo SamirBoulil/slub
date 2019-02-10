@@ -6,9 +6,9 @@ namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
-use Slub\Domain\Event\GTMed;
-use Slub\Domain\Event\Merged;
-use Slub\Domain\Event\NotGTMed;
+use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRMerged;
+use Slub\Domain\Event\PRNotGTMed;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -88,13 +88,13 @@ class PR
     public function GTM(): void
     {
         $this->GTMCount++;
-        $this->events[] = GTMed::forPR($this->PRIdentifier);
+        $this->events[] = PRGTMed::forPR($this->PRIdentifier);
     }
 
     public function notGTM(): void
     {
         $this->notGTMCount++;
-        $this->events[] = NotGTMed::forPR($this->PRIdentifier);
+        $this->events[] = PRNotGTMed::forPR($this->PRIdentifier);
     }
 
     public function green(): void
@@ -112,7 +112,7 @@ class PR
     public function merged(): void
     {
         $this->isMerged = true;
-        $this->events[] = Merged::ForPR($this->PRIdentifier);
+        $this->events[] = PRMerged::ForPR($this->PRIdentifier);
     }
 
     /**

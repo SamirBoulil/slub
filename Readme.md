@@ -8,19 +8,13 @@ Botman: https://github.com/botman/botman
 
 
 # Todo:
-- Remove interfaces from test coverage in phpunit
 - Add test coverage 100% ?
 - Add glossary (squad, PR, GTM...)
 
-# Later
-- get notified who GTMed a PR
+# Ideas
+- get notified *who* GTMed a PR ?
+- Be notified *who* merged the PR ?
 - be notified when a PR is closed but not merged ?
-- Be notified who merged the PR ?
 
 # To refactor
-- Only at the end: Add VOs pour GTMCount NotGTMCount, Merged?
-- Rename feature context: notify-ci-status-changed.feature / notify-ci-green.feature
-- Only at the end of application layer: Rethink naming of application services (should it make the author appear?)
 
-# Branches (no wifi)
-ci-status-red

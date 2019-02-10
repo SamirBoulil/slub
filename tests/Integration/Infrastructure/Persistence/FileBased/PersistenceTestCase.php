@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\FileBased;
 
-use PHPUnit\Framework\TestCase;
-use Slub\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 abstract class PersistenceTestCase extends KernelTestCase

@@ -9,7 +9,15 @@ default:
                     - "@slub.application.put_pr_to_review.put_pr_to_review_handler"
                 - Tests\Acceptance\Context\ReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
-                    - "@slub.application.gtm_pr.gtm_pr_handler"
+                    - "@slub.application.review.review_handler"
+                    - "@helpers.event_spy"
+                - Tests\Acceptance\Context\CIStatusUpdateContext:
+                    - "@slub.infrastructure.persistence.pr_repository"
+                    - "@slub.application.ci_status_update.ci_status_update_handler"
+                    - "@helpers.event_spy"
+                - Tests\Acceptance\Context\MergedPRContext:
+                    - "@slub.infrastructure.persistence.pr_repository"
+                    - "@slub.application.merged_pr.merged_pr_handler"
                     - "@helpers.event_spy"
     extensions:
         Behat\Symfony2Extension:

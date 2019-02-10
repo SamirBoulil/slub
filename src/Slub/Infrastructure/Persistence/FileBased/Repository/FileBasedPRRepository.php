@@ -113,6 +113,13 @@ class FileBasedPRRepository implements PRRepositoryInterface
         fclose($fp);
     }
 
+    private function dispatchEvents(PR $PR): void
+    {
+        foreach ($PR->getEvents() as $event) {
+            $this->eventDispatcher->dispatch(get_class($event), $event);
+        }
+    }
+
     public function getBy(PRIdentifier $PRidentifier): PR
     {
         $allPRs = $this->all();
@@ -150,12 +157,5 @@ class FileBasedPRRepository implements PRRepositoryInterface
     {
         touch($this->filePath);
         unlink($this->filePath);
-    }
-
-    private function dispatchEvents(PR $PR): void
-    {
-        foreach ($PR->getEvents() as $event) {
-            $this->eventDispatcher->dispatch(get_class($event), $event);
-        }
     }
 }

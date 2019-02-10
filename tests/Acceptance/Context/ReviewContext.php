@@ -34,7 +34,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Given /^a pull request in review$/
+     * @Given /^a PR in review$/
      */
     public function aPullRequestInReview()
     {
@@ -43,7 +43,7 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^the pull request is GTMed$/
+     * @When /^the PR is GTMed$/
      */
     public function thePullRequestIsGTMed()
     {
@@ -55,7 +55,16 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the pull request has one more GTM$/
+     * @Then /^the PR should be GTMed$/
+     */
+    public function thePullRequestShouldBeGTMed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals(1, $PR->normalize()['GTM']);
+    }
+
+    /**
+     * @Then /^the squad should be notified that the PR has one more GTM$/
      */
     public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreGTM()
     {
@@ -63,11 +72,11 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $GTMCount = $PR->normalize()['GTM'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
-        Assert::assertTrue($this->eventSpy->PRhasBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
     }
 
     /**
-     * @When /^the pull request is NOT GTMED$/
+     * @When /^the PR is NOT GTMED$/
      */
     public function thePullRequestIsNOTGTMED()
     {
@@ -79,7 +88,16 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the pull request has one more NOT GTM$/
+     * @Then /^the PR should be NOT GTMed$/
+     */
+    public function thePullRequestShouldBeNOTGTMed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals(1, $PR->normalize()['NOT_GTM']);
+    }
+
+    /**
+     * @Then /^the squad should be notified that the PR has one more NOT GTM$/
      */
     public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreNOTGTM()
     {
@@ -87,11 +105,11 @@ class ReviewContext extends FeatureContext
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         $notGTMCount = $PR->normalize()['NOT_GTM'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
-        Assert::assertTrue($this->eventSpy->PRhasNotBeenGMTed());
+        Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
     }
 
     /**
-     * @When /^a pull request is reviewed on an unsupported repository$/
+     * @When /^a PR is reviewed on an unsupported repository$/
      */
     public function aPullRequestIsReviewedOnAnUnsupportedRepository()
     {
@@ -112,7 +130,7 @@ class ReviewContext extends FeatureContext
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
-        Assert::assertFalse($this->eventSpy->PRhasNotBeenGMTed(), 'Event has been thrown, while none was expected.');
+        Assert::assertFalse($this->eventSpy->PRNotGMTedDispatched(), 'Event has been thrown, while none was expected.');
     }
 
     private function PRExists(PRIdentifier $PRIdentifier): bool

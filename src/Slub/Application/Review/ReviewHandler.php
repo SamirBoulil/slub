@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Application\Review;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -34,7 +33,18 @@ class ReviewHandler
         if ($this->isUnsupported($review)) {
             return;
         }
+        $this->updatePRWithReview($review);
+    }
 
+    private function isUnsupported(Review $review): bool
+    {
+        $repositoryIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
+
+        return $this->isSupported->repository($repositoryIdentifier) === false;
+    }
+
+    private function updatePRWithReview(Review $review): void
+    {
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         if ($review->isGTM) {
             $PR->GTM();
@@ -42,12 +52,5 @@ class ReviewHandler
             $PR->notGTM();
         }
         $this->PRRepository->save($PR);
-    }
-
-    private function isUnsupported(Review $review): bool
-    {
-        $channelIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
-
-        return $this->isSupported->repository($channelIdentifier) === false;
     }
 }

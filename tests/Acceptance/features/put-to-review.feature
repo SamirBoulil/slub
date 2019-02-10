@@ -1,5 +1,5 @@
 Feature: Collect the pull requests put to review
-  In order to let the squad follow the progress of a pull request
+  In order to let the squad follow the progress of a pull request (PR)
   As an author
   I want to put a specific PR to review
 

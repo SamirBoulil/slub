@@ -31,8 +31,20 @@ services:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
 
-    slub.application.gtm_pr.gtm_pr_handler:
+    slub.application.review.review_handler:
         class: Slub\Application\Review\ReviewHandler
+        arguments:
+            - "@slub.infrastructure.persistence.pr_repository"
+            - "@slub.infrastructure.query.is_supported"
+
+    slub.application.ci_status_update.ci_status_update_handler:
+        class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler
+        arguments:
+            - "@slub.infrastructure.persistence.pr_repository"
+            - "@slub.infrastructure.query.is_supported"
+
+    slub.application.merged_pr.merged_pr_handler:
+        class: Slub\Application\MergedPR\MergedPRHandler
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"

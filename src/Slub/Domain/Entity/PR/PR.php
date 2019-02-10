@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
-use Slub\Domain\Event\PRGTMed;
-use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\GTMed;
+use Slub\Domain\Event\Merged;
+use Slub\Domain\Event\NotGTMed;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -13,7 +16,9 @@ class PR
 {
     private const IDENTIFIER_KEY = 'identifier';
     private const GTM_KEY = 'GTM';
-    private const NOTGTM_KEY = 'NOT_GTM';
+    private const NOT_GTM_KEY = 'NOT_GTM';
+    private const CI_STATUS_KEY = 'CI_STATUS';
+    private const IS_MERGED_KEY = 'IS_MERGED';
 
     /** @var Event[] */
     private $events = [];
@@ -27,27 +32,41 @@ class PR
     /** @var int */
     private $notGTMCount;
 
-    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount)
+    /** @var CIStatus */
+    private $CIStatus;
+
+    /** @var bool */
+    private $isMerged;
+
+    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus, bool $isMerged)
     {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
+        $this->CIStatus = $CIStatus;
+        $this->isMerged = $isMerged;
     }
 
     public static function create(PRIdentifier $PRIdentifier): self
     {
-        return new self($PRIdentifier, 0, 0);
+        return new self($PRIdentifier, 0, 0, CIStatus::pending(), false);
     }
 
     public static function fromNormalized(array $normalizedPR): self
     {
         Assert::keyExists($normalizedPR, self::IDENTIFIER_KEY);
-        $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
-        $GTM = $normalizedPR[self::GTM_KEY];
-        $NOTGTM = $normalizedPR[self::NOTGTM_KEY];
+        Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
+        Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
+        Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
 
-        return new self($identifier, $GTM, $NOTGTM);
+        $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
+        $GTM = $normalizedPR[self::GTM_KEY];
+        $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
+        $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
+        $isMerged = $normalizedPR[self::IS_MERGED_KEY];
+
+        return new self($identifier, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus), $isMerged);
     }
 
     public function normalize(): array
@@ -55,7 +74,9 @@ class PR
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
-            self::NOTGTM_KEY     => $this->notGTMCount,
+            self::NOT_GTM_KEY    => $this->notGTMCount,
+            self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
+            self::IS_MERGED_KEY  => $this->isMerged,
         ];
     }
 
@@ -67,13 +88,31 @@ class PR
     public function GTM(): void
     {
         $this->GTMCount++;
-        $this->events[] = PRGTMed::withIdentifier($this->PRIdentifier);
+        $this->events[] = GTMed::forPR($this->PRIdentifier);
     }
 
     public function notGTM(): void
     {
         $this->notGTMCount++;
-        $this->events[] = PRNotGTMed::withIdentifier($this->PRIdentifier);
+        $this->events[] = NotGTMed::forPR($this->PRIdentifier);
+    }
+
+    public function green(): void
+    {
+        $this->CIStatus = CIStatus::green();
+        $this->events[] = CIGreen::ForPR($this->PRIdentifier);
+    }
+
+    public function red(): void
+    {
+        $this->CIStatus = CIStatus::red();
+        $this->events[] = CIRed::ForPR($this->PRIdentifier);
+    }
+
+    public function merged(): void
+    {
+        $this->isMerged = true;
+        $this->events[] = Merged::ForPR($this->PRIdentifier);
     }
 
     /**

@@ -51,11 +51,11 @@ class PutPRToReviewContext extends FeatureContext
     ): PutPRToReview {
         $this->currentRepositoryIdentifier = $repositoryIdentifier;
         $this->currentPRIdentifier = $PRIdentifier;
-        $putPRToReview = new PutPRToReview(
-            $channelIdentifier,
-            $this->currentRepositoryIdentifier,
-            $this->currentPRIdentifier
-        );
+
+        $putPRToReview = new PutPRToReview();
+        $putPRToReview->channelIdentifier = $channelIdentifier;
+        $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
+        $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
 
         return $putPRToReview;
     }

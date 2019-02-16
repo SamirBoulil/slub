@@ -8,9 +8,10 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
-use Tests\Integration\Infrastructure\Persistence\FileBased\PersistenceTestCase;
+use Tests\Integration\Infrastructure\KernelTestCase;
+use Tests\Integration\Infrastructure\Persistence\FileBased\FileBasedTestCase;
 
-class FileBasedPRRepositoryTest extends PersistenceTestCase
+class FileBasedPRRepositoryTest extends KernelTestCase
 {
     /** @var FileBasedPRRepository */
     private $fileBasedPRRepository;
@@ -19,7 +20,6 @@ class FileBasedPRRepositoryTest extends PersistenceTestCase
     {
         parent::setUp();
         $this->fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
-        $this->fileBasedPRRepository->resetFile();
     }
 
     /**

@@ -17,6 +17,33 @@
     "behat/transliterator": {
         "version": "v1.2.0"
     },
+    "botman/botman": {
+        "version": "2.4.1"
+    },
+    "botman/driver-slack": {
+        "version": "2.1.3"
+    },
+    "botman/driver-web": {
+        "version": "1.5.1"
+    },
+    "botman/studio": {
+        "version": "1.3.1"
+    },
+    "botman/studio-addons": {
+        "version": "1.4.1"
+    },
+    "botman/tinker": {
+        "version": "1.0.4"
+    },
+    "clue/stdio-react": {
+        "version": "v2.2.0"
+    },
+    "clue/term-react": {
+        "version": "v1.2.0"
+    },
+    "clue/utf8-react": {
+        "version": "v1.1.0"
+    },
     "composer/semver": {
         "version": "1.4.2"
     },
@@ -25,6 +52,9 @@
     },
     "container-interop/container-interop": {
         "version": "1.2.0"
+    },
+    "dnoegel/php-xdg-base-dir": {
+        "version": "0.1"
     },
     "doctrine/annotations": {
         "version": "1.0",
@@ -35,11 +65,29 @@
             "ref": "cb4152ebcadbe620ea2261da1a1c5a9b8cea7672"
         }
     },
+    "doctrine/inflector": {
+        "version": "v1.3.0"
+    },
     "doctrine/instantiator": {
         "version": "1.1.0"
     },
     "doctrine/lexer": {
         "version": "v1.0.1"
+    },
+    "dragonmantank/cron-expression": {
+        "version": "v2.2.0"
+    },
+    "egulias/email-validator": {
+        "version": "2.1.7"
+    },
+    "erusev/parsedown": {
+        "version": "1.7.1"
+    },
+    "evenement/evenement": {
+        "version": "v3.0.1"
+    },
+    "fideloper/proxy": {
+        "version": "4.1.0"
     },
     "friendsofphp/php-cs-fixer": {
         "version": "2.2",
@@ -50,14 +98,62 @@
             "ref": "81dee417d2cc60cd1c9d6208dff2ec22a1103e93"
         }
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.5.2"
+    },
+    "jakub-onderka/php-console-color": {
+        "version": "v0.2"
+    },
+    "jakub-onderka/php-console-highlighter": {
+        "version": "v0.4"
+    },
     "jean85/pretty-package-versions": {
         "version": "1.2"
+    },
+    "laravel/framework": {
+        "version": "v5.7.26"
+    },
+    "laravel/nexmo-notification-channel": {
+        "version": "v1.0.1"
+    },
+    "laravel/slack-notification-channel": {
+        "version": "v1.0.3"
+    },
+    "laravel/tinker": {
+        "version": "v1.0.8"
+    },
+    "lcobucci/jwt": {
+        "version": "3.2.5"
+    },
+    "league/flysystem": {
+        "version": "1.0.50"
     },
     "matthiasnoback/convenient-immutability": {
         "version": "v0.2.1"
     },
+    "monolog/monolog": {
+        "version": "1.24.0"
+    },
+    "mpociot/phpws": {
+        "version": "2.0.1"
+    },
+    "mpociot/pipeline": {
+        "version": "1.0.2"
+    },
+    "mpociot/slack-client": {
+        "version": "1.2.0"
+    },
     "myclabs/deep-copy": {
         "version": "1.8.1"
+    },
+    "nesbot/carbon": {
+        "version": "1.36.2"
     },
     "nette/bootstrap": {
         "version": "v2.4.6"
@@ -80,11 +176,17 @@
     "nette/utils": {
         "version": "v2.5.3"
     },
+    "nexmo/client": {
+        "version": "1.6.2"
+    },
     "nikic/php-parser": {
         "version": "v4.2.0"
     },
     "ocramius/package-versions": {
         "version": "1.3.0"
+    },
+    "opis/closure": {
+        "version": "3.1.5"
     },
     "phar-io/manifest": {
         "version": "1.0.3"
@@ -94,6 +196,15 @@
     },
     "php-cs-fixer/diff": {
         "version": "v1.3.0"
+    },
+    "php-http/guzzle6-adapter": {
+        "version": "v1.1.1"
+    },
+    "php-http/httplug": {
+        "version": "v1.1.0"
+    },
+    "php-http/promise": {
+        "version": "v1.0.0"
     },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
@@ -143,11 +254,44 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/log": {
         "version": "1.1.0"
     },
     "psr/simple-cache": {
         "version": "1.0.1"
+    },
+    "psy/psysh": {
+        "version": "v0.9.9"
+    },
+    "ralouphie/getallheaders": {
+        "version": "2.0.5"
+    },
+    "ramsey/uuid": {
+        "version": "3.8.0"
+    },
+    "react/cache": {
+        "version": "v0.5.0"
+    },
+    "react/dns": {
+        "version": "v0.4.16"
+    },
+    "react/event-loop": {
+        "version": "v1.1.0"
+    },
+    "react/promise": {
+        "version": "v2.7.1"
+    },
+    "react/promise-timer": {
+        "version": "v1.5.0"
+    },
+    "react/socket": {
+        "version": "v0.8.12"
+    },
+    "react/stream": {
+        "version": "v1.1.0"
     },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
@@ -182,6 +326,12 @@
     "sebastian/version": {
         "version": "2.0.1"
     },
+    "spatie/macroable": {
+        "version": "1.0.0"
+    },
+    "swiftmailer/swiftmailer": {
+        "version": "v6.1.3"
+    },
     "symfony/cache": {
         "version": "v4.2.3"
     },
@@ -202,6 +352,9 @@
     },
     "symfony/contracts": {
         "version": "v1.0.2"
+    },
+    "symfony/css-selector": {
+        "version": "v4.2.3"
     },
     "symfony/debug": {
         "version": "v4.2.3"
@@ -278,16 +431,58 @@
             "ref": "1fb02a6e1c8f3d4232cce485c9afa868d63b115a"
         }
     },
+    "symfony/var-dumper": {
+        "version": "v4.2.3"
+    },
     "symfony/var-exporter": {
         "version": "v4.2.3"
     },
     "symfony/yaml": {
         "version": "v4.2.3"
     },
+    "thecodingmachine/discovery": {
+        "version": "v1.2.1"
+    },
     "theseer/tokenizer": {
         "version": "1.1.0"
     },
+    "tightenco/collect": {
+        "version": "v5.7.25"
+    },
+    "tijsverkoyen/css-to-inline-styles": {
+        "version": "2.2.1"
+    },
+    "vlucas/phpdotenv": {
+        "version": "v2.6.1"
+    },
     "webmozart/assert": {
         "version": "1.4.0"
+    },
+    "zendframework/zend-diactoros": {
+        "version": "1.8.6"
+    },
+    "zendframework/zend-escaper": {
+        "version": "2.6.0"
+    },
+    "zendframework/zend-http": {
+        "version": "2.9.1"
+    },
+    "zendframework/zend-loader": {
+        "version": "2.6.0"
+    },
+    "zendframework/zend-log": {
+        "version": "2.10.0"
+    },
+    "zendframework/zend-servicemanager": {
+        "version": "3.4.0"
+    },
+    "zendframework/zend-stdlib": {
+        "version": "3.2.1"
+    },
+    "zendframework/zend-uri": {
+        "version": "2.6.1"
+    },
+    "zendframework/zend-validator": {
+        "version": "2.12.0"
     }
 }

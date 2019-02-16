@@ -50,7 +50,7 @@ services:
             - "@slub.infrastructure.query.is_supported"
 
     # Infrastructure
-    # Persistence
+    ## Persistence
     slub.infrastructure.persistence.pr_repository:
         class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
         arguments:
@@ -62,3 +62,17 @@ services:
         arguments:
             - "%slub.supported_repositories%"
             - "%slub.supported_channels%"
+
+    ## Chat
+    slub.infrastructure.chat.slack.listen_for_new_pr_to_review:
+        class: Slub\Infrastructure\Chat\Slack\ListenForNewPRToReview
+        arguments:
+            - []
+
+
+    # Third party
+    botman:
+        class: BotMan\BotMan\BotMan
+        factory: 'BotMan\BotMan\BotManFactory::create'
+        arguments:
+            - []

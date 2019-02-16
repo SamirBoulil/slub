@@ -8,7 +8,6 @@ use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\Drivers\Slack\SlackDriver;
-use Slub\Application\PutPRToReview\PutPRToReview;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -26,7 +25,6 @@ class ListenForNewPRToReview
     public function execute(): void
     {
         $botMan = $this->createBot();
-
         $botMan->listen();
     }
 

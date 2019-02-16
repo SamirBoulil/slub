@@ -69,6 +69,12 @@ services:
         arguments:
             - []
 
+    slub.infrastructure.chat.slack.slub_bot_factory:
+        class: Slub\Infrastructure\Chat\Slack\SlubBotFactory
+        arguments:
+            - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+            - slack:
+                token: '%env(SLACK_TOKEN)%'
 
     # Third party
     botman:

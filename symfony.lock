@@ -398,6 +398,9 @@
     "symfony/http-kernel": {
         "version": "v4.2.3"
     },
+    "symfony/lock": {
+        "version": "v4.2.3"
+    },
     "symfony/options-resolver": {
         "version": "v4.2.3"
     },

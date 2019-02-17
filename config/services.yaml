@@ -64,17 +64,19 @@ services:
             - "%slub.supported_channels%"
 
     ## Chat
-    slub.infrastructure.chat.slack.listen_for_new_pr_to_review:
-        class: Slub\Infrastructure\Chat\Slack\ListenForNewPRToReview
-        arguments:
-            - []
-
-    slub.infrastructure.chat.slack.slub_bot_factory:
-        class: Slub\Infrastructure\Chat\Slack\SlubBotFactory
+    slub.infrastructure.chat.slack.slub_bot:
+        class: Slub\Infrastructure\Chat\Slack\SlubBot
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - slack:
                 token: '%env(SLACK_TOKEN)%'
+
+    slub.infrastructure.chat.slack.start_slub_bot_console:
+        class: Slub\Infrastructure\Chat\Slack\StartSlubBotConsole
+        arguments:
+            - '@slub.infrastructure.chat.slack.slub_bot'
+        tags:
+            - {name: console.command }
 
     # Third party
     botman:

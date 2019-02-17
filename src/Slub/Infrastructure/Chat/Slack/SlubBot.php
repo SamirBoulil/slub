@@ -10,18 +10,20 @@ use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\Drivers\Slack\SlackDriver;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
-use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class SlubBotFactory
+class SlubBot
 {
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
     /** @var array */
     private $config;
+
+    /** @var BotMan */
+    private $bot;
 
     public function __construct(PutPRToReviewHandler $putPRToReviewHandler, array $config)
     {
@@ -31,14 +33,23 @@ class SlubBotFactory
 
     public function start(): Botman
     {
-        DriverManager::loadDriver(SlackDriver::class);
-        $bot = BotManFactory::create($this->config);
-        $bot = $this->listensToNewPR($bot);
+        if (null !== $this->bot) {
+            throw new \LogicException('Slub bot is already started');
+        }
 
-        return $bot;
+        DriverManager::loadDriver(SlackDriver::class);
+        $this->bot = BotManFactory::create($this->config);
+        $this->listensToNewPR($this->bot);
+
+        return $this->bot;
     }
 
-    private function listensToNewPR(BotMan $bot): BotMan
+    public function isStarted(): bool
+    {
+        return null !== $this->bot;
+    }
+
+    private function listensToNewPR(BotMan $bot): void
     {
         $bot->hears(
             'TR .* https://github.com/(.*)(/pull/.*)$',
@@ -51,7 +62,5 @@ class SlubBotFactory
                 $this->putPRToReviewHandler->handle($prToReview);
             }
         );
-
-        return $bot;
     }
 }

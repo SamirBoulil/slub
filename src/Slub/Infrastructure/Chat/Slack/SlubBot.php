@@ -36,10 +36,11 @@ class SlubBot
         if (null !== $this->bot) {
             throw new \LogicException('Slub bot is already started');
         }
-
         DriverManager::loadDriver(SlackDriver::class);
         $this->bot = BotManFactory::create($this->config);
         $this->listensToNewPR($this->bot);
+        $this->healthCheck($this->bot);
+        $this->bot->listen();
 
         return $this->bot;
     }
@@ -60,6 +61,16 @@ class SlubBot
                 $prToReview->channelIdentifier = 'squad-raccoons';
 
                 $this->putPRToReviewHandler->handle($prToReview);
+            }
+        );
+    }
+
+    private function healthCheck(BotMan $bot): void
+    {
+        $bot->hears(
+            'alive',
+            function (Botman $bot) {
+                $bot->reply('yes :+1:');
             }
         );
     }

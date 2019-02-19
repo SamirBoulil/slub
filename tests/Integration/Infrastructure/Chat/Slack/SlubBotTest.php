@@ -33,13 +33,28 @@ class SlubBotTest extends KernelTestCase
     public function it_starts_a_bot_that_listens_for_new_PR(): void
     {
         $slubBot = $this->get('slub.infrastructure.chat.slack.slub_bot');
-
         $this->assertFalse($slubBot->isStarted());
-        $botTester = $this->startBot();
-
+        $this->startBot();
         $this->assertTrue($slubBot->isStarted());
+    }
+
+    /**
+     * @test
+     */
+    public function it_answers_to_new_PR_messages(): void
+    {
+        $botTester = $this->startBot();
         $botTester->receives('TR pliz https://github.com/akeneo/pim-community-dev/pull/9590')->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/pull/9590');
+    }
+
+    /**
+     * @test
+     */
+    public function it_answers_to_health_check_message(): void
+    {
+        $botTester = $this->startBot();
+        $botTester->receives('alive')->assertReply('yes :+1:');
     }
 
     /**

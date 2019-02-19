@@ -71,16 +71,7 @@ services:
             - slack:
                 token: '%env(SLACK_TOKEN)%'
 
-    slub.infrastructure.chat.slack.start_slub_bot_console:
-        class: Slub\Infrastructure\Chat\Slack\StartSlubBotConsole
+    slub.infrastructure.chat.slack.slub_bot_action:
+        class: Slub\Infrastructure\Chat\Slack\SlubBotAction
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
-        tags:
-            - {name: console.command }
-
-    # Third party
-    botman:
-        class: BotMan\BotMan\BotMan
-        factory: 'BotMan\BotMan\BotManFactory::create'
-        arguments:
-            - []

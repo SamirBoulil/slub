@@ -12,11 +12,6 @@ use Tests\Integration\Infrastructure\WebTestCase;
  */
 class SlubBotActionTest extends WebTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * @test
      */

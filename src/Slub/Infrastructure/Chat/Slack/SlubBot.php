@@ -8,8 +8,10 @@ use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\Drivers\Slack\SlackDriver;
+use Psr\Log\LoggerInterface;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Domain\Query\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -19,46 +21,61 @@ class SlubBot
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
-    /** @var array */
-    private $config;
+    /** @var GetChannelInformationInterface */
+    private $getChannelInformation;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var BotMan */
     private $bot;
 
-    public function __construct(PutPRToReviewHandler $putPRToReviewHandler, array $config)
-    {
+    public function __construct(
+        PutPRToReviewHandler $putPRToReviewHandler,
+        GetChannelInformationInterface $getChannelInformation,
+        LoggerInterface $logger,
+        array $config
+    ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
-        $this->config = $config;
-    }
+        $this->getChannelInformation = $getChannelInformation;
+        $this->logger = $logger;
 
-    public function start(): Botman
-    {
-        if (null !== $this->bot) {
-            throw new \LogicException('Slub bot is already started');
-        }
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create($this->config);
+        $this->bot = BotManFactory::create($config);
         $this->listensToNewPR($this->bot);
         $this->healthCheck($this->bot);
         $this->bot->listen();
-
-        return $this->bot;
     }
 
-    public function isStarted(): bool
+    public function start(): void
     {
-        return null !== $this->bot;
+        $this->logger->info('Infra - SlubBot is now listening...');
+    }
+
+    public function getBot(): BotMan
+    {
+        return $this->bot;
     }
 
     private function listensToNewPR(BotMan $bot): void
     {
         $bot->hears(
-            'TR .* https://github.com/(.*)(/pull/.*)$',
-            function (Botman $bot, string $repository, string $prSuffix) {
+            'TR .* <https://github.com/(.*)/pull/(.*)>$',
+            function (Botman $bot, string $repository, $prIdentifier) {
+                $channelIdentifier = $this->getChannelIdentifier($bot);
                 $prToReview = new PutPRToReview();
-                $prToReview->PRIdentifier = $repository . $prSuffix;
+                $prToReview->PRIdentifier = $repository . '/' . $prIdentifier;
                 $prToReview->repositoryIdentifier = $repository;
-                $prToReview->channelIdentifier = 'squad-raccoons';
+                $prToReview->channelIdentifier = $channelIdentifier;
+
+                $this->logger->critical(
+                    sprintf(
+                        'Infra - NEW PR TO REVIEW detected (channel "%s", repository "%s", PR "%s")',
+                        $channelIdentifier,
+                        $repository,
+                        $prIdentifier
+                    )
+                );
 
                 $this->putPRToReviewHandler->handle($prToReview);
             }
@@ -73,5 +90,14 @@ class SlubBot
                 $bot->reply('yes :+1:');
             }
         );
+    }
+
+    private function getChannelIdentifier(BotMan $bot): string
+    {
+        $channelId = $bot->getMessage()->getPayload()['channel'];
+        $this->getChannelInformation->setSlubBot($this);
+        $channelInformation = $this->getChannelInformation->fetch($channelId);
+
+        return $channelInformation->channelName;
     }
 }

@@ -16,7 +16,7 @@ services:
     _defaults:
         autowire: false      # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
-        public: "%env(IS_TESTING)%"
+        public: true
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -30,6 +30,7 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
+            - "@logger"
 
     slub.application.new_review.new_review_handler:
         class: Slub\Application\NewReview\NewReviewHandler
@@ -55,7 +56,7 @@ services:
         class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
         arguments:
             - "@event_dispatcher"
-            - "%env(PERSISTENCE_PR_REPOSITORY_FILE_PATH)%"
+            - "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
 
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
@@ -68,6 +69,8 @@ services:
         class: Slub\Infrastructure\Chat\Slack\SlubBot
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+            - '@slub.infrastructure.query.get_channel_information'
+            - '@logger'
             - slack:
                 token: '%env(SLACK_TOKEN)%'
 
@@ -75,3 +78,6 @@ services:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
+
+    slub.infrastructure.query.get_channel_information:
+        class: Slub\Infrastructure\Chat\Slack\GetChannelInformation

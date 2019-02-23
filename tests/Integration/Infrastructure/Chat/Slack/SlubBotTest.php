@@ -30,22 +30,11 @@ class SlubBotTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_starts_a_bot_that_listens_for_new_PR(): void
-    {
-        $slubBot = $this->get('slub.infrastructure.chat.slack.slub_bot');
-        $this->assertFalse($slubBot->isStarted());
-        $this->startBot();
-        $this->assertTrue($slubBot->isStarted());
-    }
-
-    /**
-     * @test
-     */
     public function it_answers_to_new_PR_messages(): void
     {
         $botTester = $this->startBot();
-        $botTester->receives('TR pliz https://github.com/akeneo/pim-community-dev/pull/9590')->assertReplyNothing();
-        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/pull/9590');
+        $botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId'])->assertReplyNothing();
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609');
     }
 
     /**
@@ -57,29 +46,19 @@ class SlubBotTest extends KernelTestCase
         $botTester->receives('alive')->assertReply('yes :+1:');
     }
 
-    /**
-     * @test
-     */
-    public function it_throws_if_you_create_a_slub_bot_twice(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->startBot();
-        $this->startBot();
-    }
-
-    private function assertNewPRRequestReceived(string $prIdentifier): void
-    {
-        $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
-    }
-
     private function startBot(): BotManTester
     {
         DriverManager::loadDriver(ProxyDriver::class);
         $fakeDriver = new FakeDriver();
         ProxyDriver::setInstance($fakeDriver);
-        $bot = $this->get('slub.infrastructure.chat.slack.slub_bot')->start();
+        $bot = $this->get('slub.infrastructure.chat.slack.slub_bot')->getBot();
         $botManTester = new BotmanTester($bot, $fakeDriver);
 
         return $botManTester;
+    }
+
+    private function assertNewPRRequestReceived(string $prIdentifier): void
+    {
+        $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
     }
 }

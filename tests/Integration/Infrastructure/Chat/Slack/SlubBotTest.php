@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Integration\Infrastructure\Chat\Slack;
+
+use BotMan\BotMan\Drivers\DriverManager;
+use BotMan\BotMan\Drivers\Tests\FakeDriver;
+use BotMan\BotMan\Drivers\Tests\ProxyDriver;
+use BotMan\Studio\Testing\BotManTester;
+use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Repository\PRRepositoryInterface;
+use Tests\Integration\Infrastructure\KernelTestCase;
+
+/**
+ * @author    Samir Boulil <samir.boulil@akeneo.com>
+ */
+class SlubBotTest extends KernelTestCase
+{
+    /** @var PRRepositoryInterface */
+    private $PRRepository;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
+    }
+
+    /**
+     * @test
+     */
+    public function it_answers_to_new_PR_messages(): void
+    {
+        $botTester = $this->startBot();
+        $botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId'])->assertReplyNothing();
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609');
+    }
+
+    /**
+     * @test
+     */
+    public function it_answers_to_health_check_message(): void
+    {
+        $botTester = $this->startBot();
+        $botTester->receives('alive')->assertReply('yes :+1:');
+    }
+
+    private function startBot(): BotManTester
+    {
+        DriverManager::loadDriver(ProxyDriver::class);
+        $fakeDriver = new FakeDriver();
+        ProxyDriver::setInstance($fakeDriver);
+        $bot = $this->get('slub.infrastructure.chat.slack.slub_bot')->getBot();
+        $botManTester = new BotmanTester($bot, $fakeDriver);
+
+        return $botManTester;
+    }
+
+    private function assertNewPRRequestReceived(string $prIdentifier): void
+    {
+        $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
+    }
+}

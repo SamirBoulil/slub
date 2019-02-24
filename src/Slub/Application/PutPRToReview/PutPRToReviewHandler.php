@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Application\PutPRToReview;
 
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -19,15 +20,23 @@ class PutPRToReviewHandler
     /** @var IsSupportedInterface */
     private $isSupported;
 
-    public function __construct(PRRepositoryInterface $PRRepository, IsSupportedInterface $isRepositorySupported)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        PRRepositoryInterface $PRRepository,
+        IsSupportedInterface $isRepositorySupported,
+        LoggerInterface $logger
+    ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isRepositorySupported;
+        $this->logger = $logger;
     }
 
     public function handle(PutPRToReview $command)
     {
         if ($this->isUnsupported($command)) {
+            $this->logger->critical('Repository was not supported');
             return;
         }
         $this->createPr($command);
@@ -44,6 +53,7 @@ class PutPRToReviewHandler
 
     private function createPr(PutPRToReview $putPRToReview): void
     {
+        $this->logger->critical(sprintf('PR "%s" has been put to review', $putPRToReview->PRIdentifier));
         $this->PRRepository->save(
             PR::create(PRIdentifier::create($putPRToReview->PRIdentifier))
         );

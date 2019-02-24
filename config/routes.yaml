@@ -1,3 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+index:
+    path: /
+    controller: slub.infrastructure.chat.slack.slub_bot_action::executeAction
+    methods: [POST]

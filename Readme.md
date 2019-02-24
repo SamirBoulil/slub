@@ -17,4 +17,6 @@ Botman: https://github.com/botman/botman
 - be notified when a PR is closed but not merged ?
 
 # To refactor
-
+- Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier
+- Slub\Infrastructure\Chat\Slack\GetChannelInformation::setSlubBot find a way to get create another client from scratch or get the bot in the query function without doing a cercular reference
+- config/services.yaml:19 - set public classes to false: the "test" env should have public true (unless the bug has been fixed)

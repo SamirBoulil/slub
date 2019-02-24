@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\PR\MessageId;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
@@ -18,15 +19,19 @@ class PRTest extends TestCase
      */
     public function it_creates_a_PR_and_normalizes_itself()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
 
         $this->assertSame(
             [
-                'identifier' => 'akeneo/pim-community-dev/1111',
-                'GTM'        => 0,
-                'NOT_GTM'    => 0,
-                'CI_STATUS'  => 'PENDING',
-                'IS_MERGED'  => false,
+                'identifier'  => 'akeneo/pim-community-dev/1111',
+                'GTM'         => 0,
+                'NOT_GTM'     => 0,
+                'CI_STATUS'   => 'PENDING',
+                'IS_MERGED'   => false,
+                'MESSAGE_IDS' => ['1'],
             ],
             $pr->normalize()
         );
@@ -43,6 +48,7 @@ class PRTest extends TestCase
             'NOT_GTM'    => 0,
             'CI_STATUS'  => 'GREEN',
             'IS_MERGED'  => true,
+            'MESSAGE_IDS' => ['1', '2']
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -66,7 +72,10 @@ class PRTest extends TestCase
      */
     public function it_can_be_GTM_multiple_times()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
         $this->assertEquals(0, $pr->normalize()['GTM']);
 
         $pr->GTM();
@@ -81,7 +90,10 @@ class PRTest extends TestCase
      */
     public function it_can_be_NOT_GTM_multiple_times()
     {
-        $pr = PR::create(PRIdentifier::create('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
         $this->assertEquals(0, $pr->normalize()['NOT_GTM']);
 
         $pr->notGTM();
@@ -96,7 +108,10 @@ class PRTest extends TestCase
      */
     public function it_can_become_green()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(
+            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
         $pr->green();
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'GREEN');
         $this->assertCount(1, $pr->getEvents());
@@ -108,7 +123,7 @@ class PRTest extends TestCase
      */
     public function it_can_become_red()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageId::fromString('1'));
         $pr->red();
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'RED');
         $this->assertCount(1, $pr->getEvents());
@@ -120,7 +135,7 @@ class PRTest extends TestCase
      */
     public function it_can_be_merged()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'));
+        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageId::fromString('1'));
         $pr->merged();
         $this->assertEquals($pr->normalize()['IS_MERGED'], true);
         $this->assertCount(1, $pr->getEvents());
@@ -134,9 +149,35 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
-        $pr = PR::create($identifier);
+        $pr = PR::create($identifier, MessageId::fromString('1'));
 
         $this->assertTrue($pr->PRIdentifier()->equals($identifier));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_put_to_review_multiple_times()
+    {
+        $pr = PR::create(
+            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
+        $pr->putToReviewAgainViaMessage(MessageId::create('2'));
+        $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_put_to_review_multiple_times_with_the_same_message()
+    {
+        $pr = PR::create(
+            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
+        $pr->putToReviewAgainViaMessage(MessageId::create('1'));
+        $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
     }
 
     public function normalizedWithMissingInformation(): array

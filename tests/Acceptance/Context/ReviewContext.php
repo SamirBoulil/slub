@@ -5,6 +5,7 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
+use Slub\Domain\Entity\PR\MessageId;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
@@ -39,7 +40,7 @@ class ReviewContext extends FeatureContext
     public function aPullRequestInReview()
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
-        $this->PRRepository->save(PR::create($this->currentPRIdentifier));
+        $this->PRRepository->save(PR::create($this->currentPRIdentifier, MessageId::fromString('1')));
     }
 
     /**

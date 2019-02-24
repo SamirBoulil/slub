@@ -8,6 +8,12 @@ Feature: Collect the pull requests put to review
     When an author puts a PR to review
     Then the PR is added to the list of followed PRs
 
+  @nominal
+  Scenario: Put a PR to review
+    Given an author puts a PR to review
+    When an author puts a PR to review a second time
+    Then the PR is updated with the new message id
+
   @secondary
   Scenario: Put a PR belonging to an unsupported repository to review
     When an author puts a PR belonging to an unsupported repository to review

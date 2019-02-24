@@ -18,4 +18,7 @@ class PutPRToReview
 
     /** @var string */
     public $channelIdentifier;
+
+    /** @var string */
+    public $messageId;
 }

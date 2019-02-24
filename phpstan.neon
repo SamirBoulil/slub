@@ -1,0 +1,5 @@
+parameters:
+	ignoreErrors:
+		-
+		    message: '/.*/'
+		    path: %currentWorkingDirectory%/tests/Integration/Infrastructure/Chat/Slack/SlubBotTest.php

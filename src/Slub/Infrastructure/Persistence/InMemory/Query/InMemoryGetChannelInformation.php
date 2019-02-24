@@ -33,6 +33,5 @@ class InMemoryGetChannelInformation implements GetChannelInformationInterface
 
     public function setSlubBot(SlubBot $slubBot): void
     {
-
     }
 }

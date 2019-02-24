@@ -23,4 +23,12 @@ class GetChannelInformationTest extends KernelTestCase
     }
 
     // Not easy to test without mocking this framework.
+
+    /**
+     * @test
+     */
+    public function it_dummy_tests()
+    {
+        $this->assertTrue(true);
+    }
 }

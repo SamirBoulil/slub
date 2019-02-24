@@ -26,9 +26,9 @@ class PRTest extends TestCase
 
         $this->assertSame(
             [
-                'identifier'  => 'akeneo/pim-community-dev/1111',
-                'GTM'         => 0,
-                'NOT_GTM'     => 0,
+                'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+                'GTMS'         => 0,
+                'NOT_GTMS'     => 0,
                 'CI_STATUS'   => 'PENDING',
                 'IS_MERGED'   => false,
                 'MESSAGE_IDS' => ['1'],
@@ -43,9 +43,9 @@ class PRTest extends TestCase
     public function it_is_created_from_normalized()
     {
         $normalizedPR = [
-            'identifier' => 'akeneo/pim-community-dev/1111',
-            'GTM'        => 2,
-            'NOT_GTM'    => 0,
+            'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 2,
+            'NOT_GTMS'    => 0,
             'CI_STATUS'  => 'GREEN',
             'IS_MERGED'  => true,
             'MESSAGE_IDS' => ['1', '2']
@@ -76,13 +76,13 @@ class PRTest extends TestCase
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
             MessageId::fromString('1')
         );
-        $this->assertEquals(0, $pr->normalize()['GTM']);
+        $this->assertEquals(0, $pr->normalize()['GTMS']);
 
         $pr->GTM();
-        $this->assertEquals(1, $pr->normalize()['GTM']);
+        $this->assertEquals(1, $pr->normalize()['GTMS']);
 
         $pr->GTM();
-        $this->assertEquals(2, $pr->normalize()['GTM']);
+        $this->assertEquals(2, $pr->normalize()['GTMS']);
     }
 
     /**
@@ -94,13 +94,13 @@ class PRTest extends TestCase
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
             MessageId::fromString('1')
         );
-        $this->assertEquals(0, $pr->normalize()['NOT_GTM']);
+        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
         $pr->notGTM();
-        $this->assertEquals(1, $pr->normalize()['NOT_GTM']);
+        $this->assertEquals(1, $pr->normalize()['NOT_GTMS']);
 
         $pr->notGTM();
-        $this->assertEquals(2, $pr->normalize()['NOT_GTM']);
+        $this->assertEquals(2, $pr->normalize()['NOT_GTMS']);
     }
 
     /**
@@ -185,42 +185,42 @@ class PRTest extends TestCase
         return [
             'Missing identifier'     => [
                 [
-                    'GTM'       => 0,
-                    'NOT_GTM'   => 0,
+                    'GTMS'       => 0,
+                    'NOT_GTMS'   => 0,
                     'CI_STATUS' => 'PENDING',
                     'IS_MERGED' => false,
                 ],
             ],
-            'Missing GTM'            => [
+            'Missing GTMS'            => [
                 [
-                    'identifier' => 'akeneo/pim-community-dev/1111',
-                    'NOT_GTM'    => 0,
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'NOT_GTMS'    => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
                 ],
             ],
-            'Missing NOT GTM'        => [
+            'Missing NOT GTMS'        => [
                 [
-                    'identifier' => 'akeneo/pim-community-dev/1111',
-                    'GTM'        => 0,
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'GTMS'        => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
                 ],
             ],
             'Missing CI status'      => [
                 [
-                    'identifier' => 'akeneo/pim-community-dev/1111',
-                    'GTM'        => 0,
-                    'NOT_GTM'    => 0,
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'GTMS'        => 0,
+                    'NOT_GTMS'    => 0,
                     'IS_MERGED'  => false,
 
                 ],
             ],
             'Missing is merged flag' => [
                 [
-                    'identifier' => 'akeneo/pim-community-dev/1111',
-                    'GTM'        => 0,
-                    'NOT_GTM'    => 0,
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'GTMS'        => 0,
+                    'NOT_GTMS'    => 0,
                     'CI_STATUS'  => 'PENDING',
                 ],
             ],

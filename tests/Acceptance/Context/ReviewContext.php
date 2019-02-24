@@ -61,7 +61,7 @@ class ReviewContext extends FeatureContext
     public function thePullRequestShouldBeGTMed()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertEquals(1, $PR->normalize()['GTM']);
+        Assert::assertEquals(1, $PR->normalize()['GTMS']);
     }
 
     /**
@@ -71,7 +71,7 @@ class ReviewContext extends FeatureContext
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        $GTMCount = $PR->normalize()['GTM'];
+        $GTMCount = $PR->normalize()['GTMS'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
     }
@@ -94,7 +94,7 @@ class ReviewContext extends FeatureContext
     public function thePullRequestShouldBeNOTGTMed()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertEquals(1, $PR->normalize()['NOT_GTM']);
+        Assert::assertEquals(1, $PR->normalize()['NOT_GTMS']);
     }
 
     /**
@@ -104,7 +104,7 @@ class ReviewContext extends FeatureContext
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        $notGTMCount = $PR->normalize()['NOT_GTM'];
+        $notGTMCount = $PR->normalize()['NOT_GTMS'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
     }

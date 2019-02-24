@@ -14,9 +14,9 @@ use Webmozart\Assert\Assert;
 
 class PR
 {
-    private const IDENTIFIER_KEY = 'identifier';
-    private const GTM_KEY = 'GTM';
-    private const NOT_GTM_KEY = 'NOT_GTM';
+    private const IDENTIFIER_KEY = 'IDENTIFIER';
+    private const GTM_KEY = 'GTMS';
+    private const NOT_GTM_KEY = 'NOT_GTMS';
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';

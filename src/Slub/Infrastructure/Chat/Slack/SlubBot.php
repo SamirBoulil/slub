@@ -67,6 +67,7 @@ class SlubBot
                 $prToReview->PRIdentifier = $repository . '/' . $prIdentifier;
                 $prToReview->repositoryIdentifier = $repository;
                 $prToReview->channelIdentifier = $channelIdentifier;
+                $prToReview->messageId = $this->getMessageId($bot);
 
                 $this->logger->critical(
                     sprintf(
@@ -99,5 +100,10 @@ class SlubBot
         $channelInformation = $this->getChannelInformation->fetch($channelId);
 
         return $channelInformation->channelName;
+    }
+
+    private function getMessageId($bot)
+    {
+        return $bot->getMessage()->getPayload()['ts'];
     }
 }

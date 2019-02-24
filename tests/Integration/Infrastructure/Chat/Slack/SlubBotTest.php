@@ -33,8 +33,10 @@ class SlubBotTest extends KernelTestCase
     public function it_answers_to_new_PR_messages(): void
     {
         $botTester = $this->startBot();
-        $botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId'])->assertReplyNothing();
-        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609');
+        $botTester->receives(
+            'TR please <https://github.com/akeneo/pim-community-dev/pull/9609>',
+            ['channel' => 'channelId', 'ts' => '1234'])->assertReplyNothing();
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', '1234');
     }
 
     /**
@@ -57,8 +59,10 @@ class SlubBotTest extends KernelTestCase
         return $botManTester;
     }
 
-    private function assertNewPRRequestReceived(string $prIdentifier): void
+    private function assertNewPRRequestReceived(string $prIdentifier, string $messageId): void
     {
-        $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
+        $PR = $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
+        $this->assertEquals($prIdentifier, $PR->normalize()['identifier']);
+        $this->assertEquals([$messageId], $PR->normalize()['MESSAGE_IDS']);
     }
 }

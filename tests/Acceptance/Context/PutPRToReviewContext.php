@@ -11,6 +11,7 @@ use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 
 class PutPRToReviewContext extends FeatureContext
 {
+
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
@@ -19,6 +20,9 @@ class PutPRToReviewContext extends FeatureContext
 
     /** @var string */
     private $currentRepositoryIdentifier;
+
+    /** @var string[] */
+    private $currentMessageIds = [];
 
     public function __construct(
         FileBasedPRRepository $PRRepository,
@@ -39,7 +43,8 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'squad-raccoons'
+            'squad-raccoons',
+            '1234'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -47,15 +52,18 @@ class PutPRToReviewContext extends FeatureContext
     private function createPutPRToReviewCommand(
         string $repositoryIdentifier,
         string $PRIdentifier,
-        string $channelIdentifier
+        string $channelIdentifier,
+        string $messageId
     ): PutPRToReview {
         $this->currentRepositoryIdentifier = $repositoryIdentifier;
         $this->currentPRIdentifier = $PRIdentifier;
+        $this->currentMessageIds[] = $messageId;
 
         $putPRToReview = new PutPRToReview();
         $putPRToReview->channelIdentifier = $channelIdentifier;
         $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
         $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
+        $putPRToReview->messageId = $messageId;
 
         return $putPRToReview;
     }
@@ -68,7 +76,8 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview = $this->createPutPRToReviewCommand(
             'unknown/unknown',
             'unknown/unknown/1111',
-            'squad-raccoons'
+            'squad-raccoons',
+            '1'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -81,7 +90,8 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'unsupported-channel'
+            'unsupported-channel',
+            '1'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -91,7 +101,14 @@ class PutPRToReviewContext extends FeatureContext
      */
     public function thePRIsAddedToTheListOfFollowedPRs()
     {
-        Assert::assertTrue($this->PRExists($this->currentPRIdentifier));
+        $this->assertPR(
+            $this->currentPRIdentifier,
+            0,
+            0,
+            'PENDING',
+            false,
+            $this->currentMessageIds
+        );
     }
 
     private function PRExists(string $PRIdentifier): bool
@@ -112,5 +129,54 @@ class PutPRToReviewContext extends FeatureContext
     public function thePRIsNotAddedToTheListOfFollowedPRs()
     {
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
+    }
+
+    /**
+     * @When /^an author puts a PR to review a second time$/
+     */
+    public function anAuthorPutsAPRToReviewASecondTime()
+    {
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'akeneo/pim-community-dev',
+            'akeneo/pim-community-dev/1111',
+            'squad-raccoons',
+            '6666'
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
+    }
+
+    /**
+     * @Then /^the PR is updated with the new message id$/
+     */
+    public function thePRIsUpdatedWithTheNewMessageId()
+    {
+        $this->assertPR(
+            $this->currentPRIdentifier,
+            0,
+            0,
+            'PENDING',
+            false,
+            $this->currentMessageIds
+        );
+    }
+
+    private function assertPR(
+        string $prIdentifier,
+        int $gtmCount,
+        int $notGtmCount,
+        $ciStatus,
+        $isMerged,
+        $messageIds
+    ): void {
+        Assert::assertTrue($this->PRExists($prIdentifier));
+        $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
+        Assert::assertEquals([
+            'identifier'  => $prIdentifier,
+            'GTM'         => $gtmCount,
+            'NOT_GTM'     => $notGtmCount,
+            'CI_STATUS'   => $ciStatus,
+            'IS_MERGED'   => $isMerged,
+            'MESSAGE_IDS' => $messageIds
+        ], $pr->normalize());
     }
 }

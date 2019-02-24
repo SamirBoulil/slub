@@ -19,12 +19,16 @@ class PR
     private const NOT_GTM_KEY = 'NOT_GTM';
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
+    private const MESSAGE_IDS = 'MESSAGE_IDS';
 
     /** @var Event[] */
     private $events = [];
 
     /** @var PRIdentifier */
     private $PRIdentifier;
+
+    /** @var MessageId[] */
+    private $messageIds;
 
     /** @var int */
     private $GTMCount;
@@ -38,18 +42,25 @@ class PR
     /** @var bool */
     private $isMerged;
 
-    private function __construct(PRIdentifier $PRIdentifier, int $GTMCount, int $notGTMCount, CIStatus $CIStatus, bool $isMerged)
-    {
+    private function __construct(
+        PRIdentifier $PRIdentifier,
+        array $messageIds,
+        int $GTMCount,
+        int $notGTMCount,
+        CIStatus $CIStatus,
+        bool $isMerged
+    ) {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
         $this->CIStatus = $CIStatus;
         $this->isMerged = $isMerged;
+        $this->messageIds = $messageIds;
     }
 
-    public static function create(PRIdentifier $PRIdentifier): self
+    public static function create(PRIdentifier $PRIdentifier, MessageId $messageId): self
     {
-        return new self($PRIdentifier, 0, 0, CIStatus::pending(), false);
+        return new self($PRIdentifier, [$messageId], 0, 0, CIStatus::pending(), false);
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -59,14 +70,20 @@ class PR
         Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
         Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
+        Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
+        Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
 
         $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
         $GTM = $normalizedPR[self::GTM_KEY];
         $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
         $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
+        $messageIds = array_map(function (string $messageId) {
+            return MessageId::fromString($messageId);
+        }, $normalizedPR[self::MESSAGE_IDS]);
 
-        return new self($identifier, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus), $isMerged);
+
+        return new self($identifier, $messageIds, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus), $isMerged);
     }
 
     public function normalize(): array
@@ -77,6 +94,9 @@ class PR
             self::NOT_GTM_KEY    => $this->notGTMCount,
             self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY  => $this->isMerged,
+            self::MESSAGE_IDS    => array_map(function (MessageId $messageId) {
+                return $messageId->stringValue();
+            }, $this->messageIds)
         ];
     }
 
@@ -121,5 +141,23 @@ class PR
     public function getEvents(): array
     {
         return $this->events;
+    }
+
+    public function putToReviewAgainViaMessage(MessageId $newMessageId): void
+    {
+        $alreadyExists = !empty(
+            array_filter(
+                $this->messageIds,
+                function (MessageId $messageId) use ($newMessageId) {
+                    return $messageId->equals($newMessageId);
+                }
+            )
+        );
+
+        if ($alreadyExists) {
+            return;
+        }
+
+        $this->messageIds[] = $newMessageId;
     }
 }

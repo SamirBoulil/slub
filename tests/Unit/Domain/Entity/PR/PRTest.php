@@ -157,6 +157,18 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_the_message_ids()
+    {
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageId::fromString('1')
+        );
+        $this->assertEquals('1', current($pr->messageIds())->stringValue());
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_put_to_review_multiple_times()
     {
         $pr = PR::create(

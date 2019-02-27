@@ -10,6 +10,7 @@ parameters:
         - "squad-raccoons"
         - "squad-chipmunks"
     locale: 'en'
+    slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
 
 services:
     # default configuration for services in *this* file
@@ -56,7 +57,7 @@ services:
         class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
         arguments:
             - "@event_dispatcher"
-            - "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
+            - "%slub.infrastructure.persistence.file_database%"
 
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
@@ -64,15 +65,22 @@ services:
             - "%slub.supported_repositories%"
             - "%slub.supported_channels%"
 
+    slub.infrastructure.persistence.get_message_ids_for_pr:
+        class: Slub\Infrastructure\Persistence\FileBased\Query\FileBasedGetMessageIdsForPR
+        arguments:
+            - "%slub.infrastructure.persistence.file_database%"
+
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:
         class: Slub\Infrastructure\Chat\Slack\SlubBot
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.query.get_channel_information'
+            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@logger'
-            - slack:
-                token: '%env(SLACK_TOKEN)%'
+            - '%env(SLACK_TOKEN)%'
+        tags:
+            - { name: kernel.event_subscriber }
 
     slub.infrastructure.chat.slack.slub_bot_action:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction

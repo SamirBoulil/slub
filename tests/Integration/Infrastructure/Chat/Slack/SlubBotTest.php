@@ -36,7 +36,7 @@ class SlubBotTest extends KernelTestCase
         $botTester->receives(
             'TR please <https://github.com/akeneo/pim-community-dev/pull/9609>',
             ['channel' => 'channelId', 'ts' => '1234'])->assertReplyNothing();
-        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', '1234');
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
 
     /**

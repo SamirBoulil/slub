@@ -6,9 +6,11 @@
 parameters:
     slub.supported_repositories:
         - "akeneo/pim-community-dev"
+        - "SamirBoulil/slub"
     slub.supported_channels:
         - "squad-raccoons"
         - "squad-chipmunks"
+        - "general"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
 

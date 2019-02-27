@@ -53,7 +53,7 @@ class SlubBot implements EventSubscriberInterface
         $this->logger = $logger;
 
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create(['slack' => $slackToken]);
+        $this->bot = BotManFactory::create(['slack' => ['token' => $slackToken]]);
         $this->listensToNewPR($this->bot);
         $this->healthCheck($this->bot);
         $this->bot->listen();
@@ -141,6 +141,8 @@ class SlubBot implements EventSubscriberInterface
     public function send(MessageId $messageId): void
     {
         $message = explode('@', $messageId->stringValue());
+        $this->bot->loadDriver(SlackDriver::DRIVER_NAME);
+        $this->bot->say('', $message[0]);
         $this->bot->sendPayload([
             'token'     => $this->slackToken,
             'channel'   => $message[0],

@@ -61,7 +61,13 @@ class PutPRToReviewHandler
             || !$this->isSupported->channel($channelIdentifier);
 
         if ($isUnsupported) {
-            $this->logger->critical('Repository was not supported');
+            $this->logger->critical(
+                sprintf(
+                    'Repository ("%s") or channel ("%s") was not supported',
+                    $putPRToReview->repositoryIdentifier,
+                    $putPRToReview->channelIdentifier
+                )
+            );
         }
 
         return $isUnsupported;

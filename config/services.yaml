@@ -81,3 +81,10 @@ services:
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
+
+    ## VCS
+    slub.infrastructure.vcs.github.new_review_action:
+        class: Slub\Infrastructure\VCS\Github\NewReviewAction
+        arguments:
+            - '@slub.application.new_review.new_review_handler'
+            - '@logger'

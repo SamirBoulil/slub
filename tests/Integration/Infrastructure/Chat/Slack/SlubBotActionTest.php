@@ -18,7 +18,7 @@ class SlubBotActionTest extends WebTestCase
     public function it_answers_the_slack_challenge_if_there_is_one()
     {
         $client = static::createClient();
-        $client->request('POST', '/', [], [], [], (string) json_encode(['challenge' => 'reply with this string']));
+        $client->request('POST', '/chat/slack/messages', [], [], [], (string) json_encode(['challenge' => 'reply with this string']));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertEquals('{"challenge":"reply with this string"}', $client->getResponse()->getContent());
     }
@@ -29,7 +29,7 @@ class SlubBotActionTest extends WebTestCase
     public function it_starts_slubbot_if_there_is_no_challenge()
     {
         $client = static::createClient();
-        $client->request('POST', '/', [], [], [], (string) json_encode(['message' => 'Message coming from Slack']));
+        $client->request('POST', '/chat/slack/messages', [], [], [], (string) json_encode(['message' => 'Message coming from Slack']));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertEquals('', $client->getResponse()->getContent());
     }

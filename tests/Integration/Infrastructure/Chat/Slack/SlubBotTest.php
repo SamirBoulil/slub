@@ -62,7 +62,7 @@ class SlubBotTest extends KernelTestCase
     private function assertNewPRRequestReceived(string $prIdentifier, string $messageId): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
-        $this->assertEquals($prIdentifier, $PR->normalize()['identifier']);
+        $this->assertEquals($prIdentifier, $PR->normalize()['IDENTIFIER']);
         $this->assertEquals([$messageId], $PR->normalize()['MESSAGE_IDS']);
     }
 }

@@ -11,7 +11,6 @@ use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 
 class PutPRToReviewContext extends FeatureContext
 {
-
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
@@ -171,9 +170,9 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertTrue($this->PRExists($prIdentifier));
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
         Assert::assertEquals([
-            'identifier'  => $prIdentifier,
-            'GTM'         => $gtmCount,
-            'NOT_GTM'     => $notGtmCount,
+            'IDENTIFIER'  => $prIdentifier,
+            'GTMS'         => $gtmCount,
+            'NOT_GTMS'     => $notGtmCount,
             'CI_STATUS'   => $ciStatus,
             'IS_MERGED'   => $isMerged,
             'MESSAGE_IDS' => $messageIds

@@ -12,6 +12,7 @@ parameters:
         - "general"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
+    slub.infrastructure.chat.slack.base_uri: "https://slack.com/api"
 
 services:
     # default configuration for services in *this* file
@@ -52,6 +53,14 @@ services:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
 
+    slub.application.event_subscribers.notify_squad:
+        class: Slub\Application\NotifySquad\NotifySquad
+        arguments:
+            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
+            - '@slub.infrastructure.chat.slack.slack_client'
+        tags:
+            - { name: kernel.event_subscriber }
+
     # Infrastructure
     ## Persistence
     slub.infrastructure.persistence.pr_repository:
@@ -90,6 +99,16 @@ services:
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
+
+    slub.infrastructure.chat.slack.slack_client:
+        class: Slub\Infrastructure\Chat\Slack\SlackClient
+        arguments:
+            - '@slub.infrastructure.chat.slack.guzzle_client'
+
+    slub.infrastructure.chat.slack.guzzle_client:
+        class: GuzzleHttp\Client
+        arguments:
+            - {'base_uri': '%slub.infrastructure.chat.slack.base_uri%', 'query': {'token': '%env(SLACK_TOKEN)%'}}
 
     ## VCS
     slub.infrastructure.vcs.github.new_review_action:

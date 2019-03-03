@@ -11,7 +11,7 @@ use BotMan\Drivers\Slack\SlackDriver;
 use Psr\Log\LoggerInterface;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Query\GetChannelInformationInterface;
 use Slub\Domain\Query\GetMessageIdsForPR;
@@ -138,7 +138,7 @@ class SlubBot implements EventSubscriberInterface
             . $bot->getMessage()->getPayload()['ts'];
     }
 
-    public function send(MessageId $messageId): void
+    public function send(MessageIdentifier $messageId): void
     {
         $message = explode('@', $messageId->stringValue());
         $this->bot->loadDriver(SlackDriver::DRIVER_NAME);

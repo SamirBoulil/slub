@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\FileBased\Query;
 
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetMessageIdsForPR;
@@ -63,17 +63,17 @@ class FileBasedGetMessageIdsForPRTest extends KernelTestCase
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
-            MessageId::fromString(current($messageIds))
+            MessageIdentifier::fromString(current($messageIds))
         );
         for ($i = 1, $iMax = \count($messageIds); $i < $iMax; $i++) {
-            $PR->putToReviewAgainViaMessage(MessageId::fromString($messageIds[$i]));
+            $PR->putToReviewAgainViaMessage(MessageIdentifier::fromString($messageIds[$i]));
         }
         $fileBasedPRRepository->save($PR);
     }
 
     private function assertMessageIds(array $expectedMessageIds, array $actualMessageIds): void
     {
-        $normalizedActualMessageIds = array_map(function (MessageId $messageId) {
+        $normalizedActualMessageIds = array_map(function (MessageIdentifier $messageId) {
             return $messageId->stringValue();
         }, $actualMessageIds);
         $this->assertEquals($expectedMessageIds, $normalizedActualMessageIds);

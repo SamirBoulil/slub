@@ -11,25 +11,18 @@ use BotMan\Drivers\Slack\SlackDriver;
 use Psr\Log\LoggerInterface;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
-use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Query\GetChannelInformationInterface;
-use Slub\Domain\Query\GetMessageIdsForPR;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class SlubBot implements EventSubscriberInterface
+class SlubBot
 {
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
 
     /** @var GetChannelInformationInterface */
     private $getChannelInformation;
-
-    /** @var GetMessageIdsForPR */
-    private $getMessageIdsForPR;
 
     /** @var LoggerInterface */
     private $logger;
@@ -43,13 +36,11 @@ class SlubBot implements EventSubscriberInterface
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
         GetChannelInformationInterface $getChannelInformation,
-        GetMessageIdsForPR $getMessageIdsForPR,
         LoggerInterface $logger,
         string $slackToken
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->getChannelInformation = $getChannelInformation;
-        $this->getMessageIdsForPR = $getMessageIdsForPR;
         $this->logger = $logger;
 
         DriverManager::loadDriver(SlackDriver::class);
@@ -58,13 +49,6 @@ class SlubBot implements EventSubscriberInterface
         $this->healthCheck($this->bot);
         $this->bot->listen();
         $this->slackToken = $slackToken;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PRGTMed::class => 'notifySquadThePRIsGTMed',
-        ];
     }
 
     public function start(): void
@@ -103,15 +87,6 @@ class SlubBot implements EventSubscriberInterface
         );
     }
 
-    public function notifySquadThePRIsGTMed(PRGTMed $event): void
-    {
-        $PRIdentifier = $event->PRIdentifier();
-        $messageIds = $this->getMessageIdsForPR->fetch($PRIdentifier);
-        foreach ($messageIds as $messageId) {
-            $this->send($messageId);
-        }
-    }
-
     private function healthCheck(BotMan $bot): void
     {
         $bot->hears(
@@ -131,23 +106,11 @@ class SlubBot implements EventSubscriberInterface
         return $channelInformation->channelName;
     }
 
-    private function getMessageId($bot)
+    private function getMessageId($bot): string
     {
-        return $bot->getMessage()->getPayload()['channel']
-            . '@'
-            . $bot->getMessage()->getPayload()['ts'];
-    }
+        $channel = $bot->getMessage()->getPayload()['channel'];
+        $ts = $bot->getMessage()->getPayload()['ts'];
 
-    public function send(MessageIdentifier $messageId): void
-    {
-        $message = explode('@', $messageId->stringValue());
-        $this->bot->loadDriver(SlackDriver::DRIVER_NAME);
-        $this->bot->say('', $message[0]);
-        $this->bot->sendPayload([
-            'token'     => $this->slackToken,
-            'channel'   => $message[0],
-            'text'      => 'PR is GTMed',
-            'thread_ts' => $message[1],
-        ]);
+        return MessageIdentifierHelper::from($channel, $ts);
     }
 }

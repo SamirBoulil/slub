@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Application\NotifySquad;
 
+use Psr\Log\LoggerInterface;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,10 +24,17 @@ class NotifySquad implements EventSubscriberInterface
     /** @var ChatClient */
     private $chatClient;
 
-    public function __construct(GetMessageIdsForPR $getMessageIdsForPR, ChatClient $chatClient)
-    {
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        GetMessageIdsForPR $getMessageIdsForPR,
+        ChatClient $chatClient,
+        LoggerInterface $logger
+    ) {
         $this->chatClient = $chatClient;
         $this->getMessageIdsForPR = $getMessageIdsForPR;
+        $this->logger = $logger;
     }
 
     public static function getSubscribedEvents(): array
@@ -41,5 +50,16 @@ class NotifySquad implements EventSubscriberInterface
         foreach ($messageIds as $messageId) {
             $this->chatClient->replyInThread($messageId, self::MESSAGE_PR_GTMED);
         }
+        $this->logger->critical(
+            sprintf(
+                'Notified the squad a PR has been GTMed: %s',
+                implode(
+                    ',',
+                    array_map(function (MessageIdentifier $messageId) {
+                        return $messageId->stringValue();
+                    }, $messageIds)
+                )
+            )
+        );
     }
 }

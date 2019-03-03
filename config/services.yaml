@@ -58,6 +58,7 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -86,11 +87,8 @@ services:
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.query.get_channel_information'
-            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
-        tags:
-            - { name: kernel.event_subscriber }
 
     slub.infrastructure.chat.slack.slub_bot_action:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction
@@ -104,6 +102,7 @@ services:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
         arguments:
             - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@logger'
 
     slub.infrastructure.chat.slack.guzzle_client:
         class: GuzzleHttp\Client

@@ -6,7 +6,7 @@ namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
@@ -87,7 +87,7 @@ class PutPRToReviewHandler
     private function attachMessageToPR(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
-        $PR->putToReviewAgainViaMessage(MessageId::create($putPRToReview->messageId));
+        $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageId));
         $this->PRRepository->save($PR);
     }
 
@@ -96,7 +96,7 @@ class PutPRToReviewHandler
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create($putPRToReview->PRIdentifier),
-                MessageId::fromString($putPRToReview->messageId)
+                MessageIdentifier::fromString($putPRToReview->messageId)
             )
         );
     }

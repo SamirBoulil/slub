@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\FileBased\Query;
 
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Slub\Domain\Repository\PRNotFoundException;
@@ -26,7 +26,7 @@ class FileBasedGetMessageIdsForPR implements GetMessageIdsForPR
     {
         $PRInformation = $this->getPRInformation($PRIdentifier);
         $messageIds = array_map(function (string $messageId) {
-            return MessageId::fromString($messageId);
+            return MessageIdentifier::fromString($messageId);
         }, $PRInformation['MESSAGE_IDS']);
 
         return $messageIds;

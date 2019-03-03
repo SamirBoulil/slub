@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
@@ -21,7 +21,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
 
         $this->assertSame(
@@ -74,7 +74,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['GTMS']);
 
@@ -92,7 +92,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
@@ -110,7 +110,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
         $pr->green();
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'GREEN');
@@ -123,7 +123,7 @@ class PRTest extends TestCase
      */
     public function it_can_become_red()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageId::fromString('1'));
+        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'));
         $pr->red();
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'RED');
         $this->assertCount(1, $pr->getEvents());
@@ -135,7 +135,7 @@ class PRTest extends TestCase
      */
     public function it_can_be_merged()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageId::fromString('1'));
+        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'));
         $pr->merged();
         $this->assertEquals($pr->normalize()['IS_MERGED'], true);
         $this->assertCount(1, $pr->getEvents());
@@ -149,7 +149,7 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
-        $pr = PR::create($identifier, MessageId::fromString('1'));
+        $pr = PR::create($identifier, MessageIdentifier::fromString('1'));
 
         $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
@@ -161,7 +161,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals('1', current($pr->messageIds())->stringValue());
     }
@@ -173,9 +173,9 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
-        $pr->putToReviewAgainViaMessage(MessageId::create('2'));
+        $pr->putToReviewAgainViaMessage(MessageIdentifier::create('2'));
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
     }
 
@@ -186,9 +186,9 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageId::fromString('1')
+            MessageIdentifier::fromString('1')
         );
-        $pr->putToReviewAgainViaMessage(MessageId::create('1'));
+        $pr->putToReviewAgainViaMessage(MessageIdentifier::create('1'));
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
     }
 

@@ -12,7 +12,7 @@ parameters:
         - "general"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
-    slub.infrastructure.chat.slack.base_uri: "https://slack.com/api"
+    slub.infrastructure.chat.slack.base_uri: "https://slack.com"
 
 services:
     # default configuration for services in *this* file
@@ -102,12 +102,10 @@ services:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
         arguments:
             - '@slub.infrastructure.chat.slack.guzzle_client'
-            - '@logger'
+            - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.chat.slack.guzzle_client:
         class: GuzzleHttp\Client
-        arguments:
-            - {'base_uri': '%slub.infrastructure.chat.slack.base_uri%', 'query': {'token': '%env(SLACK_TOKEN)%'}}
 
     ## VCS
     slub.infrastructure.vcs.github.new_review_action:

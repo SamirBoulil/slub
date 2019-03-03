@@ -35,11 +35,13 @@ class SlackClientTest extends KernelTestCase
      */
     public function it_replies_in_thread(): void
     {
+        $this->mockGuzzleWith(new Response(200, [], ''));
+
         $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
 
         $generatedRequest = $this->mock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/chat.postMessage', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             [
                 'channel'   => 'channel',
@@ -50,16 +52,43 @@ class SlackClientTest extends KernelTestCase
         );
     }
 
+    /**
+     * @test
+     */
+    public function it_throws_if_the_http_status_is_not_ok(): void
+    {
+        $this->mockGuzzleWith(new Response(400, [], ''));
+
+        $this->expectException(\RuntimeException::class);
+        $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_ok_flag_is_false(): void
+    {
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
+    }
+
     private function setUpGuzzleMock(): void
     {
-        $this->mock = new MockHandler([new Response(200, [], '')]);
+        $this->mock = new MockHandler([]);
         $handler = HandlerStack::create($this->mock);
         $client = new Client(['handler' => $handler]);
-        $this->slackClient = new SlackClient($client);
+        $this->slackClient = new SlackClient($client, 'xobxob-slack-token');
     }
 
     private function getBodyContent($generatedRequest): array
     {
         return json_decode($generatedRequest->getBody()->getContents(), true);
+    }
+
+    private function mockGuzzleWith(Response $response): void
+    {
+        $this->mock->append($response);
     }
 }

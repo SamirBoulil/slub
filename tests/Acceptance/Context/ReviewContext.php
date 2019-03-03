@@ -5,11 +5,14 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\NotifySquad\NotifySquad;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
 class ReviewContext extends FeatureContext
@@ -20,18 +23,26 @@ class ReviewContext extends FeatureContext
     /** @var EventsSpy */
     private $eventSpy;
 
+    /** @var ChatClientSpy */
+    private $chatClientSpy;
+
     /** @var PRIdentifier */
     private $currentPRIdentifier;
+
+    /** @var MessageIdentifier */
+    private $currentMessageIdentifier;
 
     public function __construct(
         FileBasedPRRepository $PRRepository,
         NewReviewHandler $reviewHandler,
-        EventsSpy $eventSpy
+        EventsSpy $eventSpy,
+        ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
 
         $this->ReviewHandler = $reviewHandler;
         $this->eventSpy = $eventSpy;
+        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**
@@ -40,7 +51,8 @@ class ReviewContext extends FeatureContext
     public function aPullRequestInReview()
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
-        $this->PRRepository->save(PR::create($this->currentPRIdentifier, MessageId::fromString('CHANNEL_ID@1')));
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
+        $this->PRRepository->save(PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier));
     }
 
     /**
@@ -74,6 +86,10 @@ class ReviewContext extends FeatureContext
         $GTMCount = $PR->normalize()['GTMS'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifySquad::MESSAGE_PR_GTMED
+        );
     }
 
     /**

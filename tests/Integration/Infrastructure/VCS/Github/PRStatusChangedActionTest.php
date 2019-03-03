@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Github;
 
-use Slub\Domain\Entity\PR\MessageId;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -62,7 +62,7 @@ class PRStatusChangedActionTest extends WebTestCase
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create(self::PRIdentifier),
-                MessageId::create('CHANNEL_ID@1111')
+                MessageIdentifier::create('CHANNEL_ID@1111')
             )
         );
     }

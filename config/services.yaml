@@ -9,10 +9,10 @@ parameters:
         - "SamirBoulil/slub"
     slub.supported_channels:
         - "squad-raccoons"
-        - "squad-chipmunks"
         - "general"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
+    slub.infrastructure.chat.slack.base_uri: "https://slack.com"
 
 services:
     # default configuration for services in *this* file
@@ -53,6 +53,15 @@ services:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
 
+    slub.application.event_subscribers.notify_squad:
+        class: Slub\Application\NotifySquad\NotifySquad
+        arguments:
+            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+
     # Infrastructure
     ## Persistence
     slub.infrastructure.persistence.pr_repository:
@@ -78,11 +87,8 @@ services:
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.query.get_channel_information'
-            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
-        tags:
-            - { name: kernel.event_subscriber }
 
     slub.infrastructure.chat.slack.slub_bot_action:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction
@@ -91,6 +97,15 @@ services:
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
+
+    slub.infrastructure.chat.slack.slack_client:
+        class: Slub\Infrastructure\Chat\Slack\SlackClient
+        arguments:
+            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '%env(SLACK_TOKEN)%'
+
+    slub.infrastructure.chat.slack.guzzle_client:
+        class: GuzzleHttp\Client
 
     ## VCS
     slub.infrastructure.vcs.github.new_review_action:

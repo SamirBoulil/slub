@@ -6,7 +6,7 @@ namespace Slub\Domain\Entity\PR;
 
 use Webmozart\Assert\Assert;
 
-class MessageId
+class MessageIdentifier
 {
     /** @var string */
     private $messageId;
@@ -32,7 +32,7 @@ class MessageId
         return $this->messageId;
     }
 
-    public function equals(MessageId $messageId): bool
+    public function equals(MessageIdentifier $messageId): bool
     {
         return $messageId->messageId === $this->messageId;
     }

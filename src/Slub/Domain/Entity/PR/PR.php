@@ -27,7 +27,7 @@ class PR
     /** @var PRIdentifier */
     private $PRIdentifier;
 
-    /** @var MessageId[] */
+    /** @var MessageIdentifier[] */
     private $messageIds;
 
     /** @var int */
@@ -58,7 +58,7 @@ class PR
         $this->messageIds = $messageIds;
     }
 
-    public static function create(PRIdentifier $PRIdentifier, MessageId $messageId): self
+    public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageId): self
     {
         return new self($PRIdentifier, [$messageId], 0, 0, CIStatus::pending(), false);
     }
@@ -79,7 +79,7 @@ class PR
         $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(function (string $messageId) {
-            return MessageId::fromString($messageId);
+            return MessageIdentifier::fromString($messageId);
         }, $normalizedPR[self::MESSAGE_IDS]);
 
 
@@ -94,7 +94,7 @@ class PR
             self::NOT_GTM_KEY    => $this->notGTMCount,
             self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY  => $this->isMerged,
-            self::MESSAGE_IDS    => array_map(function (MessageId $messageId) {
+            self::MESSAGE_IDS    => array_map(function (MessageIdentifier $messageId) {
                 return $messageId->stringValue();
             }, $this->messageIds)
         ];
@@ -136,7 +136,7 @@ class PR
     }
 
     /**
-     * @return MessageId[]
+     * @return MessageIdentifier[]
      */
     public function messageIds(): array
     {
@@ -151,12 +151,12 @@ class PR
         return $this->events;
     }
 
-    public function putToReviewAgainViaMessage(MessageId $newMessageId): void
+    public function putToReviewAgainViaMessage(MessageIdentifier $newMessageId): void
     {
         $alreadyExists = !empty(
             array_filter(
                 $this->messageIds,
-                function (MessageId $messageId) use ($newMessageId) {
+                function (MessageIdentifier $messageId) use ($newMessageId) {
                     return $messageId->equals($newMessageId);
                 }
             )

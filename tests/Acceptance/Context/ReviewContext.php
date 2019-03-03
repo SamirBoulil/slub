@@ -40,7 +40,7 @@ class ReviewContext extends FeatureContext
     public function aPullRequestInReview()
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
-        $this->PRRepository->save(PR::create($this->currentPRIdentifier, MessageId::fromString('1')));
+        $this->PRRepository->save(PR::create($this->currentPRIdentifier, MessageId::fromString('CHANNEL_ID@1')));
     }
 
     /**

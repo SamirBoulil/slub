@@ -62,7 +62,7 @@ class PRStatusChangedActionTest extends WebTestCase
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create(self::PRIdentifier),
-                MessageId::create('1111')
+                MessageId::create('CHANNEL_ID@1111')
             )
         );
     }

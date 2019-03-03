@@ -136,6 +136,14 @@ class PR
     }
 
     /**
+     * @return MessageId[]
+     */
+    public function messageIds(): array
+    {
+        return $this->messageIds;
+    }
+
+    /**
      * @return Event[]
      */
     public function getEvents(): array

@@ -11,6 +11,7 @@ use BotMan\Drivers\Slack\SlackDriver;
 use Psr\Log\LoggerInterface;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Query\GetChannelInformationInterface;
 
 /**
@@ -99,9 +100,8 @@ class SlubBot
 
     private function getChannelIdentifier(BotMan $bot): string
     {
-        $channelId = $bot->getMessage()->getPayload()['channel'];
-        $this->getChannelInformation->setSlubBot($this);
-        $channelInformation = $this->getChannelInformation->fetch($channelId);
+        $channelIdentifier = ChannelIdentifier::fromString($bot->getMessage()->getPayload()['channel']);
+        $channelInformation = $this->getChannelInformation->fetch($channelIdentifier);
 
         return $channelInformation->channelName;
     }

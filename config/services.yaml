@@ -97,6 +97,9 @@ services:
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
+        arguments:
+            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient

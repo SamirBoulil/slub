@@ -8,15 +8,16 @@ Botman: https://github.com/botman/botman
 
 
 # Todo:
-- Add test coverage 100% ?
-- Add glossary (squad, PR, GTM...)
+- Add firebase port
+- Deloy to heroku
 
 # Ideas
+- Add glossary (squad, PR, GTM...)
 - get notified *who* GTMed a PR ?
 - Be notified *who* merged the PR ?
 - be notified when a PR is closed but not merged ?
 
 # To refactor
 - Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier
-- Slub\Infrastructure\Chat\Slack\GetChannelInformation::setSlubBot find a way to get create another client from scratch or get the bot in the query function without doing a cercular reference
 - config/services.yaml:19 - set public classes to false: the "test" env should have public true (unless the bug has been fixed)
+- Send a message when 2 GTMs only and change the behats accordingly

@@ -18,16 +18,18 @@ use Tests\Integration\Infrastructure\KernelTestCase;
 class SlackClientTest extends KernelTestCase
 {
     /** @var MockHandler */
-    protected $mock;
+    private $mock;
 
     /** @var SlackClient */
-    protected $slackClient;
+    private $slackClient;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->setUpGuzzleMock();
+        // Could have an GuzzleTestCase with mock & client as properties
+        $client = $this->setUpGuzzleMock();
+        $this->slackClient = new SlackClient($client, 'xobxob-slack-token');
     }
 
     /**
@@ -74,12 +76,13 @@ class SlackClientTest extends KernelTestCase
         $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
     }
 
-    private function setUpGuzzleMock(): void
+    private function setUpGuzzleMock(): Client
     {
         $this->mock = new MockHandler([]);
         $handler = HandlerStack::create($this->mock);
         $client = new Client(['handler' => $handler]);
-        $this->slackClient = new SlackClient($client, 'xobxob-slack-token');
+
+        return $client;
     }
 
     private function getBodyContent($generatedRequest): array

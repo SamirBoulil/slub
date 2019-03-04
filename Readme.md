@@ -8,16 +8,16 @@ Botman: https://github.com/botman/botman
 
 
 # Todo:
-- Add test coverage 100% ?
-- Add glossary (squad, PR, GTM...)
+- Add firebase port
+- Deloy to heroku
 
 # Ideas
+- Add glossary (squad, PR, GTM...)
 - get notified *who* GTMed a PR ?
 - Be notified *who* merged the PR ?
 - be notified when a PR is closed but not merged ?
 
 # To refactor
-- Todo: Rework Slub\Infrastructure\Chat\Slack\GetChannelInformation to be testable with guzzle
 - Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier
 - config/services.yaml:19 - set public classes to false: the "test" env should have public true (unless the bug has been fixed)
 - Send a message when 2 GTMs only and change the behats accordingly

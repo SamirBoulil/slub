@@ -30,8 +30,8 @@ class InMemoryGetChannelInformationTest extends TestCase
      */
     public function it_retrieves_the_name_of_the_channel_for_an_id()
     {
-        $channelInformation = $this->getChannelInformation->fetch('11111');
+        $channelInformation = $this->getChannelInformation->fetch(ChannelIdentifier::fromString('11111'));
         $this->assertEquals('squad-raccoons', $channelInformation->channelName);
-        $this->assertEquals('11111', $channelInformation->channelId);
+        $this->assertEquals('11111', $channelInformation->channelIdentifier);
     }
 }

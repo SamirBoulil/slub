@@ -41,6 +41,9 @@ class SqlPRRepository implements PRRepositoryInterface
 
     public function reset(): void
     {
+        $this->sqlConnection->executeUpdate(
+            sprintf('CREATE DATABASE IF NOT EXISTS %s;', $this->sqlConnection->getDatabase())
+        );
         $this->sqlConnection->executeUpdate('DROP TABLE IF EXISTS pr');
         $createTable = <<<SQL
 CREATE TABLE pr (

@@ -122,3 +122,11 @@ services:
         arguments:
             - '@slub.application.new_review.new_review_handler'
             - '@logger'
+
+    ## CLI
+    slub.infrastructure.installer.cli.InstallerCLI:
+        class: Slub\Infrastructure\Installer\CLI\InstallerCLI
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+        tags:
+            - { name: console.command }

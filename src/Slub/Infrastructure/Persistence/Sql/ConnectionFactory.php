@@ -20,5 +20,4 @@ class ConnectionFactory
 
         return $sqlConnection;
     }
-
 }

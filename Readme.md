@@ -9,6 +9,7 @@ Botman: https://github.com/botman/botman
 
 # Todo:
 - Add firebase port
+- Add tactical loggers
 - Deloy to heroku
 
 # Ideas

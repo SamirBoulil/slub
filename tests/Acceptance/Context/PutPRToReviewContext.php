@@ -7,7 +7,7 @@ use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
 
 class PutPRToReviewContext extends FeatureContext
 {
@@ -24,7 +24,7 @@ class PutPRToReviewContext extends FeatureContext
     private $currentMessageIds = [];
 
     public function __construct(
-        FileBasedPRRepository $PRRepository,
+        SqlPRRepository $PRRepository,
         PutPRToReviewHandler $putPRToReviewHandler
     ) {
         parent::__construct($PRRepository);

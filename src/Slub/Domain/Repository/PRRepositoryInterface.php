@@ -15,4 +15,6 @@ interface PRRepositoryInterface
      * @throws PRNotFoundException
      */
     public function getBy(PRIdentifier $PRidentifier): PR;
+
+    public function reset();
 }

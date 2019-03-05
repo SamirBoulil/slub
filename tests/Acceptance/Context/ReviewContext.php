@@ -11,7 +11,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
@@ -33,7 +33,7 @@ class ReviewContext extends FeatureContext
     private $currentMessageIdentifier;
 
     public function __construct(
-        FileBasedPRRepository $PRRepository,
+        SqlPRRepository $PRRepository,
         NewReviewHandler $reviewHandler,
         EventsSpy $eventSpy,
         ChatClientSpy $chatClientSpy

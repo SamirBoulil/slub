@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
+namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;

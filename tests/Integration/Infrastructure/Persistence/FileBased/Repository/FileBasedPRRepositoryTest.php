@@ -8,12 +8,13 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
+use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
 use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 class FileBasedPRRepositoryTest extends KernelTestCase
 {
-    /** @var SqlPRRepository */
+    /** @var FileBasedPRRepository */
     private $fileBasedPRRepository;
 
     public function setUp(): void
@@ -54,7 +55,7 @@ class FileBasedPRRepositoryTest extends KernelTestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $this->fileBasedPRRepository->save(PR::create($identifier, MessageIdentifier::fromString('1')));
-        $this->fileBasedPRRepository->resetFile();
+        $this->fileBasedPRRepository->reset();
 
         $this->expectException(PRNotFoundException::class);
         $this->fileBasedPRRepository->getBy($identifier);

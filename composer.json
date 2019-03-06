@@ -65,10 +65,7 @@
       "cache:clear": "symfony-cmd",
       "assets:install %PUBLIC_DIR%": "symfony-cmd",
       "mkdir -p var/persistence/prod var/persistence/dev var/persistence/test": "script",
-      "touch var/persistence/prod/pr_repository.json var/persistence/dev/pr_repository.json var/persistence/test/pr_repository.json ": "script",
-      "slub:install --env=test": "symfony-cmd",
-      "slub:install --env=dev": "symfony-cmd",
-      "slub:install --env=prod": "symfony-cmd"
+      "touch var/persistence/prod/pr_repository.json var/persistence/dev/pr_repository.json var/persistence/test/pr_repository.json ": "script"
     },
     "post-install-cmd": [
       "@auto-scripts"

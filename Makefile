@@ -1,3 +1,11 @@
+.PHONY: install
+install:
+	bin/console --env=prod slub:install
+
+.PHONY: install-test
+install-test:
+	bin/console --env=test slub:install
+
 .PHONY: check
 check:
 	bin/console cache:clear --env=test

@@ -5,13 +5,12 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Slub\Application\NotifySquad\ChatClient;
 use Slub\Application\NotifySquad\NotifySquad;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
+use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
@@ -33,12 +32,12 @@ class ReviewContext extends FeatureContext
     private $currentMessageIdentifier;
 
     public function __construct(
-        SqlPRRepository $PRRepository,
+        PRRepositoryInterface $PRPRRepository,
         NewReviewHandler $reviewHandler,
         EventsSpy $eventSpy,
         ChatClientSpy $chatClientSpy
     ) {
-        parent::__construct($PRRepository);
+        parent::__construct($PRPRRepository);
 
         $this->ReviewHandler = $reviewHandler;
         $this->eventSpy = $eventSpy;

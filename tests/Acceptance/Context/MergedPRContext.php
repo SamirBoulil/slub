@@ -8,7 +8,7 @@ use PHPUnit\Framework\Assert;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
+use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\EventsSpy;
 
 /**
@@ -26,11 +26,11 @@ class MergedPRContext extends FeatureContext
     private $currentPRIdentifier;
 
     public function __construct(
-        SqlPRRepository $repository,
+        PRRepositoryInterface $PRRepository,
         MergedPRHandler $mergedPRHandler,
         EventsSpy $eventSpy
     ) {
-        parent::__construct($repository);
+        parent::__construct($PRRepository);
         $this->mergedPRHandler = $mergedPRHandler;
         $this->eventSpy = $eventSpy;
     }

@@ -7,7 +7,7 @@ use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
-use Slub\Infrastructure\Persistence\FileBased\Repository\SqlPRRepository;
+use Slub\Domain\Repository\PRRepositoryInterface;
 
 class PutPRToReviewContext extends FeatureContext
 {
@@ -24,10 +24,10 @@ class PutPRToReviewContext extends FeatureContext
     private $currentMessageIds = [];
 
     public function __construct(
-        SqlPRRepository $PRRepository,
+        PRRepositoryInterface $PRPRRepository,
         PutPRToReviewHandler $putPRToReviewHandler
     ) {
-        parent::__construct($PRRepository);
+        parent::__construct($PRPRRepository);
 
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->currentRepositoryIdentifier = '';
@@ -171,11 +171,11 @@ class PutPRToReviewContext extends FeatureContext
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
         Assert::assertEquals([
             'IDENTIFIER'  => $prIdentifier,
-            'GTMS'         => $gtmCount,
-            'NOT_GTMS'     => $notGtmCount,
+            'GTMS'        => $gtmCount,
+            'NOT_GTMS'    => $notGtmCount,
             'CI_STATUS'   => $ciStatus,
             'IS_MERGED'   => $isMerged,
-            'MESSAGE_IDS' => $messageIds
+            'MESSAGE_IDS' => $messageIds,
         ], $pr->normalize());
     }
 }

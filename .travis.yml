@@ -2,14 +2,20 @@ env:
   global:
     - CC_TEST_REPORTER_ID=91ad473d99d5da644e03cbca3889b3cb0c128d026e0c04ef2ef6a3f89ed6f46f
     - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
+    - DATABASE_URL=mysql://root:root@127.0.0.1:3306/slub
 language: php
 php: 7.2
+
+services:
+  - mysql
+
 #before_install: phpenv config-rm xdebug.ini || echo "xdebug not available for PHP $TRAVIS_PHP_VERSION"
 install: composer install --prefer-dist --no-interaction
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
+  - make install-test
 script:
   - make check
 after_script:

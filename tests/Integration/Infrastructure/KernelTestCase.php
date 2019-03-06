@@ -32,6 +32,6 @@ class KernelTestCase extends SymfonyTestCase
     private function resetDatabase(): void
     {
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
-        $fileBasedPRRepository->resetFile();
+        $fileBasedPRRepository->reset();
     }
 }

@@ -8,7 +8,7 @@ use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository;
+use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\EventsSpy;
 
 /**
@@ -26,11 +26,11 @@ class CIStatusUpdateContext extends FeatureContext
     private $currentPRIdentifier;
 
     public function __construct(
-        FileBasedPRRepository $repository,
+        PRRepositoryInterface $PRRepository,
         CIStatusUpdateHandler $CIStatusUpdateHandler,
         EventsSpy $eventSpy
     ) {
-        parent::__construct($repository);
+        parent::__construct($PRRepository);
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->eventSpy = $eventSpy;
     }

@@ -64,22 +64,28 @@ services:
 
     # Infrastructure
     ## Persistence
-    slub.infrastructure.persistence.pr_repository:
-        class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
+    slub.infrastructure.persistence.sql.database_connection:
+        class: Doctrine\DBAL\Connection
+        factory: 'Slub\Infrastructure\Persistence\Sql\ConnectionFactory::create'
         arguments:
+            - "%env(DATABASE_URL)%"
+
+    slub.infrastructure.persistence.pr_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlPRRepository
+        arguments:
+            - "@slub.infrastructure.persistence.sql.database_connection"
             - "@event_dispatcher"
-            - "%slub.infrastructure.persistence.file_database%"
+
+    slub.infrastructure.persistence.get_message_ids_for_pr:
+        class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetMessageIdsForPR
+        arguments:
+            - "@slub.infrastructure.persistence.sql.database_connection"
 
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:
             - "%slub.supported_repositories%"
             - "%slub.supported_channels%"
-
-    slub.infrastructure.persistence.get_message_ids_for_pr:
-        class: Slub\Infrastructure\Persistence\FileBased\Query\FileBasedGetMessageIdsForPR
-        arguments:
-            - "%slub.infrastructure.persistence.file_database%"
 
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:
@@ -116,3 +122,11 @@ services:
         arguments:
             - '@slub.application.new_review.new_review_handler'
             - '@logger'
+
+    ## CLI
+    slub.infrastructure.installer.cli.InstallerCLI:
+        class: Slub\Infrastructure\Installer\CLI\InstallerCLI
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+        tags:
+            - { name: console.command }

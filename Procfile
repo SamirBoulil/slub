@@ -1,0 +1,2 @@
+web: make install
+

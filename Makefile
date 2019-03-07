@@ -6,7 +6,7 @@ install:
 .PHONY: install-test
 install-test:
 	bin/console --env=test cache:clear
-	bin/console --env=test slub:install
+	bin/console --env=test slub:install -vvv
 
 .PHONY: check
 check:

@@ -10,6 +10,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SqlPRRepository implements PRRepositoryInterface
@@ -53,21 +54,7 @@ class SqlPRRepository implements PRRepositoryInterface
 
     public function reset(): void
     {
-        $this->sqlConnection->executeUpdate(
-            sprintf('CREATE DATABASE IF NOT EXISTS %s;', $this->sqlConnection->getDatabase())
-        );
-        $this->sqlConnection->executeUpdate('DROP TABLE IF EXISTS pr');
-        $createTable = <<<SQL
-CREATE TABLE pr (
-	IDENTIFIER VARCHAR(255) PRIMARY KEY,
-	GTMS INT(11) DEFAULT 0,
-	NOT_GTMS INT(11) DEFAULT 0,
-	CI_STATUS VARCHAR(255) NOT NULL,
-	IS_MERGED BOOLEAN DEFAULT false,
-	MESSAGE_IDS JSON
-);
-SQL;
-        $this->sqlConnection->executeUpdate($createTable);
+        $this->sqlConnection->executeUpdate('DELETE FROM pr;');
     }
 
     /**
@@ -78,7 +65,7 @@ SQL;
     {
         $sql = <<<SQL
 SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
-FROM PR
+FROM pr
 WHERE identifier = :identifier;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql, ['identifier' => $PRidentifier->stringValue()]);
@@ -94,7 +81,7 @@ SQL;
     {
         $sql = <<<SQL
 SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
-FROM PR
+FROM pr
 ORDER BY IS_MERGED ASC;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql);
@@ -146,6 +133,6 @@ ON DUPLICATE KEY UPDATE
   IS_MERGED = :IS_MERGED,
   MESSAGE_IDS = :MESSAGE_IDS;
 SQL;
-        $this->sqlConnection->executeUpdate($sql, $PR->normalize(), ['MESSAGE_IDS' => 'json']);
+        $this->sqlConnection->executeUpdate($sql, $PR->normalize(), ['IS_MERGED' => 'boolean', 'MESSAGE_IDS' => 'json']);
     }
 }

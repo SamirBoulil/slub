@@ -133,6 +133,6 @@ services:
     slub.infrastructure.installer.cli.InstallerCLI:
         class: Slub\Infrastructure\Installer\CLI\InstallerCLI
         arguments:
-            - '@slub.infrastructure.persistence.pr_repository'
+            - "@slub.infrastructure.persistence.sql.database_connection"
         tags:
             - { name: console.command }

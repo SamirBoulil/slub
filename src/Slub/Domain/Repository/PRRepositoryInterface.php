@@ -17,4 +17,9 @@ interface PRRepositoryInterface
     public function getBy(PRIdentifier $PRidentifier): PR;
 
     public function reset();
+
+    /**
+     * @return PR[]
+     */
+    public function all(): array;
 }

@@ -39,6 +39,18 @@ class SqlPRRepository implements PRRepositoryInterface
         return $this->hydrate($result);
     }
 
+    /**
+     * @return PR[]
+     */
+    public function all(): array
+    {
+        $result = $this->fetchAll();
+
+        return array_map(function (array $normalizedPR) {
+            return $this->hydrate($normalizedPR);
+        }, $result);
+    }
+
     public function reset(): void
     {
         $this->sqlConnection->executeUpdate(
@@ -78,6 +90,19 @@ SQL;
         return $result;
     }
 
+    private function fetchAll(): array
+    {
+        $sql = <<<SQL
+SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
+FROM PR
+ORDER BY IS_MERGED ASC;
+SQL;
+        $statement = $this->sqlConnection->executeQuery($sql);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $result;
+    }
+
     /**
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -109,8 +134,17 @@ SQL;
     private function updatePR(PR $PR): void
     {
         $sql = <<<SQL
-INSERT INTO pr (IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
-VALUES (:IDENTIFIER, :GTMS, :NOT_GTMS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS);
+INSERT INTO
+  pr (IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
+VALUES
+  (:IDENTIFIER, :GTMS, :NOT_GTMS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS)
+ON DUPLICATE KEY UPDATE
+  IDENTIFIER = :IDENTIFIER,
+  GTMS = :GTMS,
+  NOT_GTMS = :NOT_GTMS,
+  CI_STATUS = :CI_STATUS,
+  IS_MERGED = :IS_MERGED,
+  MESSAGE_IDS = :MESSAGE_IDS;
 SQL;
         $this->sqlConnection->executeUpdate($sql, $PR->normalize(), ['MESSAGE_IDS' => 'json']);
     }

@@ -35,7 +35,7 @@ class FileBasedPRRepository implements PRRepositoryInterface
     /**
      * @return PR[]
      */
-    private function all(): array
+    public function all(): array
     {
         $normalizedPRs = $this->readFile();
         $result = $this->denormalizePRs($normalizedPRs);

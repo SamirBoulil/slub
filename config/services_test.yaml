@@ -24,14 +24,3 @@ services:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
         arguments:
             - "%slub.channels%"
-
-    slub.infrastructure.persistence.pr_repository:
-        class: Slub\Infrastructure\Persistence\FileBased\Repository\FileBasedPRRepository
-        arguments:
-            - "@event_dispatcher"
-            - "%slub.infrastructure.persistence.file_database%"
-
-    slub.infrastructure.persistence.get_message_ids_for_pr:
-        class: Slub\Infrastructure\Persistence\FileBased\Query\FileBasedGetMessageIdsForPR
-        arguments:
-            - "%slub.infrastructure.persistence.file_database%"

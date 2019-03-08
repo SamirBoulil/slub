@@ -34,7 +34,98 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save($savedPR);
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);
 
-        $this->assertSame($fetchedPR->normalize(), $savedPR->normalize());
+        $this->assertSame($savedPR->normalize(), $fetchedPR->normalize());
+    }
+
+    /**
+     * @test
+     */
+    public function it_updates_a_pr()
+    {
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $savedPR = PR::create($identifier, MessageIdentifier::fromString('1'));
+        $this->sqlPRRepository->save($savedPR);
+
+        $updatedPR = $savedPR;
+        $updatedPR->notGTM();
+        $updatedPR->GTM();
+        $updatedPR->green();
+        $updatedPR->merged();
+        $updatedPR->putToReviewAgainViaMessage(MessageIdentifier::fromString('5151'));
+        $this->sqlPRRepository->save($updatedPR);
+
+        $fetchedPR = $this->sqlPRRepository->getBy($identifier);
+        $this->assertSame($updatedPR->normalize(), $fetchedPR->normalize());
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_all_PR_ordered_by_is_merged()
+    {
+        $this->sqlPRRepository->save(
+            PR::fromNormalized([
+                    'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+                    'GTMS'        => 1,
+                    'NOT_GTMS'    => 1,
+                    'CI_STATUS'   => 'PENDING',
+                    'IS_MERGED'   => false,
+                    'MESSAGE_IDS' => ['1', '2'],
+
+                ]
+            )
+        );
+        $this->sqlPRRepository->save(
+            PR::fromNormalized([
+                    'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
+                    'GTMS'        => 1,
+                    'NOT_GTMS'    => 1,
+                    'CI_STATUS'   => 'PENDING',
+                    'IS_MERGED'   => true,
+                    'MESSAGE_IDS' => ['1', '2'],
+                ]
+            )
+        );
+        $this->sqlPRRepository->save(
+            PR::fromNormalized([
+                    'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
+                    'GTMS'        => 1,
+                    'NOT_GTMS'    => 1,
+                    'CI_STATUS'   => 'PENDING',
+                    'IS_MERGED'   => false,
+                    'MESSAGE_IDS' => ['1', '2'],
+                ]
+            )
+        );
+        $actualPRs = $this->sqlPRRepository->all();
+        $this->assertPRs([
+            [
+                'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+                'GTMS'        => 1,
+                'NOT_GTMS'    => 1,
+                'CI_STATUS'   => 'PENDING',
+                'IS_MERGED'   => false,
+                'MESSAGE_IDS' => ['1', '2'],
+
+            ],
+            [
+                'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
+                'GTMS'        => 1,
+                'NOT_GTMS'    => 1,
+                'CI_STATUS'   => 'PENDING',
+                'IS_MERGED'   => false,
+                'MESSAGE_IDS' => ['1', '2'],
+
+            ],
+            [
+                'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
+                'GTMS'        => 1,
+                'NOT_GTMS'    => 1,
+                'CI_STATUS'   => 'PENDING',
+                'IS_MERGED'   => true,
+                'MESSAGE_IDS' => ['1', '2'],
+            ],
+        ], $actualPRs);
     }
 
     /**
@@ -59,5 +150,19 @@ class SqlPRRepositoryTest extends KernelTestCase
 
         $this->expectException(PRNotFoundException::class);
         $this->sqlPRRepository->getBy($identifier);
+    }
+
+    /**
+     * @param array $expectedPRs
+     * @param PR[] $actualPRs
+     */
+    private function assertPRs(array $expectedPRs, array $actualPRs): void
+    {
+        $normalizedFetchedPR = [];
+        foreach ($actualPRs as $actualPR) {
+            $normalizedFetchedPR[] = $actualPR->normalize();
+        }
+
+        $this->assertSame($expectedPRs, $normalizedFetchedPR);
     }
 }

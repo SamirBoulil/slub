@@ -21,4 +21,4 @@ Botman: https://github.com/botman/botman
 # To refactor
 - Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier
 - config/services.yaml:19 - set public classes to false: the "test" env should have public true (unless the bug has been fixed)
-- Send a message when 2 GTMs only and change the behats accordingly
+- Remove filebased ?

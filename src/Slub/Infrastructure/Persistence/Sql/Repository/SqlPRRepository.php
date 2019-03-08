@@ -10,6 +10,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SqlPRRepository implements PRRepositoryInterface
@@ -39,23 +40,21 @@ class SqlPRRepository implements PRRepositoryInterface
         return $this->hydrate($result);
     }
 
+    /**
+     * @return PR[]
+     */
+    public function all(): array
+    {
+        $result = $this->fetchAll();
+
+        return array_map(function (array $normalizedPR) {
+            return $this->hydrate($normalizedPR);
+        }, $result);
+    }
+
     public function reset(): void
     {
-        $this->sqlConnection->executeUpdate(
-            sprintf('CREATE DATABASE IF NOT EXISTS %s;', $this->sqlConnection->getDatabase())
-        );
-        $this->sqlConnection->executeUpdate('DROP TABLE IF EXISTS pr');
-        $createTable = <<<SQL
-CREATE TABLE pr (
-	IDENTIFIER VARCHAR(255) PRIMARY KEY,
-	GTMS INT(11) DEFAULT 0,
-	NOT_GTMS INT(11) DEFAULT 0,
-	CI_STATUS VARCHAR(255) NOT NULL,
-	IS_MERGED BOOLEAN DEFAULT false,
-	MESSAGE_IDS JSON
-);
-SQL;
-        $this->sqlConnection->executeUpdate($createTable);
+        $this->sqlConnection->executeUpdate('DELETE FROM pr;');
     }
 
     /**
@@ -66,7 +65,7 @@ SQL;
     {
         $sql = <<<SQL
 SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
-FROM PR
+FROM pr
 WHERE identifier = :identifier;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql, ['identifier' => $PRidentifier->stringValue()]);
@@ -74,6 +73,19 @@ SQL;
         if (false === $result) {
             throw PRNotFoundException::create($PRidentifier);
         }
+
+        return $result;
+    }
+
+    private function fetchAll(): array
+    {
+        $sql = <<<SQL
+SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
+FROM pr
+ORDER BY IS_MERGED ASC;
+SQL;
+        $statement = $this->sqlConnection->executeQuery($sql);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         return $result;
     }
@@ -109,9 +121,18 @@ SQL;
     private function updatePR(PR $PR): void
     {
         $sql = <<<SQL
-INSERT INTO pr (IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
-VALUES (:IDENTIFIER, :GTMS, :NOT_GTMS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS);
+INSERT INTO
+  pr (IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
+VALUES
+  (:IDENTIFIER, :GTMS, :NOT_GTMS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS)
+ON DUPLICATE KEY UPDATE
+  IDENTIFIER = :IDENTIFIER,
+  GTMS = :GTMS,
+  NOT_GTMS = :NOT_GTMS,
+  CI_STATUS = :CI_STATUS,
+  IS_MERGED = :IS_MERGED,
+  MESSAGE_IDS = :MESSAGE_IDS;
 SQL;
-        $this->sqlConnection->executeUpdate($sql, $PR->normalize(), ['MESSAGE_IDS' => 'json']);
+        $this->sqlConnection->executeUpdate($sql, $PR->normalize(), ['IS_MERGED' => 'boolean', 'MESSAGE_IDS' => 'json']);
     }
 }

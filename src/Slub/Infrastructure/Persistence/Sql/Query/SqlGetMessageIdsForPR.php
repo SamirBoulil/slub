@@ -37,7 +37,7 @@ class SqlGetMessageIdsForPR implements GetMessageIdsForPR
     {
         $sql = <<<SQL
 SELECT MESSAGE_IDS
-FROM PR
+FROM pr
 WHERE identifier = :identifier;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql, ['identifier' => $PRIdentifier->stringValue()]);

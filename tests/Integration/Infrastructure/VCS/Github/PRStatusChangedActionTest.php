@@ -98,7 +98,7 @@ class PRStatusChangedActionTest extends WebTestCase
         "body": "Pourquoi pas",
         "commit_id": "caed81fdd51f573d7235fb63959ef6a6d0aaf809",
         "submitted_at": "2019-02-24T12:33:40Z",
-        "state": "APPROVE",
+        "state": "approved",
         "html_url": "https://github.com/akeneo/pim-community-dev/pull/10#pullrequestreview-207149777",
         "pull_request_url": "https://api.github.com/repos/akeneo/pim-community-dev/pulls/10",
         "author_association": "OWNER",

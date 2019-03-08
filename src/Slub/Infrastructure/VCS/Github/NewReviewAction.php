@@ -52,7 +52,7 @@ class NewReviewAction
     {
         $PRStatus = $PRStatusUpdate['review']['state'];
 
-        return 'APPROVE' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
+        return 'approved' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
     }
 
     private function getPRIdentifier(array $PRStatusUpdate): string
@@ -75,6 +75,6 @@ class NewReviewAction
     {
         $PRStatus = $PRStatusUpdate['review']['state'];
 
-        return 'APPROVE' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
+        return 'approved' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
     }
 }

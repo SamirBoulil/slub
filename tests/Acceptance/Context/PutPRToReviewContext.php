@@ -104,6 +104,7 @@ class PutPRToReviewContext extends FeatureContext
             $this->currentPRIdentifier,
             0,
             0,
+            0,
             'PENDING',
             false,
             $this->currentMessageIds
@@ -153,6 +154,7 @@ class PutPRToReviewContext extends FeatureContext
             $this->currentPRIdentifier,
             0,
             0,
+            0,
             'PENDING',
             false,
             $this->currentMessageIds
@@ -163,6 +165,7 @@ class PutPRToReviewContext extends FeatureContext
         string $prIdentifier,
         int $gtmCount,
         int $notGtmCount,
+        int $commentsCount,
         $ciStatus,
         $isMerged,
         $messageIds
@@ -173,6 +176,7 @@ class PutPRToReviewContext extends FeatureContext
             'IDENTIFIER'  => $prIdentifier,
             'GTMS'        => $gtmCount,
             'NOT_GTMS'    => $notGtmCount,
+            'COMMENTS'    => $commentsCount,
             'CI_STATUS'   => $ciStatus,
             'IS_MERGED'   => $isMerged,
             'MESSAGE_IDS' => $messageIds,

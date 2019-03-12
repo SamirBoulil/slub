@@ -6,6 +6,7 @@ namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
@@ -20,6 +21,7 @@ class PR
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
+    private const COMMENTS_KEY = 'COMMENTS';
 
     /** @var Event[] */
     private $events = [];
@@ -32,6 +34,9 @@ class PR
 
     /** @var int */
     private $GTMCount;
+
+    /** @var int */
+    private $comments;
 
     /** @var int */
     private $notGTMCount;
@@ -47,12 +52,14 @@ class PR
         array $messageIds,
         int $GTMCount,
         int $notGTMCount,
+        int $comments,
         CIStatus $CIStatus,
         bool $isMerged
     ) {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
+        $this->comments = $comments;
         $this->CIStatus = $CIStatus;
         $this->isMerged = $isMerged;
         $this->messageIds = $messageIds;
@@ -60,7 +67,7 @@ class PR
 
     public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageId): self
     {
-        return new self($PRIdentifier, [$messageId], 0, 0, CIStatus::pending(), false);
+        return new self($PRIdentifier, [$messageId], 0, 0, 0, CIStatus::pending(), false);
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -68,6 +75,7 @@ class PR
         Assert::keyExists($normalizedPR, self::IDENTIFIER_KEY);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
+        Assert::keyExists($normalizedPR, self::COMMENTS_KEY);
         Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
@@ -77,13 +85,21 @@ class PR
         $GTM = $normalizedPR[self::GTM_KEY];
         $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
         $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
+        $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(function (string $messageId) {
             return MessageIdentifier::fromString($messageId);
         }, $normalizedPR[self::MESSAGE_IDS]);
 
-
-        return new self($identifier, $messageIds, $GTM, $NOTGTM, CIStatus::fromNormalized($CIStatus), $isMerged);
+        return new self(
+            $identifier,
+            $messageIds,
+            $GTM,
+            $NOTGTM,
+            $comments,
+            CIStatus::fromNormalized($CIStatus),
+            $isMerged
+        );
     }
 
     public function normalize(): array
@@ -92,11 +108,12 @@ class PR
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
             self::GTM_KEY        => $this->GTMCount,
             self::NOT_GTM_KEY    => $this->notGTMCount,
+            self::COMMENTS_KEY   => $this->comments,
             self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY  => $this->isMerged,
             self::MESSAGE_IDS    => array_map(function (MessageIdentifier $messageId) {
                 return $messageId->stringValue();
-            }, $this->messageIds)
+            }, $this->messageIds),
         ];
     }
 
@@ -115,6 +132,12 @@ class PR
     {
         $this->notGTMCount++;
         $this->events[] = PRNotGTMed::forPR($this->PRIdentifier);
+    }
+
+    public function comment(): void
+    {
+        $this->comments++;
+        $this->events[] = PRCommented::forPR($this->PRIdentifier);
     }
 
     public function green(): void
@@ -154,12 +177,12 @@ class PR
     public function putToReviewAgainViaMessage(MessageIdentifier $newMessageId): void
     {
         $alreadyExists = !empty(
-            array_filter(
-                $this->messageIds,
-                function (MessageIdentifier $messageId) use ($newMessageId) {
-                    return $messageId->equals($newMessageId);
-                }
-            )
+        array_filter(
+            $this->messageIds,
+            function (MessageIdentifier $messageId) use ($newMessageId) {
+                return $messageId->equals($newMessageId);
+            }
+        )
         );
 
         if ($alreadyExists) {

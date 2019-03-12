@@ -71,7 +71,8 @@ class SlubBotTest extends KernelTestCase
     {
         return[
             'PR with please' => ['TR please <https://github.com/akeneo/pim-community-dev/pull/9609>'],
-            'PR without please' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609>']
+            'PR without please' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609>'],
+            'PR with trailing /files' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609/files>']
         ];
     }
 }

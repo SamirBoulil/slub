@@ -68,11 +68,11 @@ class NewReviewAction
 
         switch ($PRStatus) {
             case 'approved':
-                return 'gtm';
+                return 'accepted';
             case 'request_changes':
-                return 'not_gtm';
+                return 'refused';
             case 'commented':
-                return 'comment';
+                return 'commented';
             default:
                 throw new BadRequestHttpException(
                     sprintf(

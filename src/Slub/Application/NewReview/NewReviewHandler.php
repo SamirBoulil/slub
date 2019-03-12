@@ -47,13 +47,13 @@ class NewReviewHandler
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         switch ($review->reviewStatus) {
-            case 'gtm':
+            case 'accepted':
                 $PR->GTM();
                 break;
-            case 'not_gtm':
+            case 'refused':
                 $PR->notGTM();
                 break;
-            case 'comment':
+            case 'commented':
                 $PR->comment();
                 break;
             default:

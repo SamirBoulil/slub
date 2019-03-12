@@ -62,7 +62,7 @@ class ReviewContext extends FeatureContext
         $gtm = new NewReview();
         $gtm->repositoryIdentifier = 'akeneo/pim-community-dev';
         $gtm->PRIdentifier = 'akeneo/pim-community-dev/1010';
-        $gtm->reviewStatus = 'gtm';
+        $gtm->reviewStatus = 'accepted';
         $this->reviewHandler->handle($gtm);
     }
 
@@ -99,7 +99,7 @@ class ReviewContext extends FeatureContext
         $notGTM = new NewReview();
         $notGTM->repositoryIdentifier = 'akeneo/pim-community-dev';
         $notGTM->PRIdentifier = 'akeneo/pim-community-dev/1010';
-        $notGTM->reviewStatus = 'not_gtm';
+        $notGTM->reviewStatus = 'refused';
         $this->reviewHandler->handle($notGTM);
     }
 
@@ -173,7 +173,7 @@ class ReviewContext extends FeatureContext
         $comment = new NewReview();
         $comment->repositoryIdentifier = 'akeneo/pim-community-dev';
         $comment->PRIdentifier = 'akeneo/pim-community-dev/1010';
-        $comment->reviewStatus = 'comment';
+        $comment->reviewStatus = 'commented';
         $this->reviewHandler->handle($comment);
     }
 

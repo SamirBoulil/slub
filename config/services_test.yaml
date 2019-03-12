@@ -1,10 +1,6 @@
 parameters:
-    slub.repositories:
-        - "akeneo/pim-community-dev"
-        - "SamirBoulil/slub"
-    slub.channels:
-        - "squad-raccoons"
-        - "general"
+    SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
+    SUPPORTED_CHANNELS: "squad-raccoons,general"
 
 services:
     # default configuration for services in *this* file
@@ -23,4 +19,4 @@ services:
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
         arguments:
-            - "%slub.channels%"
+            - "%env(SUPPORTED_CHANNELS)%"

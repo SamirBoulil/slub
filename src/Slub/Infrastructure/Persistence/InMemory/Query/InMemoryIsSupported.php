@@ -17,8 +17,10 @@ class InMemoryIsSupported implements IsSupportedInterface
     /** @var array */
     private $supportedChannels;
 
-    public function __construct(array $supportedRepositories, array $supportedChannels)
+    public function __construct(string $commaSeparatedRepositories, string $commaSeparatedchannels)
     {
+        $supportedRepositories = explode(',', $commaSeparatedRepositories);
+        $supportedChannels = explode(',', $commaSeparatedchannels);
         Assert::allString($supportedRepositories);
         Assert::allString($supportedChannels);
         $this->supportedRepositories = $this->createIdentifiers($supportedRepositories);

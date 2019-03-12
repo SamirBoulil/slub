@@ -4,12 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    slub.supported_repositories:
-        - "akeneo/pim-community-dev"
-        - "SamirBoulil/slub"
-    slub.supported_channels:
-        - "squad-raccoons"
-        - "general"
+    SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
+    SUPPORTED_CHANNELS: "squad-raccoons,general"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
     slub.infrastructure.chat.slack.base_uri: "https://slack.com"
@@ -84,8 +80,8 @@ services:
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:
-            - "%slub.supported_repositories%"
-            - "%slub.supported_channels%"
+            - "%env(SUPPORTED_REPOSITORIES)%"
+            - "%env(SUPPORTED_CHANNELS)%"
 
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:

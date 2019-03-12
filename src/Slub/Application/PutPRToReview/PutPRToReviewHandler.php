@@ -47,9 +47,7 @@ class PutPRToReviewHandler
             $this->createNewPR($command);
         }
 
-        $this->logger->critical(
-            sprintf('PR "%s" has been put to review', $command->PRIdentifier)
-        );
+        $this->logger->info(sprintf('PR "%s" has been put to review', $command->PRIdentifier));
     }
 
     private function isUnsupported(PutPRToReview $putPRToReview): bool
@@ -61,9 +59,10 @@ class PutPRToReviewHandler
             || !$this->isSupported->channel($channelIdentifier);
 
         if ($isUnsupported) {
-            $this->logger->critical(
+            $this->logger->info(
                 sprintf(
-                    'Repository ("%s") or channel ("%s") was not supported',
+                    'PR "%s" was not put to review because it is not supported for channel "%s", and repository "%s"',
+                    $putPRToReview->PRIdentifier,
                     $putPRToReview->repositoryIdentifier,
                     $putPRToReview->channelIdentifier
                 )

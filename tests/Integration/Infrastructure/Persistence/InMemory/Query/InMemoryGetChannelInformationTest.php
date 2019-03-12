@@ -6,11 +6,8 @@ namespace Tests\Integration\Infrastructure\Persistence\InMemory\Query;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
-use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\GetChannelInformationInterface;
-use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation;
-use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported;
 
 class InMemoryGetChannelInformationTest extends TestCase
 {
@@ -20,9 +17,7 @@ class InMemoryGetChannelInformationTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->getChannelInformation = new InMemoryGetChannelInformation(
-            ['squad-raccoons', 'squad-chipmunks']
-        );
+        $this->getChannelInformation = new InMemoryGetChannelInformation('squad-raccoons,squad-chipmunks');
     }
 
     /**

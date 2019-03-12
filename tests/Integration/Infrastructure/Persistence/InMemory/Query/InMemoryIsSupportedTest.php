@@ -19,8 +19,8 @@ class InMemoryIsSupportedTest extends TestCase
     {
         parent::setUp();
         $this->isSupportedQuery = new InMemoryIsSupported(
-            ['akeneo/pim-community-dev', 'akeneo/pim-enterprise-dev'],
-            ['squad-raccoons', 'squad-chipmunks']
+            'akeneo/pim-community-dev,akeneo/pim-enterprise-dev',
+            'squad-raccoons,squad-chipmunks'
         );
     }
 

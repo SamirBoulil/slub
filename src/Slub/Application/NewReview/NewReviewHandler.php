@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Application\NewReview;
 
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -20,12 +21,17 @@ class NewReviewHandler
     /** @var IsSupportedInterface */
     private $isSupported;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        IsSupportedInterface $isSupported
+        IsSupportedInterface $isSupported,
+        LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isSupported;
+        $this->logger = $logger;
     }
 
     public function handle(NewReview $review)
@@ -49,12 +55,15 @@ class NewReviewHandler
         switch ($review->reviewStatus) {
             case 'accepted':
                 $PR->GTM();
+                $logMessage = 'PR "%s" has been GTMed';
                 break;
             case 'refused':
                 $PR->notGTM();
+                $logMessage = 'PR "%s" has been NOT GTMed';
                 break;
             case 'commented':
                 $PR->comment();
+                $logMessage = 'PR "%s" has been commented';
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -65,5 +74,6 @@ class NewReviewHandler
                 );
         }
         $this->PRRepository->save($PR);
+        $this->logger->info(sprintf($logMessage, $review->PRIdentifier));
     }
 }

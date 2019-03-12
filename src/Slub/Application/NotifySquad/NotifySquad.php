@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
-use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
@@ -56,6 +55,12 @@ class NotifySquad implements EventSubscriberInterface
         $text = self::MESSAGE_PR_GTMED;
         $PRIdentifier = $event->PRIdentifier();
         $this->replyInThreads($PRIdentifier, $text);
+        $this->logger->info(
+            sprintf(
+                'Squad has been notified PR "%s" has been GTMed',
+                $event->PRIdentifier()->stringValue()
+            )
+        );
     }
 
     public function whenPRHasBeenNotGTM(PRNotGTMed $event): void
@@ -63,6 +68,12 @@ class NotifySquad implements EventSubscriberInterface
         $text = self::MESSAGE_PR_NOT_GTMED;
         $PRIdentifier = $event->PRIdentifier();
         $this->replyInThreads($PRIdentifier, $text);
+        $this->logger->info(
+            sprintf(
+                'Squad has been notified PR "%s" has been NOT GTMed',
+                $event->PRIdentifier()->stringValue()
+            )
+        );
     }
 
     public function whenPRComment(PRCommented $event): void
@@ -70,6 +81,12 @@ class NotifySquad implements EventSubscriberInterface
         $text = self::MESSAGE_PR_COMMENTED;
         $PRIdentifier = $event->PRIdentifier();
         $this->replyInThreads($PRIdentifier, $text);
+        $this->logger->info(
+            sprintf(
+                'Squad has been notified PR "%s" has been commented',
+                $event->PRIdentifier()->stringValue()
+            )
+        );
     }
 
     private function replyInThreads(PRIdentifier $PRIdentifier, string $message): void
@@ -77,16 +94,5 @@ class NotifySquad implements EventSubscriberInterface
         $messageIds = $this->getMessageIdsForPR->fetch($PRIdentifier);
         $lastMessageId = last($messageIds);
         $this->chatClient->replyInThread($lastMessageId, $message);
-        $this->logger->critical(
-            sprintf(
-                'Notified the squad a PR has been GTMed: %s',
-                implode(
-                    ',',
-                    array_map(function (MessageIdentifier $messageId) {
-                        return $messageId->stringValue();
-                    }, $messageIds)
-                )
-            )
-        );
     }
 }

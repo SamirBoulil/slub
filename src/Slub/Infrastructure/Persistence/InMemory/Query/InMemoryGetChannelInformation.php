@@ -18,9 +18,9 @@ class InMemoryGetChannelInformation implements GetChannelInformationInterface
     /** @var array */
     private $supportedChannels;
 
-    public function __construct(array $supportedChannels)
+    public function __construct(string $commaSeparatedChannels)
     {
-        $this->supportedChannels = $supportedChannels;
+        $this->supportedChannels = explode(',', $commaSeparatedChannels);
     }
 
     public function fetch(ChannelIdentifier $channelIdentifier): ChannelInformation

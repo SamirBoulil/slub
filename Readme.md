@@ -8,9 +8,11 @@ Botman: https://github.com/botman/botman
 
 
 # Todo:
-- Add firebase port
 - Add tactical loggers
-- Deloy to heroku
+- Put env variables:
+    - Supported repositories
+    - Supported channels
+    - Messages (GTM / commented/ not gtm) in env variables with defaults
 
 # Ideas
 - Add glossary (squad, PR, GTM...)

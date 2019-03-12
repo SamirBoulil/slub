@@ -36,6 +36,7 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
+            - "@logger"
 
     slub.application.ci_status_update.ci_status_update_handler:
         class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler

@@ -74,9 +74,9 @@ class SlubBot
                 $prToReview->channelIdentifier = $channelIdentifier;
                 $prToReview->messageId = $this->getMessageId($bot);
 
-                $this->logger->critical(
+                $this->logger->info(
                     sprintf(
-                        'Infra - NEW PR TO REVIEW detected (channel "%s", repository "%s", PR "%s")',
+                        'New PR to review detected from channel "%s" for repository "%s", PR "%s".',
                         $channelIdentifier,
                         $repository,
                         $prIdentifier

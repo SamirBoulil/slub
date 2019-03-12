@@ -19,6 +19,6 @@ class NewReview
     /** @var string */
     public $PRIdentifier;
 
-    /** @var bool */
-    public $isGTM;
+    /** @var string */
+    public $reviewStatus;
 }

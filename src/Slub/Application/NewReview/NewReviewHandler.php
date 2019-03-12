@@ -46,10 +46,23 @@ class NewReviewHandler
     private function updatePRWithReview(NewReview $review): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
-        if ($review->isGTM) {
-            $PR->GTM();
-        } else {
-            $PR->notGTM();
+        switch ($review->reviewStatus) {
+            case 'accepted':
+                $PR->GTM();
+                break;
+            case 'refused':
+                $PR->notGTM();
+                break;
+            case 'commented':
+                $PR->comment();
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'review type "%s" is not supported, supported types are "gtm", "not_gtm", "comment"',
+                        $review->reviewStatus
+                    )
+                );
         }
         $this->PRRepository->save($PR);
     }

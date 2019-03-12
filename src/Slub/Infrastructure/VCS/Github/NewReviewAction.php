@@ -9,6 +9,7 @@ use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -30,14 +31,11 @@ class NewReviewAction
     public function executeAction(Request $request): Response
     {
         $PRStatusUpdate = $this->getPRStatusUpdate($request);
-        if (!$this->isStatusSupported($PRStatusUpdate)) {
-            return new Response();
-        }
 
         $newPRReview = new NewReview();
         $newPRReview->PRIdentifier = $this->getPRIdentifier($PRStatusUpdate);
         $newPRReview->repositoryIdentifier = $this->getRepositoryIdentifier($PRStatusUpdate);
-        $newPRReview->isGTM = $this->isGTM($PRStatusUpdate);
+        $newPRReview->reviewStatus = $this->reviewStatus($PRStatusUpdate);
         $this->newReviewHandler->handle($newPRReview);
 
         return new Response();
@@ -46,13 +44,6 @@ class NewReviewAction
     private function getPRStatusUpdate(Request $request): array
     {
         return json_decode((string) $request->getContent(), true);
-    }
-
-    private function isStatusSupported(array $PRStatusUpdate): bool
-    {
-        $PRStatus = $PRStatusUpdate['review']['state'];
-
-        return 'approved' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
     }
 
     private function getPRIdentifier(array $PRStatusUpdate): string
@@ -71,10 +62,24 @@ class NewReviewAction
         return $matches[1];
     }
 
-    private function isGTM(array $PRStatusUpdate): bool
+    private function reviewStatus(array $PRStatusUpdate): string
     {
         $PRStatus = $PRStatusUpdate['review']['state'];
 
-        return 'approved' === $PRStatus || 'REQUEST_CHANGES' === $PRStatus;
+        switch ($PRStatus) {
+            case 'approved':
+                return 'accepted';
+            case 'request_changes':
+                return 'refused';
+            case 'commented':
+                return 'commented';
+            default:
+                throw new BadRequestHttpException(
+                    sprintf(
+                        'Unkown review status "%s", expected one of "approved", "request_changes", "commented"',
+                        $PRStatus
+                    )
+                );
+        }
     }
 }

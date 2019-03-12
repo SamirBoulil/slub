@@ -27,8 +27,9 @@ class PRTest extends TestCase
         $this->assertSame(
             [
                 'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
-                'GTMS'         => 0,
-                'NOT_GTMS'     => 0,
+                'GTMS'        => 0,
+                'NOT_GTMS'    => 0,
+                'COMMENTS'    => 0,
                 'CI_STATUS'   => 'PENDING',
                 'IS_MERGED'   => false,
                 'MESSAGE_IDS' => ['1'],
@@ -43,12 +44,13 @@ class PRTest extends TestCase
     public function it_is_created_from_normalized()
     {
         $normalizedPR = [
-            'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
             'GTMS'        => 2,
             'NOT_GTMS'    => 0,
-            'CI_STATUS'  => 'GREEN',
-            'IS_MERGED'  => true,
-            'MESSAGE_IDS' => ['1', '2']
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'GREEN',
+            'IS_MERGED'   => true,
+            'MESSAGE_IDS' => ['1', '2'],
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -101,6 +103,24 @@ class PRTest extends TestCase
 
         $pr->notGTM();
         $this->assertEquals(2, $pr->normalize()['NOT_GTMS']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_commented_multiple_times()
+    {
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageIdentifier::fromString('1')
+        );
+        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+
+        $pr->comment();
+        $this->assertEquals(1, $pr->normalize()['COMMENTS']);
+
+        $pr->comment();
+        $this->assertEquals(2, $pr->normalize()['COMMENTS']);
     }
 
     /**
@@ -197,24 +217,24 @@ class PRTest extends TestCase
         return [
             'Missing identifier'     => [
                 [
-                    'GTMS'       => 0,
-                    'NOT_GTMS'   => 0,
+                    'GTMS'      => 0,
+                    'NOT_GTMS'  => 0,
                     'CI_STATUS' => 'PENDING',
                     'IS_MERGED' => false,
                 ],
             ],
-            'Missing GTMS'            => [
+            'Missing GTMS'           => [
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
-                    'NOT_GTMS'    => 0,
+                    'NOT_GTMS'   => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
                 ],
             ],
-            'Missing NOT GTMS'        => [
+            'Missing NOT GTMS'       => [
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
-                    'GTMS'        => 0,
+                    'GTMS'       => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
                 ],
@@ -222,8 +242,8 @@ class PRTest extends TestCase
             'Missing CI status'      => [
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
-                    'GTMS'        => 0,
-                    'NOT_GTMS'    => 0,
+                    'GTMS'       => 0,
+                    'NOT_GTMS'   => 0,
                     'IS_MERGED'  => false,
 
                 ],
@@ -231,8 +251,8 @@ class PRTest extends TestCase
             'Missing is merged flag' => [
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
-                    'GTMS'        => 0,
-                    'NOT_GTMS'    => 0,
+                    'GTMS'       => 0,
+                    'NOT_GTMS'   => 0,
                     'CI_STATUS'  => 'PENDING',
                 ],
             ],

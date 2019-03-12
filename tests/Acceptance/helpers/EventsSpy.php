@@ -6,6 +6,7 @@ namespace Tests\Acceptance\helpers;
 
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
@@ -24,6 +25,7 @@ class EventsSpy implements EventSubscriberInterface
         return [
             PRGTMed::class    => 'notifyPRGTMed',
             PRNotGTMed::class => 'notifyPRNotGTMed',
+            PRCommented::class => 'notifyPRCommented',
             CIGreen::class    => 'notifyCIGreen',
             CIRed::class      => 'notifyCIRed',
             PRMerged::class   => 'notifyPRMerged',
@@ -48,6 +50,16 @@ class EventsSpy implements EventSubscriberInterface
     public function PRNotGMTedDispatched(): bool
     {
         return $this->events[PRNotGTMed::class] ?? false;
+    }
+
+    public function notifyPRCommented(PRCommented $PRCommented): void
+    {
+        $this->events[PRCommented::class] = true;
+    }
+
+    public function PRCommentedDispatched(): bool
+    {
+        return $this->events[PRCommented::class] ?? false;
     }
 
     public function notifyCIGreen(CIGreen $CIGreen): void

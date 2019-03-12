@@ -10,7 +10,6 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SqlPRRepository implements PRRepositoryInterface
@@ -64,7 +63,7 @@ class SqlPRRepository implements PRRepositoryInterface
     private function fetch(PRIdentifier $PRidentifier): array
     {
         $sql = <<<SQL
-SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
+SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS
 FROM pr
 WHERE identifier = :identifier;
 SQL;
@@ -80,7 +79,7 @@ SQL;
     private function fetchAll(): array
     {
         $sql = <<<SQL
-SELECT IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS
+SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS
 FROM pr
 ORDER BY IS_MERGED ASC;
 SQL;
@@ -99,6 +98,8 @@ SQL;
         $result['GTMS'] = Type::getType(Type::INTEGER)->convertToPhpValue($result['GTMS'],
             $this->sqlConnection->getDatabasePlatform());
         $result['NOT_GTMS'] = Type::getType(Type::INTEGER)->convertToPhpValue($result['NOT_GTMS'],
+            $this->sqlConnection->getDatabasePlatform());
+        $result['COMMENTS'] = Type::getType(Type::INTEGER)->convertToPhpValue($result['COMMENTS'],
             $this->sqlConnection->getDatabasePlatform());
         $result['IS_MERGED'] = Type::getType(Type::BOOLEAN)->convertToPhpValue($result['IS_MERGED'],
             $this->sqlConnection->getDatabasePlatform());
@@ -122,13 +123,14 @@ SQL;
     {
         $sql = <<<SQL
 INSERT INTO
-  pr (IDENTIFIER, GTMS, NOT_GTMS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
+  pr (IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS)
 VALUES
-  (:IDENTIFIER, :GTMS, :NOT_GTMS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS)
+  (:IDENTIFIER, :GTMS, :NOT_GTMS, :COMMENTS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS)
 ON DUPLICATE KEY UPDATE
   IDENTIFIER = :IDENTIFIER,
   GTMS = :GTMS,
   NOT_GTMS = :NOT_GTMS,
+  COMMENTS = :COMMENTS,
   CI_STATUS = :CI_STATUS,
   IS_MERGED = :IS_MERGED,
   MESSAGE_IDS = :MESSAGE_IDS;

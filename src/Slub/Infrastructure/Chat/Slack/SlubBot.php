@@ -65,7 +65,7 @@ class SlubBot
     private function listensToNewPR(BotMan $bot): void
     {
         $bot->hears(
-            'TR .* <https://github.com/(.*)/pull/(.*)>$',
+            'TR.*<https://github.com/(.*)/pull/(.*)>$',
             function (Botman $bot, string $repository, $prIdentifier) {
                 $channelIdentifier = $this->getChannelIdentifier($bot);
                 $prToReview = new PutPRToReview();

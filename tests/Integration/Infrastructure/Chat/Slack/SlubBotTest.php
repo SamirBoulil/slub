@@ -29,12 +29,13 @@ class SlubBotTest extends KernelTestCase
 
     /**
      * @test
+     * @dataProvider newPRmessages
      */
-    public function it_answers_to_new_PR_messages(): void
+    public function it_answers_to_new_PR_messages(string $message): void
     {
         $botTester = $this->startBot();
         $botTester->receives(
-            'TR please <https://github.com/akeneo/pim-community-dev/pull/9609>',
+            $message,
             ['channel' => 'channelId', 'ts' => '1234'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
@@ -64,5 +65,13 @@ class SlubBotTest extends KernelTestCase
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($prIdentifier));
         $this->assertEquals($prIdentifier, $PR->normalize()['IDENTIFIER']);
         $this->assertEquals([$messageId], $PR->normalize()['MESSAGE_IDS']);
+    }
+
+    public function newPRmessages()
+    {
+        return[
+            'PR with please' => ['TR please <https://github.com/akeneo/pim-community-dev/pull/9609>'],
+            'PR without please' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609>']
+        ];
     }
 }

@@ -49,6 +49,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR = $savedPR;
         $updatedPR->notGTM();
         $updatedPR->GTM();
+        $updatedPR->comment();
         $updatedPR->green();
         $updatedPR->merged();
         $updatedPR->putToReviewAgainViaMessage(MessageIdentifier::fromString('5151'));
@@ -68,6 +69,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
                     'GTMS'        => 1,
                     'NOT_GTMS'    => 1,
+                    'COMMENTS'    => 1,
                     'CI_STATUS'   => 'PENDING',
                     'IS_MERGED'   => false,
                     'MESSAGE_IDS' => ['1', '2'],
@@ -80,6 +82,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
                     'GTMS'        => 1,
                     'NOT_GTMS'    => 1,
+                    'COMMENTS'    => 1,
                     'CI_STATUS'   => 'PENDING',
                     'IS_MERGED'   => true,
                     'MESSAGE_IDS' => ['1', '2'],
@@ -91,6 +94,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
                     'GTMS'        => 1,
                     'NOT_GTMS'    => 1,
+                    'COMMENTS'    => 1,
                     'CI_STATUS'   => 'PENDING',
                     'IS_MERGED'   => false,
                     'MESSAGE_IDS' => ['1', '2'],
@@ -103,6 +107,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                 'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
                 'GTMS'        => 1,
                 'NOT_GTMS'    => 1,
+                'COMMENTS'    => 1,
                 'CI_STATUS'   => 'PENDING',
                 'IS_MERGED'   => false,
                 'MESSAGE_IDS' => ['1', '2'],
@@ -112,6 +117,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                 'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
                 'GTMS'        => 1,
                 'NOT_GTMS'    => 1,
+                'COMMENTS'    => 1,
                 'CI_STATUS'   => 'PENDING',
                 'IS_MERGED'   => false,
                 'MESSAGE_IDS' => ['1', '2'],
@@ -121,6 +127,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                 'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
                 'GTMS'        => 1,
                 'NOT_GTMS'    => 1,
+                'COMMENTS'    => 1,
                 'CI_STATUS'   => 'PENDING',
                 'IS_MERGED'   => true,
                 'MESSAGE_IDS' => ['1', '2'],

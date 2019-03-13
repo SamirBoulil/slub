@@ -65,6 +65,18 @@ class NewReviewActionTest extends WebTestCase
     /**
      * @test
      */
+    public function it_returns_throws_if_the_secret_does_not_match()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $client = static::createClient();
+        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->unsupportedStatus());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertReviews(0, 0, 0);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_status_is_not_supported()
     {
         $this->expectException(BadRequestHttpException::class);

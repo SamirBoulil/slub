@@ -119,6 +119,7 @@ services:
         arguments:
             - '@slub.application.new_review.new_review_handler'
             - '@logger'
+            - '%env(GITHUB_WEBHOOK_SECRET)%'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

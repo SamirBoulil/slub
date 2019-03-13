@@ -1,6 +1,7 @@
 parameters:
     SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
     SUPPORTED_CHANNELS: "squad-raccoons,general"
+    GITHUB_WEBHOOK_SECRET: "my_secret"
 
 services:
     # default configuration for services in *this* file

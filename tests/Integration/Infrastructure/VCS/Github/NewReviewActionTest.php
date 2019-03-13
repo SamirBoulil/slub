@@ -35,7 +35,8 @@ class NewReviewActionTest extends WebTestCase
     public function it_listens_to_accepted_PR()
     {
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->PRAccepted());
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRAccepted(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRAccepted());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(1, 0, 0);
     }
@@ -46,7 +47,8 @@ class NewReviewActionTest extends WebTestCase
     public function it_listens_to_refused_PR()
     {
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->PRRefused());
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRRefused(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRRefused());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 1, 0);
     }
@@ -57,7 +59,8 @@ class NewReviewActionTest extends WebTestCase
     public function it_listens_to_commented_PR()
     {
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->PRCommented());
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRCommented(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRCommented());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 0, 1);
     }
@@ -65,11 +68,13 @@ class NewReviewActionTest extends WebTestCase
     /**
      * @test
      */
-    public function it_returns_throws_if_the_secret_does_not_match()
+    public function it_returns_throws_if_the_signatures_does_not_match()
     {
         $this->expectException(BadRequestHttpException::class);
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->unsupportedStatus());
+        $client->request('POST', '/vcs/github/new_review', [], [], [
+            'X-Hub-Signature' => hash_hmac('sha1', $this->PRCommented(), 'wrong_secret'),
+        ], $this->PRCommented());
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 0, 0);
     }

@@ -16,20 +16,27 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class NewReviewAction
 {
+    private const SECRET_HEADER = 'X-Hub-Signature';
+
     /** @var NewReviewHandler */
     private $newReviewHandler;
 
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(NewReviewHandler $newReviewHandler, LoggerInterface $logger)
+    /** @var string */
+    private $secret;
+
+    public function __construct(NewReviewHandler $newReviewHandler, LoggerInterface $logger, string $secret)
     {
         $this->newReviewHandler = $newReviewHandler;
         $this->logger = $logger;
+        $this->secret = $secret;
     }
 
     public function executeAction(Request $request): Response
     {
+        $this->checkSecret($request);
         $PRStatusUpdate = $this->getPRStatusUpdate($request);
 
         $newPRReview = new NewReview();
@@ -80,6 +87,20 @@ class NewReviewAction
                         $PRStatus
                     )
                 );
+        }
+    }
+
+    private function checkSecret(Request $request): void
+    {
+        $secretHeader = $request->headers->get(self::SECRET_HEADER);
+        if (null === $secretHeader || empty($secretHeader) || !is_string($secretHeader)) {
+            throw new BadRequestHttpException();
+        }
+        $actualSHA1 = last(explode('=', $secretHeader));
+        $expectedSHA1 = hash_hmac('sha1', (string) $request->getContent(), $this->secret);
+
+        if ($expectedSHA1 !== $actualSHA1) {
+            throw new BadRequestHttpException();
         }
     }
 }

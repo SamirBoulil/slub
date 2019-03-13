@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -20,13 +21,17 @@ class WebTestCase extends SymfonyWebTestCase
         $this->resetDatabase();
     }
 
-    public function get(string $serviceId)
+    public function get(string $serviceOrParameterId)
     {
         if (self::$kernel->getContainer() === null) {
             return new \LogicException('Kernel should not be null');
         }
 
-        return self::$kernel->getContainer()->get($serviceId);
+        try {
+            return self::$kernel->getContainer()->get($serviceOrParameterId);
+        } catch (ServiceNotFoundException $e) {
+            return self::$kernel->getContainer()->getParameter($serviceOrParameterId);
+        }
     }
 
     private function resetDatabase(): void

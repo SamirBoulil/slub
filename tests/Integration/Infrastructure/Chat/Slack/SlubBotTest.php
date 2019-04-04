@@ -67,12 +67,19 @@ class SlubBotTest extends KernelTestCase
         $this->assertEquals([$messageId], $PR->normalize()['MESSAGE_IDS']);
     }
 
-    public function newPRmessages()
+    public function newPRmessages(): array
     {
-        return[
-            'PR with please' => ['TR please <https://github.com/akeneo/pim-community-dev/pull/9609>'],
-            'PR without please' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609>'],
-            'PR with trailing /files' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609/files>']
+        return [
+            'TR please' => ['TR please <https://github.com/akeneo/pim-community-dev/pull/9609>'],
+            'TR' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609>'],
+            'TR {url}/files' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609/files>'],
+            'Yo guys TR please' => ['Yo guys TR <https://github.com/akeneo/pim-community-dev/pull/9609/files>'],
+            'Yo guys tr please' => ['Yo guys tr <https://github.com/akeneo/pim-community-dev/pull/9609/files>'],
+            'TR {url} it\'s about something new' => ['TR <https://github.com/akeneo/pim-community-dev/pull/9609/files> it\'s about something new...'],
+            'review' => ['review <https://github.com/akeneo/pim-community-dev/pull/9609>'],
+            'review {url}/files' => ['review <https://github.com/akeneo/pim-community-dev/pull/9609/files>'],
+            'review {url} explanations' => ['review <https://github.com/akeneo/pim-community-dev/pull/9609> It\'s about something new...'],
+            'PR {url} explanations' => ['PR please <https://github.com/akeneo/pim-community-dev/pull/9609/files> yolo'],
         ];
     }
 }

@@ -62,7 +62,7 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview->channelIdentifier = $channelIdentifier;
         $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
         $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
-        $putPRToReview->messageId = $messageId;
+        $putPRToReview->messageIdentifier = $messageId;
 
         return $putPRToReview;
     }

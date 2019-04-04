@@ -64,28 +64,32 @@ class SlubBot
 
     private function listensToNewPR(BotMan $bot): void
     {
-        $bot->hears(
-            'TR.*<https://github.com/(.*)/pull/(\d+).*>$',
-            function (Botman $bot, string $repository, $prIdentifier) {
-                $channelIdentifier = $this->getChannelIdentifier($bot);
-                $prToReview = new PutPRToReview();
-                $prToReview->PRIdentifier = $repository . '/' . $prIdentifier;
-                $prToReview->repositoryIdentifier = $repository;
-                $prToReview->channelIdentifier = $channelIdentifier;
-                $prToReview->messageId = $this->getMessageId($bot);
+        $createNewPr = function (Botman $bot, string $repository, $PRNumber) {
+            $this->putPRToReview($PRNumber, $repository, $bot);
+        };
+        $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+        $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+        $bot->hears('.*PR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+    }
 
-                $this->logger->info(
-                    sprintf(
-                        'New PR to review detected from channel "%s" for repository "%s", PR "%s".',
-                        $channelIdentifier,
-                        $repository,
-                        $prIdentifier
-                    )
-                );
+    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, BotMan $bot): void
+    {
+        $prToReview = new PutPRToReview();
+        $prToReview->PRIdentifier = sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
+        $prToReview->repositoryIdentifier = $repositoryIdentifier;
+        $prToReview->channelIdentifier = $this->getChannelIdentifier($bot);
+        $prToReview->messageIdentifier = $this->getMessageIdentifier($bot);
 
-                $this->putPRToReviewHandler->handle($prToReview);
-            }
+        $this->logger->info(
+            sprintf(
+                'New PR to review detected from channel "%s" for repository "%s", PR "%s".',
+                $this->getChannelIdentifier($bot),
+                $repositoryIdentifier,
+                $prToReview->PRIdentifier
+            )
         );
+
+        $this->putPRToReviewHandler->handle($prToReview);
     }
 
     private function healthCheck(BotMan $bot): void
@@ -106,7 +110,7 @@ class SlubBot
         return $channelInformation->channelName;
     }
 
-    private function getMessageId($bot): string
+    private function getMessageIdentifier(Botman $bot): string
     {
         $channel = $bot->getMessage()->getPayload()['channel'];
         $ts = $bot->getMessage()->getPayload()['ts'];

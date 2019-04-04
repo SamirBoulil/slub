@@ -86,7 +86,7 @@ class PutPRToReviewHandler
     private function attachMessageToPR(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
-        $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageId));
+        $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageIdentifier));
         $this->PRRepository->save($PR);
     }
 
@@ -95,7 +95,7 @@ class PutPRToReviewHandler
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create($putPRToReview->PRIdentifier),
-                MessageIdentifier::fromString($putPRToReview->messageId)
+                MessageIdentifier::fromString($putPRToReview->messageIdentifier)
             )
         );
     }

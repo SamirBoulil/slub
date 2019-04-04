@@ -20,5 +20,5 @@ class PutPRToReview
     public $channelIdentifier;
 
     /** @var string */
-    public $messageId;
+    public $messageIdentifier;
 }

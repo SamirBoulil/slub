@@ -114,12 +114,21 @@ services:
         class: GuzzleHttp\Client
 
     ## VCS
-    slub.infrastructure.vcs.github.new_review_action:
-        class: Slub\Infrastructure\VCS\Github\NewReviewAction
+    slub.infrastructure.vcs.github.new_event_action:
+        class: Slub\Infrastructure\VCS\Github\NewEventAction
+        arguments:
+            - '@slub.infrastructure.vcs.github.event_handler_registry'
+            - '%env(GITHUB_WEBHOOK_SECRET)%'
+
+    slub.infrastructure.vcs.github.event_handler_registry:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry
+        arguments:
+            - '@slub.infrastructure.vcs.github.new_review'
+
+    slub.infrastructure.vcs.github.new_review:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
-            - '@logger'
-            - '%env(GITHUB_WEBHOOK_SECRET)%'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Slub\Application\NotifySquad;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 interface ChatClient

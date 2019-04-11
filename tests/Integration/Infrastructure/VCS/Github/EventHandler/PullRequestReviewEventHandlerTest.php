@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Github;
+namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -14,7 +14,7 @@ use Tests\Integration\Infrastructure\WebTestCase;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class NewReviewActionTest extends WebTestCase
+class PullRequestReviewEventHandlerTest extends WebTestCase
 {
     private const PRIdentifier = 'SamirBoulil/slub/10';
 
@@ -36,7 +36,7 @@ class NewReviewActionTest extends WebTestCase
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRAccepted(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRAccepted());
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'pull_request_review', 'HTTP_X-Hub-Signature' => $signature], $this->PRAccepted());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(1, 0, 0);
     }
@@ -48,7 +48,7 @@ class NewReviewActionTest extends WebTestCase
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRRefused(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRRefused());
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'pull_request_review', 'HTTP_X-Hub-Signature' => $signature], $this->PRRefused());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 1, 0);
     }
@@ -60,7 +60,7 @@ class NewReviewActionTest extends WebTestCase
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRCommented(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github/new_review', [], [], ['HTTP_X-Hub-Signature' => $signature], $this->PRCommented());
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'pull_request_review', 'HTTP_X-Hub-Signature' => $signature], $this->PRCommented());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 0, 1);
     }
@@ -68,12 +68,29 @@ class NewReviewActionTest extends WebTestCase
     /**
      * @test
      */
-    public function it_returns_throws_if_the_signatures_does_not_match()
+    public function it_throws_if_the_signatures_does_not_match()
     {
         $this->expectException(BadRequestHttpException::class);
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [
-            'X-Hub-Signature' => hash_hmac('sha1', $this->PRCommented(), 'wrong_secret'),
+        $client->request('POST', '/vcs/github', [], [], [
+            'HTTP_X-GitHub-Event' => 'pull_request_review',
+            'HTTP_X-Hub-Signature' => hash_hmac('sha1', $this->PRCommented(), 'wrong_secret'),
+        ], $this->PRCommented());
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertReviews(0, 0, 0);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_it_is_not_an_event_of_type_pull_request_review()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $client = static::createClient();
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRCommented(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request('POST', '/vcs/github', [], [], [
+            'HTTP_X-GitHub-Event' => 'unsupported_event_type',
+            'HTTP_X-Hub-Signature' => $signature
         ], $this->PRCommented());
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 0, 0);
@@ -86,7 +103,7 @@ class NewReviewActionTest extends WebTestCase
     {
         $this->expectException(BadRequestHttpException::class);
         $client = static::createClient();
-        $client->request('POST', '/vcs/github/new_review', [], [], [], $this->unsupportedStatus());
+        $client->request('POST', '/vcs/github', [], [], [], $this->unsupportedStatus());
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
         $this->assertReviews(0, 0, 0);
     }

@@ -3,9 +3,9 @@ index:
     controller: slub.infrastructure.chat.slack.slub_bot_action::executeAction
     methods: [POST]
 
-vcs_github_new_review:
-    path: /vcs/github/new_review
-    controller: slub.infrastructure.vcs.github.new_review_action:executeAction
+vcs_github_new_event:
+    path: /vcs/github
+    controller: slub.infrastructure.vcs.github.new_event_action:executeAction
     methods: [POST]
 
 ui_http_list_prs:

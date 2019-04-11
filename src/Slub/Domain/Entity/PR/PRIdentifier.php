@@ -22,9 +22,9 @@ class PRIdentifier
         return new self($PRIdentifier);
     }
 
-    public static function fromString(string $identifier): self
+    public static function fromString(string $PRIdentifier): self
     {
-        return new self($identifier);
+        return new self($PRIdentifier);
     }
 
     public function stringValue(): string

@@ -1,4 +1,4 @@
-index:
+chat_slack_messages:
     path: /chat/slack/messages
     controller: slub.infrastructure.chat.slack.slub_bot_action::executeAction
     methods: [POST]

@@ -6,6 +6,7 @@
 parameters:
     SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
     SUPPORTED_CHANNELS: "squad-raccoons,general"
+    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,jenkins"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
     slub.infrastructure.chat.slack.base_uri: "https://slack.com"
@@ -122,13 +123,24 @@ services:
 
     slub.infrastructure.vcs.github.event_handler_registry:
         class: Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry
-        arguments:
-            - '@slub.infrastructure.vcs.github.new_review'
+        calls:
+            - method: addEventHandler
+              arguments:
+                  - '@slub.infrastructure.vcs.github.new_review'
+            - method: addEventHandler
+              arguments:
+                  - '@slub.infrastructure.vcs.github.check_run'
 
     slub.infrastructure.vcs.github.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
+
+    slub.infrastructure.vcs.github.check_run:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+        arguments:
+            - '@slub.application.ci_status_update.ci_status_update_handler'
+            - '%env(SUPPORTED_CI_CHECKS)%'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

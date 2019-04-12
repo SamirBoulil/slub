@@ -9,11 +9,11 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
  */
 class EventHandlerRegistry
 {
-    private $eventHandlers;
+    private $eventHandlers = [];
 
-    public function __construct(EventHandlerInterface $newReviewEvent)
+    public function addEventHandler(EventHandlerInterface $eventHandler): void
     {
-        $this->eventHandlers = [$newReviewEvent];
+        $this->eventHandlers[] = $eventHandler;
     }
 
     public function get(string $eventType): ?EventHandlerInterface

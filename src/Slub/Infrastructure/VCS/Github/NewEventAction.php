@@ -47,7 +47,7 @@ class NewEventAction
             throw new BadRequestHttpException('Expected event to have a type "%s"');
         }
 
-        return $eventType;
+        return (string) $eventType;
     }
 
     private function checkSecret(Request $request): void

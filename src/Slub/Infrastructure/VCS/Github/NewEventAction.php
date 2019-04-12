@@ -43,11 +43,11 @@ class NewEventAction
     private function getEventTypeOrThrow(Request $request): string
     {
         $eventType = $request->headers->get(self::EVENT_TYPE);
-        if (null === $eventType) {
+        if (null === $eventType || !is_string($eventType)) {
             throw new BadRequestHttpException('Expected event to have a type "%s"');
         }
 
-        return (string) $eventType;
+        return $eventType;
     }
 
     private function checkSecret(Request $request): void

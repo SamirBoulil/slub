@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class PullRequestReviewEventHandler implements EventHandlerInterface
 {
-    public const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
+    private const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
 
     /** @var NewReviewHandler */
     private $newReviewHandler;

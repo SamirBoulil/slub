@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
+use Slub\Application\NotifySquad\NotifySquad;
+use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
 /**
@@ -22,17 +27,36 @@ class CIStatusUpdateContext extends FeatureContext
     /** @var EventsSpy */
     private $eventSpy;
 
+    /** @var ChatClientSpy */
+    private $chatClientSpy;
+
     /** @var PRIdentifier */
     private $currentPRIdentifier;
+
+    /** @var MessageIdentifier */
+    private $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
         CIStatusUpdateHandler $CIStatusUpdateHandler,
-        EventsSpy $eventSpy
+        EventsSpy $eventSpy,
+        ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->eventSpy = $eventSpy;
+        $this->PRRepository = $PRRepository;
+        $this->chatClientSpy = $chatClientSpy;
+    }
+
+    /**
+     * @Given /^a PR in review waiting for the CI results$/
+     */
+    public function aPRInReviewWaitingForTheCIResults()
+    {
+        $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
+        $this->PRRepository->save(PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier));
     }
 
     /**
@@ -44,8 +68,6 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $CIStatusUpdate->isGreen = true;
-        $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
-
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -67,6 +89,10 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIGreenEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifySquad::MESSAGE_CI_GREEN
+        );
     }
 
     /**
@@ -78,8 +104,6 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $CIStatusUpdate->isGreen = false;
-        $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
-
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -101,6 +125,10 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifySquad::MESSAGE_CI_RED
+        );
     }
 
     /**
@@ -112,8 +140,6 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate->repositoryIdentifier = 'unsupported_repository';
         $CIStatusUpdate->PRIdentifier = 'unsupported_repository/1010';
         $CIStatusUpdate->isGreen = true;
-        $this->currentPRIdentifier = PRIdentifier::fromString($CIStatusUpdate->PRIdentifier);
-
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 

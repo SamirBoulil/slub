@@ -5,14 +5,14 @@ Feature: Improve the feedback delay between the squad and the continuous integra
 
   @nominal
   Scenario: Notify the squad when the CI is green for a PR
-    Given a PR in review
+    Given a PR in review waiting for the CI results
     When the CI is green for the PR
     Then the PR should be green
     And the squad should be notified that the ci is green for the PR
 
   @nominal
   Scenario: Notify the squad when the CI is red for a PR
-    Given a PR in review
+    Given a PR in review waiting for the CI results
     When the CI is red for the PR
     Then the PR should be red
     And the squad should be notified that the ci is red for the PR

@@ -16,5 +16,6 @@ class DummyEventHandler implements EventHandlerInterface
 
     public function handle(Request $request): void
     {
+        // Nothing to do here
     }
 }

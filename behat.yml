@@ -16,6 +16,7 @@ default:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.ci_status_update.ci_status_update_handler"
                     - "@helpers.event_spy"
+                    - "@slub.infrastructure.chat.slack.slack_client"
                 - Tests\Acceptance\Context\MergedPRContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.merged_pr.merged_pr_handler"

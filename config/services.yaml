@@ -126,26 +126,26 @@ services:
         calls:
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.new_review_event_handler'
+                  - '@slub.infrastructure.vcs.github.event_handler.new_review'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.check_run_event_handler'
+                  - '@slub.infrastructure.vcs.github.event_handler.check_run_success'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.check_suite_failed_event_handler'
+                  - '@slub.infrastructure.vcs.github.event_handler.check_suite_failed'
 
-    slub.infrastructure.vcs.github.new_review_event_handler:
+    slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
 
-    slub.infrastructure.vcs.github.check_run_event_handler:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+    slub.infrastructure.vcs.github.event_handler.check_run_success:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunSuccessEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
-    slub.infrastructure.vcs.github.check_suite_failed_event_handler:
+    slub.infrastructure.vcs.github.event_handler.check_suite_failed:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteFailedEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'

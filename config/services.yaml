@@ -6,7 +6,7 @@
 parameters:
     SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
     SUPPORTED_CHANNELS: "squad-raccoons,general"
-    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,jenkins"
+    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,ci/circleci: back_behat_legacy"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
     slub.infrastructure.chat.slack.base_uri: "https://slack.com"
@@ -126,21 +126,29 @@ services:
         calls:
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.new_review'
+                  - '@slub.infrastructure.vcs.github.event_handler.new_review'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.check_run'
+                  - '@slub.infrastructure.vcs.github.event_handler.check_run_success'
+            - method: addEventHandler
+              arguments:
+                  - '@slub.infrastructure.vcs.github.event_handler.check_suite_failed'
 
-    slub.infrastructure.vcs.github.new_review:
+    slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
 
-    slub.infrastructure.vcs.github.check_run:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+    slub.infrastructure.vcs.github.event_handler.check_run_success:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunSuccessEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.event_handler.check_suite_failed:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteFailedEventHandler
+        arguments:
+            - '@slub.application.ci_status_update.ci_status_update_handler'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

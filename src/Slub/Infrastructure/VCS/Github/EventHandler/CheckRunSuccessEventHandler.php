@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class CheckRunEventHandler implements EventHandlerInterface
+class CheckRunSuccessEventHandler implements EventHandlerInterface
 {
     private const CHECK_RUN_EVENT_TYPE = 'check_run';
 
@@ -49,7 +49,7 @@ class CheckRunEventHandler implements EventHandlerInterface
     {
         return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames)
             && 'completed' === $CIStatusUpdate['action']
-            && in_array($CIStatusUpdate['check_run']['conclusion'], ['failure', 'success']);
+            && 'success' === $CIStatusUpdate['check_run']['conclusion'];
     }
 
     private function updateCIStatus(array $CIStatusUpdate): void
@@ -57,7 +57,7 @@ class CheckRunEventHandler implements EventHandlerInterface
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->isGreen = $this->isGreen($CIStatusUpdate);
+        $command->isGreen = true;
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -68,10 +68,5 @@ class CheckRunEventHandler implements EventHandlerInterface
             $CIStatusUpdate['repository']['full_name'],
             $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
         );
-    }
-
-    private function isGreen(array $CIStatusUpdate): bool
-    {
-        return 'success' === $CIStatusUpdate['check_run']['conclusion'];
     }
 }

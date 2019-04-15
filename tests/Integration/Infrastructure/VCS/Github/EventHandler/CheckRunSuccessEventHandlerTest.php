@@ -8,13 +8,12 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\Integration\Infrastructure\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class CheckRunEventHandlerTest extends WebTestCase
+class CheckRunSuccessEventHandlerTest extends WebTestCase
 {
     private const PRIdentifier = 'SamirBoulil/slub/10';
 
@@ -41,20 +40,6 @@ class CheckRunEventHandlerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertGreen();
-    }
-
-    /**
-     * @test
-     */
-    public function it_listens_to_red_ci()
-    {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->redCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
-
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->redCI());
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRed();
     }
 
     /**
@@ -89,38 +74,6 @@ class CheckRunEventHandlerTest extends WebTestCase
   "check_run": {
     "status": "completed",
     "conclusion": "success",
-    "name": "travis",
-    "check_suite": {
-      "pull_requests": [
-        {
-          "number": 10
-        }
-      ]
-    },
-    "pull_requests": [
-      {
-        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
-        "number": 26
-      }
-    ]
-  },
-  "repository": {
-    "full_name": "SamirBoulil/slub"
-  }
-}
-JSON;
-
-        return $json;
-    }
-
-    private function redCI(): string
-    {
-        $json = <<<JSON
-{
-  "action": "completed",
-  "check_run": {
-    "status": "completed",
-    "conclusion": "failure",
     "name": "travis",
     "check_suite": {
       "pull_requests": [
@@ -181,12 +134,6 @@ JSON;
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
         $this->assertEquals('GREEN', $PR->normalize()['CI_STATUS']);
-    }
-
-    private function assertRed()
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
-        $this->assertEquals('RED', $PR->normalize()['CI_STATUS']);
     }
 
     private function assertPending()

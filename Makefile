@@ -20,3 +20,11 @@ check:
 tunnel:
 	ngrok http slub.test:80
 	open https://api.slack.com/apps/AGAJXNKPG/event-subscriptions?
+
+.PHONY: log-prod
+log-prod:
+	heroku logs --tail -a slub-akeneo
+
+.PHONY: log-staging
+log-staging:
+	heroku logs --tail -a slub-test

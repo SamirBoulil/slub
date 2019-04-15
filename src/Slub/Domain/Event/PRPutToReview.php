@@ -7,7 +7,6 @@ namespace Slub\Domain\Event;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Symfony\Component\EventDispatcher\Event;
-use Webmozart\Assert\Assert;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

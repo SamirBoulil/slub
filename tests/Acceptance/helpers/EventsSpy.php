@@ -10,6 +10,7 @@ use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\PRPutToReview;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -23,13 +24,24 @@ class EventsSpy implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PRGTMed::class    => 'notifyPRGTMed',
+            PRPutToReview::class => 'notifyPRPutToReview',
+            PRGTMed::class => 'notifyPRGTMed',
             PRNotGTMed::class => 'notifyPRNotGTMed',
             PRCommented::class => 'notifyPRCommented',
-            CIGreen::class    => 'notifyCIGreen',
-            CIRed::class      => 'notifyCIRed',
-            PRMerged::class   => 'notifyPRMerged',
+            CIGreen::class => 'notifyCIGreen',
+            CIRed::class => 'notifyCIRed',
+            PRMerged::class => 'notifyPRMerged',
         ];
+    }
+
+    public function notifyPRPutToReview(PRPutToReview $PRPutToReview): void
+    {
+        $this->events[PRPutToReview::class] = true;
+    }
+
+    public function PRPutToReviewDispatched(): bool
+    {
+        return $this->events[PRPutToReview::class] ?? false;
     }
 
     public function notifyPRGTMed(PRGTMed $PRGTMed): void

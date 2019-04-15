@@ -2,12 +2,17 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
+use Slub\Application\NotifySquad\NotifySquad;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Tests\Acceptance\helpers\ChatClientSpy;
+use Tests\Acceptance\helpers\EventsSpy;
 
 class PutPRToReviewContext extends FeatureContext
 {
@@ -20,18 +25,28 @@ class PutPRToReviewContext extends FeatureContext
     /** @var string */
     private $currentRepositoryIdentifier;
 
+    /** @var EventsSpy */
+    private $eventSpy;
+
+    /** @var ChatClientSpy */
+    private $chatClientSpy;
+
     /** @var string[] */
     private $currentMessageIds = [];
 
     public function __construct(
-        PRRepositoryInterface $PRPRRepository,
-        PutPRToReviewHandler $putPRToReviewHandler
+        PRRepositoryInterface $PRRepository,
+        PutPRToReviewHandler $putPRToReviewHandler,
+        EventsSpy $eventSpy,
+        ChatClientSpy $chatClientSpy
     ) {
-        parent::__construct($PRPRRepository);
+        parent::__construct($PRRepository);
 
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->currentRepositoryIdentifier = '';
         $this->currentPRIdentifier = '';
+        $this->eventSpy = $eventSpy;
+        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**
@@ -109,6 +124,7 @@ class PutPRToReviewContext extends FeatureContext
             false,
             $this->currentMessageIds
         );
+        Assert::assertTrue($this->eventSpy->PRPutToReviewDispatched());
     }
 
     private function PRExists(string $PRIdentifier): bool
@@ -181,5 +197,13 @@ class PutPRToReviewContext extends FeatureContext
             'IS_MERGED'   => $isMerged,
             'MESSAGE_IDS' => $messageIds,
         ], $pr->normalize());
+    }
+
+    /**
+     * @Given /^the squad should be notified that the PR has been successfully put to review$/
+     */
+    public function theSquadShouldBeNotifiedThatThePRHasBeenSuccessfullyInterpreted()
+    {
+        $this->chatClientSpy->assertHasBeenCalledWith(MessageIdentifier::fromString(last($this->currentMessageIds)), NotifySquad::REACTION_PR_PUT_TO_REVIEW);
     }
 }

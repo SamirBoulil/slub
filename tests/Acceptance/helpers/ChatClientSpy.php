@@ -24,6 +24,12 @@ class ChatClientSpy implements ChatClient
         $this->actualText = $text;
     }
 
+    public function reactToMessageWith(MessageIdentifier $messageIdentifier, string $text): void
+    {
+        $this->actualMessageIdentifier = $messageIdentifier;
+        $this->actualText = $text;
+    }
+
     public function assertHasBeenCalledWith(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
     {
         if (

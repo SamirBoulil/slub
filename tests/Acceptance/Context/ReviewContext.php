@@ -32,12 +32,12 @@ class ReviewContext extends FeatureContext
     private $currentMessageIdentifier;
 
     public function __construct(
-        PRRepositoryInterface $PRPRRepository,
+        PRRepositoryInterface $PRRepository,
         NewReviewHandler $reviewHandler,
         EventsSpy $eventSpy,
         ChatClientSpy $chatClientSpy
     ) {
-        parent::__construct($PRPRRepository);
+        parent::__construct($PRRepository);
 
         $this->reviewHandler = $reviewHandler;
         $this->eventSpy = $eventSpy;

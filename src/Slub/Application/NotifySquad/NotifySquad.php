@@ -20,10 +20,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifySquad implements EventSubscriberInterface
 {
-    public const MESSAGE_PR_GTMED = ':rocket: GTM';
+    public const MESSAGE_PR_GTMED = ':white_check_mark: GTM';
     public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: PR Refused';
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
-    public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
+    public const MESSAGE_CI_GREEN = ':rocket: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Red';
 
     /** @var GetMessageIdsForPR */

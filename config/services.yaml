@@ -6,7 +6,7 @@
 parameters:
     SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
     SUPPORTED_CHANNELS: "squad-raccoons,general"
-    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,jenkins"
+    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,ci/circleci: back_behat_legacy"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
     slub.infrastructure.chat.slack.base_uri: "https://slack.com"

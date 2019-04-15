@@ -126,21 +126,29 @@ services:
         calls:
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.new_review'
+                  - '@slub.infrastructure.vcs.github.new_review_event_handler'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.check_run'
+                  - '@slub.infrastructure.vcs.github.check_run_event_handler'
+            - method: addEventHandler
+              arguments:
+                  - '@slub.infrastructure.vcs.github.check_suite_failed_event_handler'
 
-    slub.infrastructure.vcs.github.new_review:
+    slub.infrastructure.vcs.github.new_review_event_handler:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
 
-    slub.infrastructure.vcs.github.check_run:
+    slub.infrastructure.vcs.github.check_run_event_handler:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.check_suite_failed_event_handler:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteFailedEventHandler
+        arguments:
+            - '@slub.application.ci_status_update.ci_status_update_handler'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

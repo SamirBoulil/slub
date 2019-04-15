@@ -7,6 +7,8 @@ default:
                 - Tests\Acceptance\Context\PutPRToReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.put_pr_to_review.put_pr_to_review_handler"
+                    - "@helpers.event_spy"
+                    - "@slub.infrastructure.chat.slack.slack_client"
                 - Tests\Acceptance\Context\ReviewContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.new_review.new_review_handler"

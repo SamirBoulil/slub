@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
+use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\PRPutToReview;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -25,6 +27,7 @@ class NotifySquad implements EventSubscriberInterface
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed';
+    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
 
     /** @var GetMessageIdsForPR */
     private $getMessageIdsForPR;
@@ -48,6 +51,7 @@ class NotifySquad implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            PRPutToReview::class => 'whenPRIsPutToReview',
             PRGTMed::class => 'whenPRHasBeenGTM',
             PRNotGTMed::class => 'whenPRHasBeenNotGTM',
             PRCommented::class => 'whenPRComment',
@@ -76,6 +80,11 @@ class NotifySquad implements EventSubscriberInterface
                 $event->PRIdentifier()->stringValue()
             )
         );
+    }
+
+    public function whenPRIsPutToReview(PRPutToReview $event): void
+    {
+        $this->chatClient->reactToMessageWith($event->messageIdentifier(), self::REACTION_PR_PUT_TO_REVIEW);
     }
 
     public function whenPRComment(PRCommented $event): void

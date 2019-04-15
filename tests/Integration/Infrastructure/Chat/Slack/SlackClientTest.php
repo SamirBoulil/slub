@@ -57,6 +57,28 @@ class SlackClientTest extends KernelTestCase
     /**
      * @test
      */
+    public function it_adds_reactions_to_messages(): void
+    {
+        $this->mockGuzzleWith(new Response(200, [], ''));
+
+        $this->slackClient->reactToMessageWith(MessageIdentifier::fromString('channel@message'), 'ok_hand');
+
+        $generatedRequest = $this->mock->getLastRequest();
+        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('/api/reactions.add', $generatedRequest->getUri()->getPath());
+        $this->assertEquals(
+            [
+                'channel'   => 'channel',
+                'timestamp' => 'message',
+                'name'      => 'ok_hand',
+            ],
+            $this->getBodyContent($generatedRequest)
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_http_status_is_not_ok(): void
     {
         $this->mockGuzzleWith(new Response(400, [], ''));

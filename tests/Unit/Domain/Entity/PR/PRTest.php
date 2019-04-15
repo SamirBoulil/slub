@@ -11,6 +11,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRMerged;
+use Slub\Domain\Event\PRPutToReview;
 
 class PRTest extends TestCase
 {
@@ -19,10 +20,10 @@ class PRTest extends TestCase
      */
     public function it_creates_a_PR_and_normalizes_itself()
     {
-        $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
-            MessageIdentifier::fromString('1')
-        );
+        $expectedPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $expectedMessageIdentifier = MessageIdentifier::fromString('1');
+
+        $pr = PR::create($expectedPRIdentifier, $expectedMessageIdentifier);
 
         $this->assertSame(
             [
@@ -36,6 +37,7 @@ class PRTest extends TestCase
             ],
             $pr->normalize()
         );
+        $this->assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
     /**
@@ -56,6 +58,7 @@ class PRTest extends TestCase
         $pr = PR::fromNormalized($normalizedPR);
 
         $this->assertSame($normalizedPR, $pr->normalize());
+        $this->assertEmpty($pr->getEvents());
     }
 
     /**
@@ -128,11 +131,18 @@ class PRTest extends TestCase
      */
     public function it_can_become_green()
     {
-        $pr = PR::create(
-            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageIdentifier::fromString('1')
-        );
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 0,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'PENDING',
+            'IS_MERGED'   => false,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+
         $pr->green();
+
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'GREEN');
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIGreen::class, current($pr->getEvents()));
@@ -143,8 +153,18 @@ class PRTest extends TestCase
      */
     public function it_can_become_red()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'));
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 0,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'PENDING',
+            'IS_MERGED'   => false,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+
         $pr->red();
+
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'RED');
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIRed::class, current($pr->getEvents()));
@@ -155,8 +175,18 @@ class PRTest extends TestCase
      */
     public function it_can_be_merged()
     {
-        $pr = PR::create(PRIdentifier::fromString('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'));
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 0,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'PENDING',
+            'IS_MERGED'   => false,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+
         $pr->merged();
+
         $this->assertEquals($pr->normalize()['IS_MERGED'], true);
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
@@ -183,7 +213,7 @@ class PRTest extends TestCase
             PRIdentifier::create('akeneo/pim-community-dev/1111'),
             MessageIdentifier::fromString('1')
         );
-        $this->assertEquals('1', current($pr->messageIds())->stringValue());
+        $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
     }
 
     /**
@@ -191,12 +221,25 @@ class PRTest extends TestCase
      */
     public function it_can_be_put_to_review_multiple_times()
     {
-        $pr = PR::create(
-            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageIdentifier::fromString('1')
-        );
-        $pr->putToReviewAgainViaMessage(MessageIdentifier::create('2'));
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 2,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'GREEN',
+            'IS_MERGED'   => true,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+        $expectedMessageId = MessageIdentifier::create('2');
+
+        $pr->putToReviewAgainViaMessage($expectedMessageId);
+
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
+        $this->assertPRPutToReviewEvent(
+            $pr->getEvents(),
+            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
+            $expectedMessageId
+        );
     }
 
     /**
@@ -204,12 +247,20 @@ class PRTest extends TestCase
      */
     public function it_can_be_put_to_review_multiple_times_with_the_same_message()
     {
-        $pr = PR::create(
-            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
-            MessageIdentifier::fromString('1')
-        );
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 0,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'PENDING',
+            'IS_MERGED'   => false,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+
         $pr->putToReviewAgainViaMessage(MessageIdentifier::create('1'));
+
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
+        $this->assertEmpty($pr->getEvents());
     }
 
     public function normalizedWithMissingInformation(): array
@@ -257,5 +308,20 @@ class PRTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param array $events
+     * @param PRIdentifier $expectedPRIdentifier
+     * @param MessageIdentifier $expectedMessageId
+     *
+     */
+    private function assertPRPutToReviewEvent(array $events, PRIdentifier $expectedPRIdentifier, MessageIdentifier $expectedMessageId): void
+    {
+        $this->assertCount(1, $events);
+        $PRPutToReviewEvent = current($events);
+        $this->assertInstanceOf(PRPutToReview::class, $PRPutToReviewEvent);
+        $this->assertTrue($PRPutToReviewEvent->PRIdentifier()->equals($expectedPRIdentifier));
+        $this->assertTrue($PRPutToReviewEvent->messageIdentifier()->equals($expectedMessageId));
     }
 }

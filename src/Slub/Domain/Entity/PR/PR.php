@@ -10,6 +10,7 @@ use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\PRPutToReview;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -30,7 +31,7 @@ class PR
     private $PRIdentifier;
 
     /** @var MessageIdentifier[] */
-    private $messageIds;
+    private $messageIdentifiers;
 
     /** @var int */
     private $GTMCount;
@@ -62,12 +63,15 @@ class PR
         $this->comments = $comments;
         $this->CIStatus = $CIStatus;
         $this->isMerged = $isMerged;
-        $this->messageIds = $messageIds;
+        $this->messageIdentifiers = $messageIds;
     }
 
-    public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageId): self
+    public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier): self
     {
-        return new self($PRIdentifier, [$messageId], 0, 0, 0, CIStatus::pending(), false);
+        $pr = new self($PRIdentifier, [$messageIdentifier], 0, 0, 0, CIStatus::pending(), false);
+        $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
+
+        return $pr;
     }
 
     public static function fromNormalized(array $normalizedPR): self
@@ -113,7 +117,7 @@ class PR
             self::IS_MERGED_KEY  => $this->isMerged,
             self::MESSAGE_IDS    => array_map(function (MessageIdentifier $messageId) {
                 return $messageId->stringValue();
-            }, $this->messageIds),
+            }, $this->messageIdentifiers),
         ];
     }
 
@@ -161,9 +165,9 @@ class PR
     /**
      * @return MessageIdentifier[]
      */
-    public function messageIds(): array
+    public function messageIdentifiers(): array
     {
-        return $this->messageIds;
+        return $this->messageIdentifiers;
     }
 
     /**
@@ -178,7 +182,7 @@ class PR
     {
         $alreadyExists = !empty(
         array_filter(
-            $this->messageIds,
+            $this->messageIdentifiers,
             function (MessageIdentifier $messageId) use ($newMessageId) {
                 return $messageId->equals($newMessageId);
             }
@@ -189,6 +193,7 @@ class PR
             return;
         }
 
-        $this->messageIds[] = $newMessageId;
+        $this->messageIdentifiers[] = $newMessageId;
+        $this->events[] = PRPutToReview::forPR($this->PRIdentifier, $newMessageId);
     }
 }

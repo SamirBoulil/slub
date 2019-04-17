@@ -88,7 +88,6 @@ JSON;
 
     private function PRNotMerged(): string
     {
-
         $json = <<<JSON
 {
     "dummy": "value"

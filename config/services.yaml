@@ -129,15 +129,15 @@ services:
                   - '@slub.infrastructure.vcs.github.event_handler.new_review'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.check_run_success'
+                  - '@slub.infrastructure.vcs.github.event_handler.check_run'
 
     slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
 
-    slub.infrastructure.vcs.github.event_handler.check_run_success:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunSuccessEventHandler
+    slub.infrastructure.vcs.github.event_handler.check_run:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'

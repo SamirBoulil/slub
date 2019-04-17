@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class CheckRunSuccessEventHandler implements EventHandlerInterface
+class CheckRunEventHandler implements EventHandlerInterface
 {
     private const CHECK_RUN_EVENT_TYPE = 'check_run';
 

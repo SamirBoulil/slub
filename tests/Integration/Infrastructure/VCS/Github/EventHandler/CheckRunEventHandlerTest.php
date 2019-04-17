@@ -13,7 +13,7 @@ use Tests\Integration\Infrastructure\WebTestCase;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class CheckRunSuccessEventHandlerTest extends WebTestCase
+class CheckRunEventHandlerTest extends WebTestCase
 {
     private const PRIdentifier = 'SamirBoulil/slub/10';
 

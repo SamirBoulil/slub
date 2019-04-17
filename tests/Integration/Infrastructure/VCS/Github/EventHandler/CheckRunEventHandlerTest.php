@@ -73,7 +73,7 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_do_anything_for_unsupported_results()
+    public function it_does_nothing_for_unsupported_results()
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedResult(), $this->get('GITHUB_WEBHOOK_SECRET')));
@@ -87,7 +87,7 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_do_anything_for_unsupported_completion()
+    public function it_does_nothing_for_unsupported_completion()
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedAction(), $this->get('GITHUB_WEBHOOK_SECRET')));

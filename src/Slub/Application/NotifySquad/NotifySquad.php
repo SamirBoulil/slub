@@ -11,6 +11,7 @@ use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
 use Slub\Domain\Query\GetMessageIdsForPR;
@@ -22,12 +23,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifySquad implements EventSubscriberInterface
 {
+    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
+    public const REACTION_PR_MERGED = 'rocket';
+
     public const MESSAGE_PR_GTMED = ':+1: GTM';
     public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: PR Refused';
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed';
-    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
 
     /** @var GetMessageIdsForPR */
     private $getMessageIdsForPR;
@@ -57,6 +60,7 @@ class NotifySquad implements EventSubscriberInterface
             PRCommented::class => 'whenPRComment',
             CIGreen::class => 'whenCIIsGreen',
             CIRed::class => 'whenCIIsRed',
+            PRMerged::class => 'whenPRIsMerged'
         ];
     }
 
@@ -85,6 +89,12 @@ class NotifySquad implements EventSubscriberInterface
     public function whenPRIsPutToReview(PRPutToReview $event): void
     {
         $this->chatClient->reactToMessageWith($event->messageIdentifier(), self::REACTION_PR_PUT_TO_REVIEW);
+        $this->logger->info(
+            sprintf(
+                'squad has been notified pr "%s" is in review',
+                $event->PRIdentifier()->stringValue()
+            )
+        );
     }
 
     public function whenPRComment(PRCommented $event): void
@@ -115,6 +125,20 @@ class NotifySquad implements EventSubscriberInterface
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has a CI Red',
+                $event->PRIdentifier()->stringValue()
+            )
+        );
+    }
+
+    public function whenPRIsMerged(PRMerged $event): void
+    {
+        $messageIds = $this->getMessageIdsForPR->fetch($event->PRIdentifier());
+        foreach ($messageIds as $messageId) {
+            $this->chatClient->reactToMessageWith($messageId, self::REACTION_PR_MERGED);
+        }
+        $this->logger->info(
+            sprintf(
+                'Squad has been notified PR "%s" is merged',
                 $event->PRIdentifier()->stringValue()
             )
         );

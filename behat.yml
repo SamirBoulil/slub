@@ -23,6 +23,7 @@ default:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.merged_pr.merged_pr_handler"
                     - "@helpers.event_spy"
+                    - "@slub.infrastructure.chat.slack.slack_client"
     extensions:
         Behat\Symfony2Extension:
             kernel:

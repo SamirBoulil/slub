@@ -7,8 +7,10 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
+use Slub\Application\NotifySquad\NotifySquad;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
 /**
@@ -25,14 +27,19 @@ class MergedPRContext extends FeatureContext
     /** @var PRIdentifier */
     private $currentPRIdentifier;
 
+    /** @var ChatClientSpy */
+    private $chatClientSpy;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         MergedPRHandler $mergedPRHandler,
-        EventsSpy $eventSpy
+        EventsSpy $eventSpy,
+        ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
         $this->mergedPRHandler = $mergedPRHandler;
         $this->eventSpy = $eventSpy;
+        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**
@@ -62,6 +69,8 @@ class MergedPRContext extends FeatureContext
     public function theSquadShouldBeNotifiedThatThePRHasBeenMerged()
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
+        $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
+        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
     }
 
     /**

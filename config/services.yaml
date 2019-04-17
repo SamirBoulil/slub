@@ -142,11 +142,6 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
-    slub.infrastructure.vcs.github.event_handler.check_suite_failed:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteFailedEventHandler
-        arguments:
-            - '@slub.application.ci_status_update.ci_status_update_handler'
-
     ## UI
     slub.infrastructure.ui.http.list_prs_action:
         class: Slub\Infrastructure\UI\Http\ListPRsAction

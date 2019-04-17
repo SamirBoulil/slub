@@ -28,3 +28,11 @@ log-prod:
 .PHONY: log-staging
 log-staging:
 	heroku logs --tail -a slub-test
+
+.PHONY: log-staging
+od-prod: # Open dashboard production
+	open https://dashboard.heroku.com/apps/slub-test
+
+.PHONY: log-staging
+od-staging: # Open dashboard staging
+	open https://dashboard.heroku.com/apps/slub-test

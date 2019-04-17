@@ -68,37 +68,6 @@ class PullRequestReviewEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_throws_if_the_signatures_does_not_match()
-    {
-        $this->expectException(BadRequestHttpException::class);
-        $client = static::createClient();
-        $client->request('POST', '/vcs/github', [], [], [
-            'HTTP_X-GitHub-Event' => 'pull_request_review',
-            'HTTP_X-Hub-Signature' => hash_hmac('sha1', $this->PRCommented(), 'wrong_secret'),
-        ], $this->PRCommented());
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        $this->assertReviews(0, 0, 0);
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_if_it_is_not_an_event_of_type_pull_request_review()
-    {
-        $this->expectException(BadRequestHttpException::class);
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRCommented(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github', [], [], [
-            'HTTP_X-GitHub-Event' => 'unsupported_event_type',
-            'HTTP_X-Hub-Signature' => $signature
-        ], $this->PRCommented());
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
-        $this->assertReviews(0, 0, 0);
-    }
-
-    /**
-     * @test
-     */
     public function it_throws_if_the_status_is_not_supported()
     {
         $this->expectException(BadRequestHttpException::class);

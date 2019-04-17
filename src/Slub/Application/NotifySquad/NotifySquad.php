@@ -11,6 +11,7 @@ use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
+use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
 use Slub\Domain\Query\GetMessageIdsForPR;

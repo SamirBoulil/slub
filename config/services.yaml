@@ -130,9 +130,6 @@ services:
             - method: addEventHandler
               arguments:
                   - '@slub.infrastructure.vcs.github.event_handler.check_run_success'
-            - method: addEventHandler
-              arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.check_suite_failed'
 
     slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler

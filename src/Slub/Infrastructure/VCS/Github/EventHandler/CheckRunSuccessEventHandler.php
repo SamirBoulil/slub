@@ -47,9 +47,15 @@ class CheckRunSuccessEventHandler implements EventHandlerInterface
 
     private function isCIStatusUpdateSupported(array $CIStatusUpdate): bool
     {
-        return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames)
-            && 'completed' === $CIStatusUpdate['action']
-            && 'success' === $CIStatusUpdate['check_run']['conclusion'];
+        if ('completed' !== $CIStatusUpdate['action']) {
+            return false;
+        }
+        $conclusion = $CIStatusUpdate['check_run']['conclusion'];
+        if ('success' === $conclusion) {
+            return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
+        }
+
+        return 'failure' === $conclusion;
     }
 
     private function updateCIStatus(array $CIStatusUpdate): void
@@ -57,7 +63,7 @@ class CheckRunSuccessEventHandler implements EventHandlerInterface
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->isGreen = true;
+        $command->isGreen = $this->isGreen($CIStatusUpdate);
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -68,5 +74,10 @@ class CheckRunSuccessEventHandler implements EventHandlerInterface
             $CIStatusUpdate['repository']['full_name'],
             $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
         );
+    }
+
+    private function isGreen(array $CIStatusUpdate): bool
+    {
+        return 'success' === $CIStatusUpdate['check_run']['conclusion'];
     }
 }

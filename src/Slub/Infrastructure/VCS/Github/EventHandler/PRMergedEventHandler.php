@@ -45,7 +45,9 @@ class PRMergedEventHandler implements EventHandlerInterface
 
     private function isPullRequestEventSupported(array $PRMergedEvent): bool
     {
-        return isset($PRMergedEvent['pull_request']['merged']) && false === $PRMergedEvent['pull_request']['merged'];
+        $isMerged = $PRMergedEvent['pull_request']['merged'] ?? false;
+
+        return $isMerged;
     }
 
     private function updatePR(array $CIStatusUpdate): void

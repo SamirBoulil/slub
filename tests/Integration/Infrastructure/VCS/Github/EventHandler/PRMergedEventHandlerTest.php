@@ -75,7 +75,7 @@ class PRMergedEventHandlerTest extends WebTestCase
 {
     "pull_request": {
         "number": 10,
-        "merged": false
+        "merged": true
     },
     "repository": {
         "full_name": "SamirBoulil/slub"

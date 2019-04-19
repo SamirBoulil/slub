@@ -6,6 +6,7 @@ namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\PutPRToReview\PutPRToReview;
+use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
@@ -23,7 +24,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifySquad implements EventSubscriberInterface
 {
-    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
     public const REACTION_PR_MERGED = 'rocket';
 
     public const MESSAGE_PR_GTMED = ':+1: GTM';
@@ -54,7 +54,7 @@ class NotifySquad implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PRPutToReview::class => 'whenPRIsPutToReview',
+//            PRPutToReview::class => 'whenPRIsPutToReview',
             PRGTMed::class => 'whenPRHasBeenGTM',
             PRNotGTMed::class => 'whenPRHasBeenNotGTM',
             PRCommented::class => 'whenPRComment',
@@ -88,7 +88,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenPRIsPutToReview(PRPutToReview $event): void
     {
-        $this->chatClient->reactToMessageWith($event->messageIdentifier(), self::REACTION_PR_PUT_TO_REVIEW);
+        $this->chatClient->reactToMessageWith($event->messageIdentifier(), PutPRToReviewHandler::REACTION_PR_PUT_TO_REVIEW);
         $this->logger->info(
             sprintf(
                 'squad has been notified pr "%s" is in review',

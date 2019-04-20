@@ -39,13 +39,13 @@ class GetBotUserIdTest extends TestCase
      */
     public function it_fetches_the_slack_user_id()
     {
-        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "user": {"id": "USER_ID"}}'));
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "bot": {"id": "USER_ID"}}'));
 
         $userId = $this->getBotUserId->fetch();
 
         $generatedRequest = $this->httpMock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/api/users.identity', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('/api/bots.info', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             'token=xobxob-slack-token',
             $this->getBodyContent($generatedRequest)

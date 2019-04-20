@@ -87,7 +87,7 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_GTMED
+            NewReviewHandler::MESSAGE_PR_GTMED
         );
     }
 
@@ -124,7 +124,7 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_NOT_GTMED
+            NewReviewHandler::MESSAGE_PR_NOT_GTMED
         );
     }
 
@@ -198,7 +198,7 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_COMMENTED
+            NewReviewHandler::MESSAGE_PR_COMMENTED
         );
     }
 }

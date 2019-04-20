@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
+use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -26,9 +27,6 @@ class NotifySquad implements EventSubscriberInterface
 {
     public const REACTION_PR_MERGED = 'rocket';
 
-    public const MESSAGE_PR_GTMED = ':+1: GTM';
-    public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: PR Refused';
-    public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed';
 
@@ -55,9 +53,9 @@ class NotifySquad implements EventSubscriberInterface
     {
         return [
 //            PRPutToReview::class => 'whenPRIsPutToReview',
-            PRGTMed::class => 'whenPRHasBeenGTM',
-            PRNotGTMed::class => 'whenPRHasBeenNotGTM',
-            PRCommented::class => 'whenPRComment',
+//            PRGTMed::class => 'whenPRHasBeenGTM',
+//            PRNotGTMed::class => 'whenPRHasBeenNotGTM',
+//            PRCommented::class => 'whenPRComment',
             CIGreen::class => 'whenCIIsGreen',
             CIRed::class => 'whenCIIsRed',
             PRMerged::class => 'whenPRIsMerged'
@@ -66,7 +64,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenPRHasBeenGTM(PRGTMed $event): void
     {
-        $this->replyInThreads($event->PRIdentifier(), self::MESSAGE_PR_GTMED);
+        $this->replyInThreads($event->PRIdentifier(), NewReviewHandler::MESSAGE_PR_GTMED);
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has been GTMed',
@@ -77,7 +75,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenPRHasBeenNotGTM(PRNotGTMed $event): void
     {
-        $this->replyInThreads($event->PRIdentifier(), self::MESSAGE_PR_NOT_GTMED);
+        $this->replyInThreads($event->PRIdentifier(), NewReviewHandler::MESSAGE_PR_NOT_GTMED);
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has been NOT GTMed',
@@ -99,7 +97,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenPRComment(PRCommented $event): void
     {
-        $this->replyInThreads($event->PRIdentifier(), self::MESSAGE_PR_COMMENTED);
+        $this->replyInThreads($event->PRIdentifier(), NewReviewHandler::MESSAGE_PR_COMMENTED);
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has been commented',

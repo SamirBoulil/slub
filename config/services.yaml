@@ -38,6 +38,7 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
+            - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
 
     slub.application.ci_status_update.ci_status_update_handler:

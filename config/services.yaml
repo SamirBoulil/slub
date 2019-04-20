@@ -46,6 +46,8 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
+            - "@slub.infrastructure.chat.slack.slack_client"
+            - "@logger"
 
     slub.application.merged_pr.merged_pr_handler:
         class: Slub\Application\MergedPR\MergedPRHandler

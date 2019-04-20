@@ -90,7 +90,7 @@ class CIStatusUpdateContext extends FeatureContext
         );
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_CI_GREEN
+            CIStatusUpdateHandler::MESSAGE_CI_GREEN
         );
     }
 
@@ -126,7 +126,7 @@ class CIStatusUpdateContext extends FeatureContext
         );
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_CI_RED
+            CIStatusUpdateHandler::MESSAGE_CI_RED
         );
     }
 

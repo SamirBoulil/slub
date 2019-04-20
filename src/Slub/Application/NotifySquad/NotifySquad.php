@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
+use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
@@ -26,9 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class NotifySquad implements EventSubscriberInterface
 {
     public const REACTION_PR_MERGED = 'rocket';
-
-    public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
-    public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed';
 
     /** @var GetMessageIdsForPR */
     private $getMessageIdsForPR;
@@ -56,8 +54,8 @@ class NotifySquad implements EventSubscriberInterface
 //            PRGTMed::class => 'whenPRHasBeenGTM',
 //            PRNotGTMed::class => 'whenPRHasBeenNotGTM',
 //            PRCommented::class => 'whenPRComment',
-            CIGreen::class => 'whenCIIsGreen',
-            CIRed::class => 'whenCIIsRed',
+            //CIGreen::class => 'whenCIIsGreen',
+            //CIRed::class => 'whenCIIsRed',
             PRMerged::class => 'whenPRIsMerged'
         ];
     }
@@ -108,7 +106,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenCIIsGreen(CIGreen $event): void
     {
-        $this->replyInThreads($event->PRIdentifier(), self::MESSAGE_CI_GREEN);
+        $this->replyInThreads($event->PRIdentifier(), CIStatusUpdateHandler::MESSAGE_CI_GREEN);
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has a CI Green',
@@ -119,7 +117,7 @@ class NotifySquad implements EventSubscriberInterface
 
     public function whenCIIsRed(CIRed $event): void
     {
-        $this->replyInThreads($event->PRIdentifier(), self::MESSAGE_CI_RED);
+        $this->replyInThreads($event->PRIdentifier(), CIStatusUpdateHandler::MESSAGE_CI_RED);
         $this->logger->info(
             sprintf(
                 'Squad has been notified PR "%s" has a CI Red',

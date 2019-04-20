@@ -98,7 +98,7 @@ class NotifySquad implements EventSubscriberInterface
 
     private function getReviewCount(array $normalizedPR): string
     {
-        $reviewCount = $normalizedPR['GTMS'] + $normalizedPR['NOT_GTMS'];
+        $reviewCount = (int) $normalizedPR['GTMS'] + $normalizedPR['NOT_GTMS'];
 
         return self::REACTION_PR_REVIEWED[$reviewCount];
     }

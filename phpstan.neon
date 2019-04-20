@@ -3,3 +3,5 @@ parameters:
 		-
 		    message: '/.*/'
 		    path: %currentWorkingDirectory%/tests/Integration/Infrastructure/Chat/Slack/SlubBotTest.php
+includes:
+        - vendor/jangregor/phpstan-prophecy/src/extension.neon

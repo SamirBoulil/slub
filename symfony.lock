@@ -122,6 +122,9 @@
     "jakub-onderka/php-console-highlighter": {
         "version": "v0.4"
     },
+    "jangregor/phpstan-prophecy": {
+        "version": "0.3.0"
+    },
     "jean85/pretty-package-versions": {
         "version": "1.2"
     },

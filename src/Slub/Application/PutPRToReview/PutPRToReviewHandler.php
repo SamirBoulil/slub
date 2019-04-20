@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
-use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -45,29 +45,23 @@ class PutPRToReviewHandler
 
     public function handle(PutPRToReview $command)
     {
-        if ($this->isUnsupported($command)) {
+        if (!$this->isSupported($command)) {
             return;
         }
-
-        if ($this->PRExists($command)) {
-            $this->attachMessageToPR($command);
-        } else {
-            $this->createNewPR($command);
-        }
-
+        $this->createOrUpdatePR($command);
         $this->notifySquad($command);
-        $this->logger->info(sprintf('PR "%s" has been put to review', $command->PRIdentifier));
+        $this->logIt($command);
     }
 
-    private function isUnsupported(PutPRToReview $putPRToReview): bool
+    private function isSupported(PutPRToReview $putPRToReview): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
         $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
 
-        $isUnsupported = !$this->isSupported->repository($repositoryIdentifier)
-            || !$this->isSupported->channel($channelIdentifier);
+        $isSupported = $this->isSupported->repository($repositoryIdentifier)
+            && $this->isSupported->channel($channelIdentifier);
 
-        if ($isUnsupported) {
+        if (!$isSupported) {
             $this->logger->info(
                 sprintf(
                     'PR "%s" was not put to review because it is not supported for channel "%s", and repository "%s"',
@@ -78,7 +72,16 @@ class PutPRToReviewHandler
             );
         }
 
-        return $isUnsupported;
+        return $isSupported;
+    }
+
+    private function createOrUpdatePR(PutPRToReview $command): void
+    {
+        if ($this->PRExists($command)) {
+            $this->attachMessageToPR($command);
+        } else {
+            $this->createNewPR($command);
+        }
     }
 
     private function PRExists(PutPRToReview $putPRToReview): bool
@@ -121,5 +124,10 @@ class PutPRToReviewHandler
                 $command->PRIdentifier
             )
         );
+    }
+
+    private function logIt(PutPRToReview $command): void
+    {
+        $this->logger->info(sprintf('PR "%s" has been put to review', $command->PRIdentifier));
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\MergedPR;
 
 use Psr\Log\LoggerInterface;
-use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;

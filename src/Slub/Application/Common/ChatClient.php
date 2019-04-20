@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Slub\Application\NotifySquad;
+namespace Slub\Application\Common;
 
 use Slub\Domain\Entity\PR\MessageIdentifier;
 

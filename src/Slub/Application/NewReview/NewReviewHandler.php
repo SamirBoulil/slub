@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\NewReview;
 
 use Psr\Log\LoggerInterface;
-use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -51,6 +51,7 @@ class NewReviewHandler
         }
         $this->updatePRWithReview($review);
         $this->notifySquad($review);
+        $this->logIt($review);
     }
 
     private function isSupported(NewReview $review): bool
@@ -89,15 +90,12 @@ class NewReviewHandler
         switch ($review->reviewStatus) {
             case 'accepted':
                 $squadMessage = self::MESSAGE_PR_GTMED;
-                $logMessage = 'PR "%s" has been GTMed';
                 break;
             case 'refused':
                 $squadMessage = self::MESSAGE_PR_NOT_GTMED;
-                $logMessage = 'PR "%s" has been NOT GTMed';
                 break;
             case 'commented':
                 $squadMessage = NewReviewHandler::MESSAGE_PR_COMMENTED;
-                $logMessage = 'PR "%s" has been commented';
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -111,6 +109,28 @@ class NewReviewHandler
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
         $lastMessageIdentifier = last($PR->messageIdentifiers());
         $this->chatClient->replyInThread($lastMessageIdentifier, $squadMessage);
-        $this->logger->info(sprintf($logMessage, $review->PRIdentifier));
+    }
+
+    private function logIt(NewReview $review): void
+    {
+        switch ($review->reviewStatus) {
+            case 'accepted':
+                $logMessage = sprintf('PR "%s" has been GTMed', $review->PRIdentifier);
+                break;
+            case 'refused':
+                $logMessage = sprintf('PR "%s" has been NOT GTMed', $review->PRIdentifier);
+                break;
+            case 'commented':
+                $logMessage = sprintf('PR "%s" has been commented', $review->PRIdentifier);
+                break;
+            default:
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'review type "%s" is not supported, supported types are "gtm", "not_gtm", "comment"',
+                        $review->reviewStatus
+                    )
+                );
+        }
+        $this->logger->info($logMessage);
     }
 }

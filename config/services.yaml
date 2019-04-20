@@ -57,15 +57,6 @@ services:
             - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
 
-    slub.application.event_subscribers.notify_squad:
-        class: Slub\Application\NotifySquad\NotifySquad
-        arguments:
-            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
-            - '@slub.infrastructure.chat.slack.slack_client'
-            - '@logger'
-        tags:
-            - { name: kernel.event_subscriber }
-
     # Infrastructure
     ## Persistence
     slub.infrastructure.persistence.sql.database_connection:

@@ -7,7 +7,6 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
-use Slub\Application\NotifySquad\NotifySquad;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
-use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**

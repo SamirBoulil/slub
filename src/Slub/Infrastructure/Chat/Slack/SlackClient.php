@@ -6,7 +6,7 @@ namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
-use Slub\Application\NotifySquad\ChatClient;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**

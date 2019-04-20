@@ -5,7 +5,6 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Slub\Application\NotifySquad\NotifySquad;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;

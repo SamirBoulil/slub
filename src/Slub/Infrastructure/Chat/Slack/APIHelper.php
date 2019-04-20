@@ -20,7 +20,7 @@ class APIHelper
         if ($hasError) {
             throw new \RuntimeException(
                 sprintf(
-                    'There was an issue when retrieving the reactions for a message (status %d): "%s"',
+                    'There was an issue when communicating with the slack API (status %d): "%s"',
                     $statusCode,
                     json_encode($contents)
                 )

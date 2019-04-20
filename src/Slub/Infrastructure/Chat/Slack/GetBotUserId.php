@@ -39,7 +39,7 @@ class GetBotUserId
     {
         $response = APIHelper::checkResponse(
             $this->client->post(
-                'https://slack.com/api/reactions.get',
+                'https://slack.com/api/users.identity',
                 [
                     'form_params' => [
                         'token' => $this->slackToken,

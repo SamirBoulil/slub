@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
-*/
+ */
 class GetBotReactionsForMessageAndUser
 {
     /** @var Client */
@@ -33,17 +33,18 @@ class GetBotReactionsForMessageAndUser
 
     private function fetchReactions(string $channel, string $ts): array
     {
-        $response = $this->client->post(
-            'https://slack.com/api/reactions.get',
-            [
-                'form_params' => [
-                    'token' => $this->slackToken,
-                    'channel' => $channel,
-                    'timestamp' => $ts
-                ],
-            ]
+        $reactions = APIHelper::checkResponse(
+            $this->client->post(
+                'https://slack.com/api/reactions.get',
+                [
+                    'form_params' => [
+                        'token' => $this->slackToken,
+                        'channel' => $channel,
+                        'timestamp' => $ts
+                    ],
+                ]
+            )
         );
-        $reactions = APIHelper::checkResponse($response);
 
         return $reactions['message']['reactions'];
     }

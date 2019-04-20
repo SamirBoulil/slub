@@ -23,21 +23,22 @@ class GetBotReactionsForMessageAndUser
         $this->slackToken = $slackToken;
     }
 
-    public function fetch(string $ts, string $userId): array
+    public function fetch(string $channel, string $ts, string $userId): array
     {
-        $reactions = $this->fetchReactions($ts);
+        $reactions = $this->fetchReactions($channel, $ts);
         $botReactions = $this->findBotReactions($userId, $reactions);
 
         return $botReactions;
     }
 
-    private function fetchReactions(string $ts): array
+    private function fetchReactions(string $channel, string $ts): array
     {
         $response = $this->client->post(
             'https://slack.com/api/reactions.get',
             [
                 'form_params' => [
                     'token' => $this->slackToken,
+                    'channel' => $channel,
                     'timestamp' => $ts
                 ],
             ]

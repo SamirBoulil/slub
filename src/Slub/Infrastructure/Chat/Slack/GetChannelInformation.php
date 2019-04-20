@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Query\ChannelInformation;
 use Slub\Domain\Query\GetChannelInformationInterface;
@@ -35,35 +33,16 @@ class GetChannelInformation implements GetChannelInformationInterface
             'https://slack.com/api/channels.info',
             [
                 'form_params' => [
-                    'token'   => $this->slackToken,
+                    'token' => $this->slackToken,
                     'channel' => $channelIdentifier->stringValue(),
                 ],
             ]
         );
-        $channel = $this->parseResponse($response);
+        $channel = APIHelper::checkResponse($response);
         $channelInformation = new ChannelInformation();
         $channelInformation->channelIdentifier = $channelIdentifier->stringValue();
         $channelInformation->channelName = $channel['channel']['name'];
 
         return $channelInformation;
-    }
-
-    private function parseResponse(ResponseInterface $response): array
-    {
-        $statusCode = $response->getStatusCode();
-        $contents = json_decode($response->getBody()->getContents(), true);
-        $hasError = 200 !== $statusCode || false === $contents['ok'] || !isset($contents['channel']);
-
-        if ($hasError) {
-            throw new \RuntimeException(
-                sprintf(
-                    'There was an issue when retrieving the channel information (status %d): "%s"',
-                    $statusCode,
-                    json_encode($contents)
-                )
-            );
-        }
-
-        return $contents;
     }
 }

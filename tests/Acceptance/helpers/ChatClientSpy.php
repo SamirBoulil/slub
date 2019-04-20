@@ -14,16 +14,16 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 class ChatClientSpy implements ChatClient
 {
     /** @var string[][] */
-    private $recordedMessages;
+    private $recordedMessages = [];
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
         $this->recordedMessages[$messageIdentifier->stringValue()][] = $text;
     }
 
-    public function reactToMessageWith(MessageIdentifier $messageIdentifier, string $text): void
+    public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactions): void
     {
-        $this->recordedMessages[$messageIdentifier->stringValue()][] = $text;
+        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactions, $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
     public function assertHasBeenCalledWith(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
@@ -36,5 +36,10 @@ class ChatClientSpy implements ChatClient
         );
         Assert::assertNotEmpty($this->recordedMessages[$key]);
         Assert::assertContains($expectedText, $this->recordedMessages[$key]);
+    }
+
+    public function reset(): void
+    {
+        $this->recordedMessages = [];
     }
 }

@@ -6,6 +6,7 @@ namespace Slub\Application\Notify;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
@@ -13,8 +14,7 @@ use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
-use Slub\Domain\Query\GetMessageIdsForPR;
-use Slub\Domain\Query\GetReviewCountForPR;
+use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -24,16 +24,14 @@ class NotifySquad implements EventSubscriberInterface
 {
     public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
     /** @var string[] */
-    public const REACTION_PR_REVIEWED = ['zero', 'one',  'two',  'three',  'four',  'five',  'six',  'seven',  'eight',  'nine'];
+    public const REACTION_PR_REVIEWED = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     public const REACTION_CI_GREEN = 'white_check_mark';
     public const REACTION_CI_RED = 'octagonal_sign';
     public const REACTION_PR_MERGED = 'rocket';
+    public const REACTION_CI_PENDING = 'small_orange_diamond';
 
-    /** @var GetMessageIdsForPR */
-    private $getMessageIdsForPR;
-
-    /** @var GetReviewCountForPR */
-    private $getReviewCountForPR;
+    /** @var PRRepositoryInterface */
+    private $PRRepository;
 
     /** @var ChatClient */
     private $chatClient;
@@ -41,15 +39,10 @@ class NotifySquad implements EventSubscriberInterface
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(
-        GetMessageIdsForPR $getMessageIdsForPR,
-        GetReviewCountForPR $getReviewCountForPR,
-        ChatClient $chatClient,
-        LoggerInterface $logger
-    ) {
+    public function __construct(PRRepositoryInterface $PRRepository, ChatClient $chatClient, LoggerInterface $logger)
+    {
+        $this->PRRepository = $PRRepository;
         $this->chatClient = $chatClient;
-        $this->getMessageIdsForPR = $getMessageIdsForPR;
-        $this->getReviewCountForPR = $getReviewCountForPR;
         $this->logger = $logger;
     }
 
@@ -65,55 +58,78 @@ class NotifySquad implements EventSubscriberInterface
         ];
     }
 
+    private function synchronizeReactions(PRIdentifier $PRIdentifier): void
+    {
+        $PR = $this->PRRepository->getBy($PRIdentifier);
+        $reactions = $this->getReactionsToSet($PR);
+        foreach ($PR->messageIdentifiers() as $messageIdentifier) {
+            $this->chatClient->setReactionsToMessageWith($messageIdentifier, $reactions);
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getReactionsToSet(PR $PR): array
+    {
+        $normalizedPR = $PR->normalize();
+        $statusBar = [self::REACTION_PR_PUT_TO_REVIEW];
+        $statusBar[] = $this->getReviewCount($normalizedPR);
+        $statusBar[] = $this->getCIStatusReaction($normalizedPR);
+        if ($normalizedPR['IS_MERGED']) {
+            $statusBar[] = self::REACTION_PR_MERGED;
+        }
+
+        return $statusBar;
+    }
+
+    private function getCIStatusReaction(array $normalizedPR): string
+    {
+        $ciStatus = $normalizedPR['CI_STATUS'];
+        if ('GREEN' === $ciStatus) {
+            return self::REACTION_CI_GREEN;
+        }
+        if ('RED' === $ciStatus) {
+            return self::REACTION_CI_RED;
+        }
+
+        return self::REACTION_CI_PENDING;
+    }
+
+    private function getReviewCount(array $normalizedPR): string
+    {
+        $reviewCount = $normalizedPR['GTMS'] + $normalizedPR['NOT_GTMS'];
+
+        return self::REACTION_PR_REVIEWED[$reviewCount];
+    }
+
     public function whenPRIsPutToReview(PRPutToReview $event): void
     {
-        $this->notifySquadWithReactionForPR($event->PRIdentifier(), self::REACTION_PR_PUT_TO_REVIEW);
-        $this->logger->info(sprintf('Squad has been notified pr "%s" is in review', $event->PRIdentifier()->stringValue()));
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 
     public function whenPRHasBeenGTMed(PRGTMed $event): void
     {
-        $this->notifyPRHasBeenReviewed($event->PRIdentifier());
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 
     public function whenPRHasBeenNotGTMed(PRNotGTMed $event): void
     {
-        $this->notifyPRHasBeenReviewed($event->PRIdentifier());
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 
     public function whenCIIsGreen(CIGreen $event): void
     {
-        $this->notifySquadWithReactionForPR($event->PRIdentifier(), self::REACTION_CI_GREEN);
-        $this->logger->info(sprintf('Squad has been notified PR "%s" is green', $event->PRIdentifier()->stringValue()));
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 
     public function whenCIIsRed(CIRed $event): void
     {
-        $this->notifySquadWithReactionForPR($event->PRIdentifier(), self::REACTION_CI_RED);
-        $this->logger->info(sprintf('Squad has been notified PR "%s" is red', $event->PRIdentifier()->stringValue()));
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 
     public function whenPRIsMerged(PRMerged $event): void
     {
-        $this->notifySquadWithReactionForPR($event->PRIdentifier(), self::REACTION_PR_MERGED);
-        $this->logger->info(sprintf('Squad has been notified PR "%s" is merged', $event->PRIdentifier()->stringValue()));
-    }
-
-    private function notifyPRHasBeenReviewed(PRIdentifier $PRIdentifier): void
-    {
-        $reviewCount = $this->getReviewCountForPR->fetch($PRIdentifier);
-        $reviewEmoji = self::REACTION_PR_REVIEWED[$reviewCount] ?? null;
-        if (null !== $reviewEmoji) {
-            $this->notifySquadWithReactionForPR($PRIdentifier, $reviewEmoji);
-        }
-        $this->logger->info(sprintf('Squad has been notified PR "%s" has been reviewed', $PRIdentifier->stringValue()));
-    }
-
-    private function notifySquadWithReactionForPR(PRIdentifier $PRIdentifier, string $text): void
-    {
-        $messageIds = $this->getMessageIdsForPR->fetch($PRIdentifier);
-        foreach ($messageIds as $messageId) {
-            $this->chatClient->reactToMessageWith($messageId, $text);
-        }
+        $this->synchronizeReactions($event->PRIdentifier());
     }
 }

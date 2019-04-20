@@ -65,8 +65,7 @@ services:
     slub.application.notify.notify_squad:
         class: Slub\Application\Notify\NotifySquad
         arguments:
-            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
-            - '@slub.infrastructure.persistence.get_review_count_for_pr'
+            - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
         tags:
@@ -122,9 +121,23 @@ services:
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
+    slub.infrastructure.query.get_bot_reactions_for_message_and_user:
+        class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
+        arguments:
+            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '%env(SLACK_TOKEN)%'
+
+    slub.infrastructure.query.get_bot_user_id:
+        class: Slub\Infrastructure\Chat\Slack\GetBotUserId
+        arguments:
+            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '%env(SLACK_TOKEN)%'
+
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
         arguments:
+            - '@slub.infrastructure.query.get_bot_user_id'
+            - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 

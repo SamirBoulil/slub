@@ -58,6 +58,7 @@ class CIStatusUpdateContext extends FeatureContext
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $this->PRRepository->save(PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier));
+        $this->chatClientSpy->reset();
     }
 
     /**

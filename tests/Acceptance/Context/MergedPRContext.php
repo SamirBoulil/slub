@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
+use Slub\Application\Notify\NotifyAuthor;
+use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -69,7 +72,7 @@ class MergedPRContext extends FeatureContext
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
         $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
-        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, MergedPRHandler::REACTION_PR_MERGED);
+        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
     }
 
     /**

@@ -50,21 +50,19 @@ class SlackClient implements ChatClient
     public function reactToMessageWith(MessageIdentifier $messageIdentifier, string $emoji): void
     {
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $this->checkResponse(
-            $this->client->post(
-                'https://slack.com/api/reactions.add',
-                [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken,
-                        'Content-type' => 'application/json; charset=utf-8',
-                    ],
-                    'json' => [
-                        'channel' => $message['channel'],
-                        'timestamp' => $message['ts'],
-                        'name' => $emoji,
-                    ],
-                ]
-            )
+        $this->client->post(
+            'https://slack.com/api/reactions.add',
+            [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->slackToken,
+                    'Content-type' => 'application/json; charset=utf-8',
+                ],
+                'json' => [
+                    'channel' => $message['channel'],
+                    'timestamp' => $message['ts'],
+                    'name' => $emoji,
+                ],
+            ]
         );
     }
 

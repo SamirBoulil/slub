@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
+use Slub\Application\Notify\NotifyAuthor;
+use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -89,7 +92,7 @@ class CIStatusUpdateContext extends FeatureContext
         );
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            CIStatusUpdateHandler::MESSAGE_CI_GREEN
+            NotifySquad::REACTION_CI_GREEN
         );
     }
 
@@ -121,11 +124,11 @@ class CIStatusUpdateContext extends FeatureContext
     {
         Assert::assertTrue(
             $this->eventSpy->CIRedEventDispatched(),
-            'Expected CIGreenEvent to be dispatched, but was not found'
+            'Expected CIRedEvent to be dispatched, but was not found'
         );
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            CIStatusUpdateHandler::MESSAGE_CI_RED
+            NotifySquad::REACTION_CI_RED
         );
     }
 
@@ -147,5 +150,35 @@ class CIStatusUpdateContext extends FeatureContext
     public function theSquadShouldNotBeNotNotified()
     {
         Assert::assertFalse($this->eventSpy->hasEvents(), 'Expected to have no events, but some were found');
+    }
+
+    /**
+     * @Given /^the author should be notified that the ci is green for the PR$/
+     */
+    public function theAuthorShouldBeNotifiedThatTheCiIsGreenForThePR()
+    {
+        Assert::assertTrue(
+            $this->eventSpy->CIGreenEventDispatched(),
+            'Expected CIGreenEvent to be dispatched, but was not found'
+        );
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifyAuthor::MESSAGE_CI_GREEN
+        );
+    }
+
+    /**
+     * @Given /^the author should be notified that the ci is red for the PR$/
+     */
+    public function theAuthorShouldBeNotifiedThatTheCiIsRedForThePR()
+    {
+        Assert::assertTrue(
+            $this->eventSpy->CIRedEventDispatched(),
+            'Expected CIRedEvent to be dispatched, but was not found'
+        );
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifyAuthor::MESSAGE_CI_RED
+        );
     }
 }

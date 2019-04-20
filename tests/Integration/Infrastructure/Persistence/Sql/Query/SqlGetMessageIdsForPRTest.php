@@ -20,12 +20,12 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     private const PR_IDENTIFIER = 'akeneo/pim-community-dev/1111';
 
     /** @var GetMessageIdsForPR */
-    private $fileBasedGetMessageIdsForPR;
+    private $getMessageIdsForPR;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->fileBasedGetMessageIdsForPR = $this->get('slub.infrastructure.persistence.get_message_ids_for_pr');
+        $this->getMessageIdsForPR = $this->get('slub.infrastructure.persistence.get_message_ids_for_pr');
         $this->resetDB();
     }
 
@@ -35,7 +35,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     public function it_returns_the_message_ids_for_a_given_PR_identifier()
     {
         $this->createPRWithMessageIds(['1', '2']);
-        $messageIds = $this->fileBasedGetMessageIdsForPR->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER));
+        $messageIds = $this->getMessageIdsForPR->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER));
         $this->assertMessageIds(['1', '2'], $messageIds);
     }
 
@@ -45,7 +45,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     public function it_throws_if_the_PR_does_not_exists()
     {
         $this->expectException(PRNotFoundException::class);
-        $this->fileBasedGetMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
+        $this->getMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
     }
 
     /**
@@ -54,7 +54,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     public function it_throws_if_the_PR_does_not_have_any_message()
     {
         $this->expectException(PRNotFoundException::class);
-        $this->fileBasedGetMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
+        $this->getMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
     }
 
     private function createPRWithMessageIds(array $messageIds): void

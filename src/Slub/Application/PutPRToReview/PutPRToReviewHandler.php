@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
-use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -17,16 +16,11 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 
 class PutPRToReviewHandler
 {
-    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
-
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
     /** @var IsSupportedInterface */
     private $isSupported;
-
-    /** @var ChatClient */
-    private $chatClient;
 
     /** @var LoggerInterface */
     private $logger;
@@ -34,12 +28,10 @@ class PutPRToReviewHandler
     public function __construct(
         PRRepositoryInterface $PRRepository,
         IsSupportedInterface $isRepositorySupported,
-        ChatClient $chatClient,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isRepositorySupported;
-        $this->chatClient = $chatClient;
         $this->logger = $logger;
     }
 
@@ -49,7 +41,6 @@ class PutPRToReviewHandler
             return;
         }
         $this->createOrUpdatePR($command);
-        $this->notifySquad($command);
         $this->logIt($command);
     }
 
@@ -108,20 +99,6 @@ class PutPRToReviewHandler
             PR::create(
                 PRIdentifier::create($putPRToReview->PRIdentifier),
                 MessageIdentifier::fromString($putPRToReview->messageIdentifier)
-            )
-        );
-    }
-
-    private function notifySquad(PutPRToReview $command): void
-    {
-        $this->chatClient->reactToMessageWith(
-            MessageIdentifier::fromString($command->messageIdentifier),
-            self::REACTION_PR_PUT_TO_REVIEW
-        );
-        $this->logger->info(
-            sprintf(
-                'squad has been notified pr "%s" is in review',
-                $command->PRIdentifier
             )
         );
     }

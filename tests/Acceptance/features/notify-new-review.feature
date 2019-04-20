@@ -8,6 +8,7 @@ Feature: Improve the communication between the author of the pull request (PR) a
     Given a PR in review
     When the PR is GTMed
     Then the PR should be GTMed
+    And the author should be notified that the PR has one more GTM
     And the squad should be notified that the PR has one more GTM
 
   @nominal
@@ -15,6 +16,7 @@ Feature: Improve the communication between the author of the pull request (PR) a
     Given a PR in review
     When the PR is NOT GTMED
     Then the PR should be NOT GTMed
+    And the author should be notified that the PR has one more NOT GTM
     And the squad should be notified that the PR has one more NOT GTM
 
   @nominal
@@ -22,7 +24,7 @@ Feature: Improve the communication between the author of the pull request (PR) a
     Given a PR in review
     When the PR is commented
     Then the PR should have one comment
-    And the squad should be notified that the PR has one more comment
+    And the author should be notified that the PR has one more comment
 
   @secondary
   Scenario: It does not notify the new reviews on unsupported repositories

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Application\MergedPR;
 
 use Psr\Log\LoggerInterface;
-use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -16,15 +15,11 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class MergedPRHandler
 {
-    public const REACTION_PR_MERGED = 'rocket';
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
     /** @var IsSupportedInterface */
     private $isSupported;
-
-    /** @var ChatClient */
-    private $chatClient;
 
     /** @var LoggerInterface */
     private $logger;
@@ -32,12 +27,10 @@ class MergedPRHandler
     public function __construct(
         PRRepositoryInterface $PRRepository,
         IsSupportedInterface $isSupported,
-        ChatClient $chatClient,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isSupported;
-        $this->chatClient = $chatClient;
         $this->logger = $logger;
     }
 
@@ -47,7 +40,6 @@ class MergedPRHandler
             return;
         }
         $this->setPRMerged($command);
-        $this->notifySquad($command);
         $this->logIt($command);
     }
 
@@ -63,14 +55,6 @@ class MergedPRHandler
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($mergedPR->PRIdentifier));
         $PR->merged();
         $this->PRRepository->save($PR);
-    }
-
-    private function notifySquad(MergedPR $command): void
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString($command->PRIdentifier));
-        foreach ($PR->messageIdentifiers() as $messageId) {
-            $this->chatClient->reactToMessageWith($messageId, self::REACTION_PR_MERGED);
-        }
     }
 
     private function logIt(MergedPR $command): void

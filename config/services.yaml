@@ -30,7 +30,6 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
-            - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
 
     slub.application.new_review.new_review_handler:
@@ -38,7 +37,6 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
-            - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
 
     slub.application.ci_status_update.ci_status_update_handler:
@@ -46,7 +44,6 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
-            - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
 
     slub.application.merged_pr.merged_pr_handler:
@@ -54,8 +51,26 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
-            - "@slub.infrastructure.chat.slack.slack_client"
             - "@logger"
+
+    slub.application.notify.notify_author:
+        class: Slub\Application\Notify\NotifyAuthor
+        arguments:
+            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    slub.application.notify.notify_squad:
+        class: Slub\Application\Notify\NotifySquad
+        arguments:
+            - '@slub.infrastructure.persistence.get_message_ids_for_pr'
+            - '@slub.infrastructure.persistence.get_review_count_for_pr'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
+        tags:
+            - { name: kernel.event_subscriber }
 
     # Infrastructure
     ## Persistence
@@ -73,6 +88,11 @@ services:
 
     slub.infrastructure.persistence.get_message_ids_for_pr:
         class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetMessageIdsForPR
+        arguments:
+            - "@slub.infrastructure.persistence.sql.database_connection"
+
+    slub.infrastructure.persistence.get_review_count_for_pr:
+        class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetReviewCountForPR
         arguments:
             - "@slub.infrastructure.persistence.sql.database_connection"
 

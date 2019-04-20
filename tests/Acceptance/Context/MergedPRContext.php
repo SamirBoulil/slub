@@ -70,7 +70,7 @@ class MergedPRContext extends FeatureContext
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
         $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
-        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
+        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, MergedPRHandler::REACTION_PR_MERGED);
     }
 
     /**

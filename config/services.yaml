@@ -54,6 +54,8 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.pr_repository"
             - "@slub.infrastructure.query.is_supported"
+            - "@slub.infrastructure.chat.slack.slack_client"
+            - "@logger"
 
     slub.application.event_subscribers.notify_squad:
         class: Slub\Application\NotifySquad\NotifySquad

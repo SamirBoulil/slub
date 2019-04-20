@@ -6,6 +6,7 @@ namespace Slub\Application\NotifySquad;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
+use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
@@ -26,8 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifySquad implements EventSubscriberInterface
 {
-    public const REACTION_PR_MERGED = 'rocket';
-
     /** @var GetMessageIdsForPR */
     private $getMessageIdsForPR;
 
@@ -56,7 +55,7 @@ class NotifySquad implements EventSubscriberInterface
 //            PRCommented::class => 'whenPRComment',
             //CIGreen::class => 'whenCIIsGreen',
             //CIRed::class => 'whenCIIsRed',
-            PRMerged::class => 'whenPRIsMerged'
+            //PRMerged::class => 'whenPRIsMerged'
         ];
     }
 
@@ -130,7 +129,7 @@ class NotifySquad implements EventSubscriberInterface
     {
         $messageIds = $this->getMessageIdsForPR->fetch($event->PRIdentifier());
         foreach ($messageIds as $messageId) {
-            $this->chatClient->reactToMessageWith($messageId, self::REACTION_PR_MERGED);
+            $this->chatClient->reactToMessageWith($messageId, MergedPRHandler::REACTION_PR_MERGED);
         }
         $this->logger->info(
             sprintf(

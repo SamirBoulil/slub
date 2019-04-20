@@ -69,7 +69,7 @@ class SlackClient implements ChatClient
 
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
-        $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue())];
+        $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         $botUserId = $this->getBotUserId->fetch();
 
         return $this->getBotReactionsForMessageAndUser->fetch($messageId['channel'], $messageId['ts'], $botUserId);

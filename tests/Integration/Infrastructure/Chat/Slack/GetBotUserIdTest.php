@@ -44,12 +44,9 @@ class GetBotUserIdTest extends TestCase
         $userId = $this->getBotUserId->fetch();
 
         $generatedRequest = $this->httpMock->getLastRequest();
-        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('GET', $generatedRequest->getMethod());
         $this->assertEquals('/api/bots.info', $generatedRequest->getUri()->getPath());
-        $this->assertEquals(
-            'token=xobxob-slack-token',
-            $this->getBodyContent($generatedRequest)
-        );
+        $this->assertEquals('token=xobxob-slack-token', $generatedRequest->getUri()->getQuery());
         $this->assertEquals('USER_ID', $userId);
     }
 
@@ -81,18 +78,11 @@ class GetBotUserIdTest extends TestCase
         $handler = HandlerStack::create($this->httpMock);
         $client = new Client(['handler' => $handler]);
 
-        return new Client();
-
         return $client;
     }
 
     private function mockGuzzleWith(Response $response): void
     {
         $this->httpMock->append($response);
-    }
-
-    private function getBodyContent(RequestInterface $generatedRequest): string
-    {
-        return $generatedRequest->getBody()->getContents();
     }
 }

@@ -133,7 +133,6 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
-            - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
@@ -142,6 +141,7 @@ services:
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
+            - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.guzzle_client:
         class: GuzzleHttp\Client

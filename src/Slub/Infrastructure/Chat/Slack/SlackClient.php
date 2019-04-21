@@ -25,16 +25,21 @@ class SlackClient implements ChatClient
     /** @var string */
     private $slackToken;
 
+    /** @var string */
+    private $slackBotUserId; // TODO: remove,  call slack API
+
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
         Client $client,
-        string $slackToken
+        string $slackToken,
+        string  $slackBotUserId
     ) {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
         $this->slackToken = $slackToken;
+        $this->slackBotUserId = $slackBotUserId;
     }
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
@@ -70,7 +75,7 @@ class SlackClient implements ChatClient
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $botUserId = $this->getBotUserId->fetch();
+        $botUserId = $this->slackBotUserId;
 
         return $this->getBotReactionsForMessageAndUser->fetch($messageId['channel'], $messageId['ts'], $botUserId);
     }

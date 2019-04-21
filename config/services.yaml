@@ -139,6 +139,7 @@ services:
         arguments:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
+            - '@logger'
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
             - '%env(BOT_USER_ID)%'

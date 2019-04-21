@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
@@ -22,24 +23,30 @@ class SlackClient implements ChatClient
     /** @var Client */
     private $client;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /** @var string */
     private $slackToken;
 
     /** @var string */
-    private $slackBotUserId; // TODO: remove,  call slack API
+    private $slackBotUserId;  // TODO: remove,  call slack API
 
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
+        LoggerInterface $logger,
         Client $client,
         string $slackToken,
-        string  $slackBotUserId
-    ) {
+        string $slackBotUserId
+    )
+    {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
         $this->slackToken = $slackToken;
         $this->slackBotUserId = $slackBotUserId;
+        $this->logger = $logger;
     }
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
@@ -99,6 +106,7 @@ class SlackClient implements ChatClient
                 ]
             );
         }
+        $this->logger->critical(sprintf('Removing reactions: %s', implode(',', $reactionsToAdd)));
     }
 
     private function removeReactions(MessageIdentifier $messageIdentifier, array $reactionsToRemove): void
@@ -120,5 +128,6 @@ class SlackClient implements ChatClient
                 ]
             );
         }
+        $this->logger->critical(sprintf('Removing reactions: %s', implode(',', $reactionsToRemove)));
     }
 }

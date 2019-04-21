@@ -106,7 +106,13 @@ class SlackClient implements ChatClient
                 ]
             );
         }
-        $this->logger->critical(sprintf('Removing reactions: %s', implode(',', $reactionsToAdd)));
+        $this->logger->critical(
+            sprintf(
+                'Updating reactions of "%s", Adding: %s',
+                $messageIdentifier->stringValue(),
+                implode(',', $reactionsToAdd)
+            )
+        );
     }
 
     private function removeReactions(MessageIdentifier $messageIdentifier, array $reactionsToRemove): void
@@ -128,6 +134,12 @@ class SlackClient implements ChatClient
                 ]
             );
         }
-        $this->logger->critical(sprintf('Removing reactions: %s', implode(',', $reactionsToRemove)));
+        $this->logger->critical(
+            sprintf(
+                'Updating reactions of "%s", Removing: %s',
+                $messageIdentifier->stringValue(),
+                implode(',', $reactionsToRemove)
+            )
+        );
     }
 }

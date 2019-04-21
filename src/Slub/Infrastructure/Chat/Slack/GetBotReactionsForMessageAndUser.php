@@ -34,10 +34,10 @@ class GetBotReactionsForMessageAndUser
     private function fetchReactions(string $channel, string $ts): array
     {
         $reactions = APIHelper::checkResponse(
-            $this->client->post(
+            $this->client->get(
                 'https://slack.com/api/reactions.get',
                 [
-                    'form_params' => [
+                    'query' => [
                         'token' => $this->slackToken,
                         'channel' => $channel,
                         'timestamp' => $ts

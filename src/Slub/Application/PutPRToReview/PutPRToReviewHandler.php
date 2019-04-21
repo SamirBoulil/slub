@@ -69,7 +69,7 @@ class PutPRToReviewHandler
     private function createOrUpdatePR(PutPRToReview $command): void
     {
         if ($this->PRExists($command)) {
-            $this->attachMessageToPR($command);
+            $this->resentForReview($command);
         } else {
             $this->createNewPR($command);
         }
@@ -86,7 +86,7 @@ class PutPRToReviewHandler
         }
     }
 
-    private function attachMessageToPR(PutPRToReview $putPRToReview): void
+    private function resentForReview(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
         $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageIdentifier));

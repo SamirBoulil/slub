@@ -2,10 +2,12 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Slub\Application\NotifySquad\NotifySquad;
+use Slub\Application\Notify\NotifyAuthor;
+use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -52,6 +54,7 @@ class ReviewContext extends FeatureContext
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $this->PRRepository->save(PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier));
+        $this->chatClientSpy->reset();
     }
 
     /**
@@ -87,7 +90,7 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_GTMED
+            NotifySquad::REACTION_PR_REVIEWED[1]
         );
     }
 
@@ -124,7 +127,7 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_NOT_GTMED
+            NotifySquad::REACTION_PR_REVIEWED[1]
         );
     }
 
@@ -187,9 +190,9 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Given /^the squad should be notified that the PR has one more comment$/
+     * @Given /^the author should be notified that the PR has one more comment$/
      */
-    public function theSquadShouldBeNotifiedThatThePRHasOneMoreComment()
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreComment()
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not commented');
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
@@ -198,7 +201,29 @@ class ReviewContext extends FeatureContext
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
-            NotifySquad::MESSAGE_PR_COMMENTED
+            NotifyAuthor::MESSAGE_PR_COMMENTED
+        );
+    }
+
+    /**
+     * @Given /^the author should be notified that the PR has one more GTM$/
+     */
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM()
+    {
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifyAuthor::MESSAGE_PR_GTMED
+        );
+    }
+
+    /**
+     * @Given /^the author should be notified that the PR has one more NOT GTM$/
+     */
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM()
+    {
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifyAuthor::MESSAGE_PR_NOT_GTMED
         );
     }
 }

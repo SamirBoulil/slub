@@ -28,12 +28,14 @@
     "symfony/lock": "4.2.*",
     "symfony/monolog-bundle": "^3.3",
     "symfony/yaml": "4.2.*",
-    "webmozart/assert": "^1.4"
+    "webmozart/assert": "^1.4",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "behat/behat": "^3.5",
     "behat/symfony2-extension": "^2.1",
     "friendsofphp/php-cs-fixer": "^2.14",
+    "jangregor/phpstan-prophecy": "^0.3.0",
     "phpstan/phpstan": "^0.11.0",
     "phpunit/phpunit": "^7.5"
   },

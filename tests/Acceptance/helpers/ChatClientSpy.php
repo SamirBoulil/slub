@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
-use Slub\Application\NotifySquad\ChatClient;
+use PHPUnit\Framework\Assert;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
@@ -12,38 +13,33 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class ChatClientSpy implements ChatClient
 {
-    /** @var MessageIdentifier */
-    private $actualMessageIdentifier;
-
-    /** @var string */
-    private $actualText;
+    /** @var string[][] */
+    private $recordedMessages = [];
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
-        $this->actualMessageIdentifier = $messageIdentifier;
-        $this->actualText = $text;
+        $this->recordedMessages[$messageIdentifier->stringValue()][] = $text;
     }
 
-    public function reactToMessageWith(MessageIdentifier $messageIdentifier, string $text): void
+    public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactions): void
     {
-        $this->actualMessageIdentifier = $messageIdentifier;
-        $this->actualText = $text;
+        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactions, $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
     public function assertHasBeenCalledWith(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
     {
-        if (
-            null === $this->actualMessageIdentifier ||
-            null === $this->actualText ||
-            (!$expectedMessageIdentifier->equals($this->actualMessageIdentifier) || $expectedText !== $this->actualText)
-        ) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Chat client has not replied on message "%s" the text "%s"',
-                    $expectedMessageIdentifier->stringValue(),
-                    $expectedText
-                )
-            );
-        }
+        $key = $expectedMessageIdentifier->stringValue();
+        Assert::assertArrayHasKey(
+            $key,
+            $this->recordedMessages,
+            sprintf('Expected to have a reply to message ID "%s"', $expectedMessageIdentifier->stringValue())
+        );
+        Assert::assertNotEmpty($this->recordedMessages[$key]);
+        Assert::assertContains($expectedText, $this->recordedMessages[$key]);
+    }
+
+    public function reset(): void
+    {
+        $this->recordedMessages = [];
     }
 }

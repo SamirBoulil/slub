@@ -122,6 +122,9 @@
     "jakub-onderka/php-console-highlighter": {
         "version": "v0.4"
     },
+    "jangregor/phpstan-prophecy": {
+        "version": "0.3.0"
+    },
     "jean85/pretty-package-versions": {
         "version": "1.2"
     },
@@ -181,6 +184,9 @@
     },
     "nette/robot-loader": {
         "version": "v3.1.0"
+    },
+    "nette/schema": {
+        "version": "v1.0.0"
     },
     "nette/utils": {
         "version": "v2.5.3"
@@ -442,6 +448,9 @@
     },
     "symfony/options-resolver": {
         "version": "v4.2.3"
+    },
+    "symfony/polyfill-intl-idn": {
+        "version": "v1.11.0"
     },
     "symfony/polyfill-mbstring": {
         "version": "v1.10.0"

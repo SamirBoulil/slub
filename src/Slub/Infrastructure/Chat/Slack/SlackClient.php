@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
-use Psr\Http\Message\ResponseInterface;
-use Slub\Application\NotifySquad\ChatClient;
+use Psr\Log\LoggerInterface;
+use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
@@ -14,22 +14,44 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class SlackClient implements ChatClient
 {
+    /** @var GetBotUserId */
+    private $getBotUserId;
+
+    /** @var GetBotReactionsForMessageAndUser */
+    private $getBotReactionsForMessageAndUser;
+
     /** @var Client */
     private $client;
+
+    /** @var LoggerInterface */
+    private $logger;
 
     /** @var string */
     private $slackToken;
 
-    public function __construct(Client $client, string $slackToken)
-    {
+    /** @var string */
+    private $slackBotUserId;  // TODO: remove,  call slack API
+
+    public function __construct(
+        GetBotUserId $getBotUserId,
+        GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
+        Client $client,
+        LoggerInterface $logger,
+        string $slackToken,
+        string $slackBotUserId
+    ) {
+        $this->getBotUserId = $getBotUserId;
+        $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
         $this->slackToken = $slackToken;
+        $this->slackBotUserId = $slackBotUserId;
+        $this->logger = $logger;
     }
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $this->checkResponse(
+        APIHelper::checkResponse(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
@@ -47,10 +69,27 @@ class SlackClient implements ChatClient
         );
     }
 
-    public function reactToMessageWith(MessageIdentifier $messageIdentifier, string $emoji): void
+    public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void
+    {
+        $currentReactions = $this->getCurrentReactions($messageIdentifier);
+        $reactionsToRemove = array_diff($currentReactions, $reactionsToSet);
+        $reactionsToAdd = array_diff($reactionsToSet, $currentReactions);
+        $this->removeReactions($messageIdentifier, $reactionsToRemove);
+        $this->addReactions($messageIdentifier, $reactionsToAdd);
+    }
+
+    private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
+    {
+        $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
+        $botUserId = $this->slackBotUserId;
+
+        return $this->getBotReactionsForMessageAndUser->fetch($messageId['channel'], $messageId['ts'], $botUserId);
+    }
+
+    private function addReactions(MessageIdentifier $messageIdentifier, array $reactionsToAdd): void
     {
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $this->checkResponse(
+        foreach ($reactionsToAdd as $reactionToAdd) {
             $this->client->post(
                 'https://slack.com/api/reactions.add',
                 [
@@ -61,27 +100,45 @@ class SlackClient implements ChatClient
                     'json' => [
                         'channel' => $message['channel'],
                         'timestamp' => $message['ts'],
-                        'name' => $emoji,
+                        'name' => $reactionToAdd,
                     ],
                 ]
+            );
+        }
+        $this->logger->critical(
+            sprintf(
+                'Updating reactions of "%s", Adding: %s',
+                $messageIdentifier->stringValue(),
+                implode(',', $reactionsToAdd)
             )
         );
     }
 
-    private function checkResponse(ResponseInterface $response): void
+    private function removeReactions(MessageIdentifier $messageIdentifier, array $reactionsToRemove): void
     {
-        $statusCode = $response->getStatusCode();
-        $contents = json_decode($response->getBody()->getContents(), true);
-        $hasError = 200 !== $statusCode || false === $contents['ok'];
-
-        if ($hasError) {
-            throw new \RuntimeException(
-                sprintf(
-                    'There was an issue when sending a message to slack (status %d): "%s"',
-                    $statusCode,
-                    json_encode($contents)
-                )
+        $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
+        foreach ($reactionsToRemove as $reactionToRemove) {
+            $this->client->post(
+                'https://slack.com/api/reactions.remove',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'channel' => $message['channel'],
+                        'timestamp' => $message['ts'],
+                        'name' => $reactionToRemove,
+                    ],
+                ]
             );
         }
+        $this->logger->critical(
+            sprintf(
+                'Updating reactions of "%s", Removing: %s',
+                $messageIdentifier->stringValue(),
+                implode(',', $reactionsToRemove)
+            )
+        );
     }
 }

@@ -75,17 +75,6 @@ class GetChannelInformationTest extends TestCase
         $this->getChannelInformation->fetch(ChannelIdentifier::fromString('1231461'));
     }
 
-    /**
-     * @test
-     */
-    public function it_throws_if_can_t_find_the_channel_name()
-    {
-        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
-
-        $this->expectException(\RuntimeException::class);
-        $this->getChannelInformation->fetch(ChannelIdentifier::fromString('1231461'));
-    }
-
     private function setUpGuzzleMock(): Client
     {
         $this->mock = new MockHandler([]);

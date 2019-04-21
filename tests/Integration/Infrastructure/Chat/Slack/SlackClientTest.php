@@ -8,7 +8,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\GetBotUserId;
 use Slub\Infrastructure\Chat\Slack\SlackClient;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
@@ -17,8 +21,14 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SlackClientTest extends KernelTestCase
 {
+    /** @var ObjectProphecy */
+    private $getBotUserId;
+
+    /** @var ObjectProphecy */
+    private $getBotReactionsForMessageAndUser;
+
     /** @var MockHandler */
-    private $mock;
+    private $httpClientMock;
 
     /** @var SlackClient */
     private $slackClient;
@@ -29,7 +39,12 @@ class SlackClientTest extends KernelTestCase
 
         // Could have an GuzzleTestCase with mock & client as properties
         $client = $this->setUpGuzzleMock();
-        $this->slackClient = new SlackClient($client, 'xobxob-slack-token');
+        $this->getBotUserId = $this->prophesize(GetBotUserId::class);
+        $this->getBotReactionsForMessageAndUser = $this->prophesize(GetBotReactionsForMessageAndUser::class);
+
+        $this->slackClient = new SlackClient(
+            $this->getBotUserId->reveal(), $this->getBotReactionsForMessageAndUser->reveal(), $client, $this->prophesize(LoggerInterface::class)->reveal(), 'xobxob-slack-token', 'USER_ID' // TODO: to remove
+        );
     }
 
     /**
@@ -37,11 +52,11 @@ class SlackClientTest extends KernelTestCase
      */
     public function it_replies_in_thread(): void
     {
-        $this->mockGuzzleWith(new Response(200, [], ''));
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 
         $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
 
-        $generatedRequest = $this->mock->getLastRequest();
+        $generatedRequest = $this->httpClientMock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
         $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
@@ -59,21 +74,72 @@ class SlackClientTest extends KernelTestCase
      */
     public function it_adds_reactions_to_messages(): void
     {
-        $this->mockGuzzleWith(new Response(200, [], ''));
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+            ->shouldBeCalled()
+            ->willReturn(['ok_hand']);
 
-        $this->slackClient->reactToMessageWith(MessageIdentifier::fromString('channel@message'), 'ok_hand');
+        $this->slackClient->setReactionsToMessageWith(MessageIdentifier::fromString('channel@message'), ['ok_hand', 'rocket']);
 
-        $generatedRequest = $this->mock->getLastRequest();
+        $generatedRequest = $this->httpClientMock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
         $this->assertEquals('/api/reactions.add', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             [
                 'channel'   => 'channel',
                 'timestamp' => 'message',
-                'name'      => 'ok_hand',
+                'name'      => 'rocket',
             ],
             $this->getBodyContent($generatedRequest)
         );
+    }
+
+    /**
+     * @test
+     */
+    public function it_removes_reactions_from_the_messages(): void
+    {
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+            ->shouldBeCalled()
+            ->willReturn(['ok_hand', 'one', 'red_ci']);
+
+        $this->slackClient->setReactionsToMessageWith(
+            MessageIdentifier::fromString('channel@message'),
+            ['ok_hand', 'one']
+        );
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('/api/reactions.remove', $generatedRequest->getUri()->getPath());
+        $this->assertEquals(
+            [
+                'channel'   => 'channel',
+                'timestamp' => 'message',
+                'name'      => 'red_ci',
+            ],
+            $this->getBodyContent($generatedRequest)
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_update_the_reactions(): void
+    {
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+            ->shouldBeCalled()
+            ->willReturn(['ok_hand', 'one', 'red_ci']);
+
+        $this->slackClient->setReactionsToMessageWith(
+            MessageIdentifier::fromString('channel@message'),
+            ['ok_hand', 'one', 'red_ci']
+        );
+        $this->assertNull($this->httpClientMock->getLastRequest());
     }
 
     /**
@@ -100,8 +166,8 @@ class SlackClientTest extends KernelTestCase
 
     private function setUpGuzzleMock(): Client
     {
-        $this->mock = new MockHandler([]);
-        $handler = HandlerStack::create($this->mock);
+        $this->httpClientMock = new MockHandler([]);
+        $handler = HandlerStack::create($this->httpClientMock);
         $client = new Client(['handler' => $handler]);
 
         return $client;
@@ -114,6 +180,6 @@ class SlackClientTest extends KernelTestCase
 
     private function mockGuzzleWith(Response $response): void
     {
-        $this->mock->append($response);
+        $this->httpClientMock->append($response);
     }
 }

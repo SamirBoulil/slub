@@ -46,7 +46,7 @@ class GetBotReactionsForMessageAndUser
             )
         );
 
-        return $reactions['message']['reactions'];
+        return $reactions['message']['reactions'] ?? [];
     }
 
     private function findBotReactions(string $userId, array $reactions): array

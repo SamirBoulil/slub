@@ -57,6 +57,22 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_no_reaction()
+    {
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "message": {}}'));
+
+        $reactions = $this->getBotReactionsForMessageAndUser->fetch('channel', 'message_id', 'BOT_USER_ID');
+
+        $generatedRequest = $this->httpMock->getLastRequest();
+        $this->assertEquals('GET', $generatedRequest->getMethod());
+        $this->assertEquals('/api/reactions.get', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('token=xobxob-slack-token&channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals([], $reactions);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_http_status_is_not_200()
     {
         $this->mockGuzzleWith(new Response(400, [], ''));

@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\GetBotUserId;
@@ -42,11 +43,7 @@ class SlackClientTest extends KernelTestCase
         $this->getBotReactionsForMessageAndUser = $this->prophesize(GetBotReactionsForMessageAndUser::class);
 
         $this->slackClient = new SlackClient(
-            $this->getBotUserId->reveal(),
-            $this->getBotReactionsForMessageAndUser->reveal(),
-            $client,
-            'xobxob-slack-token',
-            'USER_ID' // TODO: to remove
+            $this->getBotUserId->reveal(), $this->getBotReactionsForMessageAndUser->reveal(), $client, $this->prophesize(LoggerInterface::class)->reveal(), 'xobxob-slack-token', 'USER_ID' // TODO: to remove
         );
     }
 

@@ -51,7 +51,7 @@ class GetBotReactionsForMessageAndUser
 
     private function findBotReactions(string $userId, array $reactions): array
     {
-        array_map(
+        return array_map(
             function (array $reaction) {
                 return $reaction['name'];
             },
@@ -62,6 +62,5 @@ class GetBotReactionsForMessageAndUser
                 }
             )
         );
-
     }
 }

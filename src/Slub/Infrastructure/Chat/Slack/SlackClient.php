@@ -35,12 +35,11 @@ class SlackClient implements ChatClient
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
-        LoggerInterface $logger,
         Client $client,
+        LoggerInterface $logger,
         string $slackToken,
         string $slackBotUserId
-    )
-    {
+    ) {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;

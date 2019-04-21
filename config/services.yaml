@@ -91,11 +91,6 @@ services:
         arguments:
             - "@slub.infrastructure.persistence.sql.database_connection"
 
-    slub.infrastructure.persistence.get_review_count_for_pr:
-        class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetReviewCountForPR
-        arguments:
-            - "@slub.infrastructure.persistence.sql.database_connection"
-
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:

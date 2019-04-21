@@ -7,6 +7,7 @@ parameters:
     SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
     SUPPORTED_CHANNELS: "squad-raccoons,general"
     SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,ci/circleci: back_behat_legacy"
+    BOT_USER_ID: "bot_user_id"
     locale: 'en'
     slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
     slub.infrastructure.chat.slack.base_uri: "https://slack.com"
@@ -132,6 +133,7 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.guzzle_client'
             - '%env(SLACK_TOKEN)%'
+            - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient

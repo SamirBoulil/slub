@@ -20,34 +20,41 @@ class GetBotUserId
     /** @var ?string */
     private $cachedResult;
 
-    public function __construct(Client $client, string $slackToken)
+    /** @var string */
+    private $botUserId;
+
+    public function __construct(Client $client, string $slackToken, string $botUserId)
     {
         $this->client = $client;
         $this->slackToken = $slackToken;
+        $this->botUserId = $botUserId;
     }
 
     public function fetch(): string
     {
-        if (null === $this->cachedResult) {
-            $this->cachedResult = $this->fetchBotUserId();
-        }
+        return $this->botUserId;
 
-        return $this->cachedResult;
+//        if (null === $this->cachedResult) {
+//            $this->cachedResult = $this->fetchBotUserId();
+//        }
+//
+//        return $this->cachedResult;
     }
 
-    private function fetchBotUserId(): string
-    {
-        $response = APIHelper::checkResponse(
-            $this->client->post(
-                'https://slack.com/api/bots.info',
-                [
-                    'form_params' => [
-                        'token' => $this->slackToken,
-                    ],
-                ]
-            )
-        );
-
-        return $response['bot']['id'];
-    }
+//    private function fetchBotUserId(): string
+//    {
+//        $response = APIHelper::checkResponse(
+//            $this->client->get(
+//                'https://slack.com/api/bots.info',
+//                [
+//                    'query' => [
+//                        'token' => $this->slackToken,
+//                        'bot' => '',
+//                    ],
+//                ]
+//            )
+//        );
+//
+//        return $response['bot']['id'];
+//    }
 }

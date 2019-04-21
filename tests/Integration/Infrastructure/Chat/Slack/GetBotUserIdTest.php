@@ -81,6 +81,8 @@ class GetBotUserIdTest extends TestCase
         $handler = HandlerStack::create($this->httpMock);
         $client = new Client(['handler' => $handler]);
 
+        return new Client();
+
         return $client;
     }
 

@@ -29,7 +29,8 @@
     "symfony/monolog-bundle": "^3.3",
     "symfony/yaml": "4.2.*",
     "webmozart/assert": "^1.4",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-json": "*"
   },
   "require-dev": {
     "behat/behat": "^3.5",

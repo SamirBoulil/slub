@@ -102,8 +102,7 @@ class CheckRunEventHandlerTest extends WebTestCase
     {
         $this->PRRepository->save(
             PR::create(
-                PRIdentifier::create(self::PRIdentifier),
-                MessageIdentifier::create('CHANNEL_ID@1111')
+                PRIdentifier::create(self::PRIdentifier), MessageIdentifier::create('CHANNEL_ID@1111'), 0, 0, 0, 'pending', false
             )
         );
     }

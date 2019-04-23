@@ -8,6 +8,7 @@
 
 # Ideas
 - Be notified *who* merged the PR ?
+- Time to review AVG
 
 # To refactor
 - Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier

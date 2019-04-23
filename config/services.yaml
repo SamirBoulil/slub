@@ -114,19 +114,19 @@ services:
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.query.get_bot_reactions_for_message_and_user:
         class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.query.get_bot_user_id:
         class: Slub\Infrastructure\Chat\Slack\GetBotUserId
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.chat.slack.slack_client:
@@ -134,12 +134,12 @@ services:
         arguments:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
             - '%env(BOT_USER_ID)%'
 
-    slub.infrastructure.chat.slack.guzzle_client:
+    slub.infrastructure.http.guzzle_client:
         class: GuzzleHttp\Client
 
     ## VCS
@@ -177,6 +177,13 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRMergedEventHandler
         arguments:
             - '@slub.application.merged_pr.merged_pr_handler'
+
+    slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
+        class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

@@ -11,6 +11,7 @@ use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
+use Slub\Domain\Query\VCSStatus;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -27,7 +28,7 @@ class PR
     /** @var Event[] */
     private $events = [];
 
-    /** @var PRIdentifier */
+   /** @var PRIdentifier */
     private $PRIdentifier;
 
     /** @var MessageIdentifier[] */
@@ -195,5 +196,9 @@ class PR
 
         $this->messageIdentifiers[] = $newMessageId;
         $this->events[] = PRPutToReview::forPR($this->PRIdentifier, $newMessageId);
+    }
+
+    public function synchronize(VCSStatus $VCSStatuses): voic
+    {
     }
 }

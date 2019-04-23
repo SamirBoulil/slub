@@ -29,7 +29,7 @@ class FileBasedPRRepositoryTest extends KernelTestCase
     public function it_saves_a_pr_and_returns_it()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $savedPR = PR::create($identifier, MessageIdentifier::fromString('1'));
+        $savedPR = PR::create($identifier, MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false);
 
         $this->fileBasedPRRepository->save($savedPR);
         $fetchedPR = $this->fileBasedPRRepository->getBy($identifier);
@@ -54,7 +54,7 @@ class FileBasedPRRepositoryTest extends KernelTestCase
     public function it_resets_itself()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $this->fileBasedPRRepository->save(PR::create($identifier, MessageIdentifier::fromString('1')));
+        $this->fileBasedPRRepository->save(PR::create($identifier, MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false));
         $this->fileBasedPRRepository->reset();
 
         $this->expectException(PRNotFoundException::class);

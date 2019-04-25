@@ -19,9 +19,6 @@ class CIStatusUpdate
     /** @var string */
     public $PRIdentifier;
 
-    /** @var bool */
-    public $isGreen;
-
     /** @var string */
     public $status;
 }

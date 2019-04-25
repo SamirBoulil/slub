@@ -65,10 +65,15 @@ class CIStatusUpdateHandler
 
     private function logIt(CIStatusUpdate $CIStatusUpdate): void
     {
-        if ($CIStatusUpdate->isGreen) {
+        $logMessage = '';
+        if ('GREEN' === $CIStatusUpdate->status) {
             $logMessage = sprintf('Squad has been notified PR "%s" has a Green CI', $CIStatusUpdate->PRIdentifier);
-        } else {
+        }
+        if ('RED' === $CIStatusUpdate->status) {
             $logMessage = sprintf('Squad has been notified PR "%s" has a Red CI', $CIStatusUpdate->PRIdentifier);
+        }
+        if ('PENDING' === $CIStatusUpdate->status) {
+            $logMessage = sprintf('Squad has been notified PR "%s" has a pending CI', $CIStatusUpdate->PRIdentifier);
         }
         $this->logger->info($logMessage);
     }

@@ -78,8 +78,6 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     private function isGreen(array $CIStatusUpdate): bool
     {
-        if ('in_progress' === $CIStatusUpdate['check_suite']['status']) {
-            return false;
-        }
+        return 'success' === $CIStatusUpdate['check_run']['conclusion'];
     }
 }

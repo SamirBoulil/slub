@@ -109,7 +109,7 @@ class GetCIStatus
 
     private function deductCIStatus(array $checkRuns): string
     {
-        $supportedCheckRuns = array_filter($checkRuns['check_runs'], function(array $checkRun) {
+        $supportedCheckRuns = array_filter($checkRuns['check_runs'], function (array $checkRun) {
             return $this->isCheckRunSupported($checkRun);
         });
         if (empty($supportedCheckRuns)) {

@@ -7,7 +7,6 @@ namespace Tests\Integration\Infrastructure\VCS\Query;
 use GuzzleHttp\Psr7\Response;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
-use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
 use Tests\Integration\Infrastructure\WebTestCase;
 
 /**
@@ -41,24 +40,34 @@ class GetCIStatusTest extends WebTestCase
 
     /**
      * @test
+     * @dataProvider checkSuiteExample
      */
-    public function it_uses_the_check_suite_status_to_determine_if_it_is_red(): void
+    public function it_uses_the_check_suite_status_to_determine_if_it_is_red(array $checkSuite, string $expectedCIStatus): void
     {
-        $ciCheckSuite = [
-            'check_suites' => [
-                ['conclusion' => 'failure', 'status' => 'completed'],
-            ]
-        ];
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciCheckSuite)));
+        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($checkSuite)));
 
         $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), self::PR_COMMIT_REF);
 
-        $this->assertEquals('RED', $actualCIStatus);
+        $this->assertEquals($expectedCIStatus, $actualCIStatus);
         $generatedRequest = $this->requestSpy->getRequest();
         $this->requestSpy->assertMethod('GET', $generatedRequest);
         $this->requestSpy->assertURI('/repos/SamirBoulil/slub/commits/' . self::PR_COMMIT_REF . '/check-suites', $generatedRequest);
         $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
         $this->requestSpy->assertContentEmpty($generatedRequest);
+    }
+
+    public function checkSuiteExample()
+    {
+        return [
+            'Check suite is failed' => [
+                ['check_suites' => [['conclusion' => 'failure', 'status' => 'completed']]],
+                'RED',
+            ],
+            'Check suite is green' => [
+                ['check_suites' => [['conclusion' => 'success', 'status' => 'completed']]],
+                'GREEN',
+            ]
+        ];
     }
 
     /**

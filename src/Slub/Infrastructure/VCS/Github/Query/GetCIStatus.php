@@ -31,8 +31,11 @@ class GetCIStatus
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
     {
         $checkSuite = $this->checkSuite($PRIdentifier, $commitRef);
-        if ($this->isCheckSuiteFailed($checkSuite)) {
+        if ($this->isCheckSuiteStatus($checkSuite, 'failure')) {
             return 'RED';
+        }
+        if ($this->isCheckSuiteStatus($checkSuite, 'success')) {
+            return 'GREEN';
         }
         $checkRuns = $this->checkRuns($PRIdentifier, $commitRef);
 
@@ -130,10 +133,10 @@ class GetCIStatus
         );
     }
 
-    private function isCheckSuiteFailed(array $checkSuites): bool
+    private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool
     {
         $checkSuite = $checkSuites['check_suites'][0];
 
-        return 'completed' === $checkSuite['status'] && 'failure' === $checkSuite['conclusion'];
+        return 'completed' === $checkSuite['status'] && $expectedConclusion === $checkSuite['conclusion'];
     }
 }

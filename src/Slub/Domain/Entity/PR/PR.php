@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
@@ -161,14 +162,32 @@ class PR
 
     public function green(): void
     {
+        if ($this->CIStatus->isGreen()) {
+            return;
+        }
+
         $this->CIStatus = CIStatus::green();
         $this->events[] = CIGreen::ForPR($this->PRIdentifier);
     }
 
     public function red(): void
     {
+        if ($this->CIStatus->isRed()) {
+            return;
+        }
+
         $this->CIStatus = CIStatus::red();
         $this->events[] = CIRed::ForPR($this->PRIdentifier);
+    }
+
+    public function pending(): void
+    {
+        if ($this->CIStatus->isPending()) {
+            return;
+        }
+
+        $this->CIStatus = CIStatus::pending();
+        $this->events[] = CIPending::ForPR($this->PRIdentifier);
     }
 
     public function merged(): void

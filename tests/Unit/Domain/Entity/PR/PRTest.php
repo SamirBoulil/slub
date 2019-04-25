@@ -9,6 +9,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
@@ -168,6 +169,28 @@ class PRTest extends TestCase
         $this->assertEquals($pr->normalize()['CI_STATUS'], 'RED');
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(CIRed::class, current($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_become_pending()
+    {
+        $pr = PR::fromNormalized([
+            'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+            'GTMS'        => 0,
+            'NOT_GTMS'    => 0,
+            'COMMENTS'    => 0,
+            'CI_STATUS'   => 'GREEN',
+            'IS_MERGED'   => false,
+            'MESSAGE_IDS' => ['1'],
+        ]);
+
+        $pr->pending();
+
+        $this->assertEquals($pr->normalize()['CI_STATUS'], 'PENDING');
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(CIPending::class, current($pr->getEvents()));
     }
 
     /**

@@ -1,7 +1,7 @@
 parameters:
-    SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
-    SUPPORTED_CHANNELS: "squad-raccoons,general"
-    GITHUB_WEBHOOK_SECRET: "my_secret"
+    SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
+    SUPPORTED_CHANNELS: 'squad-raccoons,general'
+    GITHUB_WEBHOOK_SECRET: 'my_secret'
 
 services:
     # default configuration for services in *this* file
@@ -20,4 +20,7 @@ services:
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
         arguments:
-            - "%env(SUPPORTED_CHANNELS)%"
+            - '%env(SUPPORTED_CHANNELS)%'
+
+    slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
+        class: Tests\Acceptance\helpers\GetVCSStatusDummy

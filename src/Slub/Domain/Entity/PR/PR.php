@@ -66,9 +66,24 @@ class PR
         $this->messageIdentifiers = $messageIds;
     }
 
-    public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier): self
-    {
-        $pr = new self($PRIdentifier, [$messageIdentifier], 0, 0, 0, CIStatus::pending(), false);
+    public static function create(
+        PRIdentifier $PRIdentifier,
+        MessageIdentifier $messageIdentifier,
+        int $GTMs = 0,
+        int $notGTMs = 0,
+        int $comments = 0,
+        string $CIStatus = 'PENDING',
+        bool $isMerged = false
+    ): self {
+        $pr = new self(
+            $PRIdentifier,
+            [$messageIdentifier],
+            $GTMs,
+            $notGTMs,
+            $comments,
+            CIStatus::fromNormalized($CIStatus),
+            $isMerged
+        );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
 
         return $pr;

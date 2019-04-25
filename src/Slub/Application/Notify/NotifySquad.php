@@ -22,7 +22,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifySquad implements EventSubscriberInterface
 {
-    public const REACTION_PR_PUT_TO_REVIEW = 'ok_hand';
     /** @var string[] */
     public const REACTION_PR_REVIEWED = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     public const REACTION_CI_GREEN = 'white_check_mark';
@@ -79,7 +78,7 @@ class NotifySquad implements EventSubscriberInterface
     private function getReactionsToSet(PR $PR): array
     {
         $normalizedPR = $PR->normalize();
-        $statusBar = [self::REACTION_PR_PUT_TO_REVIEW];
+        $statusBar = [];
         $statusBar[] = $this->getReviewCount($normalizedPR);
         $statusBar[] = $this->getCIStatusReaction($normalizedPR);
         if ($normalizedPR['IS_MERGED']) {

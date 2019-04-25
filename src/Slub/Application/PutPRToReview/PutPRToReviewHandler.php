@@ -10,6 +10,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
+use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -19,6 +20,9 @@ class PutPRToReviewHandler
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
+    /** @var GetVCSStatus */
+    private $getVCSStatusFromGithub;
+
     /** @var IsSupportedInterface */
     private $isSupported;
 
@@ -27,15 +31,17 @@ class PutPRToReviewHandler
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
+        GetVCSStatus $getVCSStatusFromGithub, // Note: Probably this work shouldn't be made here but in the infra
         IsSupportedInterface $isRepositorySupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
+        $this->getVCSStatusFromGithub = $getVCSStatusFromGithub;
         $this->isSupported = $isRepositorySupported;
         $this->logger = $logger;
     }
 
-    public function handle(PutPRToReview $command)
+    public function handle(PutPRToReview $command): void
     {
         if (!$this->isSupported($command)) {
             return;
@@ -68,10 +74,10 @@ class PutPRToReviewHandler
 
     private function createOrUpdatePR(PutPRToReview $command): void
     {
-        if ($this->PRExists($command)) {
-            $this->resentForReview($command);
-        } else {
+        if (!$this->PRExists($command)) {
             $this->createNewPR($command);
+        } else {
+            $this->resendForReview($command);
         }
     }
 
@@ -86,7 +92,7 @@ class PutPRToReviewHandler
         }
     }
 
-    private function resentForReview(PutPRToReview $putPRToReview): void
+    private function resendForReview(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
         $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageIdentifier));
@@ -95,12 +101,18 @@ class PutPRToReviewHandler
 
     private function createNewPR(PutPRToReview $putPRToReview): void
     {
-        $this->PRRepository->save(
-            PR::create(
-                PRIdentifier::create($putPRToReview->PRIdentifier),
-                MessageIdentifier::fromString($putPRToReview->messageIdentifier)
-            )
+        $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
+        $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
+        $PR = PR::create(
+            $PRIdentifier,
+            MessageIdentifier::fromString($putPRToReview->messageIdentifier),
+            $VCSStatus->GTMCount,
+            $VCSStatus->notGTMCount,
+            $VCSStatus->comments,
+            $VCSStatus->CIStatus,
+            $VCSStatus->isMerged
         );
+        $this->PRRepository->save($PR);
     }
 
     private function logIt(PutPRToReview $command): void

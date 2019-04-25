@@ -4,13 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    SUPPORTED_REPOSITORIES: "akeneo/pim-community-dev,SamirBoulil/slub"
-    SUPPORTED_CHANNELS: "squad-raccoons,general"
-    SUPPORTED_CI_CHECKS: "Travis CI - Pull Request,ci/circleci: back_behat_legacy"
-    BOT_USER_ID: "bot_user_id"
+    SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
+    SUPPORTED_CHANNELS: 'squad-raccoons,general'
+    SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
+    BOT_USER_ID: 'bot_user_id'
     locale: 'en'
-    slub.infrastructure.persistence.file_database: "%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json"
-    slub.infrastructure.chat.slack.base_uri: "https://slack.com"
+    slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
+    slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
 
 services:
     # default configuration for services in *this* file
@@ -29,30 +29,31 @@ services:
     slub.application.put_pr_to_review.put_pr_to_review_handler:
         class: Slub\Application\PutPRToReview\PutPRToReviewHandler
         arguments:
-            - "@slub.infrastructure.persistence.pr_repository"
-            - "@slub.infrastructure.query.is_supported"
-            - "@logger"
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.vcs.github.query.get_vcs_status_from_github'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
 
     slub.application.new_review.new_review_handler:
         class: Slub\Application\NewReview\NewReviewHandler
         arguments:
-            - "@slub.infrastructure.persistence.pr_repository"
-            - "@slub.infrastructure.query.is_supported"
-            - "@logger"
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
 
     slub.application.ci_status_update.ci_status_update_handler:
         class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler
         arguments:
-            - "@slub.infrastructure.persistence.pr_repository"
-            - "@slub.infrastructure.query.is_supported"
-            - "@logger"
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
 
     slub.application.merged_pr.merged_pr_handler:
         class: Slub\Application\MergedPR\MergedPRHandler
         arguments:
-            - "@slub.infrastructure.persistence.pr_repository"
-            - "@slub.infrastructure.query.is_supported"
-            - "@logger"
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
 
     slub.application.notify.notify_author:
         class: Slub\Application\Notify\NotifyAuthor
@@ -78,24 +79,24 @@ services:
         class: Doctrine\DBAL\Connection
         factory: 'Slub\Infrastructure\Persistence\Sql\ConnectionFactory::create'
         arguments:
-            - "%env(DATABASE_URL)%"
+            - '%env(DATABASE_URL)%'
 
     slub.infrastructure.persistence.pr_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlPRRepository
         arguments:
-            - "@slub.infrastructure.persistence.sql.database_connection"
-            - "@event_dispatcher"
+            - '@slub.infrastructure.persistence.sql.database_connection'
+            - '@event_dispatcher'
 
     slub.infrastructure.persistence.get_message_ids_for_pr:
         class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetMessageIdsForPR
         arguments:
-            - "@slub.infrastructure.persistence.sql.database_connection"
+            - '@slub.infrastructure.persistence.sql.database_connection'
 
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:
-            - "%env(SUPPORTED_REPOSITORIES)%"
-            - "%env(SUPPORTED_CHANNELS)%"
+            - '%env(SUPPORTED_REPOSITORIES)%'
+            - '%env(SUPPORTED_CHANNELS)%'
 
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:
@@ -114,19 +115,19 @@ services:
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.query.get_bot_reactions_for_message_and_user:
         class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.query.get_bot_user_id:
         class: Slub\Infrastructure\Chat\Slack\GetBotUserId
         arguments:
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
 
     slub.infrastructure.chat.slack.slack_client:
@@ -134,12 +135,12 @@ services:
         arguments:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
-            - '@slub.infrastructure.chat.slack.guzzle_client'
+            - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
             - '%env(BOT_USER_ID)%'
 
-    slub.infrastructure.chat.slack.guzzle_client:
+    slub.infrastructure.http.guzzle_client:
         class: GuzzleHttp\Client
 
     ## VCS
@@ -178,6 +179,34 @@ services:
         arguments:
             - '@slub.application.merged_pr.merged_pr_handler'
 
+    slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
+        class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub
+        arguments:
+            - '@slub.infrastructure.vcs.github.query.get_pr_details'
+            - '@slub.infrastructure.vcs.github.query.find_reviews'
+            - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.query.get_pr_details:
+        class: Slub\Infrastructure\VCS\Github\Query\GetPRDetails
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+
+    slub.infrastructure.vcs.github.query.find_reviews:
+        class: Slub\Infrastructure\VCS\Github\Query\FindReviews
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+
+    slub.infrastructure.vcs.github.query.get_ci_status:
+        class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+
     ## UI
     slub.infrastructure.ui.http.list_prs_action:
         class: Slub\Infrastructure\UI\Http\ListPRsAction
@@ -188,6 +217,6 @@ services:
     slub.infrastructure.installer.cli.InstallerCLI:
         class: Slub\Infrastructure\Installer\CLI\InstallerCLI
         arguments:
-            - "@slub.infrastructure.persistence.sql.database_connection"
+            - '@slub.infrastructure.persistence.sql.database_connection'
         tags:
             - { name: console.command }

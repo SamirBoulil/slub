@@ -29,9 +29,11 @@
     "symfony/monolog-bundle": "^3.3",
     "symfony/yaml": "4.2.*",
     "webmozart/assert": "^1.4",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-json": "*"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-master",
     "behat/behat": "^3.5",
     "behat/symfony2-extension": "^2.1",
     "friendsofphp/php-cs-fixer": "^2.14",

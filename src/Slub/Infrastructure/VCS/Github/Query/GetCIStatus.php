@@ -116,29 +116,24 @@ class GetCIStatus
             return 'PENDING';
         }
 
-        $hasAFailure = array_reduce(
-            $supportedCheckRuns,
-            function ($current, $checkRun) {
+        $hasCheckRun = function (string $statusToFilterOn) {
+            return function ($current, $checkRun) use ($statusToFilterOn) {
                 if (null !== $current) {
                     return $current;
                 }
 
-                return 'failure' === $checkRun['conclusion'];
-            }
-        );
+                return $statusToFilterOn === $checkRun['conclusion'];
+            };
+        };
 
-        $hasAllSuccess = array_reduce(
-            $supportedCheckRuns,
-            function ($current, $checkRun) {
-                return 'success' === $checkRun['conclusion'] && true === $current;
-            },
-            true
-        );
+        $hasAFailure = array_reduce($supportedCheckRuns, $hasCheckRun('failure'));
+        $hasSuccess = array_reduce($supportedCheckRuns, $hasCheckRun('success'));
+
         if ($hasAFailure) {
             return 'RED';
         }
 
-        if ($hasAllSuccess) {
+        if ($hasSuccess) {
             return 'GREEN';
         }
 

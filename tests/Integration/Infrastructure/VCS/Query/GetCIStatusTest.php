@@ -130,7 +130,7 @@ class GetCIStatusTest extends WebTestCase
                 ],
                 'RED'
             ],
-            'Mixed CI checks statuses' => [
+            'Mixed CI checks statuses: red' => [
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed'],
@@ -139,7 +139,27 @@ class GetCIStatusTest extends WebTestCase
                     ],
                 ],
                 'RED'
-            ]
+            ],
+            'Mixed CI checks statuses: green' => [
+                [
+                    'check_runs' => [
+                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'neutral', 'status' => 'pending'],
+                    ],
+                ],
+                'GREEN'
+            ],
+            'Mixed CI checks statuses: pending' => [
+                [
+                    'check_runs' => [
+                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
+                    ],
+                ],
+                'PENDING'
+            ],
         ];
     }
 

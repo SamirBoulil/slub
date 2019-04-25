@@ -109,28 +109,45 @@ class GetCIStatus
 
     private function deductCIStatus(array $checkRuns): string
     {
-        return array_reduce(
-            $checkRuns['check_runs'],
-            function (string $current, array $ciStatus) {
-                if (!in_array($ciStatus['name'], $this->supportedCIChecks)
-                    || 'completed' !== $ciStatus['status']
-                    || $current === 'RED'
-                ) {
+        $supportedCheckRuns = array_filter($checkRuns['check_runs'], function(array $checkRun) {
+            return $this->isCheckRunSupported($checkRun);
+        });
+        if (empty($supportedCheckRuns)) {
+            return 'PENDING';
+        }
+
+        $hasAFailure = array_reduce(
+            $supportedCheckRuns,
+            function ($current, $checkRun) {
+                if (null !== $current) {
                     return $current;
                 }
 
-                if ('success' === $ciStatus['conclusion']) {
-                    return 'GREEN';
-                }
-
-                if ('failure' === $ciStatus['conclusion']) {
-                    return 'RED';
-                }
-
-                return $current;
-            },
-            'PENDING'
+                return 'failure' === $checkRun['conclusion'];
+            }
         );
+
+        $hasAllSuccess = array_reduce(
+            $supportedCheckRuns,
+            function ($current, $checkRun) {
+                return 'success' === $checkRun['conclusion'] && true === $current;
+            },
+            true
+        );
+        if ($hasAFailure) {
+            return 'RED';
+        }
+
+        if ($hasAllSuccess) {
+            return 'GREEN';
+        }
+
+        return 'PENDING';
+    }
+
+    private function isCheckRunSupported(array $checkRun): bool
+    {
+        return in_array($checkRun['name'], $this->supportedCIChecks);
     }
 
     private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool

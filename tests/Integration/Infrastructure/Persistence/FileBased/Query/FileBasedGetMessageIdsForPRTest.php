@@ -62,7 +62,8 @@ class FileBasedGetMessageIdsForPRTest extends KernelTestCase
         /** @var PRRepositoryInterface $fileBasedPRRepository */
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $PR = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), MessageIdentifier::fromString(current($messageIds)), 0, 0, 0, 'pending', false
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            MessageIdentifier::fromString(current($messageIds))
         );
         for ($i = 1, $iMax = \count($messageIds); $i < $iMax; $i++) {
             $PR->putToReviewAgainViaMessage(MessageIdentifier::fromString($messageIds[$i]));

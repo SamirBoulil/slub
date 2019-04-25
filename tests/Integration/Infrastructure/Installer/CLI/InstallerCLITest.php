@@ -103,7 +103,8 @@ class InstallerCLITest extends KernelTestCase
         $this->currentPRIdentifier = PRIdentifier::create('test_pr');
         $prRepository->save(
             PR::create(
-                $this->currentPRIdentifier, MessageIdentifier::create('CHANNEL_ID@1111'), 0, 0, 0, 'pending', false
+                $this->currentPRIdentifier,
+                MessageIdentifier::create('CHANNEL_ID@1111')
             )
         );
     }

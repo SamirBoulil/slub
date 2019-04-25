@@ -23,7 +23,7 @@ class PRTest extends TestCase
         $expectedPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $expectedMessageIdentifier = MessageIdentifier::fromString('1');
 
-        $pr = PR::create($expectedPRIdentifier, $expectedMessageIdentifier, 0, 0, 0, 'pending', false);
+        $pr = PR::create($expectedPRIdentifier, $expectedMessageIdentifier);
 
         $this->assertSame(
             [
@@ -78,7 +78,8 @@ class PRTest extends TestCase
     public function it_can_be_GTM_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['GTMS']);
 
@@ -95,7 +96,8 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTM_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
@@ -112,7 +114,8 @@ class PRTest extends TestCase
     public function it_can_be_commented_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
 
@@ -196,7 +199,7 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
-        $pr = PR::create($identifier, MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false);
+        $pr = PR::create($identifier, MessageIdentifier::fromString('1'));
 
         $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
@@ -207,7 +210,8 @@ class PRTest extends TestCase
     public function it_returns_the_message_ids()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), MessageIdentifier::fromString('1'), 0, 0, 0, 'pending', false
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            MessageIdentifier::fromString('1')
         );
         $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
     }

@@ -181,6 +181,27 @@ services:
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub
         arguments:
+            - '@slub.infrastructure.vcs.github.query.get_pr_details'
+            - '@slub.infrastructure.vcs.github.query.find_reviews'
+            - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.query.get_pr_details:
+        class: Slub\Infrastructure\VCS\Github\Query\GetPRDetails
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+
+    slub.infrastructure.vcs.github.query.find_reviews:
+        class: Slub\Infrastructure\VCS\Github\Query\FindReviews
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+
+    slub.infrastructure.vcs.github.query.get_ci_status:
+        class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus
+        arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'

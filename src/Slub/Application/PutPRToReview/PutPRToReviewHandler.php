@@ -10,9 +10,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
-use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\IsSupportedInterface;
-use Slub\Domain\Query\VCSStatus;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -24,25 +22,20 @@ class PutPRToReviewHandler
     /** @var IsSupportedInterface */
     private $isSupported;
 
-    /** @var GetVCSStatus */
-    private $getVCSStatus;
-
     /** @var LoggerInterface */
     private $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
         IsSupportedInterface $isRepositorySupported,
-        GetVCSStatus $getVCSStatus,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isRepositorySupported;
         $this->logger = $logger;
-        $this->getVCSStatus = $getVCSStatus;
     }
 
-    public function handle(PutPRToReview $command)
+    public function handle(PutPRToReview $command): void
     {
         if (!$this->isSupported($command)) {
             return;
@@ -78,7 +71,7 @@ class PutPRToReviewHandler
         if (!$this->PRExists($command)) {
             $this->createNewPR($command);
         } else {
-            $this->resentForReview($command);
+            $this->resendForReview($command);
         }
     }
 
@@ -93,7 +86,7 @@ class PutPRToReviewHandler
         }
     }
 
-    private function resentForReview(PutPRToReview $putPRToReview): void
+    private function resendForReview(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
         $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageIdentifier));
@@ -103,8 +96,11 @@ class PutPRToReviewHandler
     private function createNewPR(PutPRToReview $putPRToReview): void
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
-        $PR = PR::create($PRIdentifier, MessageIdentifier::fromString($putPRToReview->messageIdentifier));
-        $PR->synchronize($this->getVCSStatus->fetch($PRIdentifier));
+        $PR = PR::create(
+            $PRIdentifier,
+            MessageIdentifier::fromString($putPRToReview->messageIdentifier)
+
+        );
         $this->PRRepository->save($PR);
     }
 

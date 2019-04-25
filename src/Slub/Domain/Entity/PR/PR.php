@@ -11,7 +11,6 @@ use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
-use Slub\Domain\Query\VCSStatus;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -28,7 +27,7 @@ class PR
     /** @var Event[] */
     private $events = [];
 
-   /** @var PRIdentifier */
+    /** @var PRIdentifier */
     private $PRIdentifier;
 
     /** @var MessageIdentifier[] */
@@ -67,9 +66,24 @@ class PR
         $this->messageIdentifiers = $messageIds;
     }
 
-    public static function create(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier): self
-    {
-        $pr = new self($PRIdentifier, [$messageIdentifier], 0, 0, 0, CIStatus::pending(), false);
+    public static function create(
+        PRIdentifier $PRIdentifier,
+        MessageIdentifier $messageIdentifier,
+        int $GTMs = 0,
+        int $notGTMs = 0,
+        int $comments = 0,
+        string $CIStatus = 'PENDING',
+        bool $isMerged = false
+    ): self {
+        $pr = new self(
+            $PRIdentifier,
+            [$messageIdentifier],
+            $GTMs,
+            $notGTMs,
+            $comments,
+            CIStatus::fromNormalized($CIStatus),
+            $isMerged
+        );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
 
         return $pr;
@@ -196,9 +210,5 @@ class PR
 
         $this->messageIdentifiers[] = $newMessageId;
         $this->events[] = PRPutToReview::forPR($this->PRIdentifier, $newMessageId);
-    }
-
-    public function synchronize(VCSStatus $VCSStatuses): voic
-    {
     }
 }

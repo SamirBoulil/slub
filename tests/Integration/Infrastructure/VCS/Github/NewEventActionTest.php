@@ -65,7 +65,8 @@ class NewEventActionTest extends WebTestCase
         $PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $PRRepository->save(
             PR::create(
-                PRIdentifier::create('SamirBoulil/slub/10'), MessageIdentifier::create('CHANNEL_ID@1111'), 0, 0, 0, 'pending', false
+                PRIdentifier::create('SamirBoulil/slub/10'),
+                MessageIdentifier::create('CHANNEL_ID@1111')
             )
         );
     }

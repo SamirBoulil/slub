@@ -1,4 +1,4 @@
-{
+
     "behat/behat": {
         "version": "v3.5.0"
     },

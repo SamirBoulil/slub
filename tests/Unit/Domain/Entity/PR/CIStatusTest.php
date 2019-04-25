@@ -56,10 +56,40 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_green()
+    public function it_is_normalizable()
     {
         $this->assertEquals(CIStatus::green()->stringValue(), 'GREEN');
         $this->assertEquals(CIStatus::pending()->stringValue(), 'PENDING');
         $this->assertEquals(CIStatus::red()->stringValue(), 'RED');
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_if_it_is_green()
+    {
+        $this->assertTrue(CIStatus::green()->isGreen());
+        $this->assertFalse(CIStatus::green()->isRed());
+        $this->assertFalse(CIStatus::green()->isPending());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_if_it_is_red()
+    {
+        $this->assertTrue(CIStatus::red()->isRed());
+        $this->assertFalse(CIStatus::red()->isGreen());
+        $this->assertFalse(CIStatus::red()->isPending());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_if_it_is_pending()
+    {
+        $this->assertTrue(CIStatus::pending()->isPending());
+        $this->assertFalse(CIStatus::pending()->isRed());
+        $this->assertFalse(CIStatus::pending()->isGreen());
     }
 }

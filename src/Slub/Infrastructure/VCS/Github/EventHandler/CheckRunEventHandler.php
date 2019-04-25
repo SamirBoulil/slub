@@ -42,20 +42,12 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     private function getCIStatusUpdate(Request $request): array
     {
-        return json_decode((string) $request->getContent(), true);
+        return json_decode((string)$request->getContent(), true);
     }
 
     private function isCIStatusUpdateSupported(array $CIStatusUpdate): bool
     {
-        if ('completed' !== $CIStatusUpdate['action']) {
-            return false;
-        }
-        $conclusion = $CIStatusUpdate['check_run']['conclusion'];
-        if ('success' === $conclusion) {
-            return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
-        }
-
-        return 'failure' === $conclusion;
+        return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
     }
 
     private function updateCIStatus(array $CIStatusUpdate): void
@@ -63,7 +55,7 @@ class CheckRunEventHandler implements EventHandlerInterface
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->isGreen = $this->isGreen($CIStatusUpdate);
+        $command->status = $this->getStatus($CIStatusUpdate);
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -76,8 +68,25 @@ class CheckRunEventHandler implements EventHandlerInterface
         );
     }
 
-    private function isGreen(array $CIStatusUpdate): bool
+    private function getStatus(array $CIStatusUpdate): string
     {
-        return 'success' === $CIStatusUpdate['check_run']['conclusion'];
+        if ('queued' === $CIStatusUpdate['check_run']['status']) {
+            return 'PENDING';
+        }
+
+        $conclusion = $CIStatusUpdate['check_run']['conclusion'];
+        if ('success' === $conclusion) {
+            return 'GREEN';
+        }
+        if ('failure' === $conclusion) {
+            return 'RED';
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf(
+                'Expected conclusion to be one of "success" or "failure", but "%s" found',
+                $conclusion
+            )
+        );
     }
 }

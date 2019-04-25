@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\helpers;
 
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
@@ -30,6 +31,7 @@ class EventsSpy implements EventSubscriberInterface
             PRCommented::class => 'notifyPRCommented',
             CIGreen::class => 'notifyCIGreen',
             CIRed::class => 'notifyCIRed',
+            CIPending::class => 'notifyCIPending',
             PRMerged::class => 'notifyPRMerged',
         ];
     }
@@ -92,6 +94,16 @@ class EventsSpy implements EventSubscriberInterface
     public function CIRedEventDispatched(): bool
     {
         return $this->events[CIRed::class] ?? false;
+    }
+
+    public function notifyCIPending(CIPending $CIPending)
+    {
+        $this->events[get_class($CIPending)] = true;
+    }
+
+    public function CIPendingEventDispatched(): bool
+    {
+        return $this->events[CIPending::class] ?? false;
     }
 
     public function notifyPRMerged(PRMerged $merged): void

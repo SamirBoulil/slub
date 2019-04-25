@@ -45,7 +45,7 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_to_listen_to_green_ci_for_unsupported_check_runs()
+    public function it_does_not_to_listen_to_unsupported_check_runs()
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedGreenCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
@@ -73,12 +73,13 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_nothing_for_unsupported_results()
+    public function it_listens_to_ci_pending()
     {
+        $this->createRedPR();
         $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedResult(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->pendingCheckRun(), $this->get('GITHUB_WEBHOOK_SECRET')));
 
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->unsupportedResult());
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->pendingCheckRun());
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertPending();
@@ -87,12 +88,13 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_nothing_for_unsupported_completion()
+    public function it_throws_for_unsupported_conclusion()
     {
         $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedAction(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedResult(), $this->get('GITHUB_WEBHOOK_SECRET')));
 
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->unsupportedAction());
+        $this->expectException(\Exception::class);
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->unsupportedResult());
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertPending();
@@ -168,37 +170,6 @@ JSON;
   "check_run": {
     "status": "completed",
     "conclusion": "failure",
-    "check_suite": {
-      "pull_requests": [
-        {
-          "number": 10
-        }
-      ]
-    },
-    "pull_requests": [
-      {
-        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
-        "number": 26
-      }
-    ]
-  },
-  "repository": {
-    "full_name": "SamirBoulil/slub"
-  }
-}
-JSON;
-
-        return $json;
-    }
-
-    private function unsupportedResult(): string
-    {
-        $json = <<<JSON
-{
-  "action": "completed",
-  "check_run": {
-    "status": "completed",
-    "conclusion": "WRONG_CONCLUSION",
     "name": "travis",
     "check_suite": {
       "pull_requests": [
@@ -223,14 +194,45 @@ JSON;
         return $json;
     }
 
-    private function unsupportedAction(): string
+    private function pendingCheckRun(): string
     {
         $json = <<<JSON
 {
-  "action": "WRONG_COMPLETION",
+  "action": "created",
+  "check_run": {
+    "status": "queued",
+    "conclusion": null,
+    "name": "travis",
+    "check_suite": {
+      "pull_requests": [
+        {
+          "number": 10
+        }
+      ]
+    },
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
+        "number": 26
+      }
+    ]
+  },
+  "repository": {
+    "full_name": "SamirBoulil/slub"
+  }
+}
+JSON;
+        return $json;
+    }
+
+    private function unsupportedResult(): string
+    {
+        $json = <<<JSON
+{
+  "action": "completed",
   "check_run": {
     "status": "completed",
-    "conclusion": "success",
+    "conclusion": "WRONG_CONCLUSION",
     "name": "travis",
     "check_suite": {
       "pull_requests": [
@@ -271,5 +273,12 @@ JSON;
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
         $this->assertEquals('PENDING', $PR->normalize()['CI_STATUS']);
+    }
+
+    private function createRedPR(): void
+    {
+        $PR = $this->PRRepository->getBy(PRIdentifier::create(self::PRIdentifier));
+        $PR->red();
+        $this->PRRepository->save($PR);
     }
 }

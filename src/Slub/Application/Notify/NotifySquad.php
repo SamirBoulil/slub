@@ -9,6 +9,7 @@ use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
+use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
@@ -53,6 +54,7 @@ class NotifySquad implements EventSubscriberInterface
             PRNotGTMed::class => 'whenPRHasBeenNotGTMed',
             CIGreen::class => 'whenCIIsGreen',
             CIRed::class => 'whenCIIsRed',
+            CIPending::class => 'whenCIPending',
             PRMerged::class => 'whenPRIsMerged',
         ];
     }
@@ -129,6 +131,11 @@ class NotifySquad implements EventSubscriberInterface
     }
 
     public function whenCIIsRed(CIRed $event): void
+    {
+        $this->synchronizeReactions($event->PRIdentifier());
+    }
+
+    public function whenCIPending(CIPending $event): void
     {
         $this->synchronizeReactions($event->PRIdentifier());
     }

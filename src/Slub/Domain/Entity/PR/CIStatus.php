@@ -49,4 +49,19 @@ class CIStatus
     {
         return $this->status;
     }
+
+    public function isGreen(): bool
+    {
+        return self::GREEN === $this->status;
+    }
+
+    public function isRed(): bool
+    {
+        return self::RED === $this->status;
+    }
+
+    public function isPending(): bool
+    {
+        return self::PENDING === $this->status;
+    }
 }

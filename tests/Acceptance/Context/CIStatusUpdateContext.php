@@ -69,7 +69,7 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
-        $CIStatusUpdate->isGreen = true;
+        $CIStatusUpdate->status = 'GREEN';
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -105,7 +105,7 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
-        $CIStatusUpdate->isGreen = false;
+        $CIStatusUpdate->status = 'RED';
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -141,7 +141,7 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'unsupported_repository';
         $CIStatusUpdate->PRIdentifier = 'unsupported_repository/1010';
-        $CIStatusUpdate->isGreen = true;
+        $CIStatusUpdate->status = 'GREEN';
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -180,6 +180,55 @@ class CIStatusUpdateContext extends FeatureContext
         $this->chatClientSpy->assertHasBeenCalledWith(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_CI_RED
+        );
+    }
+
+    /**
+     * @Given /^a PR in review being green$/
+     */
+    public function aPRInReviewBeingGreen()
+    {
+        $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
+        $PR = PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier);
+        $PR->green();
+        $this->PRRepository->save($PR);
+        $this->chatClientSpy->reset();
+    }
+
+    /**
+     * @When /^the CI is being running for the PR$/
+     */
+    public function theCIIsBeingRunningForThePR()
+    {
+        $CIStatusUpdate = new CIStatusUpdate();
+        $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
+        $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $CIStatusUpdate->status = 'PENDING';
+        $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
+    }
+
+    /**
+     * @Then /^the PR should be pending$/
+     */
+    public function thePRShouldBePending()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'PENDING', 'PR is expected to be pending, but it wasn\'t');
+    }
+
+    /**
+     * @Given /^the squad should be notified that the ci is pending for the PR$/
+     */
+    public function theSquadShouldBeNotifiedThatTheCiIsPendingForThePR()
+    {
+        Assert::assertTrue(
+            $this->eventSpy->CIPendingEventDispatched(),
+            'Expected CIPending to be dispatched, but was not found'
+        );
+        $this->chatClientSpy->assertHasBeenCalledWith(
+            $this->currentMessageIdentifier,
+            NotifySquad::REACTION_CI_PENDING
         );
     }
 }

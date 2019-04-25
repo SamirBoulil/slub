@@ -21,4 +21,7 @@ class CIStatusUpdate
 
     /** @var bool */
     public $isGreen;
+
+    /** @var string */
+    public $status;
 }

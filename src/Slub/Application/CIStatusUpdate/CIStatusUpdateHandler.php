@@ -47,7 +47,7 @@ class CIStatusUpdateHandler
     private function isSupported(CIStatusUpdate $CIStatusUpdate): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($CIStatusUpdate->repositoryIdentifier);
-        Assert::boolean($CIStatusUpdate->isGreen);
+        Assert::string($CIStatusUpdate->status);
 
         return $this->isSupported->repository($repositoryIdentifier);
     }
@@ -55,10 +55,10 @@ class CIStatusUpdateHandler
     private function updateCIStatus(CIStatusUpdate $CIStatusUpdate): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
-        if ($CIStatusUpdate->isGreen) {
-            $PR->green();
-        } else {
-            $PR->red();
+        switch ($CIStatusUpdate->status) {
+            case 'GREEN': $PR->green(); break;
+            case 'RED': $PR->red(); break;
+            case 'PENDING': $PR->pending(); break;
         }
         $this->PRRepository->save($PR);
     }

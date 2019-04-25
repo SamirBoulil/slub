@@ -7,11 +7,14 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub?ref=badge_shield)
 
 # Ideas
-- Be notified *who* merged the PR ?
+- Add usernames for actions
+- Add emoji in status bar for people who reviewed instead of counts
 - Time to review AVG
+- Daily reminders of PR to review (per squad :( / channels)
 
 # To refactor
 - Slub/Infrastructure/Chat/Slack/SlubBot.php:77 - To rework PRIdentifier should be created with "repository" and "PRNumber" to create the PRIdentifier
 - config/services.yaml:19 - set public classes to false: the "test" env should have public true (unless the bug has been fixed)
 - Remove filebased ?
 - Rework the usage of guzzle mocks + setups in one class common place
+- /!\ Remove GetVCSStatus dependency in the putToReviewHandler -> get the information before creating the command

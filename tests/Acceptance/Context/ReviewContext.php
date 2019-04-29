@@ -116,22 +116,6 @@ class ReviewContext extends FeatureContext
     }
 
     /**
-     * @Then /^the squad should be notified that the PR has one more NOT GTM$/
-     */
-    public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreNOTGTM()
-    {
-        Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
-        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        $notGTMCount = $PR->normalize()['NOT_GTMS'];
-        Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d NOT GTMS, expected %d', $notGTMCount, 1));
-        Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
-        $this->chatClientSpy->assertHasBeenCalledWith(
-            $this->currentMessageIdentifier,
-            NotifySquad::REACTION_PR_REVIEWED[1]
-        );
-    }
-
-    /**
      * @When /^a PR is reviewed on an unsupported repository$/
      */
     public function aPullRequestIsReviewedOnAnUnsupportedRepository()

@@ -17,7 +17,6 @@ Feature: Improve the communication between the author of the pull request (PR) a
     When the PR is NOT GTMED
     Then the PR should be NOT GTMed
     And the author should be notified that the PR has one more NOT GTM
-    And the squad should be notified that the PR has one more NOT GTM
 
   @nominal
   Scenario: Notify the squad when the PR is commented

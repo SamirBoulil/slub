@@ -162,6 +162,9 @@ services:
             - method: addEventHandler
               arguments:
                   - '@slub.infrastructure.vcs.github.event_handler.pr_merged'
+            - method: addEventHandler
+              arguments:
+                  - '@slub.infrastructure.vcs.github.event_handler.status_updated'
 
     slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
@@ -170,6 +173,12 @@ services:
 
     slub.infrastructure.vcs.github.event_handler.check_run:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+        arguments:
+            - '@slub.application.ci_status_update.ci_status_update_handler'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.event_handler.status_updated:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '%env(SUPPORTED_CI_CHECKS)%'

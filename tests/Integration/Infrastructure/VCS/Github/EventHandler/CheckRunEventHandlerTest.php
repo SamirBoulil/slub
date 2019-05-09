@@ -40,7 +40,6 @@ class CheckRunEventHandlerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertGreen();
-        $this->assertTrue(false);
     }
 
     /**

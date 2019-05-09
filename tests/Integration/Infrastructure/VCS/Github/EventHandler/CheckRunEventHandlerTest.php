@@ -45,7 +45,7 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_to_listen_to_unsupported_check_runs()
+    public function it_does_not_to_listen_to_unsupported_and_green_check_runs()
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedGreenCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
@@ -59,12 +59,12 @@ class CheckRunEventHandlerTest extends WebTestCase
     /**
      * @test
      */
-    public function it_listens_to_red_ci()
+    public function it_listens_to_all_red_ci()
     {
         $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->redCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->redCIUnsupportedCheck(), $this->get('GITHUB_WEBHOOK_SECRET')));
 
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->redCI());
+        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->redCIUnsupportedCheck());
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertRed();
@@ -162,7 +162,7 @@ JSON;
         return $json;
     }
 
-    private function redCI(): string
+    private function redCIUnsupportedCheck(): string
     {
         $json = <<<JSON
 {
@@ -170,7 +170,7 @@ JSON;
   "check_run": {
     "status": "completed",
     "conclusion": "failure",
-    "name": "travis",
+    "name": "unsupported check run",
     "check_suite": {
       "pull_requests": [
         {

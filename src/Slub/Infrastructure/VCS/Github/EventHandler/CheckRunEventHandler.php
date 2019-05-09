@@ -35,19 +35,24 @@ class CheckRunEventHandler implements EventHandlerInterface
     public function handle(Request $request): void
     {
         $CIStatusUpdate = $this->getCIStatusUpdate($request);
-        if ($this->isCIStatusUpdateSupported($CIStatusUpdate)) {
-            $this->updateCIStatus($CIStatusUpdate);
+        if ($this->isCICheckGreenButNotSupported($CIStatusUpdate)) {
+            return;
         }
+
+        $this->updateCIStatus($CIStatusUpdate);
+    }
+
+    private function isCICheckGreenButNotSupported(array $CIStatusUpdate): bool
+    {
+        $isGreen = 'GREEN' === $this->getStatus($CIStatusUpdate);
+        $isSupported = in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
+
+        return $isGreen && !$isSupported;
     }
 
     private function getCIStatusUpdate(Request $request): array
     {
-        return json_decode((string)$request->getContent(), true);
-    }
-
-    private function isCIStatusUpdateSupported(array $CIStatusUpdate): bool
-    {
-        return in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
+        return json_decode((string) $request->getContent(), true);
     }
 
     private function updateCIStatus(array $CIStatusUpdate): void

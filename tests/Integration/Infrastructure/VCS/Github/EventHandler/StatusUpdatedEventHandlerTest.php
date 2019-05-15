@@ -14,7 +14,7 @@ use Tests\Integration\Infrastructure\WebTestCase;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class StatusUpdatedEventHandler extends WebTestCase
+class StatusUpdatedEventHandlerTest extends WebTestCase
 {
     private const PRIdentifier = 'SamirBoulil/slub/10';
 

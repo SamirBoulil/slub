@@ -8,6 +8,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tests\Integration\Infrastructure\WebTestCase;
 

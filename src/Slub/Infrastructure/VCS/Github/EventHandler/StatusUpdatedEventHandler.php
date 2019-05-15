@@ -77,12 +77,12 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     {
         $status = $statusUpdate['state'];
         switch ($status) {
-            case 'pending' :
+            case 'pending':
                 return 'PENDING';
-            case 'success' :
+            case 'success':
                 return 'GREEN';
-            case 'error' :
-            case 'failure' :
+            case 'error':
+            case 'failure':
                 return 'RED';
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported status "%s"', $status));

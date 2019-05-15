@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
-use Slub\Domain\Entity\PR\MessageIdentifier;
-
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */

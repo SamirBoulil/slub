@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Query;
 
-use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Tests\Integration\Infrastructure\WebTestCase;
 
@@ -14,172 +18,143 @@ use Tests\Integration\Infrastructure\WebTestCase;
  */
 class GetCIStatusTest extends WebTestCase
 {
-    private const AUTH_TOKEN = 'TOKEN';
-    private const PR_COMMIT_REF = 'pr_commit_ref';
-    private const SUPPORTED_CI_CHECK_1 = 'supported_1';
-    private const SUPPORTED_CI_CHECK_2 = 'supported_2';
-    private const SUPPORTED_CI_CHECK_3 = 'supported_3';
-    private const NOT_SUPPORTED_CI_CHECK = 'unsupported';
+    private const PR_IDENTIFIER = 'SamirBoulil/slub/36';
+    private const COMMIT_REF = 'commit_ref';
 
-    /** @var GetCIStatus*/
+    /** @var ObjectProphecy */
+    private $getStatusCheckStatus;
+
+    /** @var ObjectProphecy */
+    private $getCheckRunStatus;
+
+    /** @var ObjectProphecy */
+    private $getCheckSuiteStatus;
+
+    /** @var GetCIStatus */
     private $getCIStatus;
-
-    /** @var GuzzleSpy */
-    private $requestSpy;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->requestSpy = new GuzzleSpy();
+        $this->getCheckSuiteStatus = $this->prophesize(GetCheckSuiteStatus::class);
+        $this->getCheckRunStatus = $this->prophesize(GetCheckRunStatus::class);
+        $this->getStatusCheckStatus = $this->prophesize(GetStatusChecksStatus::class);
+
         $this->getCIStatus = new GetCIStatus(
-            $this->requestSpy->client(),
-            self::AUTH_TOKEN,
-            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3])
+            $this->getCheckSuiteStatus->reveal(),
+            $this->getCheckRunStatus->reveal(),
+            $this->getStatusCheckStatus->reveal()
         );
     }
 
     /**
      * @test
-     * @dataProvider checkSuiteExample
+     * @dataProvider ciStatusesExamples
      */
-    public function it_uses_the_check_suite_status_to_determine_if_it_is_red(array $checkSuite, string $expectedCIStatus): void
-    {
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($checkSuite)));
+    public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
+        string $checkSuiteStatus,
+        ?string $checkRunStatus,
+        ?string $statusCheckStatus,
+        string $expectedCIStatus
+    ): void {
+        $this->mockIndependentResults($checkSuiteStatus, $checkRunStatus, $statusCheckStatus);
 
-        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), self::PR_COMMIT_REF);
+        $actualCIStatus = $this->getCIStatus();
 
-        $this->assertEquals($expectedCIStatus, $actualCIStatus);
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI('/repos/SamirBoulil/slub/commits/' . self::PR_COMMIT_REF . '/check-suites', $generatedRequest);
-        $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
+        self::assertEquals($expectedCIStatus, $actualCIStatus);
     }
 
-    public function checkSuiteExample()
+    public function ciStatusesExamples(): array
     {
         return [
-            'Check suite is failed' => [
-                ['check_suites' => [['conclusion' => 'failure', 'status' => 'completed']]],
+            'The CI is "GREEN" if the check suite is "GREEN"'                                                          => [
+                'GREEN',
+                null,
+                null,
+                'GREEN'
+            ],
+            'The CI is "RED" if the check suite is "RED"'                                                              => [
+                'RED',
+                null,
+                null,
+                'RED'
+            ],
+            'If the Check suite / status check are "PENDING", the CI result depends on the check run result (GREEN)'   => [
+                'PENDING',
+                'GREEN',
+                'PENDING',
+                'GREEN',
+            ],
+            'If the Check suite / status check are "PENDING", the CI result depends on the check run result (RED)'     => [
+                'PENDING',
+                'RED',
+                'PENDING',
                 'RED',
             ],
-            'Check suite is green' => [
-                ['check_suites' => [['conclusion' => 'success', 'status' => 'completed']]],
+            'If the Check suite / check run are "PENDING", the CI result depends on the status check result (GREEN)'   => [
+                'PENDING',
+                'PENDING',
                 'GREEN',
-            ]
+                'GREEN',
+            ],
+            'If the Check suite / check run are "PENDING", the CI result depends on the status check result (RED)'     => [
+                'PENDING',
+                'PENDING',
+                'RED',
+                'RED',
+            ],
+            'If the Check suite is "PENDING", and check run is RED then the status is RED'                             => [
+                'PENDING',
+                'RED',
+                'GREEN',
+                'RED',
+            ],
+            'If the Check suite is "PENDING", and status check is RED then the status is RED'                          => [
+                'PENDING',
+                'GREEN',
+                'RED',
+                'RED',
+            ],
+            'If the Check suite is "PENDING", and both status check and check runs are GREEN then the status is GREEN' => [
+                'PENDING',
+                'GREEN',
+                'GREEN',
+                'GREEN',
+            ],
         ];
     }
 
-    /**
-     * @test
-     * @dataProvider checkRunsExamples
-     */
-    public function it_uses_the_check_runs_status_when_the_check_suite_is_not_failed(array $ciCheckRuns, string $expectedCIStatus): void
-    {
-        $this->setCheckSuitePending();
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciCheckRuns)));
+    private function mockIndependentResults(
+        string $checkSuiteStatus,
+        ?string $checkRunStatus,
+        ?string $statusCheckStatus
+    ): void {
+        $prIdentifierArgument = Argument::that(
+            function (PRIdentifier $PRIdentifier) {
+                return $PRIdentifier->equals($PRIdentifier::fromString(self::PR_IDENTIFIER));
+            }
+        );
+        $commitRefArgument = Argument::that(
+            function (string $commitRef) {
+                return self::COMMIT_REF === $commitRef;
+            }
+        );
 
-        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), self::PR_COMMIT_REF);
-
-        $this->assertEquals($expectedCIStatus, $actualCIStatus);
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI('/repos/SamirBoulil/slub/commits/' . self::PR_COMMIT_REF . '/check-runs', $generatedRequest);
-        $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
+        $this->getCheckSuiteStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
+            $checkSuiteStatus
+        );
+        $this->getCheckRunStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
+            $checkRunStatus
+        );
+        $this->getStatusCheckStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
+            $statusCheckStatus
+        );
     }
 
-    public function checkRunsExamples(): array
+    private function getCIStatus(): string
     {
-        return [
-            'CI Checks not supported' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'failure'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed']
-                    ],
-                ],
-                'PENDING'
-            ],
-            'Supported CI Checks not run' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed']
-                    ],
-                ],
-                'PENDING'
-            ],
-            'Multiple CI checks Green' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                    ],
-                ],
-                'GREEN'
-            ],
-            'Multiple CI checks Red' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'failure', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed'],
-                    ],
-                ],
-                'RED'
-            ],
-            'Multiple CI checks Pending' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'PENDING'
-            ],
-            'Mixed CI checks statuses: red' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'RED'
-            ],
-            'Mixed CI checks statuses: green' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'GREEN'
-            ]
-        ];
-    }
+        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
 
-    /**
-     * @test
-     */
-    public function it_throws_if_the_response_is_malformed(): void
-    {
-        $this->requestSpy->stubResponse(new Response(200, [], '{'));
-        $this->expectException(\RuntimeException::class);
-
-        $this->getCIStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');
-    }
-
-    private function setCheckSuitePending(): void
-    {
-        $ciCheckSuite = [
-            'check_suites' => [
-                ['conclusion' => 'pending', 'status' => 'completed'],
-            ]
-        ];
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciCheckSuite)));
+        return $actualCIStatus;
     }
 }

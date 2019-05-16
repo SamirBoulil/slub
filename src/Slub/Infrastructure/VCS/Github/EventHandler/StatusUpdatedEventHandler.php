@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
+use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -15,15 +16,19 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 {
     private const STATUS_UPDATE_EVENT_TYPE = 'status';
 
-    /** @var string[] */
-    private $supportedStatusNames;
-
     /** @var CIStatusUpdateHandler */
     private $CIStatusUpdateHandler;
 
-    public function __construct(CIStatusUpdateHandler $CIStatusUpdateHandler, string $supportedStatusNames)
+    /** @var FindPRNumber*/
+    private $findPRNumber;
+
+    /** @var string[] */
+    private $supportedStatusNames;
+
+    public function __construct(CIStatusUpdateHandler $CIStatusUpdateHandler, FindPRNumber $findPRNumber, string $supportedStatusNames)
     {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
+        $this->findPRNumber = $findPRNumber;
         $this->supportedStatusNames = explode(',', $supportedStatusNames);
     }
 
@@ -66,11 +71,9 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     private function getPRIdentifier(array $CIStatusUpdate): string
     {
-        return sprintf(
-            '%s/%s',
-            $CIStatusUpdate['repository']['full_name'],
-            $CIStatusUpdate['number']
-        );
+        $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
+
+        return sprintf('%s/%s', $CIStatusUpdate['name'], $PRNumber);
     }
 
     private function getStatus(array $statusUpdate): string

@@ -181,6 +181,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
+            - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.event_handler.pr_merged:
@@ -236,6 +237,12 @@ services:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
+
+    slub.infrastructure.vcs.github.query.find_pr_number:
+        class: Slub\Infrastructure\VCS\Github\Query\FindPRNumber
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

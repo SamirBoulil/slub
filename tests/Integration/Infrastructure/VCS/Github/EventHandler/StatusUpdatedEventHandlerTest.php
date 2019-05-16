@@ -99,6 +99,7 @@ class StatusUpdatedEventHandlerTest extends WebTestCase
     {
         $json = <<<JSON
 {
+  "sha": "commit-ref",
   "name": "travis",
   "state": "success",
   "number": 10,
@@ -131,6 +132,7 @@ JSON;
     {
         $json = <<<JSON
 {
+  "sha": "commit-ref",
   "name": "UNSUPPORTED STATUS",
   "state": "failure",
   "number": 10,
@@ -147,6 +149,7 @@ JSON;
     {
         $json = <<<JSON
 {
+  "sha": "commit-ref",
   "name": "UNSUPPORTED STATUS",
   "state": "pending",
   "number": 10,

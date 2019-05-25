@@ -7,7 +7,6 @@ namespace Slub\Infrastructure\VCS\Github\Query;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 
 /**
@@ -15,9 +14,6 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
  */
 class GetCIStatus
 {
-    /** @var GetCheckSuiteStatus */
-    private $getCheckSuiteStatus;
-
     /** @var GetCheckRunStatus */
     private $getCheckRunStatus;
 
@@ -28,12 +24,10 @@ class GetCIStatus
     private $logger;
 
     public function __construct(
-        GetCheckSuiteStatus $getCheckSuiteStatus,
         GetCheckRunStatus $getCheckRunStatus,
         GetStatusChecksStatus $getStatusChecksStatus,
         LoggerInterface $logger
     ) {
-        $this->getCheckSuiteStatus = $getCheckSuiteStatus;
         $this->getCheckRunStatus = $getCheckRunStatus;
         $this->getStatusChecksStatus = $getStatusChecksStatus;
         $this->logger = $logger;
@@ -41,14 +35,9 @@ class GetCIStatus
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
     {
-//        $checkSuiteStatus = $this->getCheckSuiteStatus->fetch($PRIdentifier, $commitRef);
-//        $this->logger->critical('Check suite CI: ' . $checkSuiteStatus);
-//        if ('PENDING' !== $checkSuiteStatus) {
-//            return $checkSuiteStatus;
-//        }
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('Check run CI: ' . $checkRunStatus);
         $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);
+        $this->logger->critical('Check run CI: ' . $checkRunStatus);
         $this->logger->critical('status check: ' . $statusCheckStatus);
 
         $deductCIStatus = $this->deductCIStatus($checkRunStatus, $statusCheckStatus);

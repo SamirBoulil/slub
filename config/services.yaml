@@ -213,17 +213,9 @@ services:
     slub.infrastructure.vcs.github.query.get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus
         arguments:
-            - '@slub.infrastructure.vcs.github.query.ci_status.get_check_suite_status'
             - '@slub.infrastructure.vcs.github.query.ci_status.get_check_run_status'
             - '@slub.infrastructure.vcs.github.query.ci_status.get_status_check_status'
             - '@logger'
-
-    slub.infrastructure.vcs.github.query.ci_status.get_check_suite_status:
-        class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus
-        arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
-            - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.query.ci_status.get_check_run_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus

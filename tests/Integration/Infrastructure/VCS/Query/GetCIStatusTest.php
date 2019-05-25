@@ -69,55 +69,43 @@ class GetCIStatusTest extends WebTestCase
     public function ciStatusesExamples(): array
     {
         return [
-            'The CI is "GREEN" if the check suite is "GREEN"'                                                          => [
-                'GREEN',
-                null,
-                null,
-                'GREEN'
-            ],
-            'The CI is "RED" if the check suite is "RED"'                                                              => [
-                'RED',
-                null,
-                null,
-                'RED'
-            ],
-            'If the Check suite / status check are "PENDING", the CI result depends on the check run result (GREEN)'   => [
+            'check run result (GREEN)'   => [
                 'PENDING',
                 'GREEN',
                 'PENDING',
                 'GREEN',
             ],
-            'If the Check suite / status check are "PENDING", the CI result depends on the check run result (RED)'     => [
+            'check run result (RED)'     => [
                 'PENDING',
                 'RED',
                 'PENDING',
                 'RED',
             ],
-            'If the Check suite / check run are "PENDING", the CI result depends on the status check result (GREEN)'   => [
+            'check run is "PENDING", the CI result depends on the status check result (GREEN)'   => [
                 'PENDING',
                 'PENDING',
                 'GREEN',
                 'GREEN',
             ],
-            'If the Check suite / check run are "PENDING", the CI result depends on the status check result (RED)'     => [
+            'check run is "PENDING", the CI result depends on the status check result (RED)'     => [
                 'PENDING',
                 'PENDING',
                 'RED',
                 'RED',
             ],
-            'If the Check suite is "PENDING", and check run is RED then the status is RED'                             => [
+            'check run is RED then the status is RED'                             => [
                 'PENDING',
                 'RED',
                 'GREEN',
                 'RED',
             ],
-            'If the Check suite is "PENDING", and status check is RED then the status is RED'                          => [
+            'status check is RED then the status is RED'                          => [
                 'PENDING',
                 'GREEN',
                 'RED',
                 'RED',
             ],
-            'If the Check suite is "PENDING", and both status check and check runs are GREEN then the status is GREEN' => [
+            'if both status check and check runs are GREEN then the status is GREEN' => [
                 'PENDING',
                 'GREEN',
                 'GREEN',

@@ -72,7 +72,7 @@ class FindPRNumberTest extends WebTestCase
 
     private function successfullyFindsAPR(): string
     {
-        return json_encode(
+        return (string) json_encode(
             [
                 'items' => [
                     [
@@ -87,7 +87,7 @@ class FindPRNumberTest extends WebTestCase
 
     private function noResult(): string
     {
-        return json_encode(
+        return (string) json_encode(
             [
                 'items' => [],
             ]
@@ -96,7 +96,7 @@ class FindPRNumberTest extends WebTestCase
 
     private function invalidResult(): string
     {
-        return json_encode(
+        return (string) json_encode(
             [
                 'items' => [
                     [

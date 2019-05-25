@@ -24,3 +24,6 @@ services:
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Tests\Acceptance\helpers\GetVCSStatusDummy
+
+    slub.infrastructure.vcs.github.query.find_pr_number:
+      class:  Tests\Acceptance\helpers\FindPRNumberDummy

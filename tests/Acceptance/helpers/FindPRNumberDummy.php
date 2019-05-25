@@ -4,21 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\helpers;
 
+use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
+
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class FindPRNumberStub
+class FindPRNumberDummy implements FindPRNumberInterface
 {
-    /** @var string|null */
-    private $stub;
-
     public function fetch(string $repository, string $commitRef): ?string
     {
-        return $this->stub;
-    }
-
-    public function stubWith(?string $stub): void
-    {
-        $this->stub = $stub;
+        return '10';
     }
 }

@@ -6,7 +6,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
-use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,8 +25,11 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     /** @var string[] */
     private $supportedStatusNames;
 
-    public function __construct(CIStatusUpdateHandler $CIStatusUpdateHandler, FindPRNumberInterface $findPRNumber, string $supportedStatusNames)
-    {
+    public function __construct(
+        CIStatusUpdateHandler $CIStatusUpdateHandler,
+        FindPRNumberInterface $findPRNumber,
+        string $supportedStatusNames
+    ) {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->findPRNumber = $findPRNumber;
         $this->supportedStatusNames = explode(',', $supportedStatusNames);

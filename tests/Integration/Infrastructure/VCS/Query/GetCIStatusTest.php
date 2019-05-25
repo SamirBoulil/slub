@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Query;
 
+use Monolog\Logger;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -43,7 +44,8 @@ class GetCIStatusTest extends WebTestCase
         $this->getCIStatus = new GetCIStatus(
             $this->getCheckSuiteStatus->reveal(),
             $this->getCheckRunStatus->reveal(),
-            $this->getStatusCheckStatus->reveal()
+            $this->getStatusCheckStatus->reveal(),
+            new Logger('dummy')
         );
     }
 

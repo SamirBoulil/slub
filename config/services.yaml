@@ -216,6 +216,7 @@ services:
             - '@slub.infrastructure.vcs.github.query.ci_status.get_check_suite_status'
             - '@slub.infrastructure.vcs.github.query.ci_status.get_check_run_status'
             - '@slub.infrastructure.vcs.github.query.ci_status.get_status_check_status'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.ci_status.get_check_suite_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus

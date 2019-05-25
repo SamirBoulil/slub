@@ -23,6 +23,7 @@ class GetCIStatus
 
     /** @var GetStatusChecksStatus */
     private $getStatusChecksStatus;
+
     /** @var LoggerInterface */
     private $logger;
 
@@ -40,11 +41,11 @@ class GetCIStatus
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
     {
-        $checkSuiteStatus = $this->getCheckSuiteStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('Check suite CI: ' . $checkSuiteStatus);
-        if ('PENDING' !== $checkSuiteStatus) {
-            return $checkSuiteStatus;
-        }
+//        $checkSuiteStatus = $this->getCheckSuiteStatus->fetch($PRIdentifier, $commitRef);
+//        $this->logger->critical('Check suite CI: ' . $checkSuiteStatus);
+//        if ('PENDING' !== $checkSuiteStatus) {
+//            return $checkSuiteStatus;
+//        }
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
         $this->logger->critical('Check run CI: ' . $checkRunStatus);
         $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);

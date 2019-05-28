@@ -4,85 +4,111 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Entity\PR\PR;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use Slub\Application\CIStatusUpdate\CIStatusUpdate;
+use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Repository\PRRepositoryInterface;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Slub\Domain\Query\GetPRInfoInterface;
+use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
+use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class CheckRunEventHandlerTest extends WebTestCase
+class CheckRunEventHandlerTest extends TestCase
 {
-    private const PRIdentifier = 'SamirBoulil/slub/10';
+    private const PR_NUMBER = '10';
+    private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
+    private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private const SUPPORTED_CHECK_RUN = 'travis';
+    private const UNSUPPORTED_CHECK_RUN = 'UNSUPPORTED';
+
+    private const CI_STATUS = 'A_CI_STATUS';
+
+    /**
+     * @var CheckRunEventHandler
+     * @sut
+     */
+    private $checkRunEventHandler;
+
+    /** @var ObjectProphecy|CIStatusUpdateHandler */
+    private $handler;
+
+    /** @var ObjectProphecy|GetPRInfoInterface */
+    private $getPRInfo;
 
     public function setUp(): void
     {
-        parent::setUp();
-
-        $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
-        $this->createDefaultPR();
+        $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
+        $this->getPRInfo = $this->prophesize(GetPRInfo::class);
+        $this->checkRunEventHandler = new CheckRunEventHandler(
+            $this->handler->reveal(),
+            $this->getPRInfo->reveal(),
+            self::SUPPORTED_CHECK_RUN . ',circle ci'
+        );
     }
 
     /**
      * @test
      */
-    public function it_listens_to_green_ci_for_supported_check_runs()
+    public function it_only_listens_to_check_run_events()
     {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->supportedGreenCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        self::assertTrue($this->checkRunEventHandler->supports('check_run'));
+        self::assertFalse($this->checkRunEventHandler->supports('unsupported_event'));
+    }
 
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->supportedGreenCI());
+    /**
+     * @test
+     * @dataProvider events
+     */
+    public function it_handles_check_runs_fetches_information_and_calls_the_handler(array $events)
+    {
+        $prInfo = new PRInfo();
+        $prInfo->CIStatus = self::CI_STATUS;
+        $this->getPRInfo->fetch(
+            Argument::that(
+                function (PRIdentifier $PRIdentifier) {
+                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
+                }
+            )
+        )->willReturn($prInfo);
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertGreen();
+        $this->handler->handle(
+            Argument::that(function (CIStatusUpdate $command) {
+                return self::PR_IDENTIFIER === $command->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                    && self::CI_STATUS === $command->status;
+            })
+        )->shouldBeCalled();
+
+        $this->checkRunEventHandler->handle($events);
+    }
+
+    public function events(): array
+    {
+        return [
+            'it handles supported check run' => [
+                $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
+            ],
+            'it handles unsupported red check runs' => [
+                $this->unsupportedRedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
+            ],
+        ];
     }
 
     /**
      * @test
      */
-    public function it_does_not_to_listen_to_unsupported_and_green_check_runs()
+    public function it_does_not_to_handle_unsupported_and_green_check_runs()
     {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedGreenCI(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $this->getPRInfo->fetch()->shouldNotBeCalled();
+        $this->handler->handle()->shouldNotBeCalled();
 
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->unsupportedGreenCI());
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertPending();
-    }
-
-    /**
-     * @test
-     */
-    public function it_listens_to_all_red_ci()
-    {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->redCIUnsupportedCheck(), $this->get('GITHUB_WEBHOOK_SECRET')));
-
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->redCIUnsupportedCheck());
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertRed();
-    }
-
-    /**
-     * @test
-     */
-    public function it_listens_to_ci_pending()
-    {
-        $this->createRedPR();
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->pendingCheckRun(), $this->get('GITHUB_WEBHOOK_SECRET')));
-
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->pendingCheckRun());
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertPending();
+        $this->checkRunEventHandler->handle($this->unsupportedGreenCI());
     }
 
     /**
@@ -90,142 +116,81 @@ class CheckRunEventHandlerTest extends WebTestCase
      */
     public function it_throws_for_unsupported_conclusion()
     {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->unsupportedResult(), $this->get('GITHUB_WEBHOOK_SECRET')));
-
         $this->expectException(\Exception::class);
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'check_run', 'HTTP_X-Hub-Signature' => $signature], $this->unsupportedResult());
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertPending();
+        $this->checkRunEventHandler->handle($this->unsupportedResult());
     }
 
-    private function createDefaultPR(): void
+    private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $this->PRRepository->save(
-            PR::create(
-                PRIdentifier::create(self::PRIdentifier),
-                MessageIdentifier::create('CHANNEL_ID@1111')
-            )
-        );
-    }
-
-    private function supportedGreenCI(): string
-    {
+        $checkRunName = self::SUPPORTED_CHECK_RUN;
         $json = <<<JSON
 {
   "action": "completed",
   "check_run": {
     "status": "completed",
     "conclusion": "success",
-    "name": "travis",
+    "name": "${checkRunName}",
     "check_suite": {
       "pull_requests": [
         {
-          "number": 10
+          "number": ${prNumber}
         }
       ]
     }
   },
   "repository": {
-    "full_name": "SamirBoulil/slub"
+    "full_name": "${repositoryIdentifier}"
   }
 }
 JSON;
 
-        return $json;
+        return json_decode($json, true);
     }
 
-    private function unsupportedGreenCI(): string
+    private function unsupportedRedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $json = <<<JSON
-{
-  "action": "completed",
-  "check_run": {
-    "status": "completed",
-    "conclusion": "success",
-    "name": "UNSUPPORTED_CHECK_RUN",
-    "check_suite": {
-      "pull_requests": [
-        {
-          "number": 10
-        }
-      ]
-    }
-  },
-  "repository": {
-    "full_name": "SamirBoulil/slub"
-  }
-}
-JSON;
-
-        return $json;
-    }
-
-    private function redCIUnsupportedCheck(): string
-    {
+        $checkRunName = self::UNSUPPORTED_CHECK_RUN;
         $json = <<<JSON
 {
   "action": "completed",
   "check_run": {
     "status": "completed",
     "conclusion": "failure",
-    "name": "unsupported check run",
+    "name": "${checkRunName}",
     "check_suite": {
       "pull_requests": [
         {
-          "number": 10
+          "number": ${prNumber}
         }
       ]
-    },
-    "pull_requests": [
-      {
-        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
-        "number": 26
-      }
-    ]
+    }
   },
   "repository": {
-    "full_name": "SamirBoulil/slub"
+    "full_name": "${repositoryIdentifier}"
   }
 }
 JSON;
 
-        return $json;
+        return json_decode($json, true);
     }
 
-    private function pendingCheckRun(): string
+    private function unsupportedGreenCI(): array
     {
         $json = <<<JSON
 {
-  "action": "created",
+  "action": "completed",
   "check_run": {
-    "status": "queued",
-    "conclusion": null,
-    "name": "travis",
-    "check_suite": {
-      "pull_requests": [
-        {
-          "number": 10
-        }
-      ]
-    },
-    "pull_requests": [
-      {
-        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
-        "number": 26
-      }
-    ]
-  },
-  "repository": {
-    "full_name": "SamirBoulil/slub"
+    "status": "completed",
+    "conclusion": "success",
+    "name": "UNSUPPORTED_CHECK_RUN"
   }
 }
 JSON;
-        return $json;
+
+        return json_decode($json, true);
     }
 
-    private function unsupportedResult(): string
+    private function unsupportedResult(): array
     {
         $json = <<<JSON
 {
@@ -254,31 +219,6 @@ JSON;
 }
 JSON;
 
-        return $json;
-    }
-
-    private function assertGreen()
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
-        $this->assertEquals('GREEN', $PR->normalize()['CI_STATUS']);
-    }
-
-    private function assertRed()
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
-        $this->assertEquals('RED', $PR->normalize()['CI_STATUS']);
-    }
-
-    private function assertPending()
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
-        $this->assertEquals('PENDING', $PR->normalize()['CI_STATUS']);
-    }
-
-    private function createRedPR(): void
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::create(self::PRIdentifier));
-        $PR->red();
-        $this->PRRepository->save($PR);
+        return json_decode($json, true);
     }
 }

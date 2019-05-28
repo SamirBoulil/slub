@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
-use Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler;
-use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
-use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Tests\Integration\Infrastructure\WebTestCase;
 
@@ -30,15 +25,8 @@ class StatusUpdatedEventHandlerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
-        $this->getPRInfo = $this->prophesize(GetPRInfo::class);
-        $this->findPRNumber = $this->prophesize(FindPRNumber::class);
-        $this->checkRunEventHandler = new StatusUpdatedEventHandler(
-            $this->handler->reveal(),
-            $this->findPRNumber->reveal(),
-            $this->getPRInfo->reveal(),
-            self::SUPPORTED_CHECK_RUN . ',circle ci'
-        );
+        $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
+        $this->createDefaultPR();
     }
 
     /**

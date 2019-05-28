@@ -4,29 +4,44 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Entity\PR\PR;
-use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Repository\PRRepositoryInterface;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Tests\Integration\Infrastructure\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use Slub\Application\MergedPR\MergedPR;
+use Slub\Application\MergedPR\MergedPRHandler;
+use Slub\Infrastructure\VCS\Github\EventHandler\PRMergedEventHandler;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class PRMergedEventHandlerTest extends WebTestCase
+class PRMergedEventHandlerTest extends TestCase
 {
-    private const PRIdentifier = 'SamirBoulil/slub/10';
+    private const PR_NUMBER = 10;
+    private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
+    private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    /**
+     * @var PRMergedEventHandler
+     * @sut
+     */
+    private $PRMergedEventHandler;
+
+    /** @var ObjectProphecy|MergedPRHandler */
+    private $handler;
 
     public function setUp(): void
     {
-        parent::setUp();
+        $this->handler = $this->prophesize(MergedPRHandler::class);
+        $this->PRMergedEventHandler = new PRMergedEventHandler($this->handler->reveal());
+    }
 
-        $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
-        $this->createDefaultPR();
+    /**
+     * @test
+     */
+    public function it_only_listens_to_check_run_events()
+    {
+        self::assertTrue($this->PRMergedEventHandler->supports('pull_request'));
+        self::assertFalse($this->PRMergedEventHandler->supports('unsupported_event'));
     }
 
     /**
@@ -34,11 +49,25 @@ class PRMergedEventHandlerTest extends WebTestCase
      */
     public function it_listens_to_merged_PR()
     {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRMerged(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'pull_request', 'HTTP_X-Hub-Signature' => $signature], $this->PRMerged());
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertIsMerged(true);
+        $mergedPREvent = [
+            'pull_request' => [
+                'number' => self::PR_NUMBER,
+                'merged' => true,
+            ],
+            'repository'   => ['full_name' => self::REPOSITORY_IDENTIFIER],
+        ];
+
+        $this->handler->handle(
+            Argument::that(
+                function (MergedPR $mergedPR)
+                {
+                    return self::PR_IDENTIFIER === $mergedPR->PRIdentifier
+                        && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier;
+                }
+            )
+        )->shouldBeCalled();
+
+        $this->PRMergedEventHandler->handle($mergedPREvent);
     }
 
     /**
@@ -46,54 +75,10 @@ class PRMergedEventHandlerTest extends WebTestCase
      */
     public function it_does_nothing_if_the_pr_is_not_merged()
     {
-        $client = static::createClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRNotMerged(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request('POST', '/vcs/github', [], [], ['HTTP_X-GitHub-Event' => 'pull_request', 'HTTP_X-Hub-Signature' => $signature], $this->PRNotMerged());
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertIsMerged(false);
-    }
+        $unsupportedEvent = ['dummy_event'];
 
-    private function assertIsMerged(bool $isMerged)
-    {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PRIdentifier));
-        $this->assertEquals($isMerged, $PR->normalize()['IS_MERGED']);
-    }
+        $this->handler->handle(Argument::any())->shouldNotBeCalled();
 
-    private function createDefaultPR(): void
-    {
-        $this->PRRepository->save(
-            PR::create(
-                PRIdentifier::create(self::PRIdentifier),
-                MessageIdentifier::create('CHANNEL_ID@1111')
-            )
-        );
-    }
-
-    private function PRMerged(): string
-    {
-        $json = <<<JSON
-{
-    "pull_request": {
-        "number": 10,
-        "merged": true
-    },
-    "repository": {
-        "full_name": "SamirBoulil/slub"
-    }
-}
-JSON;
-
-        return $json;
-    }
-
-    private function PRNotMerged(): string
-    {
-        $json = <<<JSON
-{
-    "dummy": "value"
-}
-JSON;
-
-        return $json;
+        $this->PRMergedEventHandler->handle($unsupportedEvent);
     }
 }

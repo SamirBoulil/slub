@@ -14,7 +14,7 @@ class DummyEventHandler implements EventHandlerInterface
         return $eventType === 'dummy_event_type';
     }
 
-    public function handle(Request $request): void
+    public function handle(array $request): void
     {
         // Nothing to do here
     }

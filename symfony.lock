@@ -93,6 +93,9 @@
     "doctrine/lexer": {
         "version": "v1.0.1"
     },
+    "donatj/mock-webserver": {
+        "version": "v2.0.0"
+    },
     "dragonmantank/cron-expression": {
         "version": "v2.3.0"
     },
@@ -140,6 +143,9 @@
     },
     "jean85/pretty-package-versions": {
         "version": "1.2"
+    },
+    "johnkary/phpunit-speedtrap": {
+        "version": "v3.1.0"
     },
     "laravel/framework": {
         "version": "v5.7.28"

@@ -7,7 +7,7 @@ namespace Tests\Integration\Infrastructure\UI\Http;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Integration\Infrastructure\KernelTestCase;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

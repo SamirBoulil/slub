@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
+namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Github\EventHandler;
+namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;

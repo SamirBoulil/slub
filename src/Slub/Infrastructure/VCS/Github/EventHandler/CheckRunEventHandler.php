@@ -87,11 +87,10 @@ class CheckRunEventHandler implements EventHandlerInterface
         }
 
         $conclusion = $CIStatusUpdate['check_run']['conclusion'];
-        if ('success' === $conclusion) {
-            return 'GREEN';
-        }
-        if ('failure' === $conclusion) {
-            return 'RED';
+        switch ($conclusion) {
+            case 'success': return 'GREEN';
+            case 'failure':
+            case 'error': return 'RED';
         }
 
         throw new \InvalidArgumentException(

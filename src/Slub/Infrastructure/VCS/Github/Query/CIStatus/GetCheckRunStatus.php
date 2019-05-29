@@ -19,11 +19,24 @@ class GetCheckRunStatus
     /** @var string[] */
     private $supportedCIChecks;
 
-    public function __construct(Client $httpClient, string $authToken, string $supportedCIChecks)
-    {
+    /** @var string */
+    private $domainName;
+
+    /** @var string */
+    private $port;
+
+    public function __construct(
+        Client $httpClient,
+        string $authToken,
+        string $supportedCIChecks,
+        string $domainName,
+        string $port = '443'
+    ) {
         $this->httpClient = $httpClient;
         $this->authToken = $authToken;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
+        $this->domainName = $domainName;
+        $this->port = $port;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
@@ -94,7 +107,12 @@ class GetCheckRunStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
-        $url = sprintf('https://api.github.com/repos/%s/%s/commits/%s/check-runs', ...$matches);
+        $url = sprintf(
+            '%s:%s/repos/%s/%s/commits/%s/check-runs',
+            $this->domainName,
+            $this->port,
+            ...$matches
+        );
 
         return $url;
     }
@@ -103,6 +121,7 @@ class GetCheckRunStatus
     {
         $headers = GithubAPIHelper::authorizationHeader($this->authToken);
         $headers = array_merge($headers, GithubAPIHelper::acceptPreviewEndpointsHeader());
+
         return $headers;
     }
 

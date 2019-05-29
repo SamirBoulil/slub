@@ -10,7 +10,7 @@ use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
 use Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

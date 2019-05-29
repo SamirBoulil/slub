@@ -6,7 +6,7 @@ namespace Tests\Integration\Infrastructure\VCS\Query;
 
 use GuzzleHttp\Psr7\Response;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

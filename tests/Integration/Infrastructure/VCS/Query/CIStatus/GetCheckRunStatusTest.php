@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\Response;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 class GetCheckRunStatusTest extends WebTestCase
 {
@@ -32,7 +32,8 @@ class GetCheckRunStatusTest extends WebTestCase
         $this->getCheckRunStatus = new GetCheckRunStatus(
             $this->requestSpy->client(),
             self::AUTH_TOKEN,
-            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3])
+            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
+            'api.github.com'
         );
     }
 

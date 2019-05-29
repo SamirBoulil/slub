@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\Response;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
 use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 class GetCheckSuiteStatusTest extends WebTestCase
 {

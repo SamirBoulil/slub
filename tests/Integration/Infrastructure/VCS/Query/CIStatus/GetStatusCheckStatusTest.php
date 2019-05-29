@@ -9,7 +9,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 class GetStatusCheckStatusTest extends WebTestCase
 {
@@ -33,7 +33,8 @@ class GetStatusCheckStatusTest extends WebTestCase
         $this->getStatusCheckStatus = new GetStatusChecksStatus(
             $this->requestSpy->client(),
             self::AUTH_TOKEN,
-            implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3])
+            implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3]),
+            'api.github.com'
         );
     }
 

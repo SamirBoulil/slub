@@ -2,6 +2,8 @@ parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
     GITHUB_WEBHOOK_SECRET: 'my_secret'
+    GITHUB_URI: '127.0.0.1'
+    GITHUB_PORT: '8081'
 
 services:
     # default configuration for services in *this* file
@@ -27,3 +29,21 @@ services:
 
     slub.infrastructure.vcs.github.query.find_pr_number:
       class:  Tests\Acceptance\helpers\FindPRNumberDummy
+
+    slub.infrastructure.vcs.github.query.ci_status.get_check_run_status:
+        class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+            - '%GITHUB_URI%'
+            - '%GITHUB_PORT%'
+
+    slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:
+        class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_TOKEN)%'
+            - '%env(SUPPORTED_CI_CHECKS)%'
+            - '%GITHUB_URI%'
+            - '%GITHUB_PORT%'

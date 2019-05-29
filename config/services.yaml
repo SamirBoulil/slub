@@ -7,11 +7,11 @@ parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
+    GITHUB_URI: 'api.github.com'
     BOT_USER_ID: 'bot_user_id'
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
-
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -175,6 +175,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
+            - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
@@ -182,6 +183,7 @@ services:
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
+            - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.event_handler.pr_merged:
@@ -223,6 +225,7 @@ services:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
+            - '%GITHUB_URI%'
 
     slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus
@@ -230,12 +233,20 @@ services:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
+            - '%GITHUB_URI%'
 
     slub.infrastructure.vcs.github.query.find_pr_number:
         class: Slub\Infrastructure\VCS\Github\Query\FindPRNumber
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(GITHUB_TOKEN)%'
+
+    slub.infrastructure.vcs.github.query.get_pr_info:
+        class: Slub\Infrastructure\VCS\Github\Query\GetPRInfo
+        arguments:
+            - '@slub.infrastructure.vcs.github.query.get_pr_details'
+            - '@slub.infrastructure.vcs.github.query.find_reviews'
+            - '@slub.infrastructure.vcs.github.query.get_ci_status'
 
     ## UI
     slub.infrastructure.ui.http.list_prs_action:

@@ -6,9 +6,9 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
-use Slub\Domain\Query\GetPRInfoInterface;
+use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -20,11 +20,11 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     /** @var CIStatusUpdateHandler */
     private $CIStatusUpdateHandler;
 
-    /** @var FindPRNumberInterface*/
+    /** @var FindPRNumberInterface */
     private $findPRNumber;
 
-    /** @var GetPRInfoInterface */
-    private $getPRInfo;
+    /** @var GetCIStatus */
+    private $getCIStatus;
 
     /** @var string[] */
     private $supportedStatusNames;
@@ -32,14 +32,13 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,
         FindPRNumberInterface $findPRNumber,
-        GetPRInfoInterface $getPRInfo,
+        GetCIStatus $getCIStatus,
         string $supportedStatusNames
     ) {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->findPRNumber = $findPRNumber;
         $this->supportedStatusNames = explode(',', $supportedStatusNames);
-        $this->getPRInfo = $getPRInfo;
-        $this->supportedStatusNames = $supportedStatusNames;
+        $this->getCIStatus = $getCIStatus;
     }
 
     public function supports(string $eventType): bool
@@ -47,46 +46,23 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         return self::STATUS_UPDATE_EVENT_TYPE === $eventType;
     }
 
-    public function handle(Request $request): void
+    public function handle(array $statusUpdate): void
     {
-        $statusUpdate = $this->getStatusUpdate($request);
         if ($this->isStatusGreenButNotSupported($statusUpdate)) {
             return;
         }
-
         $this->updateCIStatus($statusUpdate);
     }
 
     private function isStatusGreenButNotSupported(array $statusUpdate): bool
     {
-        $isGreen = 'GREEN' === $this->getStatus($statusUpdate);
+        $isGreen = 'GREEN' === $this->statusCheckStatus($statusUpdate);
         $isSupported = in_array($statusUpdate['name'], $this->supportedStatusNames);
 
         return $isGreen && !$isSupported;
     }
 
-    private function getStatusUpdate(Request $request): array
-    {
-        return json_decode((string) $request->getContent(), true);
-    }
-
-    private function updateCIStatus(array $CIStatusUpdate): void
-    {
-        $command = new CIStatusUpdate();
-        $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
-        $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->status = $this->getStatus($CIStatusUpdate);
-        $this->CIStatusUpdateHandler->handle($command);
-    }
-
-    private function getPRIdentifier(array $CIStatusUpdate): string
-    {
-        $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
-
-        return sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber);
-    }
-
-    private function getStatus(array $statusUpdate): string
+    private function statusCheckStatus(array $statusUpdate): string
     {
         $status = $statusUpdate['state'];
         switch ($status) {
@@ -100,5 +76,27 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported status "%s"', $status));
         }
+    }
+
+    private function updateCIStatus(array $CIStatusUpdate): void
+    {
+        $command = new CIStatusUpdate();
+        $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate)->stringValue();
+        $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
+        $command->status = $this->getCIStatusFromGithub($this->getPRIdentifier($CIStatusUpdate), $CIStatusUpdate['sha']);
+
+        $this->CIStatusUpdateHandler->handle($command);
+    }
+
+    private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
+    {
+        $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
+
+        return PRIdentifier::fromString(sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber));
+    }
+
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): string
+    {
+        return $this->getCIStatus->fetch($PRIdentifier, $commitRef);
     }
 }

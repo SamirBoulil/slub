@@ -9,10 +9,9 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -37,12 +36,10 @@ class GetCIStatusTest extends WebTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->getCheckSuiteStatus = $this->prophesize(GetCheckSuiteStatus::class);
         $this->getCheckRunStatus = $this->prophesize(GetCheckRunStatus::class);
         $this->getStatusCheckStatus = $this->prophesize(GetStatusChecksStatus::class);
 
         $this->getCIStatus = new GetCIStatus(
-            $this->getCheckSuiteStatus->reveal(),
             $this->getCheckRunStatus->reveal(),
             $this->getStatusCheckStatus->reveal(),
             new Logger('dummy')
@@ -54,12 +51,11 @@ class GetCIStatusTest extends WebTestCase
      * @dataProvider ciStatusesExamples
      */
     public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
-        string $checkSuiteStatus,
         ?string $checkRunStatus,
         ?string $statusCheckStatus,
         string $expectedCIStatus
     ): void {
-        $this->mockIndependentResults($checkSuiteStatus, $checkRunStatus, $statusCheckStatus);
+        $this->mockIndependentResults($checkRunStatus, $statusCheckStatus);
 
         $actualCIStatus = $this->getCIStatus();
 
@@ -70,43 +66,36 @@ class GetCIStatusTest extends WebTestCase
     {
         return [
             'check run result (GREEN)'   => [
-                'PENDING',
                 'GREEN',
                 'PENDING',
                 'GREEN',
             ],
             'check run result (RED)'     => [
-                'PENDING',
                 'RED',
                 'PENDING',
                 'RED',
             ],
             'check run is "PENDING", the CI result depends on the status check result (GREEN)'   => [
                 'PENDING',
-                'PENDING',
                 'GREEN',
                 'GREEN',
             ],
             'check run is "PENDING", the CI result depends on the status check result (RED)'     => [
                 'PENDING',
-                'PENDING',
                 'RED',
                 'RED',
             ],
             'check run is RED then the status is RED'                             => [
-                'PENDING',
                 'RED',
                 'GREEN',
                 'RED',
             ],
             'status check is RED then the status is RED'                          => [
-                'PENDING',
                 'GREEN',
                 'RED',
                 'RED',
             ],
             'if both status check and check runs are GREEN then the status is GREEN' => [
-                'PENDING',
                 'GREEN',
                 'GREEN',
                 'GREEN',
@@ -115,7 +104,6 @@ class GetCIStatusTest extends WebTestCase
     }
 
     private function mockIndependentResults(
-        string $checkSuiteStatus,
         ?string $checkRunStatus,
         ?string $statusCheckStatus
     ): void {
@@ -128,10 +116,6 @@ class GetCIStatusTest extends WebTestCase
             function (string $commitRef) {
                 return self::COMMIT_REF === $commitRef;
             }
-        );
-
-        $this->getCheckSuiteStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
-            $checkSuiteStatus
         );
         $this->getCheckRunStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
             $checkRunStatus

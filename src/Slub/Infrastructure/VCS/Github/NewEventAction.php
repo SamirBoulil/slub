@@ -34,17 +34,18 @@ class NewEventAction
     public function executeAction(Request $request): Response
     {
         $this->checkSecret($request);
-        $eventType = $this->getEventTypeOrThrow($request);
-        $this->handle($request, $eventType);
+        $eventType = $this->eventTypeOrThrow($request);
+        $event = $this->event($request);
+        $this->handle($event, $eventType);
 
         return new Response();
     }
 
-    private function getEventTypeOrThrow(Request $request): string
+    private function eventTypeOrThrow(Request $request): string
     {
         $eventType = $request->headers->get(self::EVENT_TYPE);
         if (null === $eventType || !is_string($eventType)) {
-            throw new BadRequestHttpException('Expected event to have a type "%s"');
+            throw new BadRequestHttpException('Expected event to have a type string');
         }
 
         return $eventType;
@@ -64,12 +65,17 @@ class NewEventAction
         }
     }
 
-    private function handle(Request $request, string $eventType): void
+    private function handle(array $event, string $eventType): void
     {
         $eventHandler = $this->eventHandlerRegistry->get($eventType);
         if (null === $eventHandler) {
             throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
         }
-        $eventHandler->handle($request);
+        $eventHandler->handle($event);
+    }
+
+    private function event(Request $request): array
+    {
+        return json_decode((string) $request->getContent(), true);
     }
 }

@@ -30,7 +30,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private const COMMIT_REF = 'commit-ref';
 
     /**
-     * @var CIStatusUpdateHandler
+     * @var StatusUpdatedEventHandler
      * @sut
      */
     private $statusUpdateEventHandler;
@@ -77,22 +77,19 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->findPRNumber->fetch($status, self::COMMIT_REF)->willReturn(self::PR_NUMBER);
         $this->getCIStatus->fetch(
             Argument::that(
-                function (PRIdentifier $PRIdentifier)
-                {
+                function (PRIdentifier $PRIdentifier) {
                     return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
                 }
             ),
             Argument::that(
-                function (string $commitRef)
-                {
+                function (string $commitRef) {
                     return self::COMMIT_REF === $commitRef;
                 }
             )
         )->willReturn(self::CI_STATUS);
         $this->handler->handle(
             Argument::that(
-                function (CIStatusUpdate $command)
-                {
+                function (CIStatusUpdate $command) {
                     return self::PR_IDENTIFIER === $command->PRIdentifier
                         && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
                         && self::CI_STATUS === $command->status;

@@ -82,7 +82,7 @@ class NewEventActionTest extends TestCase
 
     private function requestWithNoSignature(string $eventType, array $payload)
     {
-        $content = json_encode($payload);
+        $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);
         $request->headers->set('X-GitHub-Event', $eventType);
 
@@ -91,7 +91,7 @@ class NewEventActionTest extends TestCase
 
     private function requestWithWrongSignature(string $eventType, array $payload): Request
     {
-        $content = json_encode($payload);
+        $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);
         $request->headers->set('X-GitHub-Event', $eventType);
         $request->headers->set('X-Hub-Signature', 'WRONG_SIGNATURE');
@@ -101,7 +101,7 @@ class NewEventActionTest extends TestCase
 
     private function requestWithNoEventType(string $eventType, array $payload): Request
     {
-        $content = json_encode($payload);
+        $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);
         $request->headers->set('X-Hub-Signature', 'WRONG_SIGNATURE');
 

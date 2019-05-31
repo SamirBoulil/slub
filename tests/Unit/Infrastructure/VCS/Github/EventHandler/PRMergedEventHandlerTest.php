@@ -59,8 +59,7 @@ class PRMergedEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                function (MergedPR $mergedPR)
-                {
+                function (MergedPR $mergedPR) {
                     return self::PR_IDENTIFIER === $mergedPR->PRIdentifier
                         && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier;
                 }

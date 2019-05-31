@@ -58,8 +58,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                function (NewReview $newReview) use ($expectedReviewStatus)
-                {
+                function (NewReview $newReview) use ($expectedReviewStatus) {
                     return self::PR_IDENTIFIER === $newReview->PRIdentifier
                         && self::REPOSITORY_IDENTIFIER === $newReview->repositoryIdentifier
                         && $expectedReviewStatus === $newReview->reviewStatus;

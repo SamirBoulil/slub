@@ -90,7 +90,7 @@ class CIStatusUpdatedTest extends WebTestCase
             '/repos/SamirBoulil/slub/commits/commit-ref/check-runs',
             new ResponseStack(
                 new Response(
-                    json_encode([
+                    (string) json_encode([
                         'check_runs' => [
                             ['name' => 'travis', 'conclusion' => 'success', 'status' => 'completed'],
                         ],
@@ -102,7 +102,7 @@ class CIStatusUpdatedTest extends WebTestCase
             '/repos/SamirBoulil/slub/statuses/commit-ref',
             new ResponseStack(
                 new Response(
-                    json_encode([
+                    (string) json_encode([
                         ['context' => 'travis', 'state' => 'success'],
                     ])
                 )

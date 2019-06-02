@@ -23,9 +23,6 @@ class GetCheckRunStatus
     /** @var string */
     private $domainName;
 
-    /** @var string */
-    private $port;
-
     /** @var LoggerInterface */
     private $logger;
 
@@ -34,14 +31,12 @@ class GetCheckRunStatus
         string $authToken,
         string $supportedCIChecks,
         string $domainName,
-        string $port = '443',
         LoggerInterface $logger
     ) {
         $this->httpClient = $httpClient;
         $this->authToken = $authToken;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
         $this->domainName = $domainName;
-        $this->port = $port;
         $this->logger = $logger;
     }
 
@@ -116,9 +111,8 @@ class GetCheckRunStatus
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
         $url = sprintf(
-            'https://%s:%s/repos/%s/%s/commits/%s/check-runs',
+            '%s/repos/%s/%s/commits/%s/check-runs',
             $this->domainName,
-            $this->port,
             ...$matches
         );
 

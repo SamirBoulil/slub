@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Query;
 
-use Monolog\Logger;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
@@ -42,7 +42,7 @@ class GetCIStatusTest extends WebTestCase
         $this->getCIStatus = new GetCIStatus(
             $this->getCheckRunStatus->reveal(),
             $this->getStatusCheckStatus->reveal(),
-            new Logger('dummy')
+            new NullLogger()
         );
     }
 
@@ -65,37 +65,37 @@ class GetCIStatusTest extends WebTestCase
     public function ciStatusesExamples(): array
     {
         return [
-            'check run result (GREEN)'   => [
+            'check run result (GREEN)'                                                         => [
                 'GREEN',
                 'PENDING',
                 'GREEN',
             ],
-            'check run result (RED)'     => [
+            'check run result (RED)'                                                           => [
                 'RED',
                 'PENDING',
                 'RED',
             ],
-            'check run is "PENDING", the CI result depends on the status check result (GREEN)'   => [
+            'check run is "PENDING", the CI result depends on the status check result (GREEN)' => [
                 'PENDING',
                 'GREEN',
                 'GREEN',
             ],
-            'check run is "PENDING", the CI result depends on the status check result (RED)'     => [
+            'check run is "PENDING", the CI result depends on the status check result (RED)'   => [
                 'PENDING',
                 'RED',
                 'RED',
             ],
-            'check run is RED then the status is RED'                             => [
+            'check run is RED then the status is RED'                                          => [
                 'RED',
                 'GREEN',
                 'RED',
             ],
-            'status check is RED then the status is RED'                          => [
+            'status check is RED then the status is RED'                                       => [
                 'GREEN',
                 'RED',
                 'RED',
             ],
-            'if both status check and check runs are GREEN then the status is GREEN' => [
+            'if both status check and check runs are GREEN then the status is GREEN'           => [
                 'GREEN',
                 'GREEN',
                 'GREEN',

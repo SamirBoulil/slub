@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
@@ -33,7 +34,8 @@ class GetCheckRunStatusTest extends WebTestCase
             $this->requestSpy->client(),
             self::AUTH_TOKEN,
             implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
-            'api.github.com'
+            'https://api.github.com',
+            new NullLogger()
         );
     }
 
@@ -45,7 +47,7 @@ class GetCheckRunStatusTest extends WebTestCase
         array $ciCheckRuns,
         string $expectedCIStatus
     ): void {
-        $this->requestSpy->stubResponse(new Response(200, [], (string)json_encode($ciCheckRuns)));
+        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciCheckRuns)));
 
         $actualCIStatus = $this->getCheckRunStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
@@ -71,20 +73,20 @@ class GetCheckRunStatusTest extends WebTestCase
                     'check_runs' => [
                         ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
                         ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'failure'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed']
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
                     ],
                 ],
-                'PENDING'
+                'PENDING',
             ],
             'Supported CI Checks not run'     => [
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed']
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
                     ],
                 ],
-                'PENDING'
+                'PENDING',
             ],
             'Multiple CI checks Green'        => [
                 [
@@ -93,7 +95,7 @@ class GetCheckRunStatusTest extends WebTestCase
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
                     ],
                 ],
-                'GREEN'
+                'GREEN',
             ],
             'Multiple CI checks Red'          => [
                 [
@@ -102,7 +104,7 @@ class GetCheckRunStatusTest extends WebTestCase
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed'],
                     ],
                 ],
-                'RED'
+                'RED',
             ],
             'Multiple CI checks Pending'      => [
                 [
@@ -111,7 +113,7 @@ class GetCheckRunStatusTest extends WebTestCase
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],
                 ],
-                'PENDING'
+                'PENDING',
             ],
             'Mixed CI checks statuses: red'   => [
                 [
@@ -121,7 +123,7 @@ class GetCheckRunStatusTest extends WebTestCase
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],
                 ],
-                'RED'
+                'RED',
             ],
             'Mixed CI checks statuses: green' => [
                 [
@@ -131,8 +133,8 @@ class GetCheckRunStatusTest extends WebTestCase
                         ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],
                 ],
-                'GREEN'
-            ]
+                'GREEN',
+            ],
         ];
     }
 

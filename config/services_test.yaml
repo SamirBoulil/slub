@@ -2,7 +2,7 @@ parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
     GITHUB_WEBHOOK_SECRET: 'my_secret'
-    GITHUB_URI: '127.0.0.1'
+    GITHUB_URI: '127.0.0.1:8081'
     GITHUB_PORT: '8081'
 
 services:
@@ -37,7 +37,7 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
-            - '%GITHUB_PORT%'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus
@@ -46,4 +46,3 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
-            - '%GITHUB_PORT%'

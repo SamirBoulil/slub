@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Query;
 
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\VCSStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
@@ -47,7 +48,8 @@ class GetVCSStatusFromGithubTest extends WebTestCase
         $this->getVCSStatus = new GetVCSStatusFromGithub(
             $this->getPRDetailsStub->reveal(),
             $this->findReviewsStub->reveal(),
-            $this->getCIStatusStub->reveal()
+            $this->getCIStatusStub->reveal(),
+            new NullLogger()
         );
     }
 

@@ -22,21 +22,16 @@ class GetStatusChecksStatus
     /** @var string */
     private $domainName;
 
-    /** @var string */
-    private $port;
-
     public function __construct(
         Client $httpClient,
         string $authToken,
         string $supportedCIChecks,
-        string $domainName,
-        string $port = '443'
+        string $domainName
     ) {
         $this->httpClient = $httpClient;
         $this->authToken = $authToken;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
         $this->domainName = $domainName;
-        $this->port = $port;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
@@ -103,7 +98,7 @@ class GetStatusChecksStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
-        $url = sprintf('https://%s:%s/repos/%s/%s/statuses/%s', $this->domainName, $this->port, ...$matches);
+        $url = sprintf('%s/repos/%s/%s/statuses/%s', $this->domainName, ...$matches);
 
         return $url;
     }

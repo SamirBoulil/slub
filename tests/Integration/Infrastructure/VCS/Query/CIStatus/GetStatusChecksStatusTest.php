@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
-use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
 use Tests\WebTestCase;
 
-class GetStatusCheckStatusTest extends WebTestCase
+class GetStatusChecksStatusTest extends WebTestCase
 {
     private const AUTH_TOKEN = 'TOKEN';
     private const PR_COMMIT_REF = 'pr_commit_ref';
@@ -34,7 +34,7 @@ class GetStatusCheckStatusTest extends WebTestCase
             $this->requestSpy->client(),
             self::AUTH_TOKEN,
             implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3]),
-            'api.github.com'
+            'https://api.github.com'
         );
     }
 

@@ -7,8 +7,7 @@ parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
-    GITHUB_URI: 'api.github.com'
-    GITHUB_PORT: '443'
+    GITHUB_URI: 'https://api.github.com'
     BOT_USER_ID: 'bot_user_id'
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
@@ -227,7 +226,6 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
-            - '%GITHUB_PORT%'
             - '@logger'
 
     slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:

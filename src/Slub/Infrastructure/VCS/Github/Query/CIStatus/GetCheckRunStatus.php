@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
@@ -25,18 +26,23 @@ class GetCheckRunStatus
     /** @var string */
     private $port;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         Client $httpClient,
         string $authToken,
         string $supportedCIChecks,
         string $domainName,
-        string $port = '443'
+        string $port = '443',
+        LoggerInterface $logger
     ) {
         $this->httpClient = $httpClient;
         $this->authToken = $authToken;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
         $this->domainName = $domainName;
         $this->port = $port;
+        $this->logger = $logger;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
@@ -49,6 +55,8 @@ class GetCheckRunStatus
     private function checkRuns(PRIdentifier $PRIdentifier, string $ref): array
     {
         $url = $this->checkRunsUrl($PRIdentifier, $ref);
+        $this->logger->critical($url);
+
         $headers = $this->getHeaders();
         $response = $this->httpClient->get($url, ['headers' => $headers]);
 
@@ -108,7 +116,7 @@ class GetCheckRunStatus
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
         $url = sprintf(
-            '%s:%s/repos/%s/%s/commits/%s/check-runs',
+            'https://%s:%s/repos/%s/%s/commits/%s/check-runs',
             $this->domainName,
             $this->port,
             ...$matches

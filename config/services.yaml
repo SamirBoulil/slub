@@ -8,10 +8,12 @@ parameters:
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
     GITHUB_URI: 'api.github.com'
+    GITHUB_PORT: '443'
     BOT_USER_ID: 'bot_user_id'
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -197,8 +199,7 @@ services:
             - '@slub.infrastructure.vcs.github.query.get_pr_details'
             - '@slub.infrastructure.vcs.github.query.find_reviews'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
-            - '%env(GITHUB_TOKEN)%'
-            - '%env(SUPPORTED_CI_CHECKS)%'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.get_pr_details:
         class: Slub\Infrastructure\VCS\Github\Query\GetPRDetails
@@ -226,6 +227,8 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
+            - '%GITHUB_PORT%'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus

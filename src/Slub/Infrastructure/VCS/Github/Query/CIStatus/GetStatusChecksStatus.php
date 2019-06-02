@@ -103,7 +103,7 @@ class GetStatusChecksStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
-        $url = sprintf('%s:%s/repos/%s/%s/statuses/%s', $this->domainName, $this->port, ...$matches);
+        $url = sprintf('https://%s:%s/repos/%s/%s/statuses/%s', $this->domainName, $this->port, ...$matches);
 
         return $url;
     }

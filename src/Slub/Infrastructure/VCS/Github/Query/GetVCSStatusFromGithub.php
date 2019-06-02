@@ -38,11 +38,16 @@ class GetVCSStatusFromGithub implements GetVCSStatus
     {
         $PRDetails = $this->getPRDetails->fetch($PRIdentifier);
         $this->logger->critical('Fetched PR details.');
+
         $reviews = $this->findReviews->fetch($PRIdentifier);
         $this->logger->critical('Fetched reviews');
+
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
         $this->logger->critical('Fetched ci status');
+
         $isMerged = $this->isMerged($PRDetails);
+        $this->logger->critical('Fetched is merged');
+
         $result = $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
 
         return $result;

@@ -36,8 +36,9 @@ class GetCIStatus
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
     {
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
-        $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);
         $this->logger->critical('Check run CI: ' . $checkRunStatus);
+
+        $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);
         $this->logger->critical('status check: ' . $statusCheckStatus);
 
         $deductCIStatus = $this->deductCIStatus($checkRunStatus, $statusCheckStatus);

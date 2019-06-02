@@ -6,7 +6,8 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
-use Symfony\Component\HttpFoundation\Request;
+use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Query\GetPRInfoInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -15,16 +16,23 @@ class CheckRunEventHandler implements EventHandlerInterface
 {
     private const CHECK_RUN_EVENT_TYPE = 'check_run';
 
-    /** @var string[] */
-    private $supportedCheckRunNames;
-
     /** @var CIStatusUpdateHandler */
     private $CIStatusUpdateHandler;
 
-    public function __construct(CIStatusUpdateHandler $CIStatusUpdateHandler, string $supportedCheckRunNames)
-    {
+    /** @var GetPRInfoInterface */
+    private $getPRInfo;
+
+    /** @var string[] */
+    private $supportedCheckRunNames;
+
+    public function __construct(
+        CIStatusUpdateHandler $CIStatusUpdateHandler,
+        GetPRInfoInterface $getPRInfo,
+        string $supportedCheckRunNames
+    ) {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->supportedCheckRunNames = explode(',', $supportedCheckRunNames);
+        $this->getPRInfo = $getPRInfo;
     }
 
     public function supports(string $eventType): bool
@@ -32,44 +40,43 @@ class CheckRunEventHandler implements EventHandlerInterface
         return self::CHECK_RUN_EVENT_TYPE === $eventType;
     }
 
-    public function handle(Request $request): void
+    public function handle(array $checkRunEvent): void
     {
-        $CIStatusUpdate = $this->getCIStatusUpdate($request);
-        if ($this->isCICheckGreenButNotSupported($CIStatusUpdate)) {
+        if ($this->isCICheckGreenButNotSupported($checkRunEvent)) {
             return;
         }
 
-        $this->updateCIStatus($CIStatusUpdate);
+        $this->updateCIStatus($checkRunEvent);
     }
 
-    private function isCICheckGreenButNotSupported(array $CIStatusUpdate): bool
+    private function isCICheckGreenButNotSupported(array $checkRunEvent): bool
     {
-        $isGreen = 'GREEN' === $this->getStatus($CIStatusUpdate);
-        $isSupported = in_array($CIStatusUpdate['check_run']['name'], $this->supportedCheckRunNames);
+        $isGreen = 'GREEN' === $this->getStatus($checkRunEvent);
+        $isSupported = in_array($checkRunEvent['check_run']['name'], $this->supportedCheckRunNames);
 
         return $isGreen && !$isSupported;
     }
 
-    private function getCIStatusUpdate(Request $request): array
-    {
-        return json_decode((string) $request->getContent(), true);
-    }
-
     private function updateCIStatus(array $CIStatusUpdate): void
     {
+        $PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
+        $CIStatus = $this->getCIStatusFromGithub($PRIdentifier);
+
         $command = new CIStatusUpdate();
-        $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
+        $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->status = $this->getStatus($CIStatusUpdate);
+        $command->status = $CIStatus;
         $this->CIStatusUpdateHandler->handle($command);
     }
 
-    private function getPRIdentifier(array $CIStatusUpdate): string
+    private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
-        return sprintf(
-            '%s/%s',
-            $CIStatusUpdate['repository']['full_name'],
-            $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
+        return PRIdentifier::fromString(
+            sprintf(
+                '%s/%s',
+                $CIStatusUpdate['repository']['full_name'],
+                $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
+            )
         );
     }
 
@@ -80,11 +87,10 @@ class CheckRunEventHandler implements EventHandlerInterface
         }
 
         $conclusion = $CIStatusUpdate['check_run']['conclusion'];
-        if ('success' === $conclusion) {
-            return 'GREEN';
-        }
-        if ('failure' === $conclusion) {
-            return 'RED';
+        switch ($conclusion) {
+            case 'success': return 'GREEN';
+            case 'failure':
+            case 'error': return 'RED';
         }
 
         throw new \InvalidArgumentException(
@@ -93,5 +99,10 @@ class CheckRunEventHandler implements EventHandlerInterface
                 $conclusion
             )
         );
+    }
+
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): string
+    {
+        return $this->getPRInfo->fetch($PRIdentifier)->CIStatus;
     }
 }

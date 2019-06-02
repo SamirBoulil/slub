@@ -103,6 +103,9 @@ class PutPRToReviewHandler
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
         $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
+
+        $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->CIStatus . ')');
+
         $PR = PR::create(
             $PRIdentifier,
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),

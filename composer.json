@@ -33,13 +33,15 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-master",
     "behat/behat": "^3.5",
     "behat/symfony2-extension": "^2.1",
+    "donatj/mock-webserver": "^2.0",
     "friendsofphp/php-cs-fixer": "^2.14",
     "jangregor/phpstan-prophecy": "^0.3.0",
+    "johnkary/phpunit-speedtrap": "^3.1",
     "phpstan/phpstan": "^0.11.0",
-    "phpunit/phpunit": "^7.5"
+    "phpunit/phpunit": "^7.5",
+    "roave/security-advisories": "dev-master"
   },
   "config": {
     "preferred-install": {

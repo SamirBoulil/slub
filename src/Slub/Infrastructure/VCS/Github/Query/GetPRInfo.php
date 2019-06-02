@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query;
 
-use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\GetVCSStatus;
-use Slub\Domain\Query\VCSStatus;
+use Slub\Domain\Query\GetPRInfoInterface;
+use Slub\Domain\Query\PRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class GetVCSStatusFromGithub implements GetVCSStatus
+class GetPRInfo implements GetPRInfoInterface
 {
     /** @var GetPRDetails */
     private $getPRDetails;
@@ -23,32 +22,20 @@ class GetVCSStatusFromGithub implements GetVCSStatus
     /** @var GetCIStatus */
     private $getCIStatus;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus, LoggerInterface $logger)
+    public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus)
     {
         $this->getPRDetails = $getPRDetails;
         $this->findReviews = $findReviews;
         $this->getCIStatus = $getCIStatus;
-        $this->logger = $logger;
     }
 
-    public function fetch(PRIdentifier $PRIdentifier): VCSStatus
+    public function fetch(PRIdentifier $PRIdentifier): PRInfo
     {
         $PRDetails = $this->getPRDetails->fetch($PRIdentifier);
-        $this->logger->critical('Fetched PR details.');
-
         $reviews = $this->findReviews->fetch($PRIdentifier);
-        $this->logger->critical('Fetched reviews');
-
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
-        $this->logger->critical('Fetched ci status');
-
         $isMerged = $this->isMerged($PRDetails);
-        $this->logger->critical('Fetched is merged');
-
-        $result = $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
+        $result = $this->createPRInfo($PRIdentifier, $reviews, $ciStatus, $isMerged);
 
         return $result;
     }
@@ -63,13 +50,13 @@ class GetVCSStatusFromGithub implements GetVCSStatus
         return 'closed' === $PRdetails['state'];
     }
 
-    private function createVCSStatus(
+    private function createPRInfo(
         PRIdentifier $PRIdentifier,
         array $reviews,
         string $ciStatus,
         bool $isMerged
-    ): VCSStatus {
-        $result = new VCSStatus();
+    ): PRInfo {
+        $result = new PRInfo();
         $result->PRIdentifier = $PRIdentifier->stringValue();
         $result->GTMCount = $reviews[FindReviews::GTMS];
         $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];

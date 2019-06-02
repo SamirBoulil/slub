@@ -7,7 +7,7 @@ namespace Tests\Integration\Infrastructure\VCS\Query;
 use GuzzleHttp\Psr7\Response;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

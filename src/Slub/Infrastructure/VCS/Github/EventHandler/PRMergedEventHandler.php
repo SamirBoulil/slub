@@ -30,17 +30,11 @@ class PRMergedEventHandler implements EventHandlerInterface
         return self::PULL_REQUEST_EVENT_TYPE === $eventType;
     }
 
-    public function handle(Request $request): void
+    public function handle(array $PRMergedEvent): void
     {
-        $PRMergedEvent = $this->getEventData($request);
         if ($this->isPullRequestEventSupported($PRMergedEvent)) {
             $this->updatePR($PRMergedEvent);
         }
-    }
-
-    private function getEventData(Request $request): array
-    {
-        return json_decode((string) $request->getContent(), true);
     }
 
     private function isPullRequestEventSupported(array $PRMergedEvent): bool

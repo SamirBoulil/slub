@@ -12,5 +12,5 @@ use Symfony\Component\HttpFoundation\Request;
 interface EventHandlerInterface
 {
     public function supports(string $eventType): bool;
-    public function handle(Request $request): void;
+    public function handle(array $request): void;
 }

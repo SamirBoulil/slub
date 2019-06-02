@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Query;
 
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\VCSStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
 use Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub;
-use Tests\Integration\Infrastructure\WebTestCase;
+use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -47,7 +48,8 @@ class GetVCSStatusFromGithubTest extends WebTestCase
         $this->getVCSStatus = new GetVCSStatusFromGithub(
             $this->getPRDetailsStub->reveal(),
             $this->findReviewsStub->reveal(),
-            $this->getCIStatusStub->reveal()
+            $this->getCIStatusStub->reveal(),
+            new NullLogger()
         );
     }
 

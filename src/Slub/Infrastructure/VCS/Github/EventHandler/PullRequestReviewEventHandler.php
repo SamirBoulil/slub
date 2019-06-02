@@ -6,7 +6,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -29,40 +28,30 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
         return self::NEW_REVIEW_EVENT_TYPE === $eventType;
     }
 
-    public function handle(Request $request): void
+    public function handle(array $PRStatusUpdate): void
     {
-        $PRStatusUpdate = $this->getPRStatusUpdate($request);
-        $this->updatePRStatus($PRStatusUpdate);
+        $newPRReview = $this->createNewReview($PRStatusUpdate);
+        $this->newReviewHandler->handle($newPRReview);
     }
 
-    private function getPRStatusUpdate(Request $request): array
-    {
-        return json_decode((string) $request->getContent(), true);
-    }
-
-    private function updatePRStatus(array $PRStatusUpdate): void
+    private function createNewReview(array $PRStatusUpdate): NewReview
     {
         $newPRReview = new NewReview();
         $newPRReview->PRIdentifier = $this->getPRIdentifier($PRStatusUpdate);
         $newPRReview->repositoryIdentifier = $this->getRepositoryIdentifier($PRStatusUpdate);
         $newPRReview->reviewStatus = $this->reviewStatus($PRStatusUpdate);
-        $this->newReviewHandler->handle($newPRReview);
+
+        return $newPRReview;
     }
 
     private function getPRIdentifier(array $PRStatusUpdate): string
     {
-        $PRUrl = $PRStatusUpdate['review']['html_url'];
-        preg_match('|https://github.com/(.*)/pull/(.*)#.*$|', $PRUrl, $matches);
-
-        return $matches[1].'/'.$matches[2];
+        return sprintf('%s/%s', $PRStatusUpdate['repository']['full_name'], $PRStatusUpdate['pull_request']['number']);
     }
 
     private function getRepositoryIdentifier(array $PRStatusUpdate): string
     {
-        $PRUrl = $PRStatusUpdate['review']['html_url'];
-        preg_match('#https://github.com/(.*)/pull/.*$#', $PRUrl, $matches);
-
-        return $matches[1];
+        return $PRStatusUpdate['repository']['full_name'];
     }
 
     private function reviewStatus(array $PRStatusUpdate): string
@@ -77,7 +66,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
             case 'commented':
                 return 'commented';
             default:
-                throw new BadRequestHttpException(
+                throw new \InvalidArgumentException(
                     sprintf(
                         'Unkown review status "%s", expected one of "approved", "request_changes", "commented"',
                         $PRStatus

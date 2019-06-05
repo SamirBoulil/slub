@@ -24,7 +24,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class NotifySquad implements EventSubscriberInterface
 {
     /** @var string[] */
-    public const REACTION_PR_REVIEWED = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    public const REACTION_PR_REVIEWED = [
+        'zero',
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+    ];
     public const REACTION_CI_GREEN = 'white_check_mark';
     public const REACTION_CI_RED = 'octagonal_sign';
     public const REACTION_PR_MERGED = 'rocket';
@@ -50,12 +61,12 @@ class NotifySquad implements EventSubscriberInterface
     {
         return [
             PRPutToReview::class => 'whenPRIsPutToReview',
-            PRGTMed::class => 'whenPRHasBeenGTMed',
-            PRNotGTMed::class => 'whenPRHasBeenNotGTMed',
-            CIGreen::class => 'whenCIIsGreen',
-            CIRed::class => 'whenCIIsRed',
-            CIPending::class => 'whenCIPending',
-            PRMerged::class => 'whenPRIsMerged',
+            PRGTMed::class       => 'whenPRHasBeenGTMed',
+            PRNotGTMed::class    => 'whenPRHasBeenNotGTMed',
+            CIGreen::class       => 'whenCIIsGreen',
+            CIRed::class         => 'whenCIIsRed',
+            CIPending::class     => 'whenCIPending',
+            PRMerged::class      => 'whenPRIsMerged',
         ];
     }
 
@@ -66,8 +77,9 @@ class NotifySquad implements EventSubscriberInterface
         foreach ($PR->messageIdentifiers() as $messageIdentifier) {
             $this->chatClient->setReactionsToMessageWith($messageIdentifier, $reactions);
         }
-        $this->logger->info(sprintf(
-            'Squad notified for PR %s with reactions: %s',
+        $this->logger->info(
+            sprintf(
+                'Squad notified for PR %s with reactions: %s',
                 $PRIdentifier->stringValue(),
                 implode(', ', $reactions)
             )
@@ -80,17 +92,18 @@ class NotifySquad implements EventSubscriberInterface
     private function getReactionsToSet(PR $PR): array
     {
         $normalizedPR = $PR->normalize();
-        $statusBar = [];
-        $statusBar[] = $this->getReviewCount($normalizedPR);
-        $statusBar[] = $this->getCIStatusReaction($normalizedPR);
+
         if ($normalizedPR['IS_MERGED']) {
-            $statusBar[] = self::REACTION_PR_MERGED;
+            return [$this->reactionForPRMerged()];
         }
 
-        return $statusBar;
+        return [
+            $this->reviewCountReaction($normalizedPR),
+            $this->reactionForCIStatus($normalizedPR),
+        ];
     }
 
-    private function getCIStatusReaction(array $normalizedPR): string
+    private function reactionForCIStatus(array $normalizedPR): string
     {
         $ciStatus = $normalizedPR['CI_STATUS'];
         if ('GREEN' === $ciStatus) {
@@ -103,7 +116,7 @@ class NotifySquad implements EventSubscriberInterface
         return self::REACTION_CI_PENDING;
     }
 
-    private function getReviewCount(array $normalizedPR): string
+    private function reviewCountReaction(array $normalizedPR): string
     {
         $reviewCount = (int) $normalizedPR['GTMS'];
 
@@ -143,5 +156,10 @@ class NotifySquad implements EventSubscriberInterface
     public function whenPRIsMerged(PRMerged $event): void
     {
         $this->synchronizeReactions($event->PRIdentifier());
+    }
+
+    private function reactionForPRMerged(): string
+    {
+        return self::REACTION_PR_MERGED;
     }
 }

@@ -20,5 +20,3 @@
 - /!\ Remove GetVCSStatus dependency in the putToReviewHandler -> get the information before creating the command
 - /!\ There is something fishy going on with the PRIdentifier
 - Rework Update CI status command with custom setters
-
-# Test is merged

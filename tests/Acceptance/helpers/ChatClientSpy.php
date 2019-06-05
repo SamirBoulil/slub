@@ -13,7 +13,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class ChatClientSpy implements ChatClient
 {
-    /** @var string[][] */
+    /** @var array */
     private $recordedMessages = [];
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
@@ -23,10 +23,30 @@ class ChatClientSpy implements ChatClient
 
     public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactions): void
     {
-        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactions, $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
+        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactions,
+            $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
     public function assertHasBeenCalledWith(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
+    {
+        $reactions = $this->reactionsForMessageIdentifier($expectedMessageIdentifier);
+        Assert::assertContains($expectedText, $reactions);
+    }
+
+    public function assertHasBeenCalledWithOnly(
+        MessageIdentifier $expectedMessageIdentifier,
+        string $expectedText
+    ): void {
+        $reactions = $this->reactionsForMessageIdentifier($expectedMessageIdentifier);
+        Assert::assertEquals([$expectedText], $reactions);
+    }
+
+    public function reset(): void
+    {
+        $this->recordedMessages = [];
+    }
+
+    private function reactionsForMessageIdentifier(MessageIdentifier $expectedMessageIdentifier): array
     {
         $key = $expectedMessageIdentifier->stringValue();
         Assert::assertArrayHasKey(
@@ -34,12 +54,9 @@ class ChatClientSpy implements ChatClient
             $this->recordedMessages,
             sprintf('Expected to have a reply to message ID "%s"', $expectedMessageIdentifier->stringValue())
         );
-        Assert::assertNotEmpty($this->recordedMessages[$key]);
-        Assert::assertContains($expectedText, $this->recordedMessages[$key]);
-    }
+        $reactions = $this->recordedMessages[$key];
+        Assert::assertNotEmpty($reactions);
 
-    public function reset(): void
-    {
-        $this->recordedMessages = [];
+        return $reactions;
     }
 }

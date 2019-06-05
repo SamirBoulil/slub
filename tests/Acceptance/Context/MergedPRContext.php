@@ -10,6 +10,8 @@ use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
+use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -29,6 +31,9 @@ class MergedPRContext extends FeatureContext
     /** @var PRIdentifier */
     private $currentPRIdentifier;
 
+    /** @var MessageIdentifier */
+    private $currentMessageIdentifier;
+
     /** @var ChatClientSpy */
     private $chatClientSpy;
 
@@ -42,6 +47,17 @@ class MergedPRContext extends FeatureContext
         $this->mergedPRHandler = $mergedPRHandler;
         $this->eventSpy = $eventSpy;
         $this->chatClientSpy = $chatClientSpy;
+    }
+
+    /**
+     * @Given /^a PR in review having multiple comments and a CI result$/
+     */
+    public function aPullRequestInReview()
+    {
+        $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
+        $this->PRRepository->save($this->PRWithGTMsAndGreen());
+        $this->chatClientSpy->reset();
     }
 
     /**
@@ -72,7 +88,7 @@ class MergedPRContext extends FeatureContext
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
         $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
-        $this->chatClientSpy->assertHasBeenCalledWith($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
+        $this->chatClientSpy->assertHasBeenCalledWithOnly($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
     }
 
     /**
@@ -85,5 +101,15 @@ class MergedPRContext extends FeatureContext
         $mergedPR->PRIdentifier = '1010';
         $this->currentPRIdentifier = PRIdentifier::fromString($mergedPR->PRIdentifier);
         $this->mergedPRHandler->handle($mergedPR);
+    }
+
+    private function PRWithGTMsAndGreen(): PR
+    {
+        $PR = PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier);
+        $PR->GTM();
+        $PR->GTM();
+        $PR->green();
+
+        return $PR;
     }
 }

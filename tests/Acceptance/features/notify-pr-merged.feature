@@ -5,7 +5,7 @@ Feature: Improve the signal VS noise of the list of pull requests that needs a r
 
   @nominal
   Scenario: Notify the squad when the PR is merged
-    Given a PR in review
+    Given a PR in review having multiple comments and a CI result
     When the author merges the PR
     Then the PR is merged
     And the squad should be notified that the PR has been merged

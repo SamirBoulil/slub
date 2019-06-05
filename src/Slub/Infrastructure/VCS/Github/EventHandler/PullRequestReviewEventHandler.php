@@ -30,6 +30,10 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
 
     public function handle(array $PRStatusUpdate): void
     {
+        if ($this->authorReviewedHisOwnPR($PRStatusUpdate)) {
+            return;
+        }
+
         $newPRReview = $this->createNewReview($PRStatusUpdate);
         $this->newReviewHandler->handle($newPRReview);
     }
@@ -73,5 +77,10 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
                     )
                 );
         }
+    }
+
+    private function authorReviewedHisOwnPR($PRStatusUpdate): bool
+    {
+        return $PRStatusUpdate['review']['user']['id'] === $PRStatusUpdate['pull_request']['user']['id'];
     }
 }

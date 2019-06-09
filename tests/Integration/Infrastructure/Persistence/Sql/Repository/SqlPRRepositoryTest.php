@@ -29,7 +29,10 @@ class SqlPRRepositoryTest extends KernelTestCase
     public function it_saves_a_pr_and_returns_it()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $savedPR = PR::create($identifier, MessageIdentifier::fromString('1'));
+        $savedPR = PR::create(
+            $identifier,
+            MessageIdentifier::fromString('1')
+        );
 
         $this->sqlPRRepository->save($savedPR);
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);
@@ -43,7 +46,10 @@ class SqlPRRepositoryTest extends KernelTestCase
     public function it_updates_a_pr()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $savedPR = PR::create($identifier, MessageIdentifier::fromString('1'));
+        $savedPR = PR::create(
+            $identifier,
+            MessageIdentifier::fromString('1')
+        );
         $this->sqlPRRepository->save($savedPR);
 
         $updatedPR = $savedPR;
@@ -152,7 +158,10 @@ class SqlPRRepositoryTest extends KernelTestCase
     public function it_resets_itself()
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
-        $this->sqlPRRepository->save(PR::create($identifier, MessageIdentifier::fromString('1')));
+        $this->sqlPRRepository->save(PR::create(
+            $identifier,
+            MessageIdentifier::fromString('1')
+        ));
         $this->sqlPRRepository->reset();
 
         $this->expectException(PRNotFoundException::class);

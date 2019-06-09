@@ -10,12 +10,10 @@ namespace Slub\Domain\Entity\PR;
  */
 class PutToReviewAt
 {
-    private const DATE_FORMAT = 'Y-m-d H:i:s';
-
-    /** @var string */
+    /** @var \DateTime */
     private $putToReviewAt;
 
-    public function __construct(string $putToReviewAt)
+    public function __construct(\DateTime $putToReviewAt)
     {
         $this->putToReviewAt = $putToReviewAt;
     }
@@ -24,16 +22,19 @@ class PutToReviewAt
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        return  new self($now->format(self::DATE_FORMAT));
+        return  new self($now);
     }
 
-    public static function fromString(string $putToReviewAt): self
+    public static function fromTimestamp(string $putToReviewAt): self
     {
-        return new self($putToReviewAt);
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date->setTimestamp((int) $putToReviewAt);
+
+        return new self($date);
     }
 
-    public function stringValue(): string
+    public function toTimestamp(): string
     {
-        return $this->putToReviewAt;
+        return (string) $this->putToReviewAt->getTimestamp();
     }
 }

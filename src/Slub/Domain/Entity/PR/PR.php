@@ -124,13 +124,14 @@ class PR
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(
-            function (string $messageId) {
+            function (string $messageId)
+            {
                 return MessageIdentifier::fromString($messageId);
             },
             $normalizedPR[self::MESSAGE_IDS]
         );
-        $putToReviewAt = PutToReviewAt::fromString($normalizedPR[self::PUT_TO_REVIEW_AT]);
-        $mergedAt = MergedAt::fromString($normalizedPR[self::MERGED_AT]);
+        $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
+        $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
 
         return new self(
             $identifier,
@@ -155,13 +156,14 @@ class PR
             self::CI_STATUS_KEY    => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY    => $this->isMerged,
             self::MESSAGE_IDS      => array_map(
-                function (MessageIdentifier $messageId) {
+                function (MessageIdentifier $messageId)
+                {
                     return $messageId->stringValue();
                 },
                 $this->messageIdentifiers
             ),
-            self::PUT_TO_REVIEW_AT => $this->putToReviewAt->stringValue(),
-            self::MERGED_AT        => $this->mergedAt->stringValue()
+            self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
+            self::MERGED_AT        => $this->mergedAt->toTimestamp()
         ];
     }
 
@@ -246,7 +248,8 @@ class PR
         $alreadyExists = !empty(
         array_filter(
             $this->messageIdentifiers,
-            function (MessageIdentifier $messageId) use ($newMessageId) {
+            function (MessageIdentifier $messageId) use ($newMessageId)
+            {
                 return $messageId->equals($newMessageId);
             }
         )

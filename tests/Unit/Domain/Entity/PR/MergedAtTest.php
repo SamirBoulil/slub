@@ -12,7 +12,7 @@ class MergedAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_merged_with_a_value()
+    public function it_creates_a_merged_at_date()
     {
         $mergedAt = MergedAt::create();
         $this->assertNotEmpty($mergedAt);
@@ -24,17 +24,28 @@ class MergedAtTest extends TestCase
     public function it_creates_a_merged_at_value_with_no_date()
     {
         $emptyMergedAt = MergedAt::none();
-        $this->assertEmpty($emptyMergedAt->stringValue());
+        $this->assertEmpty($emptyMergedAt->toTimestamp());
+
+        $emptyMergedAt = MergedAt::fromTimestampIfAny(null);
+        $this->assertEmpty($emptyMergedAt->toTimestamp());
     }
 
     /**
      * @test
      */
-    public function it_creates_a_put_to_review_date_from_string()
+    public function it_creates_a_merged_at_date_from_datetime()
     {
-        $aDate = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
-        $mergedAt = MergedAt::fromString($aDate);
+        $aTimestamp = $this->aTimestamp();
 
-        $this->assertEquals($aDate, $mergedAt->stringValue());
+        $mergedAt = MergedAt::fromTimestampIfAny($aTimestamp);
+
+        $this->assertEquals($aTimestamp, $mergedAt->toTimestamp());
+    }
+
+    private function aTimestamp(): string
+    {
+        $aDate = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return (string) $aDate->getTimestamp();
     }
 }

@@ -12,7 +12,7 @@ class PutToReviewAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_put_to_review()
+    public function it_creates_a_put_to_review_at_date()
     {
         $putToReviewAt = PutToReviewAt::create();
         $this->assertNotEmpty($putToReviewAt);
@@ -21,11 +21,13 @@ class PutToReviewAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_put_to_review_date_from_string()
+    public function it_creates_a_put_to_review_date_from_timestamp()
     {
-        $aDate = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
-        $putToReviewAt = PutToReviewAt::fromString($aDate);
+        $aTimestamp = (string) (new \DateTime())->getTimestamp();
 
-        $this->assertEquals($aDate, $putToReviewAt->stringValue());
+        $putToReviewAt = PutToReviewAt::fromTimestamp($aTimestamp);
+
+        $toTimestamp = $putToReviewAt->toTimestamp();
+        $this->assertEquals($aTimestamp, $toTimestamp);
     }
 }

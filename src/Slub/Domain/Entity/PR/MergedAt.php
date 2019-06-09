@@ -10,22 +10,21 @@ namespace Slub\Domain\Entity\PR;
  */
 class MergedAt
 {
-    private const DATE_FORMAT = 'Y-m-d H:i:s';
-    private const EMPTY_DATE = '';
+    private const EMPTY_DATE = null;
 
-    /** @var string */
-    private $putToReviewAt;
+    /** @var ?\DateTime */
+    private $mergedAt;
 
-    public function __construct(?string $putToReviewAt)
+    public function __construct(?\DateTime $mergedAt)
     {
-        $this->putToReviewAt = $putToReviewAt;
+        $this->mergedAt = $mergedAt;
     }
 
     public static function create(): self
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        return new self($now->format(self::DATE_FORMAT));
+        return new self($now);
     }
 
     public static function none(): self
@@ -33,13 +32,20 @@ class MergedAt
         return new self(self::EMPTY_DATE);
     }
 
-    public static function fromString(string $putToReviewAt): self
+    public static function fromTimestampIfAny(?string $putToReviewAt): self
     {
-        return new self($putToReviewAt);
+        if (null === $putToReviewAt) {
+            return new self(self::EMPTY_DATE);
+        }
+
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date->setTimestamp((int) $putToReviewAt);
+
+        return new self($date);
     }
 
-    public function stringValue(): string
+    public function toTimestamp(): ?string
     {
-        return $this->putToReviewAt;
+        return null !== $this->mergedAt ? (string)$this->mergedAt->getTimestamp() : null;
     }
 }

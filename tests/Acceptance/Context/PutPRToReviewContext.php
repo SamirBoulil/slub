@@ -187,15 +187,15 @@ class PutPRToReviewContext extends FeatureContext
     ): void {
         Assert::assertTrue($this->PRExists($prIdentifier));
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
-        Assert::assertEquals([
-            'IDENTIFIER'  => $prIdentifier,
-            'GTMS'        => $gtmCount,
-            'NOT_GTMS'    => $notGtmCount,
-            'COMMENTS'    => $commentsCount,
-            'CI_STATUS'   => $ciStatus,
-            'IS_MERGED'   => $isMerged,
-            'MESSAGE_IDS' => $messageIds,
-        ], $pr->normalize());
+        Assert::assertEquals($pr->normalize()['IDENTIFIER'], $prIdentifier);
+        Assert::assertEquals($pr->normalize()['GTMS'], $gtmCount);
+        Assert::assertEquals($pr->normalize()['NOT_GTMS'], $notGtmCount);
+        Assert::assertEquals($pr->normalize()['COMMENTS'], $commentsCount);
+        Assert::assertEquals($pr->normalize()['CI_STATUS'], $ciStatus);
+        Assert::assertEquals($pr->normalize()['IS_MERGED'], $isMerged);
+        Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
+        Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
+        Assert::assertEmpty($pr->normalize()['MERGED_AT']);
     }
 
     /**

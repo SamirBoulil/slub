@@ -31,27 +31,32 @@ class ListPRsActionTest extends WebTestCase
     public function it_lists_all_the_prs(): void
     {
         $this->PRRepository->save(
-            PR::fromNormalized([
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => true,
-                    'MESSAGE_IDS' => ['1', '2'],
+            PR::fromNormalized(
+                [
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => true,
+                    'MESSAGE_IDS'      => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'MERGED_AT'        => null
                 ]
             )
         );
         $this->PRRepository->save(
-            PR::fromNormalized([
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => false,
-                    'MESSAGE_IDS' => ['1', '2'],
-
+            PR::fromNormalized(
+                [
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => false,
+                    'MESSAGE_IDS'      => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'MERGED_AT'        => null
                 ]
             )
         );
@@ -61,27 +66,32 @@ class ListPRsActionTest extends WebTestCase
         $response = $client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals([
+        $this->assertEquals(
             [
-                'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
-                'GTMS'        => 1,
-                'NOT_GTMS'    => 1,
-                'COMMENTS'    => 1,
-                'CI_STATUS'   => 'PENDING',
-                'IS_MERGED'   => false,
-                'MESSAGE_IDS' => ['1', '2'],
-
+                [
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => false,
+                    'MESSAGE_IDS'      => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'MERGED_AT'        => null
+                ],
+                [
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => true,
+                    'MESSAGE_IDS'      => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'MERGED_AT'        => null
+                ]
             ],
-            [
-                'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
-                'GTMS'        => 1,
-                'NOT_GTMS'    => 1,
-                'COMMENTS'    => 1,
-                'CI_STATUS'   => 'PENDING',
-                'IS_MERGED'   => true,
-                'MESSAGE_IDS' => ['1', '2'],
-
-            ]
-        ], json_decode($response->getContent(), true));
+            json_decode($response->getContent(), true)
+        );
     }
 }

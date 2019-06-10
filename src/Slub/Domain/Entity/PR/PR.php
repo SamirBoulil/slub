@@ -124,8 +124,7 @@ class PR
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(
-            function (string $messageId)
-            {
+            function (string $messageId) {
                 return MessageIdentifier::fromString($messageId);
             },
             $normalizedPR[self::MESSAGE_IDS]
@@ -156,8 +155,7 @@ class PR
             self::CI_STATUS_KEY    => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY    => $this->isMerged,
             self::MESSAGE_IDS      => array_map(
-                function (MessageIdentifier $messageId)
-                {
+                function (MessageIdentifier $messageId) {
                     return $messageId->stringValue();
                 },
                 $this->messageIdentifiers
@@ -248,8 +246,7 @@ class PR
         $alreadyExists = !empty(
         array_filter(
             $this->messageIdentifiers,
-            function (MessageIdentifier $messageId) use ($newMessageId)
-            {
+            function (MessageIdentifier $messageId) use ($newMessageId) {
                 return $messageId->equals($newMessageId);
             }
         )

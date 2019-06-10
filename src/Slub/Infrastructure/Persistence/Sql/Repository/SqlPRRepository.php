@@ -47,8 +47,7 @@ class SqlPRRepository implements PRRepositoryInterface
         $result = $this->fetchAll();
 
         return array_map(
-            function (array $normalizedPR)
-            {
+            function (array $normalizedPR) {
                 return $this->hydrate($normalizedPR);
             },
             $result

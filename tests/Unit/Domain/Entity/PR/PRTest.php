@@ -16,7 +16,7 @@ use Slub\Domain\Event\PRPutToReview;
 
 class PRTest extends TestCase
 {
-    private const A_DATE = '2019-06-09 15:48:28';
+    private const A_DATE = '1560177798';
 
     /**
      * @test

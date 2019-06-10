@@ -71,7 +71,8 @@
     "auto-scripts": {
       "cache:clear": "symfony-cmd",
       "assets:install %PUBLIC_DIR%": "symfony-cmd",
-      "make install": "script"
+      "make install": "script",
+      "make migrate": "script"
     },
     "post-install-cmd": [
       "@auto-scripts"

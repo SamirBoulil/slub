@@ -16,7 +16,7 @@ use Slub\Domain\Event\PRPutToReview;
 
 class PRTest extends TestCase
 {
-    private const A_DATE = '1560177798';
+    private const A_TIMESTAMP = '1560177798';
 
     /**
      * @test
@@ -56,8 +56,8 @@ class PRTest extends TestCase
             'CI_STATUS'        => 'GREEN',
             'IS_MERGED'        => true,
             'MESSAGE_IDS'      => ['1', '2'],
-            'PUT_TO_REVIEW_AT' => self::A_DATE,
-            'MERGED_AT'        => self::A_DATE,
+            'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+            'MERGED_AT'        => self::A_TIMESTAMP,
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -319,8 +319,8 @@ class PRTest extends TestCase
                 'CI_STATUS'        => 'PENDING',
                 'IS_MERGED'        => false,
                 'MESSAGE_IDS'      => ['1'],
-                'PUT_TO_REVIEW_AT' => self::A_DATE,
-                'MERGED_AT'        => self::A_DATE,
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'MERGED_AT'        => self::A_TIMESTAMP,
             ]
         );
         return $pr;
@@ -337,8 +337,8 @@ class PRTest extends TestCase
                 'CI_STATUS'        => 'GREEN',
                 'IS_MERGED'        => false,
                 'MESSAGE_IDS'      => ['1'],
-                'PUT_TO_REVIEW_AT' => self::A_DATE,
-                'MERGED_AT'        => self::A_DATE
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'MERGED_AT'        => self::A_TIMESTAMP
             ]
         );
 

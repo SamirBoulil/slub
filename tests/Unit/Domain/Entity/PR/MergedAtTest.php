@@ -33,7 +33,7 @@ class MergedAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_merged_at_date_from_datetime()
+    public function it_creates_a_merged_at_date_from_timestamp()
     {
         $aTimestamp = $this->aTimestamp();
 

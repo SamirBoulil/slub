@@ -20,7 +20,7 @@ final class Version20190609163730 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
-        $this->MarkToBeMigratedRows();
+        $this->markRowsToBeMigrated();
         $this->addPutToReviewAtAndMigratedAtColumns();
     }
 
@@ -31,7 +31,7 @@ final class Version20190609163730 extends AbstractMigration
         $this->addSql('ALTER TABLE pr DROP MERGED_AT;');
     }
 
-    private function MarkToBeMigratedRows(): void
+    private function markRowsToBeMigrated(): void
     {
         $this->addSql('ALTER TABLE pr ADD rows_before_migration_Version20190609163730 BOOL NOT NULL DEFAULT FALSE;');
         $this->addSql(

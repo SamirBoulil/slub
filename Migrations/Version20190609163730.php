@@ -13,18 +13,21 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20190609163730 extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'Adds "put_to_review_at" and "merged_at" columns in the PR table';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
+        if ($this->environmentIsMigrated()) {
+            return;
+        }
         $this->markRowsToBeMigrated();
         $this->addPutToReviewAtAndMigratedAtColumns();
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->addSql('ALTER TABLE pr DROP rows_before_migration_Version20190609163730;');
         $this->addSql('ALTER TABLE pr DROP PUT_TO_REVIEW_AT;');
@@ -43,5 +46,32 @@ final class Version20190609163730 extends AbstractMigration
     {
         $this->addSql('ALTER TABLE pr ADD PUT_TO_REVIEW_AT VARCHAR(20) NULL;');
         $this->addSql('ALTER TABLE pr ADD MERGED_AT VARCHAR(20) NULL;');
+    }
+
+    private function environmentIsMigrated(): bool
+    {
+        $columns = $this->fetchColumns();
+
+        return $this->hasColumns(['PUT_TO_REVIEW_AT', 'MERGED_AT'], $columns);
+    }
+
+    private function hasColumns(array $expectedColumns, array $actualColumns): bool
+    {
+        return \count($expectedColumns) === \count(
+                array_filter(
+                    $actualColumns,
+                    function (string $column) use ($expectedColumns) {
+                        return in_array($column, $expectedColumns);
+                    }
+                )
+            );
+    }
+
+    private function fetchColumns(): array
+    {
+        $getPRColumns = 'SHOW COLUMNS FROM PR;';
+        $result = $this->connection->executeQuery($getPRColumns);
+
+        return $result->fetchAll(\PDO::FETCH_COLUMN);
     }
 }

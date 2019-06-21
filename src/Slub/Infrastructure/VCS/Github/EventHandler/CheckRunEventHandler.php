@@ -90,7 +90,8 @@ class CheckRunEventHandler implements EventHandlerInterface
         switch ($conclusion) {
             case 'success': return 'GREEN';
             case 'failure':
-            case 'error': return 'RED';
+            case 'error':
+            case 'default': return 'RED';
         }
 
         throw new \InvalidArgumentException(

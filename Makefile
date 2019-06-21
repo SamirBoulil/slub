@@ -3,6 +3,11 @@ install:
 	bin/console --env=prod cache:clear
 	bin/console --env=prod slub:install
 
+.PHONY: migrate
+migrate:
+	bin/console --env=prod cache:clear
+	bin/console --env=prod doctrine:migrations:migrate --no-interaction
+
 .PHONY: install-test
 install-test:
 	bin/console --env=test cache:clear

@@ -24,6 +24,8 @@ class PR
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
+    private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
+    private const MERGED_AT = 'MERGED_AT';
 
     /** @var Event[] */
     private $events = [];
@@ -49,6 +51,12 @@ class PR
     /** @var bool */
     private $isMerged;
 
+    /** @var PutToReviewAt */
+    private $putToReviewAt;
+
+    /** @var MergedAt */
+    private $mergedAt;
+
     private function __construct(
         PRIdentifier $PRIdentifier,
         array $messageIds,
@@ -56,7 +64,9 @@ class PR
         int $notGTMCount,
         int $comments,
         CIStatus $CIStatus,
-        bool $isMerged
+        bool $isMerged,
+        PutToReviewAt $putToReviewAt,
+        MergedAt $mergedAt
     ) {
         $this->PRIdentifier = $PRIdentifier;
         $this->GTMCount = $GTMCount;
@@ -65,6 +75,8 @@ class PR
         $this->CIStatus = $CIStatus;
         $this->isMerged = $isMerged;
         $this->messageIdentifiers = $messageIds;
+        $this->putToReviewAt = $putToReviewAt;
+        $this->mergedAt = $mergedAt;
     }
 
     public static function create(
@@ -83,7 +95,9 @@ class PR
             $notGTMs,
             $comments,
             CIStatus::fromNormalized($CIStatus),
-            $isMerged
+            $isMerged,
+            PutToReviewAt::create(),
+            MergedAt::none()
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
 
@@ -99,6 +113,8 @@ class PR
         Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
+        Assert::keyExists($normalizedPR, self::PUT_TO_REVIEW_AT);
+        Assert::keyExists($normalizedPR, self::MERGED_AT);
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
 
         $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
@@ -107,9 +123,14 @@ class PR
         $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
-        $messageIds = array_map(function (string $messageId) {
-            return MessageIdentifier::fromString($messageId);
-        }, $normalizedPR[self::MESSAGE_IDS]);
+        $messageIds = array_map(
+            function (string $messageId) {
+                return MessageIdentifier::fromString($messageId);
+            },
+            $normalizedPR[self::MESSAGE_IDS]
+        );
+        $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
+        $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
 
         return new self(
             $identifier,
@@ -118,22 +139,29 @@ class PR
             $NOTGTM,
             $comments,
             CIStatus::fromNormalized($CIStatus),
-            $isMerged
+            $isMerged,
+            $putToReviewAt,
+            $mergedAt
         );
     }
 
     public function normalize(): array
     {
         return [
-            self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
-            self::GTM_KEY        => $this->GTMCount,
-            self::NOT_GTM_KEY    => $this->notGTMCount,
-            self::COMMENTS_KEY   => $this->comments,
-            self::CI_STATUS_KEY  => $this->CIStatus->stringValue(),
-            self::IS_MERGED_KEY  => $this->isMerged,
-            self::MESSAGE_IDS    => array_map(function (MessageIdentifier $messageId) {
-                return $messageId->stringValue();
-            }, $this->messageIdentifiers),
+            self::IDENTIFIER_KEY   => $this->PRIdentifier()->stringValue(),
+            self::GTM_KEY          => $this->GTMCount,
+            self::NOT_GTM_KEY      => $this->notGTMCount,
+            self::COMMENTS_KEY     => $this->comments,
+            self::CI_STATUS_KEY    => $this->CIStatus->stringValue(),
+            self::IS_MERGED_KEY    => $this->isMerged,
+            self::MESSAGE_IDS      => array_map(
+                function (MessageIdentifier $messageId) {
+                    return $messageId->stringValue();
+                },
+                $this->messageIdentifiers
+            ),
+            self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
+            self::MERGED_AT        => $this->mergedAt->toTimestamp()
         ];
     }
 
@@ -193,6 +221,7 @@ class PR
     public function merged(): void
     {
         $this->isMerged = true;
+        $this->mergedAt = MergedAt::create();
         $this->events[] = PRMerged::ForPR($this->PRIdentifier);
     }
 

@@ -18,12 +18,13 @@ class ListPRsAction
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
-    public function __construct(PRRepositoryInterface $PRRepository)
-    {
+    public function __construct(
+        PRRepositoryInterface $PRRepository
+    ) {
         $this->PRRepository = $PRRepository;
     }
 
-    public function executeAction(Request $request): Response
+    public function executeAction(): Response
     {
         return new JsonResponse(
             array_map(

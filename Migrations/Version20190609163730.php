@@ -69,7 +69,7 @@ final class Version20190609163730 extends AbstractMigration
 
     private function fetchColumns(): array
     {
-        $getPRColumns = 'SHOW COLUMNS FROM PR;';
+        $getPRColumns = 'SHOW COLUMNS FROM pr;';
         $result = $this->connection->executeQuery($getPRColumns);
 
         return $result->fetchAll(\PDO::FETCH_COLUMN);

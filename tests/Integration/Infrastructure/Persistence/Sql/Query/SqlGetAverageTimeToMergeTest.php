@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
 
+use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
@@ -48,6 +49,24 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         self::assertEquals(3, $this->getAverageTimeToMerge->fetch());
     }
 
+    /**
+     * @test
+     */
+    public function it_does_not_take_into_account_prs_created_prior_to_migration_Version20190609163730()
+    {
+        $this->createPRPriorToMigrationVersion20190609163730();
+        self::assertNull($this->getAverageTimeToMerge->fetch());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_take_into_account_prs_not_merged()
+    {
+        $this->createPRNotMerged();
+        self::assertNull($this->getAverageTimeToMerge->fetch());
+    }
+
     private function resetDB(): void
     {
         $sqlPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
@@ -77,5 +96,29 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
                 ]
             )
         );
+    }
+
+    private function createPRPriorToMigrationVersion20190609163730(): void
+    {
+        /** @var Connection $connection */
+        $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
+        $sql = <<<SQL
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
+VALUES
+	('pr_identifier', 3, 0, 1, 'PENDING', 1, '{}', 1, '251512', '251512');
+SQL;
+        $connection->executeUpdate($sql);
+    }
+
+    private function createPRNotMerged(): void
+    {
+        /** @var Connection $connection */
+        $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
+        $sql = <<<SQL
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
+VALUES
+	('pr_identifier', 3, 0, 1, 'PENDING', 0, '{}', 0, '251512', '251512');
+SQL;
+        $connection->executeUpdate($sql);
     }
 }

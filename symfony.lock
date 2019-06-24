@@ -193,6 +193,9 @@
     "johnkary/phpunit-speedtrap": {
         "version": "v3.1.0"
     },
+    "kylekatarnls/update-helper": {
+        "version": "1.1.1"
+    },
     "laravel/framework": {
         "version": "v5.7.28"
     },

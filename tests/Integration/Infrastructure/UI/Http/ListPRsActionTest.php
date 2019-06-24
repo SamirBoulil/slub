@@ -6,7 +6,6 @@ namespace Tests\Integration\Infrastructure\UI\Http;
 
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Tests\Integration\Infrastructure\KernelTestCase;
 use Tests\WebTestCase;
 
 /**
@@ -41,7 +40,7 @@ class ListPRsActionTest extends WebTestCase
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => '1561363426'
                 ]
             )
         );
@@ -68,6 +67,7 @@ class ListPRsActionTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(
             [
+                'AVERAGE_TIME_TO_MERGE' => 13,
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
                     'GTMS'             => 1,
@@ -88,7 +88,7 @@ class ListPRsActionTest extends WebTestCase
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => '1561363426'
                 ]
             ],
             json_decode($response->getContent(), true)

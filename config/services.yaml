@@ -93,6 +93,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.get_average_time_to_merge:
+        class: Slub\Infrastructure\Persistence\Sql\Query\SqlGetAverageTimeToMerge
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     slub.infrastructure.query.is_supported:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:
@@ -254,6 +259,7 @@ services:
         class: Slub\Infrastructure\UI\Http\ListPRsAction
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.get_average_time_to_merge'
 
     ## CLI
     slub.infrastructure.installer.cli.InstallerCLI:

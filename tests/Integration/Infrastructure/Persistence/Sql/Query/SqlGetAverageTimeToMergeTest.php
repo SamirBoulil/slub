@@ -48,6 +48,14 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         self::assertEquals(3, $this->getAverageTimeToMerge->fetch());
     }
 
+    /**
+     * @test
+     *      It works with PR previous to Version20190609163730
+     */
+    public function it_does_not_take_into_account_pr_not_having_dates()
+    {
+    }
+
     private function resetDB(): void
     {
         $sqlPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');

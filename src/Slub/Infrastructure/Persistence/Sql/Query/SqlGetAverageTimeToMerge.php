@@ -25,7 +25,11 @@ class SqlGetAverageTimeToMerge implements GetAverageTimeToMergeInterface
     {
         $query = <<<SQL
 SELECT FLOOR(AVG(TIMESTAMPDIFF(DAY, FROM_UNIXTIME(PUT_TO_REVIEW_AT), FROM_UNIXTIME(MERGED_AT)))) average_time_to_merge
-FROM pr;
+FROM pr
+WHERE
+    IS_MERGED is TRUE
+    AND rows_before_migration_Version20190609163730 IS FALSE
+;
 SQL;
         $stmt = $this->sqlConnection->executeQuery($query);
         $result = $stmt->fetch(\PDO::FETCH_COLUMN);

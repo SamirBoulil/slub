@@ -290,12 +290,6 @@ class PRTest extends TestCase
         ];
     }
 
-    /**
-     * @param array $events
-     * @param PRIdentifier $expectedPRIdentifier
-     * @param MessageIdentifier $expectedMessageId
-     *
-     */
     private function assertPRPutToReviewEvent(
         array $events,
         PRIdentifier $expectedPRIdentifier,

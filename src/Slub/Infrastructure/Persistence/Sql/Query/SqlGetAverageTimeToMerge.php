@@ -6,12 +6,12 @@ namespace Slub\Infrastructure\Persistence\Sql\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-use Slub\Domain\Query\GetAverageTimeToMerge;
+use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class SqlGetAverageTimeToMerge implements GetAverageTimeToMerge
+class SqlGetAverageTimeToMerge implements GetAverageTimeToMergeInterface
 {
     /** @var Connection */
     private $sqlConnection;

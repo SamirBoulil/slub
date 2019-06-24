@@ -259,6 +259,7 @@ services:
         class: Slub\Infrastructure\UI\Http\ListPRsAction
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.get_average_time_to_merge'
 
     ## CLI
     slub.infrastructure.installer.cli.InstallerCLI:

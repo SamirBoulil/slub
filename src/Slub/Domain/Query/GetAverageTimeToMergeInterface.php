@@ -7,7 +7,7 @@ namespace Slub\Domain\Query;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-interface GetAverageTimeToMerge
+interface GetAverageTimeToMergeInterface
 {
-	public function fetch(): ?int;
+    public function fetch(): ?int;
 }

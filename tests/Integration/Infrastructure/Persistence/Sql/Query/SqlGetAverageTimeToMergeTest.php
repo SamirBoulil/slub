@@ -6,7 +6,7 @@ namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
 
 use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\PR\PR;
-use Slub\Domain\Query\GetAverageTimeToMerge;
+use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
@@ -18,7 +18,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
-    /** @var GetAverageTimeToMerge */
+    /** @var GetAverageTimeToMergeInterface */
     private $getAverageTimeToMerge;
 
     public function setUp(): void

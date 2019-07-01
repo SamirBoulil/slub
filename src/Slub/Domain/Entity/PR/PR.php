@@ -151,26 +151,26 @@ class PR
     public function normalize(): array
     {
         return [
-            self::IDENTIFIER_KEY   => $this->PRIdentifier()->stringValue(),
-            self::GTM_KEY          => $this->GTMCount,
-            self::NOT_GTM_KEY      => $this->notGTMCount,
-            self::COMMENTS_KEY     => $this->comments,
-            self::CI_STATUS_KEY    => $this->CIStatus->stringValue(),
-            self::IS_MERGED_KEY    => $this->isMerged,
-            self::CHANNEL_IDS      => array_map(
+            self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
+            self::GTM_KEY => $this->GTMCount,
+            self::NOT_GTM_KEY => $this->notGTMCount,
+            self::COMMENTS_KEY => $this->comments,
+            self::CI_STATUS_KEY => $this->CIStatus->stringValue(),
+            self::IS_MERGED_KEY => $this->isMerged,
+            self::CHANNEL_IDS => array_map(
                 function (ChannelIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers
             ),
-            self::MESSAGE_IDS      => array_map(
+            self::MESSAGE_IDS => array_map(
                 function (MessageIdentifier $messageIdentifier) {
                     return $messageIdentifier->stringValue();
                 },
                 $this->messageIdentifiers
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
-            self::MERGED_AT        => $this->mergedAt->toTimestamp()
+            self::MERGED_AT => $this->mergedAt->toTimestamp(),
         ];
     }
 
@@ -250,22 +250,54 @@ class PR
         return $this->events;
     }
 
-    public function putToReviewAgainViaMessage(MessageIdentifier $newMessageId): void
-    {
-        $alreadyExists = !empty(
-        array_filter(
-            $this->messageIdentifiers,
-            function (MessageIdentifier $messageId) use ($newMessageId) {
-                return $messageId->equals($newMessageId);
-            }
-        )
-        );
-
-        if ($alreadyExists) {
+    public function putToReviewAgainViaMessage(
+        ChannelIdentifier $newChannelIdentifier,
+        MessageIdentifier $newMessageIdentifier
+    ): void {
+        if ($this->hasMessageIdentifier($newMessageIdentifier) && $this->hasChannelIdentifier($newChannelIdentifier)) {
             return;
         }
 
-        $this->messageIdentifiers[] = $newMessageId;
-        $this->events[] = PRPutToReview::forPR($this->PRIdentifier, $newMessageId);
+        $hasPRBeenPutToReviewAgain = false;
+        if (!$this->hasChannelIdentifier($newChannelIdentifier)) {
+            $hasPRBeenPutToReviewAgain = true;
+            $this->channelIdentifiers[] = $newChannelIdentifier;
+        }
+        if (!$this->hasMessageIdentifier($newMessageIdentifier)) {
+            $hasPRBeenPutToReviewAgain = true;
+            $this->messageIdentifiers[] = $newMessageIdentifier;
+        }
+
+        if ($hasPRBeenPutToReviewAgain) {
+            $this->events[] = PRPutToReview::forPR($this->PRIdentifier, $newMessageIdentifier);
+        }
+    }
+
+    private function hasMessageIdentifier(MessageIdentifier $newMessageIdentifier): bool
+    {
+        return in_array(
+            $newMessageIdentifier->stringValue(),
+            array_map(
+                function (MessageIdentifier $messageIdentifier) {
+                    return $messageIdentifier->stringValue();
+                },
+                $this->messageIdentifiers
+            ),
+            true
+        );
+    }
+
+    private function hasChannelIdentifier(ChannelIdentifier $newChannelIdentifier): bool
+    {
+        return in_array(
+            $newChannelIdentifier->stringValue(),
+            array_map(
+                function (ChannelIdentifier $channelIdentifier) {
+                    return $channelIdentifier->stringValue();
+                },
+                $this->channelIdentifiers
+            ),
+            true
+        );
     }
 }

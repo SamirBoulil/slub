@@ -91,6 +91,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
                     'CI_STATUS'        => 'PENDING',
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
+                    'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => (string) $now->getTimestamp(),
                     'MERGED_AT'        => (string) $mergedAt->getTimestamp()
                 ]

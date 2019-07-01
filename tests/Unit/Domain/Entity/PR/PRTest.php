@@ -220,14 +220,15 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times()
+    public function it_can_be_put_to_review_multiple_times_in_different_channels()
     {
         $pr = $this->greenPR();
         $expectedMessageId = MessageIdentifier::create('2');
 
-        $pr->putToReviewAgainViaMessage($expectedMessageId);
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'), $expectedMessageId);
 
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons', 'brazil-team']);
         $this->assertPRPutToReviewEvent(
             $pr->getEvents(),
             PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
@@ -238,13 +239,14 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times_with_the_same_message()
+    public function it_can_be_put_to_review_multiple_times_in_the_same_channel_with_the_same_message_id()
     {
         $pr = $this->pendingPR();
 
-        $pr->putToReviewAgainViaMessage(MessageIdentifier::create('1'));
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::create('1'));
 
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons']);
         $this->assertEmpty($pr->getEvents());
     }
 

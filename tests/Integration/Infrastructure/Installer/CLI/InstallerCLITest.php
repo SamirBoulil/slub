@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Installer\CLI;
 
 use Doctrine\DBAL\Connection;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -103,8 +104,7 @@ class InstallerCLITest extends KernelTestCase
         $this->currentPRIdentifier = PRIdentifier::create('test_pr');
         $prRepository->save(
             PR::create(
-                $this->currentPRIdentifier,
-                MessageIdentifier::create('CHANNEL_ID@1111')
+                $this->currentPRIdentifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::create('CHANNEL_ID@1111')
             )
         );
     }

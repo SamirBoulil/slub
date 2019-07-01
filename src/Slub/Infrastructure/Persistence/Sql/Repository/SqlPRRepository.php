@@ -66,7 +66,7 @@ class SqlPRRepository implements PRRepositoryInterface
     private function fetch(PRIdentifier $PRidentifier): array
     {
         $sql = <<<SQL
-SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT
+SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT, CHANNEL_IDS
 FROM pr
 WHERE identifier = :identifier;
 SQL;
@@ -82,7 +82,7 @@ SQL;
     private function fetchAll(): array
     {
         $sql = <<<SQL
-SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT
+SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT, CHANNEL_IDS
 FROM pr
 ORDER BY IS_MERGED ASC;
 SQL;
@@ -98,6 +98,7 @@ SQL;
     private function hydrate(array $result): PR
     {
         $result['MESSAGE_IDS'] = json_decode($result['MESSAGE_IDS'], true);
+        $result['CHANNEL_IDS'] = null !== $result['CHANNEL_IDS'] ? json_decode($result['CHANNEL_IDS'], true) : [];
         $result['GTMS'] = Type::getType(Type::INTEGER)->convertToPhpValue(
             $result['GTMS'],
             $this->sqlConnection->getDatabasePlatform()
@@ -142,9 +143,9 @@ SQL;
     {
         $sql = <<<SQL
 INSERT INTO
-  pr (IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT)
+  pr (IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT, CHANNEL_IDS)
 VALUES
-  (:IDENTIFIER, :GTMS, :NOT_GTMS, :COMMENTS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS, :PUT_TO_REVIEW_AT, :MERGED_AT)
+  (:IDENTIFIER, :GTMS, :NOT_GTMS, :COMMENTS, :CI_STATUS, :IS_MERGED, :MESSAGE_IDS, :PUT_TO_REVIEW_AT, :MERGED_AT, :CHANNEL_IDS)
 ON DUPLICATE KEY UPDATE
   IDENTIFIER = :IDENTIFIER,
   GTMS = :GTMS,
@@ -154,7 +155,8 @@ ON DUPLICATE KEY UPDATE
   IS_MERGED = :IS_MERGED,
   MESSAGE_IDS = :MESSAGE_IDS,
   PUT_TO_REVIEW_AT = :PUT_TO_REVIEW_AT,
-  MERGED_AT = :MERGED_AT;
+  MERGED_AT = :MERGED_AT,
+  CHANNEL_IDS = :CHANNEL_IDS;
 SQL;
 
         $this->sqlConnection->executeUpdate(
@@ -163,6 +165,7 @@ SQL;
             [
                 'IS_MERGED'   => 'boolean',
                 'MESSAGE_IDS' => 'json',
+                'CHANNEL_IDS' => 'json',
             ]
         );
     }

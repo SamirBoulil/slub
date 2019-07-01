@@ -10,6 +10,7 @@ use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -105,7 +106,7 @@ class MergedPRContext extends FeatureContext
 
     private function PRWithGTMsAndGreen(): PR
     {
-        $PR = PR::create($this->currentPRIdentifier, $this->currentMessageIdentifier);
+        $PR = PR::create($this->currentPRIdentifier, ChannelIdentifier::fromString('squad-raccoons'), $this->currentMessageIdentifier);
         $PR->GTM();
         $PR->GTM();
         $PR->green();

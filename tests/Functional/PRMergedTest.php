@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Functional;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -51,7 +52,7 @@ class PRMergedTest extends WebTestCase
     {
         $this->PRRepository->save(
             PR::create(
-                PRIdentifier::create(self::PR_IDENTIFIER),
+                PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
                 MessageIdentifier::create('CHANNEL_ID@1111')
             )
         );

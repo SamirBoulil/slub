@@ -33,6 +33,9 @@ class PutPRToReviewContext extends FeatureContext
     /** @var string[] */
     private $currentMessageIds = [];
 
+    /** @var array */
+    private $currentChannelIds = [];
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         PutPRToReviewHandler $putPRToReviewHandler,
@@ -49,7 +52,7 @@ class PutPRToReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^an author puts a PR to review$/
+     * @When /^an author puts a PR to review in a channel$/
      */
     public function anAuthorPutsAPRToReview()
     {
@@ -71,6 +74,7 @@ class PutPRToReviewContext extends FeatureContext
         $this->currentRepositoryIdentifier = $repositoryIdentifier;
         $this->currentPRIdentifier = $PRIdentifier;
         $this->currentMessageIds[] = $messageId;
+        $this->currentChannelIds[] = $channelIdentifier;
 
         $putPRToReview = new PutPRToReview();
         $putPRToReview->channelIdentifier = $channelIdentifier;
@@ -121,7 +125,8 @@ class PutPRToReviewContext extends FeatureContext
             0,
             'PENDING',
             false,
-            $this->currentMessageIds
+            $this->currentMessageIds,
+            ['squad-raccoons']
         );
         Assert::assertTrue($this->eventSpy->PRPutToReviewDispatched());
     }
@@ -147,21 +152,21 @@ class PutPRToReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^an author puts a PR to review a second time$/
+     * @When /^an author puts a PR to review a second time in another channel$/
      */
     public function anAuthorPutsAPRToReviewASecondTime()
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'squad-raccoons',
+            'general',
             '6666'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
 
     /**
-     * @Then /^the PR is updated with the new message id$/
+     * @Then /^the PR is updated with the new channel id and message id$/
      */
     public function thePRIsUpdatedWithTheNewMessageId()
     {
@@ -172,7 +177,8 @@ class PutPRToReviewContext extends FeatureContext
             0,
             'PENDING',
             false,
-            $this->currentMessageIds
+            $this->currentMessageIds,
+            $this->currentChannelIds
         );
     }
 
@@ -181,9 +187,10 @@ class PutPRToReviewContext extends FeatureContext
         int $gtmCount,
         int $notGtmCount,
         int $commentsCount,
-        $ciStatus,
-        $isMerged,
-        $messageIds
+        string $ciStatus,
+        bool $isMerged,
+        array $messageIds,
+        array $channelIds
     ): void {
         Assert::assertTrue($this->PRExists($prIdentifier));
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
@@ -194,6 +201,7 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['CI_STATUS'], $ciStatus);
         Assert::assertEquals($pr->normalize()['IS_MERGED'], $isMerged);
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
+        Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);
         Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
         Assert::assertEmpty($pr->normalize()['MERGED_AT']);
     }

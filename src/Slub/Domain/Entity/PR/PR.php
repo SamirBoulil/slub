@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
@@ -23,6 +24,7 @@ class PR
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
+    private const CHANNEL_IDS = 'CHANNEL_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
     private const MERGED_AT = 'MERGED_AT';
@@ -32,6 +34,9 @@ class PR
 
     /** @var PRIdentifier */
     private $PRIdentifier;
+
+    /** @var ChannelIdentifier[] */
+    private $channelIdentifiers;
 
     /** @var MessageIdentifier[] */
     private $messageIdentifiers;
@@ -59,6 +64,7 @@ class PR
 
     private function __construct(
         PRIdentifier $PRIdentifier,
+        array $channelIdentifiers,
         array $messageIds,
         int $GTMCount,
         int $notGTMCount,
@@ -74,6 +80,7 @@ class PR
         $this->comments = $comments;
         $this->CIStatus = $CIStatus;
         $this->isMerged = $isMerged;
+        $this->channelIdentifiers = $channelIdentifiers;
         $this->messageIdentifiers = $messageIds;
         $this->putToReviewAt = $putToReviewAt;
         $this->mergedAt = $mergedAt;
@@ -81,6 +88,7 @@ class PR
 
     public static function create(
         PRIdentifier $PRIdentifier,
+        ChannelIdentifier $channelIdentifier,
         MessageIdentifier $messageIdentifier,
         int $GTMs = 0,
         int $notGTMs = 0,
@@ -89,15 +97,9 @@ class PR
         bool $isMerged = false
     ): self {
         $pr = new self(
-            $PRIdentifier,
-            [$messageIdentifier],
-            $GTMs,
-            $notGTMs,
-            $comments,
+            $PRIdentifier, [$channelIdentifier], [$messageIdentifier], $GTMs, $notGTMs, $comments,
             CIStatus::fromNormalized($CIStatus),
-            $isMerged,
-            PutToReviewAt::create(),
-            MergedAt::none()
+            $isMerged, PutToReviewAt::create(), MergedAt::none()
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
 
@@ -113,6 +115,7 @@ class PR
         Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
+        Assert::keyExists($normalizedPR, self::CHANNEL_IDS);
         Assert::keyExists($normalizedPR, self::PUT_TO_REVIEW_AT);
         Assert::keyExists($normalizedPR, self::MERGED_AT);
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
@@ -129,19 +132,19 @@ class PR
             },
             $normalizedPR[self::MESSAGE_IDS]
         );
+        $channelIdentifiers = array_map(
+            function (string $channelIdentifiers) {
+                return ChannelIdentifier::fromString($channelIdentifiers);
+            },
+            $normalizedPR[self::CHANNEL_IDS]
+        );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
         $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
 
         return new self(
-            $identifier,
-            $messageIds,
-            $GTM,
-            $NOTGTM,
-            $comments,
-            CIStatus::fromNormalized($CIStatus),
-            $isMerged,
-            $putToReviewAt,
-            $mergedAt
+            $identifier, $channelIdentifiers, $messageIds, $GTM, $NOTGTM, $comments,
+            CIStatus::fromNormalized($CIStatus), $isMerged,
+            $putToReviewAt, $mergedAt
         );
     }
 
@@ -154,9 +157,15 @@ class PR
             self::COMMENTS_KEY     => $this->comments,
             self::CI_STATUS_KEY    => $this->CIStatus->stringValue(),
             self::IS_MERGED_KEY    => $this->isMerged,
+            self::CHANNEL_IDS      => array_map(
+                function (ChannelIdentifier $channelIdentifier) {
+                    return $channelIdentifier->stringValue();
+                },
+                $this->channelIdentifiers
+            ),
             self::MESSAGE_IDS      => array_map(
-                function (MessageIdentifier $messageId) {
-                    return $messageId->stringValue();
+                function (MessageIdentifier $messageIdentifier) {
+                    return $messageIdentifier->stringValue();
                 },
                 $this->messageIdentifiers
             ),

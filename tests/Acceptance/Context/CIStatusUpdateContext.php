@@ -19,7 +19,7 @@ use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class CIStatusUpdateContext extends FeatureContext
 {

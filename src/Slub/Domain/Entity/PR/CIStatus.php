@@ -7,7 +7,7 @@ namespace Slub\Domain\Entity\PR;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class CIStatus
 {

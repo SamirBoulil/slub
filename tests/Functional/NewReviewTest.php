@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Client;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class NewReviewTest extends WebTestCase
 {

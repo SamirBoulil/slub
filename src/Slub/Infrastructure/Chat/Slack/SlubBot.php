@@ -15,7 +15,7 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Query\GetChannelInformationInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SlubBot
 {

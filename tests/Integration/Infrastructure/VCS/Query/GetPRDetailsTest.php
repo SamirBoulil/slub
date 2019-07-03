@@ -10,7 +10,7 @@ use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetPRDetailsTest extends WebTestCase
 {

@@ -19,7 +19,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class NotifySquad implements EventSubscriberInterface
 {

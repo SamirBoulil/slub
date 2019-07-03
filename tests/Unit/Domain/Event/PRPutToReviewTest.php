@@ -10,7 +10,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRPutToReview;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRPutToReviewTest extends TestCase
 {

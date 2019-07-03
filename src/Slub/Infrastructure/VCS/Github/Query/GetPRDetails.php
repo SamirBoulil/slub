@@ -8,7 +8,7 @@ use GuzzleHttp\Client;
 use Slub\Domain\Entity\PR\PRIdentifier;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetPRDetails
 {

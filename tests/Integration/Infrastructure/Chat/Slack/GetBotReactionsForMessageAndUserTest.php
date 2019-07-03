@@ -17,8 +17,8 @@ use Slub\Infrastructure\Chat\Slack\GetBotUserId;
 use Slub\Infrastructure\Chat\Slack\GetChannelInformation;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
- * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
+ * @author    Samir Boulil <samir.boulil@gmail.com>
+
  */
 class GetBotReactionsForMessageAndUserTest extends TestCase
 {

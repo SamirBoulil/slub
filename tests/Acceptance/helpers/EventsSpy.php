@@ -15,7 +15,7 @@ use Slub\Domain\Event\PRPutToReview;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @author Samir Boulil <samir.boulil@akeneo.com>
+ * @author Samir Boulil <samir.boulil@gmail.com>
  */
 class EventsSpy implements EventSubscriberInterface
 {

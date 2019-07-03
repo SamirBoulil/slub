@@ -7,7 +7,7 @@ namespace Slub\Application\NewReview;
 use ConvenientImmutability\Immutable;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class NewReview
 {

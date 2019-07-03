@@ -8,7 +8,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GithubAPIHelper
 {

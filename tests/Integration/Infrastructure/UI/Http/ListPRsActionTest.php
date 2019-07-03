@@ -9,7 +9,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class ListPRsActionTest extends WebTestCase
 {

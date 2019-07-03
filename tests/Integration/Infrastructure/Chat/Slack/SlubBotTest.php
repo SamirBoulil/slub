@@ -13,7 +13,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SlubBotTest extends KernelTestCase
 {

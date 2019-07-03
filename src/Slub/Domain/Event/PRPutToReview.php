@@ -9,7 +9,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRPutToReview extends Event
 {

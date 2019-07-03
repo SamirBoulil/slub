@@ -12,7 +12,7 @@ use Slub\Infrastructure\VCS\Github\NewEventAction;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class NewEventActionTest extends TestCase
 {

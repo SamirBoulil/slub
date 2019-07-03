@@ -8,7 +8,7 @@ use Behat\Behat\Context\Context;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 abstract class FeatureContext implements Context
 {

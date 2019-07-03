@@ -16,7 +16,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class CheckRunEventHandlerTest extends TestCase
 {

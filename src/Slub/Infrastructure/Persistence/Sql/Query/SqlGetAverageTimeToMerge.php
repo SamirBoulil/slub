@@ -9,7 +9,7 @@ use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SqlGetAverageTimeToMerge implements GetAverageTimeToMergeInterface
 {

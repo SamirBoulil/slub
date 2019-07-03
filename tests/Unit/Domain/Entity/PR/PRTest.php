@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -24,11 +25,13 @@ class PRTest extends TestCase
     public function it_creates_a_PR_and_normalizes_itself()
     {
         $prIdentifier = 'akeneo/pim-community-dev/1111';
+        $channelIdentifier = 'squad-raccoons';
         $messageId = '1';
         $expectedPRIdentifier = PRIdentifier::create($prIdentifier);
+        $expectedChannelIdentifier = ChannelIdentifier::fromString($channelIdentifier);
         $expectedMessageIdentifier = MessageIdentifier::fromString($messageId);
 
-        $pr = PR::create($expectedPRIdentifier, $expectedMessageIdentifier);
+        $pr = PR::create($expectedPRIdentifier, $expectedChannelIdentifier, $expectedMessageIdentifier);
 
         $normalizedPR = $pr->normalize();
         $this->assertEquals($prIdentifier, $normalizedPR['IDENTIFIER']);
@@ -37,6 +40,7 @@ class PRTest extends TestCase
         $this->assertEquals(0, $normalizedPR['COMMENTS']);
         $this->assertEquals('PENDING', $normalizedPR['CI_STATUS']);
         $this->assertEquals(false, $normalizedPR['IS_MERGED']);
+        $this->assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
         $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         $this->assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         $this->assertEmpty($normalizedPR['MERGED_AT']);
@@ -55,6 +59,7 @@ class PRTest extends TestCase
             'COMMENTS'         => 0,
             'CI_STATUS'        => 'GREEN',
             'IS_MERGED'        => true,
+            'CHANNEL_IDS'      => ['squad-raccoons'],
             'MESSAGE_IDS'      => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
             'MERGED_AT'        => self::A_TIMESTAMP,
@@ -83,7 +88,7 @@ class PRTest extends TestCase
     public function it_can_be_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['GTMS']);
@@ -101,7 +106,7 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
@@ -119,7 +124,7 @@ class PRTest extends TestCase
     public function it_can_be_commented_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
@@ -195,7 +200,7 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
 
-        $pr = PR::create($identifier, MessageIdentifier::fromString('1'));
+        $pr = PR::create($identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1'));
 
         $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
@@ -206,7 +211,7 @@ class PRTest extends TestCase
     public function it_returns_the_message_ids()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
@@ -215,14 +220,15 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times()
+    public function it_can_be_put_to_review_multiple_times_in_different_channels()
     {
         $pr = $this->greenPR();
         $expectedMessageId = MessageIdentifier::create('2');
 
-        $pr->putToReviewAgainViaMessage($expectedMessageId);
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'), $expectedMessageId);
 
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons', 'brazil-team']);
         $this->assertPRPutToReviewEvent(
             $pr->getEvents(),
             PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
@@ -233,13 +239,14 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times_with_the_same_message()
+    public function it_can_be_put_to_review_multiple_times_in_the_same_channel_with_the_same_message_id()
     {
         $pr = $this->pendingPR();
 
-        $pr->putToReviewAgainViaMessage(MessageIdentifier::create('1'));
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::create('1'));
 
         $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons']);
         $this->assertEmpty($pr->getEvents());
     }
 
@@ -312,6 +319,7 @@ class PRTest extends TestCase
                 'COMMENTS'         => 0,
                 'CI_STATUS'        => 'PENDING',
                 'IS_MERGED'        => false,
+                'CHANNEL_IDS'      => ['squad-raccoons'],
                 'MESSAGE_IDS'      => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'MERGED_AT'        => self::A_TIMESTAMP,
@@ -330,6 +338,7 @@ class PRTest extends TestCase
                 'COMMENTS'         => 0,
                 'CI_STATUS'        => 'GREEN',
                 'IS_MERGED'        => false,
+                'CHANNEL_IDS'      => ['squad-raccoons'],
                 'MESSAGE_IDS'      => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'MERGED_AT'        => self::A_TIMESTAMP

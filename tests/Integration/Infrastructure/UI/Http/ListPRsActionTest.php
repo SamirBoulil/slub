@@ -27,7 +27,7 @@ class ListPRsActionTest extends WebTestCase
     /**
      * @test
      */
-    public function it_lists_all_the_prs(): void
+    public function it_lists_all_the_prs_and_calculates_the_time_to_merge(): void
     {
         $this->PRRepository->save(
             PR::fromNormalized(
@@ -38,9 +38,10 @@ class ListPRsActionTest extends WebTestCase
                     'COMMENTS'         => 1,
                     'CI_STATUS'        => 'PENDING',
                     'IS_MERGED'        => true,
+                    'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => '1561363426'
+                    'MERGED_AT'        => '1561363426',
                 ]
             )
         );
@@ -53,9 +54,10 @@ class ListPRsActionTest extends WebTestCase
                     'COMMENTS'         => 1,
                     'CI_STATUS'        => 'PENDING',
                     'IS_MERGED'        => false,
+                    'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ]
             )
         );
@@ -76,8 +78,9 @@ class ListPRsActionTest extends WebTestCase
                     'CI_STATUS'        => 'PENDING',
                     'IS_MERGED'        => false,
                     'MESSAGE_IDS'      => ['1', '2'],
+                    'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ],
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
@@ -87,9 +90,10 @@ class ListPRsActionTest extends WebTestCase
                     'CI_STATUS'        => 'PENDING',
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
+                    'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
-                    'MERGED_AT'        => '1561363426'
-                ]
+                    'MERGED_AT'        => '1561363426',
+                ],
             ],
             json_decode($response->getContent(), true)
         );

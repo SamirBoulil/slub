@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\FileBased\Repository;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -30,8 +31,7 @@ class FileBasedPRRepositoryTest extends KernelTestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
-            $identifier,
-            MessageIdentifier::fromString('1')
+            $identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1')
         );
 
         $this->fileBasedPRRepository->save($savedPR);
@@ -58,8 +58,7 @@ class FileBasedPRRepositoryTest extends KernelTestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $this->fileBasedPRRepository->save(PR::create(
-            $identifier,
-            MessageIdentifier::fromString('1')
+            $identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1')
         ));
         $this->fileBasedPRRepository->reset();
 

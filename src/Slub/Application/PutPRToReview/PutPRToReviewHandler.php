@@ -95,7 +95,10 @@ class PutPRToReviewHandler
     private function resendForReview(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
-        $PR->putToReviewAgainViaMessage(MessageIdentifier::create($putPRToReview->messageIdentifier));
+        $PR->putToReviewAgainViaMessage(
+            ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
+            MessageIdentifier::create($putPRToReview->messageIdentifier)
+        );
         $this->PRRepository->save($PR);
     }
 
@@ -103,11 +106,11 @@ class PutPRToReviewHandler
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
         $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
-
         $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->CIStatus . ')');
 
         $PR = PR::create(
             $PRIdentifier,
+            ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
             $VCSStatus->GTMCount,
             $VCSStatus->notGTMCount,

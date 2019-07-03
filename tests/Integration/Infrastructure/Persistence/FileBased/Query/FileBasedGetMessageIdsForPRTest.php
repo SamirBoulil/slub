@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\FileBased\Query;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -62,11 +63,13 @@ class FileBasedGetMessageIdsForPRTest extends KernelTestCase
         /** @var PRRepositoryInterface $fileBasedPRRepository */
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $PR = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER),
+            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString(current($messageIds))
         );
         for ($i = 1, $iMax = \count($messageIds); $i < $iMax; $i++) {
-            $PR->putToReviewAgainViaMessage(MessageIdentifier::fromString($messageIds[$i]));
+            $PR->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'),
+                MessageIdentifier::fromString($messageIds[$i])
+            );
         }
         $fileBasedPRRepository->save($PR);
     }

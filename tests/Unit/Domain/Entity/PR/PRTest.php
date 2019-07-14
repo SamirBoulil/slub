@@ -220,6 +220,19 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_the_channel_ids()
+    {
+        $pr = PR::create(
+            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1')
+        );
+        $this->assertEquals('squad-raccoons', current($pr->channelIdentifiers())->stringValue());
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_put_to_review_multiple_times_in_different_channels()
     {
         $pr = $this->greenPR();

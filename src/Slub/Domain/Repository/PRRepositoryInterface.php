@@ -21,5 +21,10 @@ interface PRRepositoryInterface
     /**
      * @return PR[]
      */
+    public function findPRToReviewNotGTMed(): array;
+
+    /**
+     * @return PR[]
+     */
     public function all(): array;
 }

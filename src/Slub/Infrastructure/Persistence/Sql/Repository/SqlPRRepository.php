@@ -46,12 +46,17 @@ class SqlPRRepository implements PRRepositoryInterface
     {
         $result = $this->fetchAll();
 
-        return array_map(
-            function (array $normalizedPR) {
-                return $this->hydrate($normalizedPR);
-            },
-            $result
-        );
+        return $this->hydrateAll($result);
+    }
+
+    /**
+     * @return PR[]
+     */
+    public function findPRToReviewNotGTMed(): array
+    {
+        $PRsInReviewNotGtmed = $this->fetchPRInReviewNotGTMed();
+
+        return $this->hydrateAll($PRsInReviewNotGtmed);
     }
 
     public function reset(): void
@@ -167,6 +172,38 @@ SQL;
                 'MESSAGE_IDS' => 'json',
                 'CHANNEL_IDS' => 'json',
             ]
+        );
+    }
+
+    private function fetchPRInReviewNotGTMed(): array
+    {
+        $sql = <<<SQL
+SELECT IDENTIFIER, GTMS, NOT_GTMS, COMMENTS, CI_STATUS, IS_MERGED, MESSAGE_IDS, PUT_TO_REVIEW_AT, MERGED_AT, CHANNEL_IDS
+FROM pr
+WHERE
+    IS_MERGED IS false
+    AND GTMS < 2
+;
+SQL;
+        $statement = $this->sqlConnection->executeQuery($sql);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $result;
+    }
+
+    /**
+     * @param array $PRsInReviewNotGtmed
+     *
+     * @return array
+     *
+     */
+    private function hydrateAll(array $PRsInReviewNotGtmed): array
+    {
+        return array_map(
+            function (array $normalizedPR) {
+                return $this->hydrate($normalizedPR);
+            },
+            $PRsInReviewNotGtmed
         );
     }
 }

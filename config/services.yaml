@@ -74,6 +74,13 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    slub.application.publish_reminders.publish_reminders_handler:
+        class: Slub\Application\PublishReminders\PublishRemindersHandler
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
+
     # Infrastructure
     ## Persistence
     slub.infrastructure.persistence.sql.database_connection:

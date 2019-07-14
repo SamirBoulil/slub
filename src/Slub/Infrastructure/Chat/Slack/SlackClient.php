@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use Nette\NotImplementedException;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
@@ -140,5 +142,10 @@ class SlackClient implements ChatClient
                 implode(',', $reactionsToRemove)
             )
         );
+    }
+
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
+    {
+        throw new NotImplementedException();
     }
 }

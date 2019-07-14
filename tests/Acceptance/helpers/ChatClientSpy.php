@@ -6,6 +6,7 @@ namespace Tests\Acceptance\helpers;
 
 use PHPUnit\Framework\Assert;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
@@ -27,17 +28,28 @@ class ChatClientSpy implements ChatClient
             $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
-    public function assertHasBeenCalledWith(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
     {
-        $reactions = $this->reactionsForMessageIdentifier($expectedMessageIdentifier);
+        $this->recordedMessages[$channelIdentifier->stringValue()][] = $text;
+    }
+
+    public function assertReaction(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
+    {
+        $reactions = $this->reactionsForIdentifier($expectedMessageIdentifier->stringValue());
         Assert::assertContains($expectedText, $reactions);
     }
 
-    public function assertHasBeenCalledWithOnly(
+    public function assertHasBeenCalledWithChannelIdentifier(ChannelIdentifier $expectedChannelIdentifier, string $expectedText): void
+    {
+        $actualText = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
+        Assert::assertContains($expectedText, $actualText);
+    }
+
+    public function assertOnlyReaction(
         MessageIdentifier $expectedMessageIdentifier,
         string $expectedText
     ): void {
-        $reactions = $this->reactionsForMessageIdentifier($expectedMessageIdentifier);
+        $reactions = $this->reactionsForIdentifier($expectedMessageIdentifier->stringValue());
         Assert::assertEquals([$expectedText], $reactions);
     }
 
@@ -46,15 +58,14 @@ class ChatClientSpy implements ChatClient
         $this->recordedMessages = [];
     }
 
-    private function reactionsForMessageIdentifier(MessageIdentifier $expectedMessageIdentifier): array
+    private function reactionsForIdentifier(string $expectedIdentifier): array
     {
-        $key = $expectedMessageIdentifier->stringValue();
         Assert::assertArrayHasKey(
-            $key,
+            $expectedIdentifier,
             $this->recordedMessages,
-            sprintf('Expected to have a reply to message ID "%s"', $expectedMessageIdentifier->stringValue())
+            sprintf('Expected to have a reply/message to message ID "%s"', $expectedIdentifier)
         );
-        $reactions = $this->recordedMessages[$key];
+        $reactions = $this->recordedMessages[$expectedIdentifier];
         Assert::assertNotEmpty($reactions);
 
         return $reactions;

@@ -97,7 +97,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIGreenEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifySquad::REACTION_CI_GREEN
         );
@@ -133,7 +133,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIRedEvent to be dispatched, but was not found'
         );
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifySquad::REACTION_CI_RED
         );
@@ -168,7 +168,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIGreenEventDispatched(),
             'Expected CIGreenEvent to be dispatched, but was not found'
         );
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_CI_GREEN
         );
@@ -183,7 +183,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIRedEvent to be dispatched, but was not found'
         );
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_CI_RED
         );
@@ -234,7 +234,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIPendingEventDispatched(),
             'Expected CIPending to be dispatched, but was not found'
         );
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifySquad::REACTION_CI_PENDING
         );

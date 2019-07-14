@@ -65,7 +65,7 @@ class CheckRunEventHandlerTest extends TestCase
      * @test
      * @dataProvider events
      */
-    public function it_handles_check_runs_fetches_information_and_calls_the_handler(array $events)
+    public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent)
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus = self::CI_STATUS;
@@ -85,7 +85,7 @@ class CheckRunEventHandlerTest extends TestCase
             })
         )->shouldBeCalled();
 
-        $this->checkRunEventHandler->handle($events);
+        $this->checkRunEventHandler->handle($CheckRunEvent);
     }
 
     public function events(): array

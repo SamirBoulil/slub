@@ -9,7 +9,7 @@ use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\VCSStatus;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetVCSStatusDummy implements GetVCSStatus
 {

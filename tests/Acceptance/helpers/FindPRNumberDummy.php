@@ -7,7 +7,7 @@ namespace Tests\Acceptance\helpers;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class FindPRNumberDummy implements FindPRNumberInterface
 {

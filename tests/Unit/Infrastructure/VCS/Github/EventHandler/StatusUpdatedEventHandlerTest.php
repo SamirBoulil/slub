@@ -15,7 +15,7 @@ use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class StatusUpdatedEventHandlerTest extends TestCase
 {

@@ -10,8 +10,8 @@ use Slub\Domain\Query\GetChannelInformationInterface;
 use Slub\Infrastructure\Chat\Slack\SlubBot;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
- * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
+ * @author    Samir Boulil <samir.boulil@gmail.com>
+
  */
 class InMemoryGetChannelInformation implements GetChannelInformationInterface
 {

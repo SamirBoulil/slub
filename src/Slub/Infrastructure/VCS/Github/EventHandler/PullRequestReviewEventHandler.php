@@ -9,7 +9,7 @@ use Slub\Application\NewReview\NewReviewHandler;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @author Samir Boulil <samir.boulil@akeneo.com>
+ * @author Samir Boulil <samir.boulil@gmail.com>
  */
 class PullRequestReviewEventHandler implements EventHandlerInterface
 {

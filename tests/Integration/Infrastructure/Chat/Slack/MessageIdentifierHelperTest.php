@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Slub\Infrastructure\Chat\Slack\MessageIdentifierHelper;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class MessageIdentifierHelperTest extends TestCase
 {

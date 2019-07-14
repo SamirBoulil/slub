@@ -10,7 +10,7 @@ use Slub\Domain\Query\GetMessageIdsForPR;
 use Slub\Domain\Repository\PRNotFoundException;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class FileBasedGetMessageIdsForPR implements GetMessageIdsForPR
 {

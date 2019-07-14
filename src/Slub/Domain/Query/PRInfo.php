@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Domain\Query;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRInfo
 {

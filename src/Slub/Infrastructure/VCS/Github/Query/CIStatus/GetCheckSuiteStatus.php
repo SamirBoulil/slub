@@ -11,7 +11,7 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 /**
  * This query is not used as long as Github will not make status checks part of the check suite result.
  *
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetCheckSuiteStatus
 {

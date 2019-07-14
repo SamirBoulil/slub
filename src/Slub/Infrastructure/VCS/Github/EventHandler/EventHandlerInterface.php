@@ -7,7 +7,7 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
 */
 interface EventHandlerInterface
 {

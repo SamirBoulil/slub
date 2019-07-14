@@ -7,7 +7,7 @@ namespace Slub\Infrastructure\Chat\Slack;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class APIHelper
 {

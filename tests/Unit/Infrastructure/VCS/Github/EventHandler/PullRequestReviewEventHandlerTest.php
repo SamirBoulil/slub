@@ -12,7 +12,7 @@ use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PullRequestReviewEventHandlerTest extends TestCase
 {

@@ -9,7 +9,7 @@ use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetPRInfoInterfaceDummy implements GetPRInfoInterface
 {

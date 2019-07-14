@@ -14,7 +14,7 @@ use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetCIStatusTest extends WebTestCase
 {

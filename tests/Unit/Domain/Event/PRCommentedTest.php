@@ -9,7 +9,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRCommented;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRCommentedTest extends TestCase
 {

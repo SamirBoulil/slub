@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Client;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SlubBotActionTest extends WebTestCase
 {

@@ -10,8 +10,8 @@ use Slub\Domain\Query\ChannelInformation;
 use Slub\Domain\Query\GetChannelInformationInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
- * @copyright 2019 Akeneo SAS (http://www.akeneo.com)
+ * @author    Samir Boulil <samir.boulil@gmail.com>
+
  */
 class GetChannelInformation implements GetChannelInformationInterface
 {

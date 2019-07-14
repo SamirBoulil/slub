@@ -7,7 +7,7 @@ namespace Slub\Domain\Query;
 use Slub\Domain\Entity\PR\PRIdentifier;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 interface GetVCSStatus
 {

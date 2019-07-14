@@ -10,7 +10,7 @@ use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class CIPendingTest extends TestCase
 {

@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GuzzleSpy
 {

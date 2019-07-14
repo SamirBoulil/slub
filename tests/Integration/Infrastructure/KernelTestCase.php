@@ -7,7 +7,7 @@ namespace Tests\Integration\Infrastructure;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase as SymfonyTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class KernelTestCase extends SymfonyTestCase
 {

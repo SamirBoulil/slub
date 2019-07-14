@@ -9,7 +9,7 @@ use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class ChatClientSpy implements ChatClient
 {

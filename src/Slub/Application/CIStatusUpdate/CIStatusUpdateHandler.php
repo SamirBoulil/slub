@@ -12,7 +12,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class CIStatusUpdateHandler
 {

@@ -9,7 +9,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class EventHandlerRegistryTest extends TestCase
 {

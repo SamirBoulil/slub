@@ -12,7 +12,7 @@ use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Infrastructure\VCS\Github\EventHandler\PRMergedEventHandler;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRMergedEventHandlerTest extends TestCase
 {

@@ -10,27 +10,25 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
-use Slub\Domain\Query\GetChannelInformationInterface;
-use Slub\Infrastructure\Chat\Slack\GetChannelInformation;
+use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
+use Slub\Infrastructure\Chat\Slack\GetPrivateChannelInformation;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
-class GetChannelInformationTest extends TestCase
+class GetPrivateChannelInformationTest extends TestCase
 {
     /** @var MockHandler */
     private $mock;
 
     /** @var GetChannelInformationInterface */
-    private $getChannelInformation;
+    private $getPrivateChannelInformation;
 
     public function setUp(): void
     {
         parent::setUp();
         $client = $this->setUpGuzzleMock();
-        $this->getChannelInformation = new GetChannelInformation($client, 'xobxob-slack-token');
+        $this->getPrivateChannelInformation = new GetPrivateChannelInformation($client, 'xobxob-slack-token');
     }
 
     /**
@@ -40,11 +38,11 @@ class GetChannelInformationTest extends TestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "channel": {"name": "general"}}'));
 
-        $channelInformation = $this->getChannelInformation->fetch(ChannelIdentifier::fromString('1231461'));
+        $channelInformation = $this->getPrivateChannelInformation->fetch('1231461');
 
         $generatedRequest = $this->mock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/api/channels.info', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('/api/conversations.info', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             'token=xobxob-slack-token&channel=1231461',
             $this->getBodyContent($generatedRequest)
@@ -61,7 +59,7 @@ class GetChannelInformationTest extends TestCase
         $this->mockGuzzleWith(new Response(400, [], ''));
 
         $this->expectException(\RuntimeException::class);
-        $this->getChannelInformation->fetch(ChannelIdentifier::fromString('1231461'));
+        $this->getPrivateChannelInformation->fetch('1231461');
     }
 
     /**
@@ -72,7 +70,7 @@ class GetChannelInformationTest extends TestCase
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
         $this->expectException(\RuntimeException::class);
-        $this->getChannelInformation->fetch(ChannelIdentifier::fromString('1231461'));
+        $this->getPrivateChannelInformation->fetch('1231461');
     }
 
     private function setUpGuzzleMock(): Client

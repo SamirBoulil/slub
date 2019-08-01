@@ -32,7 +32,7 @@ class SlubBotAction
 
     private function isSlackChallenge(Request $request): bool
     {
-        $content = json_decode((string)$request->getContent(), true);
+        $content = json_decode((string) $request->getContent(), true);
 
         return isset($content['challenge']);
     }

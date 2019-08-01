@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Query\ChannelInformation;
-use Slub\Domain\Query\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
 
  */
-class GetChannelInformation implements GetChannelInformationInterface
+class GetPrivateChannelInformation implements GetChannelInformationInterface
 {
     /** @var Client */
     private $client;
@@ -27,20 +25,20 @@ class GetChannelInformation implements GetChannelInformationInterface
         $this->slackToken = $slackToken;
     }
 
-    public function fetch(ChannelIdentifier $channelIdentifier): ChannelInformation
+    public function fetch(string $channelIdentifier): ChannelInformation
     {
         $response = $this->client->post(
-            'https://slack.com/api/channels.info',
+            'https://slack.com/api/conversations.info',
             [
                 'form_params' => [
                     'token' => $this->slackToken,
-                    'channel' => $channelIdentifier->stringValue(),
+                    'channel' => $channelIdentifier,
                 ],
             ]
         );
         $channel = APIHelper::checkResponse($response);
         $channelInformation = new ChannelInformation();
-        $channelInformation->channelIdentifier = $channelIdentifier->stringValue();
+        $channelInformation->channelIdentifier = $channelIdentifier;
         $channelInformation->channelName = $channel['channel']['name'];
 
         return $channelInformation;

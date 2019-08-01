@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\InMemory\Query;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Query\ChannelInformation;
-use Slub\Domain\Query\GetChannelInformationInterface;
-use Slub\Infrastructure\Chat\Slack\SlubBot;
+use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -23,11 +21,11 @@ class InMemoryGetChannelInformation implements GetChannelInformationInterface
         $this->supportedChannels = explode(',', $commaSeparatedChannels);
     }
 
-    public function fetch(ChannelIdentifier $channelIdentifier): ChannelInformation
+    public function fetch(string $channelIdentifier): ChannelInformation
     {
         $channelInformation = new ChannelInformation();
         $channelInformation->channelName = current($this->supportedChannels);
-        $channelInformation->channelIdentifier = $channelIdentifier->stringValue();
+        $channelInformation->channelIdentifier = $channelIdentifier;
 
         return $channelInformation;
     }

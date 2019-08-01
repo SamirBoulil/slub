@@ -19,7 +19,12 @@ services:
     slub.infrastructure.chat.slack.slack_client:
         class: Tests\Acceptance\helpers\ChatClientSpy
 
-    slub.infrastructure.query.get_channel_information:
+    slub.infrastructure.query.get_public_channel_information:
+        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
+        arguments:
+            - '%env(SUPPORTED_CHANNELS)%'
+
+    slub.infrastructure.query.get_private_channel_information:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
         arguments:
             - '%env(SUPPORTED_CHANNELS)%'

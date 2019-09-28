@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\UI\CLI;
 
 use Doctrine\DBAL\Connection;
+use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,14 +13,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class SendRemindersCLI extends Command
+class PublishRemindersCLI extends Command
 {
     protected static $defaultName = 'slub:send-reminders';
 
-    public function __construct(Connection $sqlConnection)
+    /** @var PublishRemindersHandler */
+    private $publishRemindersHandler;
+
+    public function __construct(PublishRemindersHandler $publishRemindersHandler)
     {
         parent::__construct(self::$defaultName);
-        $this->sqlConnection = $sqlConnection;
+        $this->publishRemindersHandler = $publishRemindersHandler;
     }
 
     protected function configure(): void
@@ -28,7 +32,11 @@ class SendRemindersCLI extends Command
              ->setHidden(false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): ?int
     {
+        $this->publishRemindersHandler->handle();
+        $output->writeln('<info>Reminders published!</info>');
+
+        return null;
     }
 }

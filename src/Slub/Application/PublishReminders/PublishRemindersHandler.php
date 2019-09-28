@@ -61,6 +61,13 @@ class PublishRemindersHandler
         return array_values($channelIdentifiers);
     }
 
+    private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
+    {
+        $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
+        $message = $this->formatReminder($PRsToPublish);
+        $this->chatClient->publishInChannel($channelIdentifier, $message);
+    }
+
     private function prsPutToReviewInChannel(ChannelIdentifier $expectedChannelIdentifier, array $PRsInReview): array
     {
         return array_filter(
@@ -88,18 +95,11 @@ CHAT;
                 $split = explode('/', $PR->PRIdentifier()->stringValue());
 
                 return sprintf('https://github.com/%s/%s/pulls/%s', ...$split);
-
             },
                 $prs
             )
         );
 
         return sprintf($reminder, $identifiers);
-    }
-
-    private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
-    {
-        $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
-        $this->chatClient->publishInChannel($channelIdentifier, $this->formatReminder($PRsToPublish));
     }
 }

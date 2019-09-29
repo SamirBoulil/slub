@@ -113,6 +113,11 @@ services:
             - '%env(SUPPORTED_REPOSITORIES)%'
             - '%env(SUPPORTED_CHANNELS)%'
 
+    slub.infrastructure.persistence.delivered_event_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:
         class: Slub\Infrastructure\Chat\Slack\SlubBot

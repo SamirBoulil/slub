@@ -101,7 +101,7 @@ CHAT;
             array_map(function (PR $PR) {
                 $split = explode('/', $PR->PRIdentifier()->stringValue());
 
-                return sprintf('https://github.com/%s/%s/pulls/%s', ...$split);
+                return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
             },
                 $prs
             )

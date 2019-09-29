@@ -7,6 +7,7 @@ namespace Tests\Functional;
 use donatj\MockWebServer\MockWebServer;
 use donatj\MockWebServer\Response;
 use donatj\MockWebServer\ResponseStack;
+use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -78,7 +79,7 @@ class CIStatusUpdatedTest extends WebTestCase
             '/vcs/github',
             [],
             [],
-            ['HTTP_X-GitHub-Event' => 'status', 'HTTP_X-Hub-Signature' => $signature],
+            ['HTTP_X-GitHub-Event' => 'status', 'HTTP_X-Hub-Signature' => $signature, 'HTTP_X-Github-Delivery' => Uuid::uuid4()->toString()],
             $data
         );
 

@@ -13,6 +13,9 @@ use Doctrine\DBAL\Connection;
  */
 class SqlDeliveredEventRepository
 {
+    /** @var Connection */
+    private $sqlConnection;
+
     public function __construct(Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;

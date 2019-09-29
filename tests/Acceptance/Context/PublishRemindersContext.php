@@ -16,6 +16,7 @@ class PublishRemindersContext extends FeatureContext
 {
     private const SQUAD_RACCOONS = 'squad-raccoons';
     private const GENERAL = 'general';
+    private const UNSUPPORTED_CHANNEL = 'UNSUPPORTED_CHANNEL';
 
     /** @var ChatClientSpy */
     private $chatClientSpy;
@@ -82,7 +83,8 @@ CHAT
     }
 
     /**
-     * @Given /^a PR in review having no GTMs$/
+     * @Given /^a PR in review not GTMed$/
+     * @Given /^a PR not GTMed published in a supported channel$/
      */
     public function aPRInReviewHavingNoGTMs()
     {
@@ -106,9 +108,10 @@ CHAT
     }
 
     /**
-     * @Then /^the reminder should only contain the PR in review having (\d+) GTMs$/
+     * @Then /^the reminder should only contain the PR not GTMed$/
+     * @Then /^the reminder should only contain the PR not GTMed in the supported channel$/
      */
-    public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(int $numberOfGTMs): void
+    public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(): void
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifier(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
@@ -117,6 +120,14 @@ Yop, these PRs need reviews!
  - https://github.com/samirboulil/slub/pulls/1
 CHAT
         );
+    }
+
+    /**
+     * @Given /^a PR not GTMed published in a unsupported channel$/
+     */
+    public function aPRNotGTMedPublishedInAUnsupportedChannel()
+    {
+        $this->createInReviewPR('samirboulil/slub/5', self::UNSUPPORTED_CHANNEL, 0);
     }
 
     private function createMergedPR($channelIdentifier): void

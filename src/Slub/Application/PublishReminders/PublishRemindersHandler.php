@@ -24,14 +24,19 @@ class PublishRemindersHandler
     /** @var ChatClient */
     private $chatClient;
 
+    /** @var string[] */
+    private $supportedChannelsForFeature;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         ChatClient $chatClient,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        string $activatedChannels
     ) {
         $this->logger = $logger;
         $this->chatClient = $chatClient;
         $this->PRRepository = $PRRepository;
+        $this->supportedChannelsForFeature = explode(',', $activatedChannels);
     }
 
     public function handle(): void
@@ -39,7 +44,9 @@ class PublishRemindersHandler
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
-            $this->publishReminderForChannel($channelIdentifier, $PRsInReview);
+            if ($this->isChannelIsSupportedForFeature($channelIdentifier)) {
+                $this->publishReminderForChannel($channelIdentifier, $PRsInReview);
+            }
         }
 
         $this->logger->info('Reminders published');
@@ -101,5 +108,10 @@ CHAT;
         );
 
         return sprintf($reminder, $identifiers);
+    }
+
+    private function isChannelIsSupportedForFeature(ChannelIdentifier $channelIdentifier): bool
+    {
+        return in_array($channelIdentifier->stringValue(), $this->supportedChannelsForFeature);
     }
 }

@@ -6,6 +6,7 @@
 parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
     SUPPORTED_CHANNELS: 'squad-raccoons,general'
+    FEATURE_FLAG_REMINDER_SUPPORTED_CHANNELS: 'squad-raccoons,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
     GITHUB_URI: 'https://api.github.com'
     BOT_USER_ID: 'bot_user_id'
@@ -80,6 +81,7 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
+            - '%env(FEATURE_FLAG_REMINDER_SUPPORTED_CHANNELS)%'
 
     # Infrastructure
     ## Persistence

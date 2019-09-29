@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
-use Slub\Infrastructure\VCS\Github\NewEventAction;
+use Slub\Infrastructure\VCS\Github\EventHandler\NewEventAction;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

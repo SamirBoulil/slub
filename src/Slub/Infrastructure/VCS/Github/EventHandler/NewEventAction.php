@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\VCS\Github;
+namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
 use Symfony\Component\HttpFoundation\Request;

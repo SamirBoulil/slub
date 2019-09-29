@@ -68,16 +68,16 @@ class PublishRemindersContext extends FeatureContext
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pulls/1
- - https://github.com/samirboulil/slub/pulls/2
+ - https://github.com/samirboulil/slub/pull/1
+ - https://github.com/samirboulil/slub/pull/2
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifier(
             ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pulls/3
- - https://github.com/samirboulil/slub/pulls/4
+ - https://github.com/samirboulil/slub/pull/3
+ - https://github.com/samirboulil/slub/pull/4
 CHAT
         );
     }
@@ -117,7 +117,7 @@ CHAT
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pulls/1
+ - https://github.com/samirboulil/slub/pull/1
 CHAT
         );
     }

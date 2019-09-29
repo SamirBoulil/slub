@@ -113,6 +113,16 @@ services:
             - '%env(SUPPORTED_REPOSITORIES)%'
             - '%env(SUPPORTED_CHANNELS)%'
 
+    slub.infrastructure.persistence.delivered_event_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
+    slub.infrastructure.persistence.has_event_already_been_delivered:
+        class: Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     ## Chat
     slub.infrastructure.chat.slack.slub_bot:
         class: Slub\Infrastructure\Chat\Slack\SlubBot
@@ -167,9 +177,11 @@ services:
 
     ## VCS
     slub.infrastructure.vcs.github.new_event_action:
-        class: Slub\Infrastructure\VCS\Github\NewEventAction
+        class: Slub\Infrastructure\VCS\Github\EventHandler\NewEventAction
         arguments:
             - '@slub.infrastructure.vcs.github.event_handler_registry'
+            - '@slub.infrastructure.persistence.has_event_already_been_delivered'
+            - '@slub.infrastructure.persistence.delivered_event_repository'
             - '%env(GITHUB_WEBHOOK_SECRET)%'
 
     slub.infrastructure.vcs.github.event_handler_registry:

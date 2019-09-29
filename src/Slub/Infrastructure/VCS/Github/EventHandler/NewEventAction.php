@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\VCS\Github;
+namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
+use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -18,6 +19,7 @@ class NewEventAction
 {
     private const SECRET_HEADER = 'X-Hub-Signature';
     private const EVENT_TYPE = 'X-GitHub-Event';
+    private const DELIVERY = 'X-GitHub-Delivery';
 
     /** @var EventHandlerRegistry */
     private $eventHandlerRegistry;
@@ -25,10 +27,22 @@ class NewEventAction
     /** @var string */
     private $secret;
 
-    public function __construct(EventHandlerRegistry $eventHandlerRegistry, string $secret)
-    {
+    /** @var SqlDeliveredEventRepository */
+    private $sqlDeliveredEventRepository;
+
+    /** @var SqlHasEventAlreadyBeenDelivered */
+    private $sqlHasEventAlreadyBeenDelivered;
+
+    public function __construct(
+        EventHandlerRegistry $eventHandlerRegistry,
+        SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered,
+        SqlDeliveredEventRepository $sqlDeliveredEventRepository,
+        string $secret
+    ) {
         $this->eventHandlerRegistry = $eventHandlerRegistry;
         $this->secret = $secret;
+        $this->sqlDeliveredEventRepository = $sqlDeliveredEventRepository;
+        $this->sqlHasEventAlreadyBeenDelivered = $sqlHasEventAlreadyBeenDelivered;
     }
 
     public function executeAction(Request $request): Response
@@ -36,6 +50,7 @@ class NewEventAction
         $this->checkSecret($request);
         $eventType = $this->eventTypeOrThrow($request);
         $event = $this->event($request);
+        $this->undeliveredEventOrThrow($request);
         $this->handle($event, $eventType);
 
         return new Response();
@@ -49,6 +64,25 @@ class NewEventAction
         }
 
         return $eventType;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    private function undeliveredEventOrThrow(Request $request): void
+    {
+        $eventIdentifier = $request->headers->get(self::DELIVERY);
+        if (null === $eventIdentifier || !is_string($eventIdentifier)) {
+            throw new BadRequestHttpException('Expected delivery to have a type string');
+        }
+
+        $eventHasAlreadyBeenDelivered = $this->sqlHasEventAlreadyBeenDelivered->fetch($eventIdentifier);
+        if ($eventHasAlreadyBeenDelivered) {
+            throw new \RuntimeException(
+                sprintf('Event has already been delivered "%s"', $eventIdentifier)
+            );
+        }
+        $this->sqlDeliveredEventRepository->save($eventIdentifier);
     }
 
     private function checkSecret(Request $request): void

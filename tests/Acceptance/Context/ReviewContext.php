@@ -90,7 +90,7 @@ class ReviewContext extends FeatureContext
         $GTMCount = $PR->normalize()['GTMS'];
         Assert::assertEquals(1, $GTMCount, sprintf('The PR has %d GTMS, expected %d', $GTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifySquad::REACTION_PR_REVIEWED[1]
         );
@@ -185,7 +185,7 @@ class ReviewContext extends FeatureContext
         $notGTMCount = $PR->normalize()['COMMENTS'];
         Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d COMMENTS, expected %d', $notGTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_PR_COMMENTED
         );
@@ -196,7 +196,7 @@ class ReviewContext extends FeatureContext
      */
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM()
     {
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_PR_GTMED
         );
@@ -207,7 +207,7 @@ class ReviewContext extends FeatureContext
      */
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM()
     {
-        $this->chatClientSpy->assertHasBeenCalledWith(
+        $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
             NotifyAuthor::MESSAGE_PR_NOT_GTMED
         );

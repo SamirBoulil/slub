@@ -158,4 +158,12 @@ class FileBasedPRRepository implements PRRepositoryInterface
         unlink($this->filePath);
         touch($this->filePath);
     }
+
+    /**
+     * @return PR[]
+     */
+    public function findPRToReviewNotGTMed(): array
+    {
+        return [];
+    }
 }

@@ -32,7 +32,7 @@ class ChatClientSpyTest extends TestCase
 
         $this->slackClientSpy->replyInThread($messageIdentifier, $text);
 
-        $this->slackClientSpy->assertHasBeenCalledWith($messageIdentifier, $text);
+        $this->slackClientSpy->assertReaction($messageIdentifier, $text);
         $this->assertTrue(true, 'No exception was thrown');
     }
 
@@ -45,7 +45,7 @@ class ChatClientSpyTest extends TestCase
         $this->slackClientSpy->replyInThread(MessageIdentifier::fromString('general@12345'), $text);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->slackClientSpy->assertHasBeenCalledWith(MessageIdentifier::fromString('another_one'), $text);
+        $this->slackClientSpy->assertReaction(MessageIdentifier::fromString('another_one'), $text);
     }
 
     /**
@@ -57,7 +57,7 @@ class ChatClientSpyTest extends TestCase
         $this->slackClientSpy->replyInThread($messageIdentifier, 'hello');
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->slackClientSpy->assertHasBeenCalledWith($messageIdentifier, 'another_text');
+        $this->slackClientSpy->assertReaction($messageIdentifier, 'another_text');
     }
 
     /**
@@ -66,7 +66,7 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_it_has_not_been_called_prior_to_asserting()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->slackClientSpy->assertHasBeenCalledWith(
+        $this->slackClientSpy->assertReaction(
             MessageIdentifier::fromString('general@12345'),
             'another_text'
         );

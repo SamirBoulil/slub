@@ -91,6 +91,7 @@ class CheckRunEventHandler implements EventHandlerInterface
             case 'success': return 'GREEN';
             case 'failure':
             case 'error':
+            case 'action_required':
             case 'default': return 'RED';
         }
 

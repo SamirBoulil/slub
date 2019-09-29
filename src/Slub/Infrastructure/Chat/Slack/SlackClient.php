@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use Nette\NotImplementedException;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
@@ -76,6 +78,25 @@ class SlackClient implements ChatClient
         $reactionsToAdd = array_diff($reactionsToSet, $currentReactions);
         $this->removeReactions($messageIdentifier, $reactionsToRemove);
         $this->addReactions($messageIdentifier, $reactionsToAdd);
+    }
+
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
+    {
+        APIHelper::checkResponse(
+            $this->client->post(
+                'https://slack.com/api/chat.postMessage',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'channel' => $channelIdentifier->stringValue(),
+                        'text' => $text,
+                    ],
+                ]
+            )
+        );
     }
 
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array

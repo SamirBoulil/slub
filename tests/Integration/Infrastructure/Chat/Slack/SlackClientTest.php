@@ -10,6 +10,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\GetBotUserId;
@@ -140,6 +141,26 @@ class SlackClientTest extends KernelTestCase
             ['ok_hand', 'one', 'red_ci']
         );
         $this->assertNull($this->httpClientMock->getLastRequest());
+    }
+
+    /**
+     * @test
+     */
+    public function it_publishes_a_message_in_a_channel(): void
+    {
+        $message = 'a message';
+        $channel = 'channel';
+
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+        $this->slackClient->publishInChannel(ChannelIdentifier::fromString($channel), $message);
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
+        $this->assertEquals(
+            ['channel' => $channel, 'text' => $message],
+            $this->getBodyContent($generatedRequest)
+        );
     }
 
     /**

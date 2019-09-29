@@ -49,7 +49,9 @@ class SqlPRRepositoryTest extends KernelTestCase
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
-            $identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1')
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1')
         );
         $this->sqlPRRepository->save($savedPR);
 
@@ -85,39 +87,39 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ]
             )
         );
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => true,
-                    'MESSAGE_IDS' => ['1', '2'],
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => true,
+                    'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ]
             )
         );
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => false,
-                    'MESSAGE_IDS' => ['1', '2'],
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => false,
+                    'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ]
             )
         );
@@ -125,40 +127,40 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->assertPRs(
             [
                 [
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => false,
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => false,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
-                    'MESSAGE_IDS' => ['1', '2'],
+                    'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ],
                 [
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/3333',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => false,
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => false,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
-                    'MESSAGE_IDS' => ['1', '2'],
+                    'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ],
                 [
-                    'IDENTIFIER'  => 'akeneo/pim-community-dev/2222',
-                    'GTMS'        => 1,
-                    'NOT_GTMS'    => 1,
-                    'COMMENTS'    => 1,
-                    'CI_STATUS'   => 'PENDING',
-                    'IS_MERGED'   => true,
+                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'GTMS'             => 1,
+                    'NOT_GTMS'         => 1,
+                    'COMMENTS'         => 1,
+                    'CI_STATUS'        => 'PENDING',
+                    'IS_MERGED'        => true,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
-                    'MESSAGE_IDS' => ['1', '2'],
+                    'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null
+                    'MERGED_AT'        => null,
                 ],
             ],
             $actualPRs
@@ -184,7 +186,9 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $this->sqlPRRepository->save(
             PR::create(
-                $identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1')
+                $identifier,
+                ChannelIdentifier::fromString('squad-raccoons'),
+                MessageIdentifier::fromString('1')
             )
         );
         $this->sqlPRRepository->reset();
@@ -194,8 +198,27 @@ class SqlPRRepositoryTest extends KernelTestCase
     }
 
     /**
+     * @test
+     * @throws PRNotFoundException
+     */
+    public function it_finds_every_prs_in_review_not_gtmed()
+    {
+        $PRInReviewNotGTMedIdentifier = 'akeneo/pim-community-dev/1';
+        $this->createPRInReview($PRInReviewNotGTMedIdentifier, 0, false);
+        $this->createPRInReview('akeneo/pim-community-dev/2', 2, false);
+        $this->createPRInReview('akeneo/pim-community-dev/3', 0, true);
+
+        $PRs = $this->sqlPRRepository->findPRToReviewNotGTMed();
+
+        $this->assertCount(1, $PRs);
+        /** @var PR $PR */
+        $PR = current($PRs);
+        $this->assertEquals($PRInReviewNotGTMedIdentifier, $PR->normalize()['IDENTIFIER']);
+    }
+
+    /**
      * @param array $expectedPRs
-     * @param PR[] $actualPRs
+     * @param PR[]  $actualPRs
      */
     private function assertPRs(array $expectedPRs, array $actualPRs): void
     {
@@ -205,5 +228,22 @@ class SqlPRRepositoryTest extends KernelTestCase
         }
 
         $this->assertSame($expectedPRs, $normalizedFetchedPR);
+    }
+
+    private function createPRInReview(string $PRIdentifier, $GTMs, $isMerged): void
+    {
+        $identifier = PRIdentifier::create($PRIdentifier);
+        $PR = PR::create(
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1')
+        );
+        for ($i = 0; $i < $GTMs; $i++) {
+            $PR->GTM();
+        }
+        if ($isMerged) {
+            $PR->merged();
+        }
+        $this->sqlPRRepository->save($PR);
     }
 }

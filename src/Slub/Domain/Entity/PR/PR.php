@@ -273,6 +273,14 @@ class PR
         }
     }
 
+    /**
+     * @return ChannelIdentifier[]
+     */
+    public function channelIdentifiers(): array
+    {
+        return $this->channelIdentifiers;
+    }
+
     private function hasMessageIdentifier(MessageIdentifier $newMessageIdentifier): bool
     {
         return in_array(

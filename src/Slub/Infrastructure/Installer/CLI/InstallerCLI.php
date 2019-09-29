@@ -35,7 +35,8 @@ class InstallerCLI extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->createDatabaseIfNotExists();
-        $this->createTableIfNotExists();
+        $this->createPRTableIfNotExists();
+        $this->createDeliveredEventTableIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
     }
 
@@ -58,7 +59,7 @@ class InstallerCLI extends Command
         $connection->exec(sprintf('CREATE DATABASE IF NOT EXISTS %s;', $this->sqlConnection->getDatabase()));
     }
 
-    private function createTableIfNotExists(): void
+    private function createPRTableIfNotExists(): void
     {
         $createTable = <<<SQL
 CREATE TABLE IF NOT EXISTS pr (
@@ -74,6 +75,14 @@ CREATE TABLE IF NOT EXISTS pr (
 	MERGED_AT VARCHAR(20) NULL,
 	rows_before_migration_Version20190609163730 BOOL NOT NULL DEFAULT FALSE
 );
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createDeliveredEventTableIfNotExists()
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS delivered_event (IDENTIFIER VARCHAR(255) PRIMARY KEY );
 SQL;
         $this->sqlConnection->executeUpdate($createTable);
     }

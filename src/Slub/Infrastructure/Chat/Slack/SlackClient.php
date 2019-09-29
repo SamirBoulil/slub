@@ -80,6 +80,25 @@ class SlackClient implements ChatClient
         $this->addReactions($messageIdentifier, $reactionsToAdd);
     }
 
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
+    {
+        APIHelper::checkResponse(
+            $this->client->post(
+                'https://slack.com/api/chat.postMessage',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'channel' => $channelIdentifier->stringValue(),
+                        'text' => $text,
+                    ],
+                ]
+            )
+        );
+    }
+
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
@@ -142,10 +161,5 @@ class SlackClient implements ChatClient
                 implode(',', $reactionsToRemove)
             )
         );
-    }
-
-    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
-    {
-        throw new NotImplementedException();
     }
 }

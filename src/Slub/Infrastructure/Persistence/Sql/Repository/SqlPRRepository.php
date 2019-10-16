@@ -59,6 +59,14 @@ class SqlPRRepository implements PRRepositoryInterface
         return $this->hydrateAll($PRsInReviewNotGtmed);
     }
 
+    public function unpublishPR(PRIdentifier $PRIdentifierToDelete): void
+    {
+        $sql = <<<SQL
+DELETE FROM pr WHERE IDENTIFIER=:PR_IDENTIFIER;
+SQL;
+        $this->sqlConnection->executeUpdate($sql, ['PR_IDENTIFIER' => $PRIdentifierToDelete->stringValue()]);
+    }
+
     public function reset(): void
     {
         $this->sqlConnection->executeUpdate('DELETE FROM pr;');

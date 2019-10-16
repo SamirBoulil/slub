@@ -27,4 +27,6 @@ interface PRRepositoryInterface
      * @return PR[]
      */
     public function all(): array;
+
+    public function unpublishPR(PRIdentifier $PRIdentifierToDelete): void;
 }

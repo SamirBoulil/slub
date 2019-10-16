@@ -57,6 +57,12 @@ services:
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
+    slub.application.unpublish_pr.unpublish_pr_handler:
+        class: Slub\Application\UnpublishPR\UnpublishPRHandler
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@logger'
+
     slub.application.notify.notify_author:
         class: Slub\Application\Notify\NotifyAuthor
         arguments:

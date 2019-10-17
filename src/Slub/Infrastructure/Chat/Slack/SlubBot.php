@@ -9,16 +9,25 @@ use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\Drivers\Slack\SlackDriver;
 use Psr\Log\LoggerInterface;
+use Slub\Application\Common\ChatClient;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Application\UnpublishPR\UnpublishPR;
+use Slub\Application\UnpublishPR\UnpublishPRHandler;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SlubBot
 {
+    public const UNPUBLISH_CONFIRMATION_MESSAGES = ['Okaay! :ok_hand:', 'Will do! :+1:', 'Oki doki!', 'Yeeee '];
+
     /** @var PutPRToReviewHandler */
     private $putPRToReviewHandler;
+
+    /** @var UnpublishPRHandler */
+    private $unpublishPRHandler;
 
     /** @var GetChannelInformationInterface */
     private $getPublicChannelInformation;
@@ -35,29 +44,42 @@ class SlubBot
     /** @var string */
     private $slackToken;
 
+    /** @var string */
+    private $botUserId;
+
+    /** @var ChatClient */
+    private $chatClient;
+
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
+        UnpublishPRHandler $unpublishPRHandler,
+        ChatClient $chatClient,
         GetChannelInformationInterface $getPublicChannelInformation,
         GetChannelInformationInterface $getPrivateChannelInformation,
         LoggerInterface $logger,
-        string $slackToken
+        string $slackToken,
+        string $botUserId
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
+        $this->unpublishPRHandler = $unpublishPRHandler;
         $this->getPublicChannelInformation = $getPublicChannelInformation;
         $this->getPrivateChannelInformation = $getPrivateChannelInformation;
         $this->logger = $logger;
+        $this->botUserId = $botUserId;
+        $this->slackToken = $slackToken;
+        $this->chatClient = $chatClient;
 
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create(['slack' => ['token' => $slackToken]]);
+        $this->bot = BotManFactory::create(['slack' => ['token' => $this->slackToken]]);
         $this->listensToNewPR($this->bot);
+        $this->listenToPRToUnpublish($this->bot);
         $this->healthCheck($this->bot);
         $this->bot->listen();
-        $this->slackToken = $slackToken;
     }
 
     public function start(): void
     {
-        $this->logger->info('Infra - SlubBot is now listening...');
+        $this->logger->info('Bot is now listening...');
     }
 
     public function getBot(): BotMan
@@ -68,31 +90,52 @@ class SlubBot
     private function listensToNewPR(BotMan $bot): void
     {
         $createNewPr = function (Botman $bot, string $repository, $PRNumber) {
-            $this->putPRToReview($PRNumber, $repository, $bot);
+            $channelIdentifier = $this->getChannelIdentifier($bot);
+            $messageIdentifier = $this->getMessageIdentifier($bot);
+            $this->putPRToReview($PRNumber, $repository, $channelIdentifier, $messageIdentifier);
         };
         $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*PR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
     }
 
-    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, BotMan $bot): void
+    private function listenToPRToUnpublish(BotMan $bot): void
+    {
+        $unpublishPR = function (Botman $bot, string $repository, $PRNumber) {
+            $this->unpublishPR($PRNumber, $repository);
+            $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
+            $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
+        };
+        $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);
+        $bot->hears($unpublishMessage, $unpublishPR);
+    }
+
+    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier): void
     {
         $prToReview = new PutPRToReview();
         $prToReview->PRIdentifier = sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
         $prToReview->repositoryIdentifier = $repositoryIdentifier;
-        $prToReview->channelIdentifier = $this->getChannelIdentifier($bot);
-        $prToReview->messageIdentifier = $this->getMessageIdentifier($bot);
+        $prToReview->channelIdentifier = $channelIdentifier;
+        $prToReview->messageIdentifier = $messageIdentifier;
 
         $this->logger->info(
             sprintf(
-                'New PR to review detected from channel "%s" for repository "%s", PR "%s".',
-                $this->getChannelIdentifier($bot),
+                'Bot hears a new PR to review detected in channel "%s" for repository "%s" and PR "%s".',
+                $channelIdentifier,
                 $repositoryIdentifier,
                 $prToReview->PRIdentifier
             )
         );
 
         $this->putPRToReviewHandler->handle($prToReview);
+    }
+
+    private function unpublishPR(string $PRNumber, string $repositoryIdentifier): void
+    {
+        $unpublishPR = new UnpublishPR();
+        $unpublishPR->PRIdentifier = sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
+        $this->unpublishPRHandler->handle($unpublishPR);
+        $this->logger->info(sprintf('Bot hears an unpublish request for "%s".', $unpublishPR->PRIdentifier));
     }
 
     private function healthCheck(BotMan $bot): void
@@ -107,7 +150,7 @@ class SlubBot
 
     private function getChannelIdentifier(BotMan $bot): string
     {
-        $this->logger->info('Fetching channel information for channel');
+        $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
         $channel = $payload['channel'];
         $channelType = $payload['channel_type'];

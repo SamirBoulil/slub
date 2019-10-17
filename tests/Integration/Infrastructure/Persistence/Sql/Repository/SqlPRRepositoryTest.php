@@ -217,6 +217,19 @@ class SqlPRRepositoryTest extends KernelTestCase
     }
 
     /**
+     * @test
+     */
+    public function it_deletes_a_PR_that_has_been_published()
+    {
+        $PRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev/1');
+        $this->createPRInReview($PRIdentifier->stringValue(), 0, false);
+
+        $this->sqlPRRepository->unpublishPR($PRIdentifier);
+
+        $this->assertEmpty($this->sqlPRRepository->all());
+    }
+
+    /**
      * @param array $expectedPRs
      * @param PR[]  $actualPRs
      */

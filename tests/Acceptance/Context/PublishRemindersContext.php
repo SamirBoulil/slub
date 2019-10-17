@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;

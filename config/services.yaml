@@ -9,7 +9,7 @@ parameters:
     FEATURE_FLAG_REMINDER_SUPPORTED_CHANNELS: 'squad-raccoons,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
     GITHUB_URI: 'https://api.github.com'
-    BOT_USER_ID: 'bot_user_id'
+    BOT_USER_ID: 'my_bot_user_id'
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
@@ -135,10 +135,12 @@ services:
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.application.unpublish_pr.unpublish_pr_handler'
+            - '@slub.infrastructure.chat.slack.slack_client'
             - '@slub.infrastructure.query.get_public_channel_information'
             - '@slub.infrastructure.query.get_private_channel_information'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
+            - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.slub_bot_action:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction

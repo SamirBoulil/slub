@@ -9,10 +9,12 @@ use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\Drivers\Slack\SlackDriver;
 use Psr\Log\LoggerInterface;
+use Slub\Application\Common\ChatClient;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Application\UnpublishPR\UnpublishPR;
 use Slub\Application\UnpublishPR\UnpublishPRHandler;
+use Slub\Domain\Entity\PR\MessageIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -42,27 +44,37 @@ class SlubBot
     /** @var string */
     private $slackToken;
 
+    /** @var string */
+    private $botUserId;
+
+    /** @var ChatClient */
+    private $chatClient;
+
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
         UnpublishPRHandler $unpublishPRHandler,
+        ChatClient $chatClient,
         GetChannelInformationInterface $getPublicChannelInformation,
         GetChannelInformationInterface $getPrivateChannelInformation,
         LoggerInterface $logger,
-        string $slackToken
+        string $slackToken,
+        string $botUserId
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->unpublishPRHandler = $unpublishPRHandler;
         $this->getPublicChannelInformation = $getPublicChannelInformation;
         $this->getPrivateChannelInformation = $getPrivateChannelInformation;
         $this->logger = $logger;
+        $this->botUserId = $botUserId;
+        $this->slackToken = $slackToken;
+        $this->chatClient = $chatClient;
 
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create(['slack' => ['token' => $slackToken]]);
+        $this->bot = BotManFactory::create(['slack' => ['token' => $this->slackToken]]);
         $this->listensToNewPR($this->bot);
         $this->listenToPRToUnpublish($this->bot);
         $this->healthCheck($this->bot);
         $this->bot->listen();
-        $this->slackToken = $slackToken;
     }
 
     public function start(): void
@@ -91,13 +103,12 @@ class SlubBot
     {
         $unpublishPR = function (Botman $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
-            $bot->randomReply(self::UNPUBLISH_CONFIRMATION_MESSAGES);
+            $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
+//            $bot->reply($message, ['thread_ts' => $this->getMessageIdentifier($this->bot)]);
+            $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
         };
-        $botUserId = $bot->getUser()->getId();
-        $bot->hears(
-            sprintf('<%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $botUserId),
-            $unpublishPR
-        );
+        $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);
+        $bot->hears($unpublishMessage, $unpublishPR);
     }
 
     private function putPRToReview(string $PRNumber, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier): void

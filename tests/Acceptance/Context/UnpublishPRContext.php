@@ -56,7 +56,7 @@ class UnpublishPRContext extends FeatureContext
     }
 
     /**
-     * @Then /^the PR is is removed$/
+     * @Then /^the PR is is unpublished$/
      */
     public function thePRIsIsRemoved()
     {

@@ -24,13 +24,14 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SlubBotTest extends KernelTestCase
 {
-    private const BOT_USER_ID = '@YEEE';
-
     /** @var BotManTester */
     private $botTester;
 
     /** @var PRRepositoryInterface */
     private $PRRepository;
+
+    /** @var string */
+    private $botUserId;
 
     public static function setUpBeforeClass()
     {
@@ -44,6 +45,7 @@ class SlubBotTest extends KernelTestCase
         $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $this->botTester = $this->startBot();
         $this->botTester->setUser(['id' => 'DUMMY_NAME']);
+        $this->botUserId = $this->get('BOT_USER_ID');
     }
 
     /**
@@ -75,12 +77,15 @@ class SlubBotTest extends KernelTestCase
 
     /**
      * @test
-     * @dataProvider unpublishMessages
      */
-    public function it_unpublishes_a_PR(string $message): void
+    public function it_unpublishes_a_PR(): void
     {
         $PRIdentifier = 'akeneo/pim-community-dev/9609';
         $this->createPRToReview($PRIdentifier);
+        $message = sprintf(
+            '<@%s> could you please unpublish this PR <https://github.com/akeneo/pim-community-dev/pull/9609>',
+            $this->botUserId
+        );
 
         $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group'])
                         ->assertReplyIn(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
@@ -91,7 +96,7 @@ class SlubBotTest extends KernelTestCase
     private function startBot(): BotManTester
     {
         $fakeDriver = new FakeDriver();
-        $fakeDriver->setUser(['id' => self::BOT_USER_ID]);
+        $fakeDriver->setUser(['id' => $this->botUserId]);
         ProxyDriver::setInstance($fakeDriver);
         /** @var BotMan $bot */
         $bot = $this->get('slub.infrastructure.chat.slack.slub_bot')->getBot();
@@ -143,21 +148,5 @@ class SlubBotTest extends KernelTestCase
                 MessageIdentifier::fromString(Uuid::uuid4()->toString())
             )
         );
-    }
-
-    public function unpublishMessages()
-    {
-        return [
-            'Ping the bot directly' => [
-                sprintf('<%s> unpublish <https://github.com/akeneo/pim-community-dev/pull/9609>',
-                    self::BOT_USER_ID
-                ),
-            ],
-            'In a sentence' => [
-                sprintf('<%s> could you please unpublish this PR <https://github.com/akeneo/pim-community-dev/pull/9609>',
-                    self::BOT_USER_ID
-                ),
-            ],
-        ];
     }
 }

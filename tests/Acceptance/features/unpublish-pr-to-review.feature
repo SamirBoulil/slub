@@ -7,4 +7,4 @@ Feature: Unpublish a specific pull request in review
   Scenario: Unpublish a PR from the reviewing process
     Given a PR has been put to review by mistake
     When an author unpublishes a PR
-    Then the PR is is removed
+    Then the PR is is unpublished

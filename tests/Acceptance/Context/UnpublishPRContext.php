@@ -24,7 +24,7 @@ class UnpublishPRContext extends FeatureContext
     /** @var UnpublishPRHandler */
     private $unpublishPRHandler;
 
-    public function __construct(PRRepositoryInterface $PRRepository,  UnpublishPRHandler $unpublishPRHandler)
+    public function __construct(PRRepositoryInterface $PRRepository, UnpublishPRHandler $unpublishPRHandler)
     {
         parent::__construct($PRRepository);
         $this->PRRepository = $PRRepository;

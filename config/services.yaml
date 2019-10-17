@@ -134,6 +134,7 @@ services:
         class: Slub\Infrastructure\Chat\Slack\SlubBot
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+            - '@slub.application.unpublish_pr.unpublish_pr_handler'
             - '@slub.infrastructure.query.get_public_channel_information'
             - '@slub.infrastructure.query.get_private_channel_information'
             - '@logger'

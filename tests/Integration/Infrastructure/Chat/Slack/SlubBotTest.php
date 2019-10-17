@@ -17,6 +17,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Chat\Slack\SlubBot;
+use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**
@@ -29,6 +30,9 @@ class SlubBotTest extends KernelTestCase
 
     /** @var PRRepositoryInterface */
     private $PRRepository;
+
+    /** @var ChatClientSpy */
+    private $chatClientSpy;
 
     /** @var string */
     private $botUserId;
@@ -43,6 +47,7 @@ class SlubBotTest extends KernelTestCase
         parent::setUp();
 
         $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
+        $this->chatClientSpy = $this->get('slub.infrastructure.chat.slack.slack_client');
         $this->botTester = $this->startBot();
         $this->botTester->setUser(['id' => 'DUMMY_NAME']);
         $this->botUserId = $this->get('BOT_USER_ID');
@@ -87,10 +92,10 @@ class SlubBotTest extends KernelTestCase
             $this->botUserId
         );
 
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group'])
-                        ->assertReplyIn(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
+        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group']);
 
         $this->assertPRHasBeenUnpublished($PRIdentifier);
+        $this->assertBotHasRepliedWithOneOf(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
     }
 
     private function startBot(): BotManTester
@@ -148,5 +153,10 @@ class SlubBotTest extends KernelTestCase
                 MessageIdentifier::fromString(Uuid::uuid4()->toString())
             )
         );
+    }
+
+    private function assertBotHasRepliedWithOneOf(array $anyMessage): void
+    {
+        $this->chatClientSpy->assertRepliedWithOneOf($anyMessage);
     }
 }

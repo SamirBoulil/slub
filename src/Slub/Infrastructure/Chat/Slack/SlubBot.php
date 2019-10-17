@@ -104,7 +104,6 @@ class SlubBot
         $unpublishPR = function (Botman $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
             $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
-//            $bot->reply($message, ['thread_ts' => $this->getMessageIdentifier($this->bot)]);
             $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
         };
         $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);

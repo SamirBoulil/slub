@@ -53,6 +53,20 @@ class ChatClientSpy implements ChatClient
         Assert::assertEquals([$expectedText], $reactions);
     }
 
+    public function assertRepliedWithOneOf(array $expectedMessages)
+    {
+        $isFound = false;
+        foreach ($this->recordedMessages as $actualMessages) {
+            foreach ($actualMessages as $actualMessage) {
+                if (in_array($actualMessage, $expectedMessages)) {
+                    $isFound = true;
+                }
+            }
+        }
+
+        Assert::assertTrue($isFound, 'Did not find any of the messages');
+    }
+
     public function reset(): void
     {
         $this->recordedMessages = [];

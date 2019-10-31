@@ -35,8 +35,8 @@ class CIStatus
 
     public static function fromNormalized(array $normalizedCIStatus): self
     {
-        Assert::keyExists(self::BUILD_LINK_KEY, $normalizedCIStatus);
-        Assert::keyExists(self::BUILD_RESULT_KEY, $normalizedCIStatus);
+        Assert::keyExists($normalizedCIStatus, self::BUILD_LINK_KEY);
+        Assert::keyExists($normalizedCIStatus, self::BUILD_RESULT_KEY);
 
         return new self(
             BuildResult::fromNormalized($normalizedCIStatus[self::BUILD_RESULT_KEY]),
@@ -50,5 +50,20 @@ class CIStatus
             self::BUILD_RESULT_KEY => $this->buildResult->stringValue(),
             self::BUILD_LINK_KEY => $this->buildLink->stringValue()
         ];
+    }
+
+    public function isGreen(): bool
+    {
+       return $this->buildResult->isGreen();
+    }
+
+    public function isRed(): bool
+    {
+        return $this->buildResult->isRed();
+    }
+
+    public function isPending(): bool
+    {
+        return $this->buildResult->isPending();
     }
 }

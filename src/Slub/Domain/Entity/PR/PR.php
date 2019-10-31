@@ -28,7 +28,6 @@ class PR
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
     private const MERGED_AT = 'MERGED_AT';
-    private const CI_KEY = 'CI';
 
     /** @var Event[] */
     private $events = [];
@@ -51,7 +50,7 @@ class PR
     /** @var int */
     private $notGTMCount;
 
-    /** @var BuildResult */
+    /** @var CIStatus */
     private $CIStatus;
 
     /** @var bool */
@@ -116,7 +115,7 @@ class PR
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
         Assert::keyExists($normalizedPR, self::COMMENTS_KEY);
-        Assert::keyExists($normalizedPR, self::CI_KEY);
+        Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
         Assert::keyExists($normalizedPR, self::CHANNEL_IDS);
@@ -146,8 +145,14 @@ class PR
         $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
 
         return new self(
-            $identifier, $channelIdentifiers, $messageIds, $GTM, $NOTGTM, $comments,
-            BuildResult::fromNormalized($CIStatus), $isMerged,
+            $identifier,
+            $channelIdentifiers,
+            $messageIds,
+            $GTM,
+            $NOTGTM,
+            $comments,
+            CIStatus::fromNormalized($CIStatus),
+            $isMerged,
             $putToReviewAt, $mergedAt
         );
     }
@@ -159,8 +164,7 @@ class PR
             self::GTM_KEY => $this->GTMCount,
             self::NOT_GTM_KEY => $this->notGTMCount,
             self::COMMENTS_KEY => $this->comments,
-            self::CI_STATUS_KEY => $this->CIStatus->normalize()['BUILD_RESULT'], // TODO: Legacy to remove from 15/12/2019
-            self::CI_KEY => $this->CIStatus->normalize(),
+            self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
             self::CHANNEL_IDS => array_map(
                 function (ChannelIdentifier $channelIdentifier) {
@@ -208,7 +212,10 @@ class PR
             return;
         }
 
-        $this->CIStatus = BuildResult::green();
+        $this->CIStatus = CIStatus::endedWith(
+            BuildResult::green(),
+            BuildLink::none()
+        );
         $this->events[] = CIGreen::ForPR($this->PRIdentifier);
     }
 
@@ -218,7 +225,10 @@ class PR
             return;
         }
 
-        $this->CIStatus = BuildResult::red();
+        $this->CIStatus = CIStatus::endedWith(
+            BuildResult::red(),
+            BuildLink::none()
+        );
         $this->events[] = CIRed::ForPR($this->PRIdentifier);
     }
 
@@ -228,7 +238,10 @@ class PR
             return;
         }
 
-        $this->CIStatus = BuildResult::pending();
+        $this->CIStatus = CIStatus::endedWith(
+            BuildResult::pending(),
+            BuildLink::none()
+        );
         $this->events[] = CIPending::ForPR($this->PRIdentifier);
     }
 

@@ -38,13 +38,13 @@ class CIStatusTest extends TestCase
     {
         $buildResult = BuildResult::green();
 
-        $ciStatus = CIStatus::endedWith($buildResult);
+        $ciStatus = CIStatus::endedWith($buildResult, BuildLink::none());
         $normalizedCIStatus = $ciStatus->normalize();
 
         self::assertEquals(
             [
                 'BUILD_RESULT' => 'GREEN',
-                'BUILD_LINK'   => null,
+                'BUILD_LINK'   => '',
             ],
             $normalizedCIStatus
         );
@@ -53,11 +53,11 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_a_normlized_version()
+    public function it_is_created_from_a_normalized_version()
     {
         $expectedNormalizedCIStatus = [
             'BUILD_RESULT' => 'GREEN',
-            'BUILD_LINK'   => null,
+            'BUILD_LINK'   => '',
         ];
 
         $CIStatus = CIStatus::fromNormalized($expectedNormalizedCIStatus);
@@ -66,4 +66,25 @@ class CIStatusTest extends TestCase
         self::assertEquals($expectedNormalizedCIStatus, $actualNormalizedCIStatus);
     }
 
+    /**
+     * @test
+     */
+    public function it_tells_is_the_result_is_green()
+    {
+        $CIStatus = CIStatus::endedWith(BuildResult::green(), BuildLink::none());
+        self::assertTrue($CIStatus->isGreen());
+        self::assertFalse($CIStatus->isRed());
+        self::assertFalse($CIStatus->isPending());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_is_the_result_is_pending()
+    {
+        $CIStatus = CIStatus::endedWith(BuildResult::pending(), BuildLink::none());
+        self::assertTrue($CIStatus->isPending());
+        self::assertFalse($CIStatus->isGreen());
+        self::assertFalse($CIStatus->isRed());
+    }
 }

@@ -171,6 +171,7 @@ SQL;
                 'IS_MERGED'   => 'boolean',
                 'MESSAGE_IDS' => 'json',
                 'CHANNEL_IDS' => 'json',
+                'CI_STATUS' => 'json'
             ]
         );
     }

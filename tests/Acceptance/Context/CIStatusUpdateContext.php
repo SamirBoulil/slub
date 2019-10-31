@@ -23,6 +23,8 @@ use Tests\Acceptance\helpers\EventsSpy;
  */
 class CIStatusUpdateContext extends FeatureContext
 {
+    private const BUILD_LINK = 'https://my-ci.com/build/123';
+
     /** @var CIStatusUpdateHandler */
     private $CIStatusUpdateHandler;
 
@@ -112,6 +114,7 @@ class CIStatusUpdateContext extends FeatureContext
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
         $CIStatusUpdate->PRIdentifier = 'akeneo/pim-community-dev/1010';
         $CIStatusUpdate->status = 'RED';
+        $CIStatusUpdate->buildLink = self::BUILD_LINK;
         $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
     }
 
@@ -175,7 +178,7 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @Given /^the author should be notified that the ci is red for the PR$/
+     * @Given /^the author should be notified that the ci is red for the PR with the CI build link$/
      */
     public function theAuthorShouldBeNotifiedThatTheCiIsRedForThePR()
     {
@@ -185,7 +188,7 @@ class CIStatusUpdateContext extends FeatureContext
         );
         $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
-            NotifyAuthor::MESSAGE_CI_RED
+            sprintf('%s %s', NotifyAuthor::MESSAGE_CI_RED, self::BUILD_LINK)
         );
     }
 

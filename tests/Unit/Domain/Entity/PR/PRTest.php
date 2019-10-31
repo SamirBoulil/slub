@@ -39,6 +39,8 @@ class PRTest extends TestCase
         $this->assertEquals(0, $normalizedPR['NOT_GTMS']);
         $this->assertEquals(0, $normalizedPR['COMMENTS']);
         $this->assertEquals('PENDING', $normalizedPR['CI_STATUS']);
+        $this->assertEquals('PENDING', $normalizedPR['CI']['BUILD_RESULT']);
+        $this->assertEquals('', $normalizedPR['CI']['BUILD_LINK']);
         $this->assertEquals(false, $normalizedPR['IS_MERGED']);
         $this->assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
         $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
@@ -49,6 +51,7 @@ class PRTest extends TestCase
 
     /**
      * @test
+     *      TODO: Legacy remove from 15/12/2019
      */
     public function it_is_created_from_normalized()
     {
@@ -70,6 +73,34 @@ class PRTest extends TestCase
         $this->assertSame($normalizedPR, $pr->normalize());
         $this->assertEmpty($pr->getEvents());
     }
+
+    /**
+     * @test
+     */
+    public function it_is_created_from_pending_normalized()
+    {
+        $normalizedPR = [
+            'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+            'GTMS'             => 2,
+            'NOT_GTMS'         => 0,
+            'COMMENTS'         => 0,
+            'CI'               => [
+                'BUILD_RESULT' => 'GREEN',
+                'BUILD_LINK'   => '',
+            ],
+            'IS_MERGED'        => true,
+            'CHANNEL_IDS'      => ['squad-raccoons'],
+            'MESSAGE_IDS'      => ['1', '2'],
+            'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+            'MERGED_AT'        => self::A_TIMESTAMP,
+        ];
+
+        $pr = PR::fromNormalized($normalizedPR);
+
+        $this->assertSame($normalizedPR, $pr->normalize());
+        $this->assertEmpty($pr->getEvents());
+    }
+
 
     /**
      * @test

@@ -21,11 +21,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class NotifyAuthor implements EventSubscriberInterface
 {
+    public const BUILD_LINK_PLACEHOLDER = '{{build_link}}';
     public const MESSAGE_PR_GTMED = ':+1: GTM';
     public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: PR Refused';
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
-    public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed';
+    public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed ' . self::BUILD_LINK_PLACEHOLDER;
 
     /** @var GetMessageIdsForPR */
     private $getMessageIdsForPR;

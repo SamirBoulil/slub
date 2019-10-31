@@ -1,8 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Domain\Entity\PR;
 
+use Slub\Domain\Entity\PR\BuildLink;
+use Slub\Domain\Entity\PR\BuildResult;
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\CIStatus;
 
@@ -11,85 +14,56 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_with_status_pending_and_normalizes_itself()
+    public function it_is_created_from_a_build_result_and_a_build_link_and_normalizes_it_self()
     {
-        $noStatus = CIStatus::pending();
-        $this->assertEquals('PENDING', $noStatus->stringValue());
+        $buildLink = 'https://my-ci.com/build/123';
+        $buildResult = BuildResult::green();
+
+        $ciStatus = CIStatus::endedWith($buildResult, BuildLink::fromURL($buildLink));
+        $normalizedCIStatus = $ciStatus->normalize();
+
+        self::assertEquals(
+            [
+                'BUILD_RESULT' => 'GREEN',
+                'BUILD_LINK'   => $buildLink,
+            ],
+            $normalizedCIStatus
+        );
     }
 
     /**
      * @test
      */
-    public function it_can_be_constructed_with_green_status_and_normalizes_itself()
+    public function it_is_created_from_a_build_result_and_no_build_link_and_normalizes_it_self()
     {
-        $noStatus = CIStatus::green();
-        $this->assertEquals('GREEN', $noStatus->stringValue());
+        $buildResult = BuildResult::green();
+
+        $ciStatus = CIStatus::endedWith($buildResult);
+        $normalizedCIStatus = $ciStatus->normalize();
+
+        self::assertEquals(
+            [
+                'BUILD_RESULT' => 'GREEN',
+                'BUILD_LINK'   => null,
+            ],
+            $normalizedCIStatus
+        );
     }
 
     /**
      * @test
      */
-    public function it_can_be_constructed_with_red_status_and_normalizes_itself()
+    public function it_is_created_from_a_normlized_version()
     {
-        $noStatus = CIStatus::red();
-        $this->assertEquals('RED', $noStatus->stringValue());
+        $expectedNormalizedCIStatus = [
+            'BUILD_RESULT' => 'GREEN',
+            'BUILD_LINK'   => null,
+        ];
+
+        $CIStatus = CIStatus::fromNormalized($expectedNormalizedCIStatus);
+        $actualNormalizedCIStatus = $CIStatus->normalize();
+
+        self::assertEquals($expectedNormalizedCIStatus, $actualNormalizedCIStatus);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_be_constructed_from_normalized()
-    {
-        $noStatus = CIStatus::fromNormalized('GREEN');
-        $this->assertEquals('GREEN', $noStatus->stringValue());
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_if_it_does_not_support_a_status()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        CIStatus::fromNormalized('UNSUPPORTED');
-    }
-
-    /**
-     * @test
-     */
-    public function it_is_normalizable()
-    {
-        $this->assertEquals(CIStatus::green()->stringValue(), 'GREEN');
-        $this->assertEquals(CIStatus::pending()->stringValue(), 'PENDING');
-        $this->assertEquals(CIStatus::red()->stringValue(), 'RED');
-    }
-
-    /**
-     * @test
-     */
-    public function it_tells_if_it_is_green()
-    {
-        $this->assertTrue(CIStatus::green()->isGreen());
-        $this->assertFalse(CIStatus::green()->isRed());
-        $this->assertFalse(CIStatus::green()->isPending());
-    }
-
-    /**
-     * @test
-     */
-    public function it_tells_if_it_is_red()
-    {
-        $this->assertTrue(CIStatus::red()->isRed());
-        $this->assertFalse(CIStatus::red()->isGreen());
-        $this->assertFalse(CIStatus::red()->isPending());
-    }
-
-    /**
-     * @test
-     */
-    public function it_tells_if_it_is_pending()
-    {
-        $this->assertTrue(CIStatus::pending()->isPending());
-        $this->assertFalse(CIStatus::pending()->isRed());
-        $this->assertFalse(CIStatus::pending()->isGreen());
-    }
 }

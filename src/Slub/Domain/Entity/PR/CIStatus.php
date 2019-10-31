@@ -7,61 +7,48 @@ namespace Slub\Domain\Entity\PR;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@gmail.com>
+ * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
 class CIStatus
 {
-    private const PENDING = 'PENDING';
-    private const GREEN = 'GREEN';
-    private const RED = 'RED';
+    private const BUILD_RESULT_KEY = 'BUILD_RESULT';
+    private const BUILD_LINK_KEY = 'BUILD_LINK';
 
-    /** @var string */
-    private $status;
+    /** @var BuildResult */
+    private $buildResult;
 
-    private function __construct(string $status)
-    {
-        $this->status = $status;
+    /** @var BuildLink */
+    private $buildLink;
+
+    private function __construct(
+        BuildResult $buildResult,
+        BuildLink $buildLink
+    ) {
+        $this->buildResult = $buildResult;
+        $this->buildLink = $buildLink;
     }
 
-    public static function pending(): self
+    public static function endedWith(BuildResult $buildResult, BuildLink $buildLink): self
     {
-        return new self(self::PENDING);
+        return new self($buildResult, $buildLink);
     }
 
-    public static function green(): self
+    public static function fromNormalized(array $normalizedCIStatus): self
     {
-        return new self(self::GREEN);
+        Assert::keyExists(self::BUILD_LINK_KEY, $normalizedCIStatus);
+        Assert::keyExists(self::BUILD_RESULT_KEY, $normalizedCIStatus);
+
+        return new self(
+            BuildResult::fromNormalized($normalizedCIStatus[self::BUILD_RESULT_KEY]),
+            BuildLink::fromNormalized($normalizedCIStatus[self::BUILD_LINK_KEY])
+        );
     }
 
-    public static function red(): self
+    public function normalize(): array
     {
-        return new self(self::RED);
-    }
-
-    public static function fromNormalized(string $ciStatus): self
-    {
-        Assert::oneOf($ciStatus, [self::PENDING, self::GREEN, self::RED]);
-
-        return new self($ciStatus);
-    }
-
-    public function stringValue(): string
-    {
-        return $this->status;
-    }
-
-    public function isGreen(): bool
-    {
-        return self::GREEN === $this->status;
-    }
-
-    public function isRed(): bool
-    {
-        return self::RED === $this->status;
-    }
-
-    public function isPending(): bool
-    {
-        return self::PENDING === $this->status;
+        return [
+            self::BUILD_RESULT_KEY => $this->buildResult->stringValue(),
+            self::BUILD_LINK_KEY => $this->buildLink->stringValue()
+        ];
     }
 }

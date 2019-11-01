@@ -41,3 +41,11 @@ od-prod: # Open dashboard production
 .PHONY: log-staging
 od-staging: # Open dashboard staging
 	open https://dashboard.heroku.com/apps/slub-test
+
+.PHONY: status-check-failure
+status-check-failure: # Create a status check failure for a spectif sha given in parameter
+	curl -X POST -H "Authorization: token $(GITHUB_TOKEN)" https://api.github.com/repos/$(REPO)/statuses/$(SHA) -d '{"context": "status-check", "description": "status check failure", "state": "failure", "target_url": "https://google.com"}'
+
+.PHONY: status-check-success
+status-check-success: # Create a status check failure for a spectif sha given in parameter
+	curl -X POST -H "Authorization: token $(GITHUB_TOKEN)" https://api.github.com/repos/$(REPO)/statuses/$(SHA) -d '{"context": "status-check", "description": "status check success", "state": "success", "target_url": "https://google.com"}'

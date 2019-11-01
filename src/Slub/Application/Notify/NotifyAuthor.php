@@ -79,14 +79,14 @@ class NotifyAuthor implements EventSubscriberInterface
     public function whenCIIsGreen(CIGreen $event): void
     {
         $this->replyInThread($event->PRIdentifier(), self::MESSAGE_CI_GREEN);
-        $this->logger->info(sprintf('Squad has been notified PR "%s" has a CI Green', $event->PRIdentifier()->stringValue()));
+        $this->logger->info(sprintf('Author has been notified PR "%s" has a CI Green', $event->PRIdentifier()->stringValue()));
     }
 
     public function whenCIIsRed(CIRed $event): void
     {
         $redCIMessage = str_replace(self::BUILD_LINK_PLACEHOLDER, $event->buildLink()->stringValue(), self::MESSAGE_CI_RED);
         $this->replyInThread($event->PRIdentifier(), $redCIMessage);
-        $this->logger->info(sprintf('Squad has been notified PR "%s" has a CI Red', $event->PRIdentifier()->stringValue()));
+        $this->logger->info(sprintf('Author has been notified PR "%s" has a CI Red', $event->PRIdentifier()->stringValue()));
     }
 
     private function replyInThread(PRIdentifier $PRIdentifier, string $message): void

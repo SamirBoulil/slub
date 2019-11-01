@@ -194,18 +194,6 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_creates_event_if_the_pr_is_already_red()
-    {
-        $pr = $this->redPR();
-
-        $pr->red(BuildLink::none());
-
-        $this->assertEmpty($pr->getEvents());
-    }
-
-    /**
-     * @test
-     */
     public function it_can_become_pending()
     {
         $pr = $this->greenPR();

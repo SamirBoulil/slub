@@ -126,7 +126,7 @@ class GetCheckRunStatusTest extends WebTestCase
             'Mixed CI checks statuses: red'   => [
                 [
                     'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],

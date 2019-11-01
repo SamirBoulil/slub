@@ -63,6 +63,21 @@ class GetStatusChecksStatus
 
     private function deductCIStatus(array $statuses): CheckStatus
     {
+        $getStatuses = function (string $statusToFilterOn) {
+            return function ($current, $ciStatus) use ($statusToFilterOn) {
+                if (null !== $current) {
+                    return $current;
+                }
+
+                return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
+            };
+        };
+
+        $faillingStatus = array_reduce($statuses, $getStatuses('failure'));
+        if ($faillingStatus) {
+            return new CheckStatus('RED', $faillingStatus['target_url'] ?? '');
+        }
+
         $supportedStatuses = array_filter($statuses,
             function (array $status) {
                 return $this->isStatusSupported($status);
@@ -73,22 +88,7 @@ class GetStatusChecksStatus
             return new CheckStatus('PENDING');
         }
 
-        $status = function (string $statusToFilterOn) {
-            return function ($current, $ciStatus) use ($statusToFilterOn) {
-                if (null !== $current) {
-                    return $current;
-                }
-
-                return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
-            };
-        };
-        $faillingStatus = array_reduce($supportedStatuses, $status('failure'));
-
-        if ($faillingStatus) {
-            return new CheckStatus('RED', $faillingStatus['target_url'] ?? '');
-        }
-
-        $successStatus = array_reduce($supportedStatuses, $status('success'));
+        $successStatus = array_reduce($supportedStatuses, $getStatuses('success'));
         if ($successStatus) {
             return new CheckStatus('GREEN');
         }

@@ -116,6 +116,33 @@ class CheckRunEventHandlerTest extends TestCase
     /**
      * @test
      */
+    public function it_has_a_queued_check_run_we_fetch_the_ci_status()
+    {
+        $prInfo = new PRInfo();
+        $prInfo->CIStatus =  new CheckStatus(self::CI_STATUS);
+        $this->getPRInfo->fetch(
+            Argument::that(
+                function (PRIdentifier $PRIdentifier) {
+                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
+                }
+            )
+        )->willReturn($prInfo);
+
+        $this->handler->handle(
+            Argument::that(function (CIStatusUpdate $command) {
+                return self::PR_IDENTIFIER === $command->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                    && self::CI_STATUS === $command->status;
+            })
+        )->shouldBeCalled();
+
+        $this->checkRunEventHandler->handle($this->queuedCheckRun());
+    }
+
+
+    /**
+     * @test
+     */
     public function it_throws_for_unsupported_conclusion()
     {
         $this->expectException(\Exception::class);
@@ -199,6 +226,38 @@ JSON;
   "action": "completed",
   "check_run": {
     "status": "completed",
+    "conclusion": "WRONG_CONCLUSION",
+    "name": "travis",
+    "check_suite": {
+      "pull_requests": [
+        {
+          "number": 10
+        }
+      ]
+    },
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
+        "number": 26
+      }
+    ]
+  },
+  "repository": {
+    "full_name": "SamirBoulil/slub"
+  }
+}
+JSON;
+
+        return json_decode($json, true);
+    }
+
+    private function queuedCheckRun(): array
+    {
+        $json = <<<JSON
+{
+  "action": "completed",
+  "check_run": {
+    "status": "queued",
     "conclusion": "WRONG_CONCLUSION",
     "name": "travis",
     "check_suite": {

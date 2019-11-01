@@ -52,7 +52,7 @@ class InstallerCLI extends Command
         $connection = ConnectionFactory::create($mysqlUrl);
         $schemaManager = $connection->getSchemaManager();
         $databases = $schemaManager->listDatabases();
-        $databaseName = $connection->getDatabase();
+        $databaseName = $this->sqlConnection->getDatabase();
         if (in_array($databaseName, $databases)) {
             return;
         }

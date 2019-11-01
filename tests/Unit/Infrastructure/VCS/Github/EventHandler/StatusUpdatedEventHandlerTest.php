@@ -112,6 +112,10 @@ class StatusUpdatedEventHandlerTest extends TestCase
                 $this->unsupportedRedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
                 self::UNSUPPORTED_STATUS,
             ],
+            'it handles unsupported pending status' => [
+                $this->unsupportedPendingEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
+                self::UNSUPPORTED_STATUS,
+            ],
         ];
     }
 
@@ -135,7 +139,6 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->expectException(\Exception::class);
         $this->statusUpdateEventHandler->handle($this->unsupportedResult());
     }
-
 
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
@@ -165,6 +168,25 @@ JSON;
   "sha": "${commitRef}",
   "name": "${status}",
   "state": "failure",
+  "number": ${prNumber},
+  "repository": {
+    "full_name": "${repositoryIdentifier}"
+  }
+}
+JSON;
+
+        return json_decode($json, true);
+    }
+
+    private function unsupportedPendingEvent(string $repositoryIdentifier, string $prNumber): array
+    {
+        $status = self::UNSUPPORTED_STATUS;
+        $commitRef = self::COMMIT_REF;
+        $json = <<<JSON
+{
+  "sha": "${commitRef}",
+  "name": "${status}",
+  "state": "pending",
   "number": ${prNumber},
   "repository": {
     "full_name": "${repositoryIdentifier}"

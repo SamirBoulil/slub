@@ -1,3 +1,5 @@
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+
 .PHONY: install
 install:
 	bin/console --env=prod cache:clear
@@ -33,6 +35,10 @@ log-prod:
 .PHONY: log-staging
 log-staging:
 	heroku logs --tail -a slub-test
+
+.PHONY: deploy-staging
+deploy-staging:
+	git push heroku-staging $(BRANCH):master
 
 .PHONY: log-staging
 od-prod: # Open dashboard production

@@ -34,7 +34,7 @@ class GetStatusChecksStatus
         $this->domainName = $domainName;
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $ciStatuses = $this->statuses($PRIdentifier, $commitRef);
 
@@ -61,37 +61,39 @@ class GetStatusChecksStatus
         return $content;
     }
 
-    private function deductCIStatus(array $statuses): string
+    private function deductCIStatus(array $statuses): CheckStatus
     {
-        $supportedStatuses = array_filter($statuses, function (array $status) {
-            return $this->isStatusSupported($status);
-        });
+        $supportedStatuses = array_filter($statuses,
+            function (array $status) {
+                return $this->isStatusSupported($status);
+            }
+        );
 
         if (empty($supportedStatuses)) {
-            return 'PENDING';
+            return new CheckStatus('PENDING');
         }
 
-        $hasStatus = function (string $statusToFilterOn) {
+        $status = function (string $statusToFilterOn) {
             return function ($current, $ciStatus) use ($statusToFilterOn) {
                 if (null !== $current) {
                     return $current;
                 }
 
-                return $statusToFilterOn === $ciStatus['state'];
+                return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
             };
         };
-        $hasCIStatusFailure = array_reduce($supportedStatuses, $hasStatus('failure'));
-        $hasCIStatusSuccess = array_reduce($supportedStatuses, $hasStatus('success'));
+        $faillingStatus = array_reduce($supportedStatuses, $status('failure'));
 
-        if ($hasCIStatusFailure) {
-            return 'RED';
+        if ($faillingStatus) {
+            return new CheckStatus('RED', $faillingStatus['details_url'] ?? '');
         }
 
-        if ($hasCIStatusSuccess) {
-            return 'GREEN';
+        $successStatus = array_reduce($supportedStatuses, $status('success'));
+        if ($successStatus) {
+            return new CheckStatus('GREEN');
         }
 
-        return 'PENDING';
+        return new CheckStatus('PENDING');
     }
 
     private function statusesUrl(PRIdentifier $PRIdentifier, string $ref): string

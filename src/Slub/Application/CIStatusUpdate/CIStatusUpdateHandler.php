@@ -81,6 +81,8 @@ class CIStatusUpdateHandler
 
     private function buildLink(CIStatusUpdate $CIStatusUpdate): BuildLink
     {
-        return null === $CIStatusUpdate->buildLink ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink);
+        $buildLink = $CIStatusUpdate->buildLink;
+
+        return empty($buildLink) ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink);
     }
 }

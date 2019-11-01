@@ -21,7 +21,7 @@ class CheckStatus
 
     public function __construct(
         string $status,
-        string $buildLink
+        string $buildLink = ''
     ) {
         $this->status = $status;
         $this->buildLink = $buildLink;

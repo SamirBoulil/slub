@@ -7,6 +7,7 @@ namespace Tests\Integration\Infrastructure\VCS\Query;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\VCSStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
@@ -66,7 +67,7 @@ class GetVCSStatusFromGithubTest extends WebTestCase
             FindReviews::NOT_GTMS => self::EXPECTED_NOT_GTMS,
             FindReviews::COMMENTS => self::EXPECTED_COMMENTS,
         ]);
-        $this->getCIStatusStub->fetch($PRIdentifier, self::PR_COMMIT_REF)->willReturn(self::EXPECTED_CI_STATUS);
+        $this->getCIStatusStub->fetch($PRIdentifier, self::PR_COMMIT_REF)->willReturn(new CheckStatus(self::EXPECTED_CI_STATUS));
 
         $vcsStatus = $this->getVCSStatus->fetch($PRIdentifier);
 
@@ -79,7 +80,7 @@ class GetVCSStatusFromGithubTest extends WebTestCase
         $this->assertEquals(self::EXPECTED_GTMS, $vcsStatus->GTMCount);
         $this->assertEquals(self::EXPECTED_NOT_GTMS, $vcsStatus->notGTMCount);
         $this->assertEquals(self::EXPECTED_COMMENTS, $vcsStatus->comments);
-        $this->assertEquals(self::EXPECTED_CI_STATUS, $vcsStatus->CIStatus);
+        $this->assertEquals(self::EXPECTED_CI_STATUS, $vcsStatus->checkStatus);
         $this->assertEquals($expectedIsMerged, $vcsStatus->isMerged);
     }
 

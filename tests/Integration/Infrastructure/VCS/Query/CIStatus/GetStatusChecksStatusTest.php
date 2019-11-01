@@ -19,6 +19,7 @@ class GetStatusChecksStatusTest extends WebTestCase
     private const SUPPORTED_CI_STATUS_2 = 'supported_2';
     private const SUPPORTED_CI_CHECK_3 = 'supported_3';
     private const NOT_SUPPORTED_CI_STATUS = 'unsupported';
+    private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     /** @var GetStatusChecksStatus */
     private $getStatusCheckStatus;
@@ -44,7 +45,8 @@ class GetStatusChecksStatusTest extends WebTestCase
      */
     public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
         array $ciStatuses,
-        string $expectedCIStatus
+        string $expectedCIStatus,
+        string $expectedBuildLink
     ): void {
         $this->requestSpy->stubResponse(new Response(200, [], (string)json_encode($ciStatuses)));
 
@@ -53,7 +55,8 @@ class GetStatusChecksStatusTest extends WebTestCase
             self::PR_COMMIT_REF
         );
 
-        $this->assertEquals($expectedCIStatus, $actualCIStatus);
+        $this->assertEquals($expectedCIStatus, $actualCIStatus->status);
+        $this->assertEquals($expectedBuildLink, $actualCIStatus->buildLink);
         $generatedRequest = $this->requestSpy->getRequest();
         $this->requestSpy->assertMethod('GET', $generatedRequest);
         $this->requestSpy->assertURI(
@@ -73,7 +76,8 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success'],
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success']
                 ],
-                'PENDING'
+                'PENDING',
+                ''
             ],
             'Supported status not run' => [
                 [
@@ -81,36 +85,41 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral'],
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success']
                 ],
-                'PENDING'
+                'PENDING',
+                ''
             ],
             'Multiple Status Green'    => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success'],
                 ],
-                'GREEN'
+                'GREEN',
+                ''
             ],
             'Multiple status Red'      => [
                 [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure'],
+                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'details_url' => self::BUILD_LINK],
+                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'details_url' => 'http://my-ci.com/build/456'],
                 ],
-                'RED'
+                'RED',
+                self::BUILD_LINK
             ],
             'Multiple status Pending'  => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'pending'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'pending'],
                 ],
-                'PENDING'
+                'PENDING',
+                ''
             ],
             'Mixed statuses: red'      => [
                 [
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure'],
+                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'details_url' => self::BUILD_LINK],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral'],
                 ],
-                'RED'
+                'RED',
+                self::BUILD_LINK
             ],
             'Mixed statuses: green'    => [
                 [
@@ -118,7 +127,8 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral'],
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'neutral'],
                 ],
-                'GREEN'
+                'GREEN',
+                ''
             ]
         ];
     }

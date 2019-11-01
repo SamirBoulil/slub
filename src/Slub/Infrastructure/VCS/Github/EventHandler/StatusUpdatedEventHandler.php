@@ -7,6 +7,7 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
@@ -83,7 +84,9 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate)->stringValue();
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->status = $this->getCIStatusFromGithub($this->getPRIdentifier($CIStatusUpdate), $CIStatusUpdate['sha']);
+        $checkStatus = $this->getCIStatusFromGithub($this->getPRIdentifier($CIStatusUpdate), $CIStatusUpdate['sha']);
+        $command->status = $checkStatus->status;
+        $command->buildLink = $checkStatus->buildLink;
 
         $this->CIStatusUpdateHandler->handle($command);
     }
@@ -95,7 +98,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         return PRIdentifier::fromString(sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber));
     }
 
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): string
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): CheckStatus
     {
         return $this->getCIStatus->fetch($PRIdentifier, $commitRef);
     }

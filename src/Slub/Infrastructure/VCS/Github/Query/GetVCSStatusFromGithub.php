@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\VCSStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -66,7 +67,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
     private function createVCSStatus(
         PRIdentifier $PRIdentifier,
         array $reviews,
-        string $ciStatus,
+        CheckStatus $ciStatus,
         bool $isMerged
     ): VCSStatus {
         $result = new VCSStatus();
@@ -74,7 +75,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
         $result->GTMCount = $reviews[FindReviews::GTMS];
         $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];
         $result->comments = $reviews[FindReviews::COMMENTS];
-        $result->CIStatus = $ciStatus;
+        $result->checkStatus = $ciStatus->status;
         $result->isMerged = $isMerged;
 
         return $result;

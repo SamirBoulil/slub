@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Query;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 
@@ -33,30 +34,35 @@ class GetCIStatus
         $this->logger = $logger;
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('Check run CI: ' . $checkRunStatus);
+        $this->logger->critical('Check run CI: ' . $checkRunStatus->status);
 
         $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('status check: ' . $statusCheckStatus);
+        $this->logger->critical('status check: ' . $statusCheckStatus->status);
 
         $deductCIStatus = $this->deductCIStatus($checkRunStatus, $statusCheckStatus);
-        $this->logger->critical('status = ' . $deductCIStatus);
+        $this->logger->critical('status = ' . $deductCIStatus->status);
 
         return $deductCIStatus;
     }
 
-    private function deductCIStatus(string $checkRunStatus, string $statusCheckStatus): string
+    private function deductCIStatus(CheckStatus $checkStatus, CheckStatus $statusCheckStatus): CheckStatus
     {
-        if ('RED' === $checkRunStatus || 'RED' === $statusCheckStatus) {
-            return 'RED';
+        if ('RED' === $checkStatus->status) {
+            return $checkStatus;
+        }
+        if ('RED' === $statusCheckStatus->status) {
+            return $statusCheckStatus;
+        }
+        if ('GREEN' === $checkStatus->status) {
+            return $checkStatus;
+        }
+        if ('GREEN' === $statusCheckStatus->status) {
+            return $statusCheckStatus;
         }
 
-        if ('GREEN' === $checkRunStatus || 'GREEN' === $statusCheckStatus) {
-            return 'GREEN';
-        }
-
-        return 'PENDING';
+        return new CheckStatus('PENDING');
     }
 }

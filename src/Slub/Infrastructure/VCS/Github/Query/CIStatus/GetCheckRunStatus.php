@@ -79,32 +79,30 @@ class GetCheckRunStatus
         );
 
         if (empty($supportedCheckRuns)) {
-            return new CheckStatus('PENDING', '');
+            return new CheckStatus('PENDING');
         }
 
-        $hasCheckRun = function (string $statusToFilterOn) {
+        $checkRun = function (string $statusToFilterOn) {
             return function ($current, $checkRun) use ($statusToFilterOn) {
                 if (null !== $current) {
                     return $current;
                 }
 
-                if ($statusToFilterOn === $checkRun['conclusion']) {
-                    return $checkRun;
-                }
+                return ($statusToFilterOn === $checkRun['conclusion']) ? $checkRun : $current;
             };
         };
 
-        $CICheckAFailure = array_reduce($supportedCheckRuns, $hasCheckRun('failure'), null);
+        $CICheckAFailure = array_reduce($supportedCheckRuns, $checkRun('failure'), null);
         if (null !== $CICheckAFailure) {
             return new CheckStatus('RED', $CICheckAFailure['details_url'] ?? '');
         }
 
-        $CICheckSuccess = array_reduce($supportedCheckRuns, $hasCheckRun('success'), null);
+        $CICheckSuccess = array_reduce($supportedCheckRuns, $checkRun('success'), null);
         if (null !== $CICheckSuccess) {
-            return new CheckStatus('GREEN', '');
+            return new CheckStatus('GREEN');
         }
 
-        return new CheckStatus('PENDING', '');
+        return new CheckStatus('PENDING');
     }
 
     private function checkRunsUrl(PRIdentifier $PRIdentifier, string $ref): string

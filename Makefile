@@ -38,7 +38,7 @@ log-staging:
 
 .PHONY: deploy-staging
 deploy-staging:
-	git push heroku-staging $(BRANCH):master
+	git push heroku-staging $(BRANCH):master --force
 
 .PHONY: log-staging
 od-prod: # Open dashboard production

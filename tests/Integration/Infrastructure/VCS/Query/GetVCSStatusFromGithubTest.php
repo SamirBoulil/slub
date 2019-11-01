@@ -80,7 +80,7 @@ class GetVCSStatusFromGithubTest extends WebTestCase
         $this->assertEquals(self::EXPECTED_GTMS, $vcsStatus->GTMCount);
         $this->assertEquals(self::EXPECTED_NOT_GTMS, $vcsStatus->notGTMCount);
         $this->assertEquals(self::EXPECTED_COMMENTS, $vcsStatus->comments);
-        $this->assertEquals(self::EXPECTED_CI_STATUS, $vcsStatus->checkStatus);
+        $this->assertEquals(self::EXPECTED_CI_STATUS, $vcsStatus->checkStatus->status);
         $this->assertEquals($expectedIsMerged, $vcsStatus->isMerged);
     }
 

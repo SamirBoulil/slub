@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Domain\Entity\PR;
 
+use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\BuildResult;
-use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\CIStatus;
 
 class CIStatusTest extends TestCase

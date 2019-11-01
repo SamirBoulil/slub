@@ -106,8 +106,8 @@ class GetCheckRunStatusTest extends WebTestCase
             'Multiple CI checks Red'          => [
                 [
                     'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK, 'details_url' => self::BUILD_LINK],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK, 'details_url' => self::BUILD_LINK],
+                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
+                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
                     ],
                 ],
                 'RED',

@@ -59,5 +59,4 @@ class BuildLinkTest extends TestCase
         self::assertEquals($normalizedBuildLink, $buildLink->stringValue());
         self::assertEmpty($noBuildLink->stringValue());
     }
-
 }

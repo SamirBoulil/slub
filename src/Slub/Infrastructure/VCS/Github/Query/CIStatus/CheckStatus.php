@@ -11,7 +11,7 @@ use ConvenientImmutability\Immutable;
  */
 class CheckStatus
 {
-    Use Immutable;
+    use Immutable;
 
     /** @var string */
     public $status;

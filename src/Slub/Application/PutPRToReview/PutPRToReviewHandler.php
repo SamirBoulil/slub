@@ -106,7 +106,7 @@ class PutPRToReviewHandler
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
         $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
-        $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->checkStatus . ')');
+        $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->checkStatus->status . ')');
 
         $PR = PR::create(
             $PRIdentifier,
@@ -115,7 +115,7 @@ class PutPRToReviewHandler
             $VCSStatus->GTMCount,
             $VCSStatus->notGTMCount,
             $VCSStatus->comments,
-            $VCSStatus->checkStatus,
+            $VCSStatus->checkStatus->status,
             $VCSStatus->isMerged
         );
         $this->PRRepository->save($PR);

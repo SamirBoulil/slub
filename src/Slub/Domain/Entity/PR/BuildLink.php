@@ -35,7 +35,7 @@ class BuildLink
 
     public static function fromNormalized(?string $normalizedBuildLink): self
     {
-        return new self($normalizedBuildLink);
+        return new self($normalizedBuildLink ?? '');
     }
 
     public function stringValue(): string

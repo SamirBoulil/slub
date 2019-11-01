@@ -83,6 +83,6 @@ class CIStatusUpdateHandler
     {
         $buildLink = $CIStatusUpdate->buildLink;
 
-        return empty($buildLink) ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink);
+        return empty($buildLink) ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink ?? '');
     }
 }

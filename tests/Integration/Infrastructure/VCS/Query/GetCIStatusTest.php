@@ -53,8 +53,8 @@ class GetCIStatusTest extends WebTestCase
      * @dataProvider ciStatusesExamples
      */
     public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
-        ?string $checkRunStatus,
-        ?string $statusCheckStatus,
+        string $checkRunStatus,
+        string $statusCheckStatus,
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
@@ -115,9 +115,9 @@ class GetCIStatusTest extends WebTestCase
     }
 
     private function mockIndependentResults(
-        ?string $checkRunStatus,
-        ?string $statusCheckStatus,
-        ?string $buildLink
+        string $checkRunStatus,
+        string $statusCheckStatus,
+        string $buildLink
     ): void {
         $prIdentifierArgument = Argument::that(
             function (PRIdentifier $PRIdentifier) {

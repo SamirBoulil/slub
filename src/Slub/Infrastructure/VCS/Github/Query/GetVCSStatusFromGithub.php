@@ -75,7 +75,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
         $result->GTMCount = $reviews[FindReviews::GTMS];
         $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];
         $result->comments = $reviews[FindReviews::COMMENTS];
-        $result->checkStatus = $ciStatus->status;
+        $result->checkStatus = $ciStatus;
         $result->isMerged = $isMerged;
 
         return $result;

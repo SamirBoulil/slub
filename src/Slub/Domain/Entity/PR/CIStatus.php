@@ -54,7 +54,7 @@ class CIStatus
 
     public function isGreen(): bool
     {
-       return $this->buildResult->isGreen();
+        return $this->buildResult->isGreen();
     }
 
     public function isRed(): bool

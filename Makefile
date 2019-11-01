@@ -1,3 +1,5 @@
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+
 .PHONY: install
 install:
 	bin/console --env=prod cache:clear
@@ -34,6 +36,10 @@ log-prod:
 log-staging:
 	heroku logs --tail -a slub-test
 
+.PHONY: deploy-staging
+deploy-staging:
+	git push heroku-staging $(BRANCH):master
+
 .PHONY: log-staging
 od-prod: # Open dashboard production
 	open https://dashboard.heroku.com/apps/slub-akeneo
@@ -41,3 +47,11 @@ od-prod: # Open dashboard production
 .PHONY: log-staging
 od-staging: # Open dashboard staging
 	open https://dashboard.heroku.com/apps/slub-test
+
+.PHONY: status-check-failure
+status-check-failure: # Create a status check failure for a spectif sha given in parameter
+	curl -X POST -H "Authorization: token $(GITHUB_TOKEN)" https://api.github.com/repos/$(REPO)/statuses/$(SHA) -d '{"context": "status-check", "description": "status check failure", "state": "failure", "target_url": "https://google.com"}'
+
+.PHONY: status-check-success
+status-check-success: # Create a status check failure for a spectif sha given in parameter
+	curl -X POST -H "Authorization: token $(GITHUB_TOKEN)" https://api.github.com/repos/$(REPO)/statuses/$(SHA) -d '{"context": "status-check", "description": "status check success", "state": "success", "target_url": "https://google.com"}'

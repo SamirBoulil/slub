@@ -131,4 +131,12 @@ JSON;
 
         return $json;
     }
+
+    /**
+     * @test
+     */
+    public function it_fails()
+    {
+        self::assertTrue(false);
+    }
 }

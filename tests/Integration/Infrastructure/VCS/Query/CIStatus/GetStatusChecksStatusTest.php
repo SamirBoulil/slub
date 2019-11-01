@@ -48,7 +48,7 @@ class GetStatusChecksStatusTest extends WebTestCase
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
-        $this->requestSpy->stubResponse(new Response(200, [], (string)json_encode($ciStatuses)));
+        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciStatuses)));
 
         $actualCIStatus = $this->getStatusCheckStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
@@ -74,19 +74,19 @@ class GetStatusChecksStatusTest extends WebTestCase
                 [
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success'],
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success']
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success'],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
             'Supported status not run' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success']
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success'],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
             'Multiple Status Green'    => [
                 [
@@ -94,15 +94,18 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success'],
                 ],
                 'GREEN',
-                ''
+                '',
             ],
             'Multiple status Red'      => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'target_url' => 'http://my-ci.com/build/456'],
+                    ['context'    => self::SUPPORTED_CI_STATUS_2,
+                     'state'      => 'failure',
+                     'target_url' => 'http://my-ci.com/build/456',
+                    ],
                 ],
                 'RED',
-                self::BUILD_LINK
+                self::BUILD_LINK,
             ],
             'Multiple status Pending'  => [
                 [
@@ -110,16 +113,16 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'pending'],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
             'Mixed statuses: red'      => [
                 [
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'target_url' => self::BUILD_LINK],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'failure', 'target_url' => self::BUILD_LINK],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral'],
                 ],
                 'RED',
-                self::BUILD_LINK
+                self::BUILD_LINK,
             ],
             'Mixed statuses: green'    => [
                 [
@@ -128,8 +131,8 @@ class GetStatusChecksStatusTest extends WebTestCase
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'neutral'],
                 ],
                 'GREEN',
-                ''
-            ]
+                '',
+            ],
         ];
     }
 

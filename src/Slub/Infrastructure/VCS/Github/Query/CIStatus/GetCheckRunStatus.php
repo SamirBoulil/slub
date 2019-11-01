@@ -66,13 +66,28 @@ class GetCheckRunStatus
             );
         }
 
-        return $content;
+        return $content['check_runs'];
     }
 
     private function deductCIStatus(array $checkRuns): CheckStatus
     {
+        $getCheckRuns = function (string $statusToFilterOn) {
+            return function ($current, $checkRun) use ($statusToFilterOn) {
+                if (null !== $current) {
+                    return $current;
+                }
+
+                return $statusToFilterOn === $checkRun['conclusion'] ? $checkRun : $current;
+            };
+        };
+
+        $CICheckAFailure = array_reduce($checkRuns, $getCheckRuns('failure'), null);
+        if (null !== $CICheckAFailure) {
+            return new CheckStatus('RED', $CICheckAFailure['details_url'] ?? '');
+        }
+
         $supportedCheckRuns = array_filter(
-            $checkRuns['check_runs'],
+            $checkRuns,
             function (array $checkRun) {
                 return $this->isCheckRunSupported($checkRun);
             }
@@ -82,22 +97,7 @@ class GetCheckRunStatus
             return new CheckStatus('PENDING');
         }
 
-        $checkRun = function (string $statusToFilterOn) {
-            return function ($current, $checkRun) use ($statusToFilterOn) {
-                if (null !== $current) {
-                    return $current;
-                }
-
-                return ($statusToFilterOn === $checkRun['conclusion']) ? $checkRun : $current;
-            };
-        };
-
-        $CICheckAFailure = array_reduce($supportedCheckRuns, $checkRun('failure'), null);
-        if (null !== $CICheckAFailure) {
-            return new CheckStatus('RED', $CICheckAFailure['details_url'] ?? '');
-        }
-
-        $CICheckSuccess = array_reduce($supportedCheckRuns, $checkRun('success'), null);
+        $CICheckSuccess = array_reduce($supportedCheckRuns, $getCheckRuns('success'), null);
         if (null !== $CICheckSuccess) {
             return new CheckStatus('GREEN');
         }

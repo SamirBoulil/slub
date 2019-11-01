@@ -9,6 +9,8 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ *
+ * // TODO: Extract a read model Reviews from this class
  */
 class FindReviews
 {

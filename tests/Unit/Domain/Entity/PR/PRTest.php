@@ -161,6 +161,19 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_create_event_if_the_pr_is_already_green()
+    {
+        $pr = $this->greenPR();
+
+        $pr->green();
+
+        $this->assertEmpty($pr->getEvents());
+    }
+
+
+    /**
+     * @test
+     */
     public function it_can_become_red_with_a_build_link()
     {
         $buildLink = 'https://build_link';
@@ -181,6 +194,18 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_creates_event_if_the_pr_is_already_red()
+    {
+        $pr = $this->redPR();
+
+        $pr->red(BuildLink::none());
+
+        $this->assertEmpty($pr->getEvents());
+    }
+
+    /**
+     * @test
+     */
     public function it_can_become_pending()
     {
         $pr = $this->greenPR();
@@ -192,6 +217,18 @@ class PRTest extends TestCase
         $event = current($pr->getEvents());
         $this->assertInstanceOf(CIPending::class, $event);
         $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_creates_event_if_the_pr_is_already_pending()
+    {
+        $pr = $this->pendingPR();
+
+        $pr->pending();
+
+        $this->assertEmpty($pr->getEvents());
     }
 
     /**
@@ -369,6 +406,29 @@ class PRTest extends TestCase
                 'COMMENTS'    => 0,
                 'CI_STATUS'   => [
                     'BUILD_RESULT' => 'GREEN',
+                    'BUILD_LINK'   => '',
+                ],
+                'IS_MERGED'   => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS'      => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'MERGED_AT'        => self::A_TIMESTAMP
+            ]
+        );
+
+        return $pr;
+    }
+
+    private function redPR(): PR
+    {
+        $pr = PR::fromNormalized(
+            [
+                'IDENTIFIER'  => self::PR_IDENTIFIER,
+                'GTMS'        => 0,
+                'NOT_GTMS'    => 0,
+                'COMMENTS'    => 0,
+                'CI_STATUS'   => [
+                    'BUILD_RESULT' => 'RED',
                     'BUILD_LINK'   => '',
                 ],
                 'IS_MERGED'   => false,

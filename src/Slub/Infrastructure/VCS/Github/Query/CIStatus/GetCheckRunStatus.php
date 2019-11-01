@@ -40,7 +40,7 @@ class GetCheckRunStatus
         $this->logger = $logger;
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $checkRunsStatus = $this->checkRuns($PRIdentifier, $commitRef);
 
@@ -69,7 +69,7 @@ class GetCheckRunStatus
         return $content;
     }
 
-    private function deductCIStatus(array $checkRuns): string
+    private function deductCIStatus(array $checkRuns): CheckStatus
     {
         $supportedCheckRuns = array_filter(
             $checkRuns['check_runs'],
@@ -79,7 +79,7 @@ class GetCheckRunStatus
         );
 
         if (empty($supportedCheckRuns)) {
-            return 'PENDING';
+            return new CheckStatus('PENDING', '');
         }
 
         $hasCheckRun = function (string $statusToFilterOn) {
@@ -88,22 +88,23 @@ class GetCheckRunStatus
                     return $current;
                 }
 
-                return $statusToFilterOn === $checkRun['conclusion'];
+                if ($statusToFilterOn === $checkRun['conclusion']) {
+                    return $checkRun;
+                }
             };
         };
 
-        $hasCICheckAFailure = array_reduce($supportedCheckRuns, $hasCheckRun('failure'));
-        $hasCICheckSuccess = array_reduce($supportedCheckRuns, $hasCheckRun('success'));
-
-        if ($hasCICheckAFailure) {
-            return 'RED';
+        $CICheckAFailure = array_reduce($supportedCheckRuns, $hasCheckRun('failure'), null);
+        if (null !== $CICheckAFailure) {
+            return new CheckStatus('RED', $CICheckAFailure['details_url'] ?? '');
         }
 
-        if ($hasCICheckSuccess) {
-            return 'GREEN';
+        $CICheckSuccess = array_reduce($supportedCheckRuns, $hasCheckRun('success'), null);
+        if (null !== $CICheckSuccess) {
+            return new CheckStatus('GREEN', '');
         }
 
-        return 'PENDING';
+        return new CheckStatus('PENDING', '');
     }
 
     private function checkRunsUrl(PRIdentifier $PRIdentifier, string $ref): string

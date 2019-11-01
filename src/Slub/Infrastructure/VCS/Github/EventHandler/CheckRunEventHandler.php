@@ -66,6 +66,7 @@ class CheckRunEventHandler implements EventHandlerInterface
         $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
         $command->status = $CIStatus;
+        $command->buildLink = $CIStatusUpdate['build_link'];
         $this->CIStatusUpdateHandler->handle($command);
     }
 

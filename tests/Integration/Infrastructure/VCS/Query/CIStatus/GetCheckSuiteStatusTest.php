@@ -17,6 +17,7 @@ class GetCheckSuiteStatusTest extends WebTestCase
     private const SUPPORTED_CI_CHECK_1 = 'supported_1';
     private const SUPPORTED_CI_CHECK_2 = 'supported_2';
     private const SUPPORTED_CI_CHECK_3 = 'supported_3';
+    private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     /** @var GetCheckSuiteStatus */
     private $getCheckSuiteStatus;
@@ -39,16 +40,17 @@ class GetCheckSuiteStatusTest extends WebTestCase
      * @test
      * @dataProvider checkSuiteExample
      */
-    public function it_fetches_the_check_suite_status(array $checkSuite, string $expectedCIStatus): void
+    public function it_fetches_the_check_suite_status(array $checkSuite, string $expectedCIStatus, string $expectedBuildLink): void
     {
         $this->requestSpy->stubResponse(new Response(200, [], (string)json_encode($checkSuite)));
 
-        $actualCIStatus = $this->getCheckSuiteStatus->fetch(
+        $actualCheckStatus = $this->getCheckSuiteStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
             self::PR_COMMIT_REF
         );
 
-        $this->assertEquals($expectedCIStatus, $actualCIStatus);
+        $this->assertEquals($expectedCIStatus, $actualCheckStatus->status);
+        $this->assertEquals($expectedBuildLink, $actualCheckStatus->buildLink);
         $generatedRequest = $this->requestSpy->getRequest();
         $this->requestSpy->assertMethod('GET', $generatedRequest);
         $this->requestSpy->assertURI(
@@ -63,16 +65,19 @@ class GetCheckSuiteStatusTest extends WebTestCase
     {
         return [
             'Check suite is failed' => [
-                ['check_suites' => [['conclusion' => 'failure', 'status' => 'completed']]],
+                ['check_suites' => [['conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK]]],
                 'RED',
+                self::BUILD_LINK
             ],
             'Check suite is green'  => [
                 ['check_suites' => [['conclusion' => 'success', 'status' => 'completed']]],
                 'GREEN',
+                ''
             ],
             'Check suite is pending'  => [
                 ['check_suites' => [['conclusion' => 'in queue', 'status' => null]]],
                 'PENDING',
+                ''
             ]
         ];
     }

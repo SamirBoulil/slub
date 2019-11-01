@@ -85,7 +85,7 @@ class GetStatusChecksStatus
         $faillingStatus = array_reduce($supportedStatuses, $status('failure'));
 
         if ($faillingStatus) {
-            return new CheckStatus('RED', $faillingStatus['details_url'] ?? '');
+            return new CheckStatus('RED', $faillingStatus['target_url'] ?? '');
         }
 
         $successStatus = array_reduce($supportedStatuses, $status('success'));

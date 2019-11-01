@@ -98,8 +98,8 @@ class GetStatusChecksStatusTest extends WebTestCase
             ],
             'Multiple status Red'      => [
                 [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'details_url' => self::BUILD_LINK],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'details_url' => 'http://my-ci.com/build/456'],
+                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK],
+                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'target_url' => 'http://my-ci.com/build/456'],
                 ],
                 'RED',
                 self::BUILD_LINK
@@ -114,7 +114,7 @@ class GetStatusChecksStatusTest extends WebTestCase
             ],
             'Mixed statuses: red'      => [
                 [
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'details_url' => self::BUILD_LINK],
+                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'failure', 'target_url' => self::BUILD_LINK],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral'],
                 ],

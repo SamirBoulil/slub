@@ -52,7 +52,7 @@ class InstallerCLI extends Command
         $connection = ConnectionFactory::create($mysqlUrl);
         $schemaManager = $connection->getSchemaManager();
         $databases = $schemaManager->listDatabases();
-        $databaseName = $connection->getDatabase();
+        $databaseName = $this->sqlConnection->getDatabase();
         if (in_array($databaseName, $databases)) {
             return;
         }
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS pr (
 	GTMS INT(11) DEFAULT 0,
 	NOT_GTMS INT(11) DEFAULT 0,
 	COMMENTS INT(11) DEFAULT 0,
-	CI_STATUS VARCHAR(255) NOT NULL,
+	CI_STATUS JSON NOT NULL,
 	IS_MERGED BOOLEAN DEFAULT false,
 	MESSAGE_IDS JSON,
 	CHANNEL_IDS JSON,

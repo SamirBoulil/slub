@@ -12,6 +12,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
 use Slub\Infrastructure\VCS\Github\EventHandler\NewEventAction;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -56,7 +57,7 @@ class NewEventActionTest extends TestCase
     {
         $eventType = 'EVENT_TYPE';
         $eventPayload = ['payload'];
-        $supportedRequest = $this->supportedRequest($eventType, $eventPayload);
+        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $eventHandler = $this->prophesize(EventHandlerInterface::class);
         $eventHandler->handle($eventPayload)->shouldBeCalled();
         $this->eventHandlerRegistry->get($eventType)->willReturn($eventHandler->reveal());
@@ -82,12 +83,34 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
+    public function it_throws_if_the_event_type_is_unsupported()
+    {
+        $alreadyDeliveredRequest = $this->supportedRequest('UNKNOWN', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
+
+        $this->expectException(\TypeError::class);
+        $this->newEventAction->executeAction($alreadyDeliveredRequest);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_event_has_already_been_delivered()
     {
-        $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload']);
+        $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(true);
 
         $this->expectException(\Exception::class);
+        $this->newEventAction->executeAction($alreadyDeliveredRequest);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_event_identifier_is_not_set()
+    {
+        $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], null);
+
+        $this->expectException(BadRequestHttpException::class);
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
     }
 
@@ -97,17 +120,20 @@ class NewEventActionTest extends TestCase
             'if the signature is missing'      => [$this->requestWithNoSignature('EVENT_TYPE', ['payload'])],
             'if the signatures does not match' => [$this->requestWithWrongSignature('EVENT_TYPE', ['payload'])],
             'if the event type is missing'     => [$this->requestWithNoEventType('EVENT_TYPE', ['payload'])],
-            'if the event type is unsupported'     => [$this->supportedRequest('EVENT_TYPE', ['payload'])],
+            'if the event type is unsupported'     => [$this->supportedRequest('EVENT_TYPE',
+                ['payload'],
+                self::DELIVERY_EVENT_IDENTIFIER
+            )],
         ];
     }
 
-    private function supportedRequest(string $eventType, array $payload): Request
+    private function supportedRequest(string $eventType, array $payload, $eventIdentifier): Request
     {
         $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);
         $request->headers->set('X-GitHub-Event', $eventType);
         $request->headers->set('X-Hub-Signature', hash_hmac('sha1', $content, self::SECRET));
-        $request->headers->set('X-GitHub-Delivery', self::DELIVERY_EVENT_IDENTIFIER);
+        $request->headers->set('X-GitHub-Delivery', $eventIdentifier);
 
         return $request;
     }

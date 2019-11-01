@@ -198,7 +198,8 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['GTMS'], $gtmCount);
         Assert::assertEquals($pr->normalize()['NOT_GTMS'], $notGtmCount);
         Assert::assertEquals($pr->normalize()['COMMENTS'], $commentsCount);
-        Assert::assertEquals($pr->normalize()['CI_STATUS'], $ciStatus);
+        Assert::assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], $ciStatus);
+        Assert::assertEmpty($pr->normalize()['CI_STATUS']['BUILD_LINK']);
         Assert::assertEquals($pr->normalize()['IS_MERGED'], $isMerged);
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
         Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);

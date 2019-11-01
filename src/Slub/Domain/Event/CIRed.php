@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Event;
 
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -15,18 +16,27 @@ class CIRed extends Event
     /** @var PRIdentifier */
     private $PRIdentifier;
 
-    private function __construct(PRIdentifier $PRIdentifier)
+    /** @var BuildLink */
+    private $buildLink;
+
+    private function __construct(PRIdentifier $PRIdentifier, BuildLink $buildLink)
     {
         $this->PRIdentifier = $PRIdentifier;
+        $this->buildLink = $buildLink;
     }
 
-    public static function forPR(PRIdentifier $PRIdentifier): self
+    public static function forPR(PRIdentifier $PRIdentifier, BuildLink $buildLink): self
     {
-        return new self($PRIdentifier);
+        return new self($PRIdentifier, $buildLink);
     }
 
     public function PRIdentifier(): PRIdentifier
     {
         return $this->PRIdentifier;
+    }
+
+    public function buildLink(): BuildLink
+    {
+        return $this->buildLink;
     }
 }

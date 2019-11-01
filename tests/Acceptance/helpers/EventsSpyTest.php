@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\helpers;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
@@ -68,7 +69,7 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_ci_red_event_has_been_thrown()
     {
         $this->assertFalse($this->eventSpy->CIRedEventDispatched());
-        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010'), BuildLink::none()));
         $this->assertTrue($this->eventSpy->CIRedEventDispatched());
     }
 
@@ -78,7 +79,7 @@ class EventsSpyTest extends TestCase
     public function it_tells_if_it_has_events()
     {
         $this->assertFalse($this->eventSpy->hasEvents());
-        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010'), BuildLink::none()));
         $this->assertTrue($this->eventSpy->hasEvents());
     }
 

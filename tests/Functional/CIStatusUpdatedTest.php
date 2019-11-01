@@ -67,7 +67,7 @@ class CIStatusUpdatedTest extends WebTestCase
     private function Then_the_PR_should_be_green()
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER));
-        $this->assertEquals('GREEN', $PR->normalize()['CI_STATUS']);
+        $this->assertEquals('GREEN', $PR->normalize()['CI_STATUS']['BUILD_RESULT']);
     }
 
     private function callAPI(string $data): Client

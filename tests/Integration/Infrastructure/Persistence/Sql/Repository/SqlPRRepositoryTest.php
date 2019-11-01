@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -35,6 +36,7 @@ class SqlPRRepositoryTest extends KernelTestCase
             ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
+        $savedPR->red(BuildLink::fromURL('https://my-ci.com/build/123'));
 
         $this->sqlPRRepository->save($savedPR);
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);
@@ -82,7 +84,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => false,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
@@ -98,7 +100,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
@@ -114,7 +116,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => false,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
@@ -131,7 +133,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => false,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
@@ -143,7 +145,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => false,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
@@ -155,7 +157,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED'        => true,
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],

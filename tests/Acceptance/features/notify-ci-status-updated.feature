@@ -16,7 +16,7 @@ Feature: Improve the feedback delay between the squad and the continuous integra
     Given a PR in review waiting for the CI results
     When the CI is red for the PR
     Then the PR should be red
-    And the author should be notified that the ci is red for the PR
+    And the author should be notified that the ci is red for the PR with the CI build link
     And the squad should be notified that the ci is red for the PR
 
   @nominal

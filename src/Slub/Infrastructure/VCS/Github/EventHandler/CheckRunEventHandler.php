@@ -8,6 +8,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
+use Slub\Domain\Query\PRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -60,12 +61,13 @@ class CheckRunEventHandler implements EventHandlerInterface
     private function updateCIStatus(array $CIStatusUpdate): void
     {
         $PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
-        $CIStatus = $this->getCIStatusFromGithub($PRIdentifier);
+        $PRInfo = $this->getCIStatusFromGithub($PRIdentifier);
 
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $command->status = $CIStatus;
+        $command->status = $PRInfo->CIStatus->status;
+        $command->buildLink = $PRInfo->CIStatus->buildLink;
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -103,8 +105,8 @@ class CheckRunEventHandler implements EventHandlerInterface
         );
     }
 
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): string
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): PRInfo
     {
-        return $this->getPRInfo->fetch($PRIdentifier)->CIStatus;
+        return $this->getPRInfo->fetch($PRIdentifier);
     }
 }

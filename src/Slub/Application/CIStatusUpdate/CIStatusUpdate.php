@@ -21,4 +21,7 @@ class CIStatusUpdate
 
     /** @var string */
     public $status;
+
+    /** @var string|null */
+    public $buildLink;
 }

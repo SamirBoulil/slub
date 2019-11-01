@@ -111,6 +111,7 @@ SQL;
     private function hydrate(array $result): PR
     {
         $result['MESSAGE_IDS'] = json_decode($result['MESSAGE_IDS'], true);
+        $result['CI_STATUS'] = json_decode($result['CI_STATUS'], true);
         $result['CHANNEL_IDS'] = null !== $result['CHANNEL_IDS'] ? json_decode($result['CHANNEL_IDS'], true) : [];
         $result['GTMS'] = Type::getType(Type::INTEGER)->convertToPhpValue(
             $result['GTMS'],
@@ -179,6 +180,7 @@ SQL;
                 'IS_MERGED'   => 'boolean',
                 'MESSAGE_IDS' => 'json',
                 'CHANNEL_IDS' => 'json',
+                'CI_STATUS' => 'json'
             ]
         );
     }

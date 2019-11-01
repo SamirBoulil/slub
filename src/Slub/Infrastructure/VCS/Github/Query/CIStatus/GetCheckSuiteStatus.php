@@ -31,17 +31,17 @@ class GetCheckSuiteStatus
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): string
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $checkSuite = $this->checkSuite($PRIdentifier, $commitRef);
         if ($this->isCheckSuiteStatus($checkSuite, 'failure')) {
-            return 'RED';
+            return new CheckStatus('RED', $this->buildLink($checkSuite));
         }
         if ($this->isCheckSuiteStatus($checkSuite, 'success')) {
-            return 'GREEN';
+            return new CheckStatus('GREEN', '');
         }
 
-        return 'PENDING';
+        return new CheckStatus('PENDING', '');
     }
 
     private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool
@@ -85,5 +85,12 @@ class GetCheckSuiteStatus
         $headers = GithubAPIHelper::authorizationHeader($this->authToken);
         $headers = array_merge($headers, GithubAPIHelper::acceptPreviewEndpointsHeader());
         return $headers;
+    }
+
+    private function buildLink(array $checkSuites): string
+    {
+        $checkSuite = $checkSuites['check_suites'][0];
+
+        return $checkSuite['details_url'] ?? '';
     }
 }

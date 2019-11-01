@@ -97,8 +97,16 @@ class PR
         bool $isMerged = false
     ): self {
         $pr = new self(
-            $PRIdentifier, [$channelIdentifier], [$messageIdentifier], $GTMs, $notGTMs, $comments,
-            CIStatus::fromNormalized($CIStatus),
+            $PRIdentifier,
+            [$channelIdentifier],
+            [$messageIdentifier],
+            $GTMs,
+            $notGTMs,
+            $comments,
+            CIStatus::endedWith(
+                BuildResult::fromNormalized($CIStatus),
+                BuildLink::none()
+            ),
             $isMerged, PutToReviewAt::create(), MergedAt::none()
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
@@ -142,8 +150,14 @@ class PR
         $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
 
         return new self(
-            $identifier, $channelIdentifiers, $messageIds, $GTM, $NOTGTM, $comments,
-            CIStatus::fromNormalized($CIStatus), $isMerged,
+            $identifier,
+            $channelIdentifiers,
+            $messageIds,
+            $GTM,
+            $NOTGTM,
+            $comments,
+            CIStatus::fromNormalized($CIStatus),
+            $isMerged,
             $putToReviewAt, $mergedAt
         );
     }
@@ -155,7 +169,7 @@ class PR
             self::GTM_KEY => $this->GTMCount,
             self::NOT_GTM_KEY => $this->notGTMCount,
             self::COMMENTS_KEY => $this->comments,
-            self::CI_STATUS_KEY => $this->CIStatus->stringValue(),
+            self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
             self::CHANNEL_IDS => array_map(
                 function (ChannelIdentifier $channelIdentifier) {
@@ -203,18 +217,21 @@ class PR
             return;
         }
 
-        $this->CIStatus = CIStatus::green();
+        $this->CIStatus = CIStatus::endedWith(
+            BuildResult::green(),
+            BuildLink::none()
+        );
         $this->events[] = CIGreen::ForPR($this->PRIdentifier);
     }
 
-    public function red(): void
+    public function red(BuildLink $buildLink): void
     {
         if ($this->CIStatus->isRed()) {
             return;
         }
 
-        $this->CIStatus = CIStatus::red();
-        $this->events[] = CIRed::ForPR($this->PRIdentifier);
+        $this->CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);
+        $this->events[] = CIRed::ForPR($this->PRIdentifier, $buildLink);
     }
 
     public function pending(): void
@@ -223,7 +240,10 @@ class PR
             return;
         }
 
-        $this->CIStatus = CIStatus::pending();
+        $this->CIStatus = CIStatus::endedWith(
+            BuildResult::pending(),
+            BuildLink::none()
+        );
         $this->events[] = CIPending::ForPR($this->PRIdentifier);
     }
 

@@ -13,6 +13,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
@@ -28,6 +29,7 @@ class CheckRunEventHandlerTest extends TestCase
     private const UNSUPPORTED_CHECK_RUN = 'UNSUPPORTED';
 
     private const CI_STATUS = 'A_CI_STATUS';
+    private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     /**
      * @var CheckRunEventHandler
@@ -68,7 +70,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent)
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus = self::CI_STATUS;
+        $prInfo->CIStatus = new CheckStatus(self::CI_STATUS, self::BUILD_LINK);
         $this->getPRInfo->fetch(
             Argument::that(
                 function (PRIdentifier $PRIdentifier) {
@@ -110,6 +112,33 @@ class CheckRunEventHandlerTest extends TestCase
 
         $this->checkRunEventHandler->handle($this->unsupportedGreenCI());
     }
+
+    /**
+     * @test
+     */
+    public function it_has_a_queued_check_run_we_fetch_the_ci_status()
+    {
+        $prInfo = new PRInfo();
+        $prInfo->CIStatus =  new CheckStatus(self::CI_STATUS);
+        $this->getPRInfo->fetch(
+            Argument::that(
+                function (PRIdentifier $PRIdentifier) {
+                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
+                }
+            )
+        )->willReturn($prInfo);
+
+        $this->handler->handle(
+            Argument::that(function (CIStatusUpdate $command) {
+                return self::PR_IDENTIFIER === $command->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                    && self::CI_STATUS === $command->status;
+            })
+        )->shouldBeCalled();
+
+        $this->checkRunEventHandler->handle($this->queuedCheckRun());
+    }
+
 
     /**
      * @test
@@ -197,6 +226,38 @@ JSON;
   "action": "completed",
   "check_run": {
     "status": "completed",
+    "conclusion": "WRONG_CONCLUSION",
+    "name": "travis",
+    "check_suite": {
+      "pull_requests": [
+        {
+          "number": 10
+        }
+      ]
+    },
+    "pull_requests": [
+      {
+        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
+        "number": 26
+      }
+    ]
+  },
+  "repository": {
+    "full_name": "SamirBoulil/slub"
+  }
+}
+JSON;
+
+        return json_decode($json, true);
+    }
+
+    private function queuedCheckRun(): array
+    {
+        $json = <<<JSON
+{
+  "action": "completed",
+  "check_run": {
+    "status": "queued",
     "conclusion": "WRONG_CONCLUSION",
     "name": "travis",
     "check_suite": {

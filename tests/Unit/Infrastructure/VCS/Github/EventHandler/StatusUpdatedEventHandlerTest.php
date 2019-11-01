@@ -11,6 +11,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
@@ -86,7 +87,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
                     return self::COMMIT_REF === $commitRef;
                 }
             )
-        )->willReturn(self::CI_STATUS);
+        )->willReturn(new CheckStatus(self::CI_STATUS, ''));
         $this->handler->handle(
             Argument::that(
                 function (CIStatusUpdate $command) {
@@ -109,6 +110,10 @@ class StatusUpdatedEventHandlerTest extends TestCase
             ],
             'it handles unsupported red status' => [
                 $this->unsupportedRedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
+                self::UNSUPPORTED_STATUS,
+            ],
+            'it handles unsupported pending status' => [
+                $this->unsupportedPendingEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
                 self::UNSUPPORTED_STATUS,
             ],
         ];
@@ -134,7 +139,6 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->expectException(\Exception::class);
         $this->statusUpdateEventHandler->handle($this->unsupportedResult());
     }
-
 
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
@@ -164,6 +168,25 @@ JSON;
   "sha": "${commitRef}",
   "name": "${status}",
   "state": "failure",
+  "number": ${prNumber},
+  "repository": {
+    "full_name": "${repositoryIdentifier}"
+  }
+}
+JSON;
+
+        return json_decode($json, true);
+    }
+
+    private function unsupportedPendingEvent(string $repositoryIdentifier, string $prNumber): array
+    {
+        $status = self::UNSUPPORTED_STATUS;
+        $commitRef = self::COMMIT_REF;
+        $json = <<<JSON
+{
+  "sha": "${commitRef}",
+  "name": "${status}",
+  "state": "pending",
   "number": ${prNumber},
   "repository": {
     "full_name": "${repositoryIdentifier}"

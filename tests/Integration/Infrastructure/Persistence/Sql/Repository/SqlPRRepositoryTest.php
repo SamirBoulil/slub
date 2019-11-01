@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -35,6 +36,7 @@ class SqlPRRepositoryTest extends KernelTestCase
             ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
+        $savedPR->red(BuildLink::fromURL('https://my-ci.com/build/123'));
 
         $this->sqlPRRepository->save($savedPR);
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);

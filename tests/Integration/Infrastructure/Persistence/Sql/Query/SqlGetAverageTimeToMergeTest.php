@@ -88,7 +88,10 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
-                    'CI_STATUS'        => 'PENDING',
+                    'CI_STATUS'        => [
+                        'BUILD_RESULT' => 'PENDING',
+                        'BUILD_LINK' => '',
+                    ],
                     'IS_MERGED'        => true,
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
@@ -106,7 +109,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         $sql = <<<SQL
 INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
 VALUES
-	('pr_identifier', 3, 0, 1, 'PENDING', 1, '{}', 1, '251512', '251512');
+	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 1, '{}', 1, '251512', '251512');
 SQL;
         $connection->executeUpdate($sql);
     }
@@ -118,7 +121,7 @@ SQL;
         $sql = <<<SQL
 INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
 VALUES
-	('pr_identifier', 3, 0, 1, 'PENDING', 0, '{}', 0, '251512', '251512');
+	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512');
 SQL;
         $connection->executeUpdate($sql);
     }

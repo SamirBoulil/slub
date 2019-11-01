@@ -87,7 +87,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function thePRShouldBeGreen()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'GREEN', 'PR is expected to be green, but it wasn\'t');
+        Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'GREEN', 'PR is expected to be green, but it wasn\'t');
     }
 
     /**
@@ -124,7 +124,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function thePRShouldBeRed()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'RED', 'PR is expected to be red, but it wasn\'t');
+        Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'RED', 'PR is expected to be red, but it wasn\'t');
     }
 
     /**
@@ -186,9 +186,13 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIRedEvent to be dispatched, but was not found'
         );
+        $expectedMessage = str_replace(NotifyAuthor::BUILD_LINK_PLACEHOLDER,
+            self::BUILD_LINK,
+            NotifyAuthor::MESSAGE_CI_RED
+        );
         $this->chatClientSpy->assertReaction(
             $this->currentMessageIdentifier,
-            sprintf('%s %s', NotifyAuthor::MESSAGE_CI_RED, self::BUILD_LINK)
+            $expectedMessage
         );
     }
 
@@ -225,7 +229,7 @@ class CIStatusUpdateContext extends FeatureContext
     public function thePRShouldBePending()
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        Assert::assertEquals($PR->normalize()['CI_STATUS'], 'PENDING', 'PR is expected to be pending, but it wasn\'t');
+        Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'PENDING', 'PR is expected to be pending, but it wasn\'t');
     }
 
     /**

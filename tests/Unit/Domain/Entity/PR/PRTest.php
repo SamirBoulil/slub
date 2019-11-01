@@ -6,6 +6,7 @@ namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -18,13 +19,14 @@ use Slub\Domain\Event\PRPutToReview;
 class PRTest extends TestCase
 {
     private const A_TIMESTAMP = '1560177798';
+    private const PR_IDENTIFIER = 'akeneo/pim-community-dev/1111';
 
     /**
      * @test
      */
     public function it_creates_a_PR_and_normalizes_itself()
     {
-        $prIdentifier = 'akeneo/pim-community-dev/1111';
+        $prIdentifier = self::PR_IDENTIFIER;
         $channelIdentifier = 'squad-raccoons';
         $messageId = '1';
         $expectedPRIdentifier = PRIdentifier::create($prIdentifier);
@@ -54,7 +56,7 @@ class PRTest extends TestCase
     public function it_is_created_from_normalized()
     {
         $normalizedPR = [
-            'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+            'IDENTIFIER'       => self::PR_IDENTIFIER,
             'GTMS'             => 2,
             'NOT_GTMS'         => 0,
             'COMMENTS'         => 0,
@@ -92,7 +94,7 @@ class PRTest extends TestCase
     public function it_can_be_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
+            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['GTMS']);
@@ -110,7 +112,7 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
+            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
@@ -128,7 +130,7 @@ class PRTest extends TestCase
     public function it_can_be_commented_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
+            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
@@ -151,21 +153,29 @@ class PRTest extends TestCase
 
         $this->assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'GREEN');
         $this->assertCount(1, $pr->getEvents());
-        $this->assertInstanceOf(CIGreen::class, current($pr->getEvents()));
+        $event = current($pr->getEvents());
+        $this->assertInstanceOf(CIGreen::class, $event);
+        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
     }
 
     /**
      * @test
      */
-    public function it_can_become_red()
+    public function it_can_become_red_with_a_build_link()
     {
+        $buildLink = 'https://build_link';
         $pr = $this->pendingPR();
 
-        $pr->red();
+        $pr->red(BuildLink::fromURL($buildLink));
 
-        $this->assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'RED');
+        $CI_STATUS = $pr->normalize()['CI_STATUS'];
+        $this->assertEquals($CI_STATUS['BUILD_RESULT'], 'RED');
+        $this->assertEquals($CI_STATUS['BUILD_LINK'], $buildLink);
         $this->assertCount(1, $pr->getEvents());
-        $this->assertInstanceOf(CIRed::class, current($pr->getEvents()));
+        $event = current($pr->getEvents());
+        $this->assertInstanceOf(CIRed::class, $event);
+        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+        $this->assertEquals($buildLink, $event->buildLink()->stringValue());
     }
 
     /**
@@ -179,7 +189,9 @@ class PRTest extends TestCase
 
         $this->assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'PENDING');
         $this->assertCount(1, $pr->getEvents());
-        $this->assertInstanceOf(CIPending::class, current($pr->getEvents()));
+        $event = current($pr->getEvents());
+        $this->assertInstanceOf(CIPending::class, $event);
+        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
     }
 
     /**
@@ -202,7 +214,7 @@ class PRTest extends TestCase
      */
     public function it_returns_its_identifier()
     {
-        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $identifier = PRIdentifier::create(self::PR_IDENTIFIER);
 
         $pr = PR::create($identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1'));
 
@@ -215,7 +227,7 @@ class PRTest extends TestCase
     public function it_returns_the_message_ids()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'), ChannelIdentifier::fromString('squad-raccoons'),
+            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
         $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
@@ -227,7 +239,7 @@ class PRTest extends TestCase
     public function it_returns_the_channel_ids()
     {
         $pr = PR::create(
-            PRIdentifier::create('akeneo/pim-community-dev/1111'),
+            PRIdentifier::create(self::PR_IDENTIFIER),
             ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::fromString('1')
         );
@@ -248,7 +260,7 @@ class PRTest extends TestCase
         $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons', 'brazil-team']);
         $this->assertPRPutToReviewEvent(
             $pr->getEvents(),
-            PRIdentifier::fromString('akeneo/pim-community-dev/1111'),
+            PRIdentifier::fromString(self::PR_IDENTIFIER),
             $expectedMessageId
         );
     }
@@ -280,7 +292,7 @@ class PRTest extends TestCase
             ],
             'Missing GTMS'           => [
                 [
-                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => self::PR_IDENTIFIER,
                     'NOT_GTMS'   => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
@@ -288,7 +300,7 @@ class PRTest extends TestCase
             ],
             'Missing NOT GTMS'       => [
                 [
-                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => self::PR_IDENTIFIER,
                     'GTMS'       => 0,
                     'CI_STATUS'  => 'PENDING',
                     'IS_MERGED'  => false,
@@ -296,7 +308,7 @@ class PRTest extends TestCase
             ],
             'Missing CI status'      => [
                 [
-                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => self::PR_IDENTIFIER,
                     'GTMS'       => 0,
                     'NOT_GTMS'   => 0,
                     'IS_MERGED'  => false,
@@ -305,7 +317,7 @@ class PRTest extends TestCase
             ],
             'Missing is merged flag' => [
                 [
-                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => self::PR_IDENTIFIER,
                     'GTMS'       => 0,
                     'NOT_GTMS'   => 0,
                     'CI_STATUS'  => 'PENDING',
@@ -329,7 +341,7 @@ class PRTest extends TestCase
     private function pendingPR(): PR
     {
         $pr = PR::fromNormalized([
-                'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                'IDENTIFIER'       => self::PR_IDENTIFIER,
                 'GTMS'             => 0,
                 'NOT_GTMS'         => 0,
                 'COMMENTS'         => 0,
@@ -351,7 +363,7 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'  => 'akeneo/pim-community-dev/1111',
+                'IDENTIFIER'  => self::PR_IDENTIFIER,
                 'GTMS'        => 0,
                 'NOT_GTMS'    => 0,
                 'COMMENTS'    => 0,

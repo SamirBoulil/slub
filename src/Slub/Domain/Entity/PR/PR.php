@@ -97,7 +97,12 @@ class PR
         bool $isMerged = false
     ): self {
         $pr = new self(
-            $PRIdentifier, [$channelIdentifier], [$messageIdentifier], $GTMs, $notGTMs, $comments,
+            $PRIdentifier,
+            [$channelIdentifier],
+            [$messageIdentifier],
+            $GTMs,
+            $notGTMs,
+            $comments,
             CIStatus::endedWith(
                 BuildResult::fromNormalized($CIStatus),
                 BuildLink::none()
@@ -219,17 +224,14 @@ class PR
         $this->events[] = CIGreen::ForPR($this->PRIdentifier);
     }
 
-    public function red(): void
+    public function red(BuildLink $buildLink): void
     {
         if ($this->CIStatus->isRed()) {
             return;
         }
 
-        $this->CIStatus = CIStatus::endedWith(
-            BuildResult::red(),
-            BuildLink::none()
-        );
-        $this->events[] = CIRed::ForPR($this->PRIdentifier);
+        $this->CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);
+        $this->events[] = CIRed::ForPR($this->PRIdentifier, $buildLink);
     }
 
     public function pending(): void

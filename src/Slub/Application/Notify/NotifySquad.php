@@ -105,7 +105,7 @@ class NotifySquad implements EventSubscriberInterface
 
     private function reactionForCIStatus(array $normalizedPR): string
     {
-        $ciStatus = $normalizedPR['CI_STATUS'];
+        $ciStatus = $normalizedPR['CI_STATUS']['BUILD_RESULT'];
         if ('GREEN' === $ciStatus) {
             return self::REACTION_CI_GREEN;
         }

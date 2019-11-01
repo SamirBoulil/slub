@@ -7,7 +7,7 @@ namespace Slub\Domain\Entity\PR;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author Samir Boulil <samir.boulil@gmail.com>
  */
 class CIStatus
 {
@@ -48,7 +48,7 @@ class CIStatus
     {
         return [
             self::BUILD_RESULT_KEY => $this->buildResult->stringValue(),
-            self::BUILD_LINK_KEY => $this->buildLink->stringValue()
+            self::BUILD_LINK_KEY   => $this->buildLink->stringValue(),
         ];
     }
 

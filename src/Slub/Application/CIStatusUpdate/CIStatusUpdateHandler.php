@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\CIStatusUpdate;
 
 use Psr\Log\LoggerInterface;
+use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -57,7 +58,7 @@ class CIStatusUpdateHandler
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
         switch ($CIStatusUpdate->status) {
             case 'GREEN': $PR->green(); break;
-            case 'RED': $PR->red(); break;
+            case 'RED': $PR->red($this->buildLink($CIStatusUpdate)); break;
             case 'PENDING': $PR->pending(); break;
         }
         $this->PRRepository->save($PR);
@@ -76,5 +77,10 @@ class CIStatusUpdateHandler
             $logMessage = sprintf('Squad has been notified PR "%s" has a pending CI', $CIStatusUpdate->PRIdentifier);
         }
         $this->logger->info($logMessage);
+    }
+
+    private function buildLink(CIStatusUpdate $CIStatusUpdate): BuildLink
+    {
+        return null === $CIStatusUpdate->buildLink ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink);
     }
 }

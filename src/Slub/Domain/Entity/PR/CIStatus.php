@@ -57,13 +57,13 @@ class CIStatus
         return $this->buildResult->isGreen();
     }
 
-    public function isRed(): bool
-    {
-        return $this->buildResult->isRed();
-    }
-
     public function isPending(): bool
     {
         return $this->buildResult->isPending();
+    }
+
+    public function isRedWithLink(BuildLink $buildLink): bool
+    {
+        return $this->buildLink->equals($buildLink);
     }
 }

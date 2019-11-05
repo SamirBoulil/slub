@@ -96,5 +96,8 @@ class CIStatusTest extends TestCase
         self::assertFalse($CIStatus->isRedWithLink(BuildLink::none()));
         self::assertFalse($CIStatus->isPending());
         self::assertFalse($CIStatus->isGreen());
+
+        // TODO: REMOVE ME
+        self::assertFalse(true);
     }
 }

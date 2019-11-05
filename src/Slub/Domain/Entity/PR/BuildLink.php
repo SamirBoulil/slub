@@ -42,4 +42,9 @@ class BuildLink
     {
         return $this->buildLink;
     }
+
+    public function equals(BuildLink $otherBuildLink): bool
+    {
+        return $this->buildLink === $otherBuildLink->buildLink;
+    }
 }

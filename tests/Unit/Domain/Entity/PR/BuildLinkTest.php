@@ -59,4 +59,18 @@ class BuildLinkTest extends TestCase
         self::assertEquals($normalizedBuildLink, $buildLink->stringValue());
         self::assertEmpty($noBuildLink->stringValue());
     }
+
+    /**
+     * @test
+     */
+    public function it_tells_if_it_is_equal_to_another_build_link()
+    {
+        $normalizedBuildLink = 'https://my-ci.com/1213';
+
+        $buildLink = BuildLink::fromNormalized($normalizedBuildLink);
+        $noBuildLink = BuildLink::none();
+
+        self::assertTrue($buildLink->equals($buildLink));
+        self::assertFalse($buildLink->equals($noBuildLink));
+    }
 }

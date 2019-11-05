@@ -73,8 +73,6 @@ class CIStatusTest extends TestCase
     {
         $CIStatus = CIStatus::endedWith(BuildResult::green(), BuildLink::none());
         self::assertTrue($CIStatus->isGreen());
-        self::assertFalse($CIStatus->isRed());
-        self::assertFalse($CIStatus->isPending());
     }
 
     /**
@@ -84,7 +82,19 @@ class CIStatusTest extends TestCase
     {
         $CIStatus = CIStatus::endedWith(BuildResult::pending(), BuildLink::none());
         self::assertTrue($CIStatus->isPending());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_is_the_result_is_red_with_the_same_link()
+    {
+        $buildLink = BuildLink::fromURL('https://my-ci.org/build/123');
+        $CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);
+
+        self::assertTrue($CIStatus->isRedWithLink($buildLink));
+        self::assertFalse($CIStatus->isRedWithLink(BuildLink::none()));
+        self::assertFalse($CIStatus->isPending());
         self::assertFalse($CIStatus->isGreen());
-        self::assertFalse($CIStatus->isRed());
     }
 }

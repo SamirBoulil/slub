@@ -226,6 +226,10 @@ class PR
 
     public function red(BuildLink $buildLink): void
     {
+        if ($this->CIStatus->isRedWithLink($buildLink)) {
+            return;
+        }
+
         $this->CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);
         $this->events[] = CIRed::ForPR($this->PRIdentifier, $buildLink);
     }

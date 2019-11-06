@@ -79,8 +79,11 @@ class NewReviewTest extends WebTestCase
     {
         $this->PRRepository->save(
             PR::create(
-                PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-                MessageIdentifier::create('CHANNEL_ID@1111')
+                PRIdentifier::create(self::PR_IDENTIFIER),
+                ChannelIdentifier::fromString('squad-raccoons'),
+                MessageIdentifier::create('CHANNEL_ID@1111'),
+                AuthorIdentifier::fromString('sam'),
+                Title::fromString('Add new feature')
             )
         );
     }

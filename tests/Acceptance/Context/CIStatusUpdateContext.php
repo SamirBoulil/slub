@@ -11,9 +11,11 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -63,9 +65,10 @@ class CIStatusUpdateContext extends FeatureContext
         $this->PRRepository->save(PR::create(
             $this->currentPRIdentifier,
             ChannelIdentifier::fromString('squad-raccoons'),
-            $this->currentMessageIdentifier
-        )
-        );
+            $this->currentMessageIdentifier,
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        ));
         $this->chatClientSpy->reset();
     }
 
@@ -204,7 +207,11 @@ class CIStatusUpdateContext extends FeatureContext
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $PR = PR::create(
-            $this->currentPRIdentifier, ChannelIdentifier::fromString('squad-raccoons'), $this->currentMessageIdentifier
+            $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            $this->currentMessageIdentifier,
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $PR->green();
         $this->PRRepository->save($PR);

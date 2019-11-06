@@ -6,9 +6,11 @@ namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -112,6 +114,8 @@ class PutPRToReviewHandler
             $PRIdentifier,
             ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
+            AuthorIdentifier::fromString($putPRToReview->authorIdentifier),
+            Title::fromString($putPRToReview->title),
             $VCSStatus->GTMCount,
             $VCSStatus->notGTMCount,
             $VCSStatus->comments,

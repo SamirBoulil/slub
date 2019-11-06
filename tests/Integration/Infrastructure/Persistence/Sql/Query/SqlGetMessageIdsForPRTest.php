@@ -63,8 +63,11 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
         /** @var PRRepositoryInterface $fileBasedPRRepository */
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $PR = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString(current($messageIds))
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString(current($messageIds)),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         for ($i = 1, $iMax = \count($messageIds); $i < $iMax; $i++) {
             $PR->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'),

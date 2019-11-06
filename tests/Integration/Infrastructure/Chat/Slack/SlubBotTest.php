@@ -150,7 +150,9 @@ class SlubBotTest extends KernelTestCase
             PR::create(
                 PRIdentifier::create($PRIdentifier),
                 ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
-                MessageIdentifier::fromString(Uuid::uuid4()->toString())
+                MessageIdentifier::fromString(Uuid::uuid4()->toString()),
+                AuthorIdentifier::fromString('sam'),
+                Title::fromString('Add new feature')
             )
         );
     }

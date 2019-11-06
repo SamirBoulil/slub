@@ -21,4 +21,10 @@ class PutPRToReview
 
     /** @var string */
     public $messageIdentifier;
+
+    /** @var string */
+    public $authorIdentifier;
+
+    /** @var string */
+    public $title;
 }

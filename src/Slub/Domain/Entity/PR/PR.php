@@ -20,7 +20,7 @@ class PR
 {
     private const IDENTIFIER_KEY = 'IDENTIFIER';
     private const TITLE_KEY = 'TITLE';
-    private const AUTHOR_KEY = 'AUTHOR';
+    private const AUTHOR_ID_KEY = 'AUTHOR_IDENTIFIER';
     private const GTM_KEY = 'GTMS';
     private const NOT_GTM_KEY = 'NOT_GTMS';
     private const CI_STATUS_KEY = 'CI_STATUS';
@@ -133,7 +133,7 @@ class PR
     public static function fromNormalized(array $normalizedPR): self
     {
         Assert::keyExists($normalizedPR, self::IDENTIFIER_KEY);
-        Assert::keyExists($normalizedPR, self::AUTHOR_KEY);
+        Assert::keyExists($normalizedPR, self::AUTHOR_ID_KEY);
         Assert::keyExists($normalizedPR, self::TITLE_KEY);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
@@ -147,7 +147,7 @@ class PR
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
 
         $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
-        $author = AuthorIdentifier::fromString($normalizedPR[self::AUTHOR_KEY]);
+        $author = AuthorIdentifier::fromString($normalizedPR[self::AUTHOR_ID_KEY]);
         $title = Title::fromString($normalizedPR[self::TITLE_KEY]);
         $GTM = $normalizedPR[self::GTM_KEY];
         $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
@@ -189,14 +189,14 @@ class PR
     {
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
-            self::AUTHOR_KEY => $this->authorIdentifier->stringValue(),
-            self::TITLE_KEY => $this->title->stringValue(),
-            self::GTM_KEY => $this->GTMCount,
-            self::NOT_GTM_KEY => $this->notGTMCount,
-            self::COMMENTS_KEY => $this->comments,
-            self::CI_STATUS_KEY => $this->CIStatus->normalize(),
-            self::IS_MERGED_KEY => $this->isMerged,
-            self::CHANNEL_IDS => array_map(
+            self::AUTHOR_ID_KEY  => $this->authorIdentifier->stringValue(),
+            self::TITLE_KEY      => $this->title->stringValue(),
+            self::GTM_KEY        => $this->GTMCount,
+            self::NOT_GTM_KEY    => $this->notGTMCount,
+            self::COMMENTS_KEY   => $this->comments,
+            self::CI_STATUS_KEY  => $this->CIStatus->normalize(),
+            self::IS_MERGED_KEY  => $this->isMerged,
+            self::CHANNEL_IDS    => array_map(
                 function (ChannelIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },

@@ -46,7 +46,7 @@ class PRTest extends TestCase
 
         $normalizedPR = $pr->normalize();
         $this->assertEquals($prIdentifier, $normalizedPR['IDENTIFIER']);
-        $this->assertEquals($author, $normalizedPR['AUTHOR']);
+        $this->assertEquals($author, $normalizedPR['AUTHOR_IDENTIFIER']);
         $this->assertEquals($title, $normalizedPR['TITLE']);
         $this->assertEquals(0, $normalizedPR['GTMS']);
         $this->assertEquals(0, $normalizedPR['NOT_GTMS']);
@@ -68,7 +68,7 @@ class PRTest extends TestCase
     {
         $normalizedPR = [
             'IDENTIFIER'       => self::PR_IDENTIFIER,
-            'AUTHOR'           => 'sam',
+            'AUTHOR_IDENTIFIER'           => 'sam',
             'TITLE'            => 'Add new fixtures',
             'GTMS'             => 2,
             'NOT_GTMS'         => 0,
@@ -412,7 +412,7 @@ class PRTest extends TestCase
         $pr = PR::fromNormalized([
                 'IDENTIFIER'       => self::PR_IDENTIFIER,
                 'TITLE'            => 'Add new feature',
-                'AUTHOR'           => 'sam',
+                'AUTHOR_IDENTIFIER'           => 'sam',
                 'GTMS'             => 0,
                 'NOT_GTMS'         => 0,
                 'COMMENTS'         => 0,
@@ -437,7 +437,7 @@ class PRTest extends TestCase
             [
                 'IDENTIFIER'       => self::PR_IDENTIFIER,
                 'TITLE'            => 'Add new feature',
-                'AUTHOR'           => 'sam',
+                'AUTHOR_IDENTIFIER'           => 'sam',
                 'GTMS'             => 0,
                 'NOT_GTMS'         => 0,
                 'COMMENTS'         => 0,
@@ -462,7 +462,7 @@ class PRTest extends TestCase
             [
                 'IDENTIFIER'       => self::PR_IDENTIFIER,
                 'TITLE'            => 'Add new feature',
-                'AUTHOR'           => 'sam',
+                'AUTHOR_IDENTIFIER'           => 'sam',
                 'GTMS'             => 0,
                 'NOT_GTMS'         => 0,
                 'COMMENTS'         => 0,

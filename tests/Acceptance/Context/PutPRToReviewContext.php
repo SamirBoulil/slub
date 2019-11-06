@@ -60,7 +60,9 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'squad-raccoons',
-            '1234'
+            '1234',
+            'sam',
+            'Add new feature'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -69,7 +71,9 @@ class PutPRToReviewContext extends FeatureContext
         string $repositoryIdentifier,
         string $PRIdentifier,
         string $channelIdentifier,
-        string $messageId
+        string $messageId,
+        string $authorIdentifier,
+        string $title
     ): PutPRToReview {
         $this->currentRepositoryIdentifier = $repositoryIdentifier;
         $this->currentPRIdentifier = $PRIdentifier;
@@ -81,6 +85,8 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
         $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
         $putPRToReview->messageIdentifier = $messageId;
+        $putPRToReview->authorIdentifier = $authorIdentifier;
+        $putPRToReview->title = $title;
 
         return $putPRToReview;
     }
@@ -94,7 +100,9 @@ class PutPRToReviewContext extends FeatureContext
             'unknown/unknown',
             'unknown/unknown/1111',
             'squad-raccoons',
-            '1'
+            '1',
+            'sam',
+            'Add new feature'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -108,7 +116,9 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'unsupported-channel',
-            '1'
+            '1',
+            'sam',
+            'Add new feature'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -120,6 +130,8 @@ class PutPRToReviewContext extends FeatureContext
     {
         $this->assertPR(
             $this->currentPRIdentifier,
+            'sam',
+            'Add new feature',
             0,
             0,
             0,
@@ -160,7 +172,9 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'general',
-            '6666'
+            '6666',
+            'sam',
+            'Add new feature'
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -172,6 +186,8 @@ class PutPRToReviewContext extends FeatureContext
     {
         $this->assertPR(
             $this->currentPRIdentifier,
+            'sam',
+            'Add new feature',
             0,
             0,
             0,
@@ -184,6 +200,8 @@ class PutPRToReviewContext extends FeatureContext
 
     private function assertPR(
         string $prIdentifier,
+        string $authorIdentifier,
+        string $title,
         int $gtmCount,
         int $notGtmCount,
         int $commentsCount,
@@ -194,6 +212,9 @@ class PutPRToReviewContext extends FeatureContext
     ): void {
         Assert::assertTrue($this->PRExists($prIdentifier));
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
+        Assert::assertEquals($pr->normalize()['IDENTIFIER'], $prIdentifier);
+        Assert::assertEquals($pr->normalize()['AUTHOR_IDENTIFIER'], $authorIdentifier);
+        Assert::assertEquals($pr->normalize()['TITLE'], $title);
         Assert::assertEquals($pr->normalize()['IDENTIFIER'], $prIdentifier);
         Assert::assertEquals($pr->normalize()['GTMS'], $gtmCount);
         Assert::assertEquals($pr->normalize()['NOT_GTMS'], $notGtmCount);

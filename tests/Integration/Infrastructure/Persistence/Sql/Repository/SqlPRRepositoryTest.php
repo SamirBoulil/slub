@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlPRRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -34,7 +36,9 @@ class SqlPRRepositoryTest extends KernelTestCase
         $savedPR = PR::create(
             $identifier,
             ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $savedPR->red(BuildLink::fromURL('https://my-ci.com/build/123'));
 
@@ -53,7 +57,9 @@ class SqlPRRepositoryTest extends KernelTestCase
         $savedPR = PR::create(
             $identifier,
             ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->sqlPRRepository->save($savedPR);
 
@@ -80,16 +86,18 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => false,
-                    'MESSAGE_IDS'      => ['1', '2'],
-                    'CHANNEL_IDS'      => ['squad-raccoons'],
-                    'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
+                    'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
+                    'GTMS'              => 1,
+                    'NOT_GTMS'          => 1,
+                    'COMMENTS'          => 1,
+                    'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED'         => false,
+                    'MESSAGE_IDS'       => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
+                    'PUT_TO_REVIEW_AT'  => '1560175073',
+                    'MERGED_AT'         => null,
                 ]
             )
         );
@@ -97,6 +105,8 @@ class SqlPRRepositoryTest extends KernelTestCase
             PR::fromNormalized(
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
@@ -113,6 +123,8 @@ class SqlPRRepositoryTest extends KernelTestCase
             PR::fromNormalized(
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
@@ -130,6 +142,8 @@ class SqlPRRepositoryTest extends KernelTestCase
             [
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
@@ -142,6 +156,8 @@ class SqlPRRepositoryTest extends KernelTestCase
                 ],
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
@@ -154,6 +170,8 @@ class SqlPRRepositoryTest extends KernelTestCase
                 ],
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
                     'GTMS'             => 1,
                     'NOT_GTMS'         => 1,
                     'COMMENTS'         => 1,
@@ -190,7 +208,9 @@ class SqlPRRepositoryTest extends KernelTestCase
             PR::create(
                 $identifier,
                 ChannelIdentifier::fromString('squad-raccoons'),
-                MessageIdentifier::fromString('1')
+                MessageIdentifier::fromString('1'),
+                AuthorIdentifier::fromString('sam'),
+                Title::fromString('Add new feature')
             )
         );
         $this->sqlPRRepository->reset();
@@ -251,7 +271,9 @@ class SqlPRRepositoryTest extends KernelTestCase
         $PR = PR::create(
             $identifier,
             ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         for ($i = 0; $i < $GTMs; $i++) {
             $PR->GTM();

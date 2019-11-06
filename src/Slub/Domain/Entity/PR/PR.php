@@ -19,6 +19,8 @@ use Webmozart\Assert\Assert;
 class PR
 {
     private const IDENTIFIER_KEY = 'IDENTIFIER';
+    private const TITLE_KEY = 'TITLE';
+    private const AUTHOR_KEY = 'AUTHOR';
     private const GTM_KEY = 'GTMS';
     private const NOT_GTM_KEY = 'NOT_GTMS';
     private const CI_STATUS_KEY = 'CI_STATUS';
@@ -40,6 +42,12 @@ class PR
 
     /** @var MessageIdentifier[] */
     private $messageIdentifiers;
+
+    /** @var AuthorIdentifier */
+    private $authorIdentifier;
+
+    /** @var Title */
+    private $title;
 
     /** @var int */
     private $GTMCount;
@@ -66,6 +74,8 @@ class PR
         PRIdentifier $PRIdentifier,
         array $channelIdentifiers,
         array $messageIds,
+        AuthorIdentifier $authorIdentifier,
+        Title $title,
         int $GTMCount,
         int $notGTMCount,
         int $comments,
@@ -75,6 +85,8 @@ class PR
         MergedAt $mergedAt
     ) {
         $this->PRIdentifier = $PRIdentifier;
+        $this->authorIdentifier = $authorIdentifier;
+        $this->title = $title;
         $this->GTMCount = $GTMCount;
         $this->notGTMCount = $notGTMCount;
         $this->comments = $comments;
@@ -90,6 +102,8 @@ class PR
         PRIdentifier $PRIdentifier,
         ChannelIdentifier $channelIdentifier,
         MessageIdentifier $messageIdentifier,
+        AuthorIdentifier $authorIdentifier,
+        Title $title,
         int $GTMs = 0,
         int $notGTMs = 0,
         int $comments = 0,
@@ -100,6 +114,8 @@ class PR
             $PRIdentifier,
             [$channelIdentifier],
             [$messageIdentifier],
+            $authorIdentifier,
+            $title,
             $GTMs,
             $notGTMs,
             $comments,
@@ -117,6 +133,8 @@ class PR
     public static function fromNormalized(array $normalizedPR): self
     {
         Assert::keyExists($normalizedPR, self::IDENTIFIER_KEY);
+        Assert::keyExists($normalizedPR, self::AUTHOR_KEY);
+        Assert::keyExists($normalizedPR, self::TITLE_KEY);
         Assert::keyExists($normalizedPR, self::GTM_KEY);
         Assert::keyExists($normalizedPR, self::NOT_GTM_KEY);
         Assert::keyExists($normalizedPR, self::COMMENTS_KEY);
@@ -129,6 +147,8 @@ class PR
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
 
         $identifier = PRIdentifier::fromString($normalizedPR[self::IDENTIFIER_KEY]);
+        $author = AuthorIdentifier::fromString($normalizedPR[self::AUTHOR_KEY]);
+        $title = Title::fromString($normalizedPR[self::TITLE_KEY]);
         $GTM = $normalizedPR[self::GTM_KEY];
         $NOTGTM = $normalizedPR[self::NOT_GTM_KEY];
         $CIStatus = $normalizedPR[self::CI_STATUS_KEY];
@@ -153,12 +173,15 @@ class PR
             $identifier,
             $channelIdentifiers,
             $messageIds,
+            $author,
+            $title,
             $GTM,
             $NOTGTM,
             $comments,
             CIStatus::fromNormalized($CIStatus),
             $isMerged,
-            $putToReviewAt, $mergedAt
+            $putToReviewAt,
+            $mergedAt
         );
     }
 
@@ -166,6 +189,8 @@ class PR
     {
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
+            self::AUTHOR_KEY => $this->authorIdentifier->stringValue(),
+            self::TITLE_KEY => $this->title->stringValue(),
             self::GTM_KEY => $this->GTMCount,
             self::NOT_GTM_KEY => $this->notGTMCount,
             self::COMMENTS_KEY => $this->comments,

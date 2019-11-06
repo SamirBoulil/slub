@@ -6,10 +6,12 @@ namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
@@ -29,14 +31,23 @@ class PRTest extends TestCase
         $prIdentifier = self::PR_IDENTIFIER;
         $channelIdentifier = 'squad-raccoons';
         $messageId = '1';
+        $author = 'sam';
+        $title = 'Add new feature';
         $expectedPRIdentifier = PRIdentifier::create($prIdentifier);
         $expectedChannelIdentifier = ChannelIdentifier::fromString($channelIdentifier);
         $expectedMessageIdentifier = MessageIdentifier::fromString($messageId);
 
-        $pr = PR::create($expectedPRIdentifier, $expectedChannelIdentifier, $expectedMessageIdentifier);
+        $pr = PR::create($expectedPRIdentifier,
+            $expectedChannelIdentifier,
+            $expectedMessageIdentifier,
+            AuthorIdentifier::fromString($author),
+            Title::fromString($title)
+        );
 
         $normalizedPR = $pr->normalize();
         $this->assertEquals($prIdentifier, $normalizedPR['IDENTIFIER']);
+        $this->assertEquals($author, $normalizedPR['AUTHOR']);
+        $this->assertEquals($title, $normalizedPR['TITLE']);
         $this->assertEquals(0, $normalizedPR['GTMS']);
         $this->assertEquals(0, $normalizedPR['NOT_GTMS']);
         $this->assertEquals(0, $normalizedPR['COMMENTS']);
@@ -57,6 +68,8 @@ class PRTest extends TestCase
     {
         $normalizedPR = [
             'IDENTIFIER'       => self::PR_IDENTIFIER,
+            'AUTHOR'           => 'sam',
+            'TITLE'            => 'Add new fixtures',
             'GTMS'             => 2,
             'NOT_GTMS'         => 0,
             'COMMENTS'         => 0,
@@ -94,8 +107,11 @@ class PRTest extends TestCase
     public function it_can_be_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->assertEquals(0, $pr->normalize()['GTMS']);
 
@@ -112,8 +128,11 @@ class PRTest extends TestCase
     public function it_can_be_NOT_GTMed_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
@@ -130,8 +149,11 @@ class PRTest extends TestCase
     public function it_can_be_commented_multiple_times()
     {
         $pr = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
 
@@ -253,7 +275,12 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create(self::PR_IDENTIFIER);
 
-        $pr = PR::create($identifier, ChannelIdentifier::fromString('squad-raccoons'), MessageIdentifier::fromString('1'));
+        $pr = PR::create($identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
 
         $this->assertTrue($pr->PRIdentifier()->equals($identifier));
     }
@@ -264,8 +291,11 @@ class PRTest extends TestCase
     public function it_returns_the_message_ids()
     {
         $pr = PR::create(
-            PRIdentifier::create(self::PR_IDENTIFIER), ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
     }
@@ -278,7 +308,9 @@ class PRTest extends TestCase
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
             ChannelIdentifier::fromString('squad-raccoons'),
-            MessageIdentifier::fromString('1')
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
         );
         $this->assertEquals('squad-raccoons', current($pr->channelIdentifiers())->stringValue());
     }
@@ -379,12 +411,14 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized([
                 'IDENTIFIER'       => self::PR_IDENTIFIER,
+                'TITLE'            => 'Add new feature',
+                'AUTHOR'           => 'sam',
                 'GTMS'             => 0,
                 'NOT_GTMS'         => 0,
                 'COMMENTS'         => 0,
                 'CI_STATUS'        => [
                     'BUILD_RESULT' => 'PENDING',
-                    'BUILD_LINK' => ''
+                    'BUILD_LINK'   => '',
                 ],
                 'IS_MERGED'        => false,
                 'CHANNEL_IDS'      => ['squad-raccoons'],
@@ -393,6 +427,7 @@ class PRTest extends TestCase
                 'MERGED_AT'        => self::A_TIMESTAMP,
             ]
         );
+
         return $pr;
     }
 
@@ -400,19 +435,21 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'  => self::PR_IDENTIFIER,
-                'GTMS'        => 0,
-                'NOT_GTMS'    => 0,
-                'COMMENTS'    => 0,
-                'CI_STATUS'   => [
+                'IDENTIFIER'       => self::PR_IDENTIFIER,
+                'TITLE'            => 'Add new feature',
+                'AUTHOR'           => 'sam',
+                'GTMS'             => 0,
+                'NOT_GTMS'         => 0,
+                'COMMENTS'         => 0,
+                'CI_STATUS'        => [
                     'BUILD_RESULT' => 'GREEN',
                     'BUILD_LINK'   => '',
                 ],
-                'IS_MERGED'   => false,
-                'CHANNEL_IDS' => ['squad-raccoons'],
+                'IS_MERGED'        => false,
+                'CHANNEL_IDS'      => ['squad-raccoons'],
                 'MESSAGE_IDS'      => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
-                'MERGED_AT'        => self::A_TIMESTAMP
+                'MERGED_AT'        => self::A_TIMESTAMP,
             ]
         );
 
@@ -423,19 +460,21 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'  => self::PR_IDENTIFIER,
-                'GTMS'        => 0,
-                'NOT_GTMS'    => 0,
-                'COMMENTS'    => 0,
-                'CI_STATUS'   => [
+                'IDENTIFIER'       => self::PR_IDENTIFIER,
+                'TITLE'            => 'Add new feature',
+                'AUTHOR'           => 'sam',
+                'GTMS'             => 0,
+                'NOT_GTMS'         => 0,
+                'COMMENTS'         => 0,
+                'CI_STATUS'        => [
                     'BUILD_RESULT' => 'RED',
                     'BUILD_LINK'   => '',
                 ],
-                'IS_MERGED'   => false,
-                'CHANNEL_IDS' => ['squad-raccoons'],
+                'IS_MERGED'        => false,
+                'CHANNEL_IDS'      => ['squad-raccoons'],
                 'MESSAGE_IDS'      => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
-                'MERGED_AT'        => self::A_TIMESTAMP
+                'MERGED_AT'        => self::A_TIMESTAMP,
             ]
         );
 

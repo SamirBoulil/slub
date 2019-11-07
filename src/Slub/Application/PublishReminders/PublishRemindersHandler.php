@@ -112,12 +112,12 @@ CHAT;
 
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
-        $author = $PR->authorIdentifier()->stringValue();
+        $author = ucfirst($PR->authorIdentifier()->stringValue());
         $title = $PR->title()->stringValue();
         $githubLink = $githubLink($PR);
         $numberOfDaysInReview = 0 === $PR->numberOfDaysInReview() ? 'Today' : $PR->numberOfDaysInReview();
 
-        return sprintf(' - %s, "%s" (%s) %s', $author, $title, $numberOfDaysInReview, $githubLink);
+        return sprintf(' - *%s*, _"%s"_ (%s) %s', $author, $title, $numberOfDaysInReview, $githubLink);
     }
 
     private function isChannelIsSupportedForFeature(ChannelIdentifier $channelIdentifier): bool

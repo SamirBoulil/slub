@@ -70,16 +70,16 @@ class PublishRemindersContext extends FeatureContext
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/1
- - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/2
+ - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/1
+ - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/2
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
- - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/3
- - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/4
+ - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/3
+ - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/4
 CHAT
         );
     }
@@ -119,7 +119,7 @@ CHAT
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/1
+ - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/1
 CHAT
         );
     }

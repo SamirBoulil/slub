@@ -2,6 +2,7 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -65,20 +66,20 @@ class PublishRemindersContext extends FeatureContext
      */
     public function theRemindersShouldOnlyContainAReferenceToThePRsInReview()
     {
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifier(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pull/1
- - https://github.com/samirboulil/slub/pull/2
+ - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/1
+ - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/2
 CHAT
         );
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifier(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pull/3
- - https://github.com/samirboulil/slub/pull/4
+ - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/3
+ - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/4
 CHAT
         );
     }
@@ -114,11 +115,11 @@ CHAT
      */
     public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(): void
     {
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifier(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - https://github.com/samirboulil/slub/pull/1
+ - sam, "Add new feature" (Today) https://github.com/samirboulil/slub/pull/1
 CHAT
         );
     }

@@ -71,7 +71,7 @@ class PublishRemindersHandler
     private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
     {
         $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
-        $message = $this->formatReminder($PRsToPublish);
+        $message = $this->formatReminders($PRsToPublish);
         $this->chatClient->publishInChannel($channelIdentifier, $message);
     }
 
@@ -90,24 +90,34 @@ class PublishRemindersHandler
         );
     }
 
-    private function formatReminder(array $prs): string
+    private function formatReminders(array $prs): string
     {
+        $PRReminders = array_map(function (PR $PR) {
+            return $this->formatReminder($PR);
+        }, $prs);
         $reminder = <<<CHAT
 Yop, these PRs need reviews!
- - %s
+%s
 CHAT;
-        $identifiers = implode(
-            "\n - ",
-            array_map(function (PR $PR) {
-                $split = explode('/', $PR->PRIdentifier()->stringValue());
 
-                return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
-            },
-                $prs
-            )
-        );
+        $result = sprintf($reminder, implode("\n", $PRReminders));
 
-        return sprintf($reminder, $identifiers);
+        return $result;
+    }
+
+    private function formatReminder(PR $PR): string
+    {
+        $githubLink = function (PR $PR) {
+            $split = explode('/', $PR->PRIdentifier()->stringValue());
+
+            return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
+        };
+        $author = $PR->authorIdentifier()->stringValue();
+        $title = $PR->title()->stringValue();
+        $githubLink = $githubLink($PR);
+        $numberOfDaysInReview = 0 === $PR->numberOfDaysInReview() ? 'Today' : $PR->numberOfDaysInReview();
+
+        return sprintf(' - %s, "%s" (%s) %s', $author, $title, $numberOfDaysInReview, $githubLink);
     }
 
     private function isChannelIsSupportedForFeature(ChannelIdentifier $channelIdentifier): bool

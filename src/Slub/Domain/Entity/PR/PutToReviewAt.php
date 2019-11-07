@@ -36,4 +36,12 @@ class PutToReviewAt
     {
         return (string) $this->putToReviewAt->getTimestamp();
     }
+
+    public function numberOfDaysInReview(): int
+    {
+        $today = new \DateTime('now');
+        $diff = $today->diff($this->putToReviewAt);
+
+        return $diff->days;
+    }
 }

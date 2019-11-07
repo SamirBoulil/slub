@@ -218,6 +218,16 @@ class PR
         return $this->PRIdentifier;
     }
 
+    public function authorIdentifier(): AuthorIdentifier
+    {
+        return $this->authorIdentifier;
+    }
+
+    public function title(): Title
+    {
+        return $this->title;
+    }
+
     public function GTM(): void
     {
         $this->GTMCount++;
@@ -324,6 +334,11 @@ class PR
     public function channelIdentifiers(): array
     {
         return $this->channelIdentifiers;
+    }
+
+    public function numberOfDaysInReview(): int
+    {
+        return $this->putToReviewAt->numberOfDaysInReview();
     }
 
     private function hasMessageIdentifier(MessageIdentifier $newMessageIdentifier): bool

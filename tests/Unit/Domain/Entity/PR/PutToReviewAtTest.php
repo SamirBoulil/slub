@@ -30,4 +30,17 @@ class PutToReviewAtTest extends TestCase
         $toTimestamp = $putToReviewAt->toTimestamp();
         $this->assertEquals($aTimestamp, $toTimestamp);
     }
+
+    /**
+     * @test
+     */
+    public function it_tells_the_number_of_days_between_now_and_the_time_the_PR_has_been_put_in_review()
+    {
+        $aTimestamp = (string) (new \DateTime())->getTimestamp();
+        $putToReviewAt = PutToReviewAt::fromTimestamp($aTimestamp);
+
+        $actualNumberOfDaysInReview = $putToReviewAt->numberOfDaysInReview();
+
+        $this->assertEquals(0, $actualNumberOfDaysInReview);
+    }
 }

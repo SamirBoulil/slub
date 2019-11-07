@@ -10,9 +10,6 @@ Feature: Publish a reminder of the pull requests to review for every channels
     And a PR merged
     When the system publishes a reminder
     Then the reminder should only contain the PR not GTMed
-#    And the reminder should contain the number of days since the PR has been put to review
-#    And the reminder should contain the CI status
-#    And the reminder should contain the number of GTMs
 
   @nominal
   Scenario: Publish a reminder of a PR in review for each slack channels

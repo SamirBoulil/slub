@@ -6,9 +6,11 @@ namespace Tests\Functional;
 
 use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Tests\WebTestCase;

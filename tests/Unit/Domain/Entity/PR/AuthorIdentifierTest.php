@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Domain\Entity\PR;
 
-use Slub\Domain\Entity\PR\AuthorIdentifier;
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

@@ -119,10 +119,10 @@ class SlubBot
         $bot->hears($unpublishMessage, $unpublishPR);
     }
 
-    private function putPRToReview(string $PRIdentifier, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier, PRInfo $PRInfo): void
+    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier, PRInfo $PRInfo): void
     {
         $PRToReview = new PutPRToReview();
-        $PRToReview->PRIdentifier = $PRIdentifier;
+        $PRToReview->PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
         $PRToReview->repositoryIdentifier = $repositoryIdentifier;
         $PRToReview->channelIdentifier = $channelIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
@@ -131,7 +131,8 @@ class SlubBot
         $PRToReview->GTMCount = $PRInfo->GTMCount;
         $PRToReview->notGTMCount = $PRInfo->notGTMCount;
         $PRToReview->comments = $PRInfo->comments;
-        $PRToReview->CIStatus = $PRInfo->CIStatus;
+        $PRToReview->CIStatus = $PRInfo->CIStatus->status;
+        $PRToReview->isMerged = $PRInfo->isMerged;
 
         $this->logger->info(
             sprintf(
@@ -200,7 +201,7 @@ class SlubBot
         return $this->getPRInfo->fetch(PRIdentifier::fromString($PRIdentifier));
     }
 
-    private function PRIdentifier(string $repositoryIdentifier, $PRNumber): string
+    private function PRIdentifier(string $PRNumber, string $repositoryIdentifier): string
     {
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
     }

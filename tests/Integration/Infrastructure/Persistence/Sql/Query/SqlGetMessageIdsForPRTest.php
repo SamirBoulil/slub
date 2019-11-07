@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
 
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;

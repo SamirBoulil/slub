@@ -84,19 +84,21 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         $this->PRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'       => Uuid::uuid4()->toString(),
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => [
+                    'IDENTIFIER'        => Uuid::uuid4()->toString(),
+                    'AUTHOR_IDENTIFIER' => 'sam',
+                    'TITLE'             => 'Add new feature',
+                    'GTMS'              => 1,
+                    'NOT_GTMS'          => 1,
+                    'COMMENTS'          => 1,
+                    'CI_STATUS'         => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK' => '',
+                        'BUILD_LINK'   => '',
                     ],
-                    'IS_MERGED'        => true,
-                    'MESSAGE_IDS'      => ['1', '2'],
-                    'CHANNEL_IDS'      => ['squad-raccoons'],
-                    'PUT_TO_REVIEW_AT' => (string) $now->getTimestamp(),
-                    'MERGED_AT'        => (string) $mergedAt->getTimestamp()
+                    'IS_MERGED'         => true,
+                    'MESSAGE_IDS'       => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
+                    'PUT_TO_REVIEW_AT'  => (string) $now->getTimestamp(),
+                    'MERGED_AT'         => (string) $mergedAt->getTimestamp(),
                 ]
             )
         );
@@ -107,9 +109,9 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         /** @var Connection $connection */
         $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sql = <<<SQL
-INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
 VALUES
-	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 1, '{}', 1, '251512', '251512');
+	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 1, '{}', 1, '251512', '251512', 'sam', 'Add new feature');
 SQL;
         $connection->executeUpdate($sql);
     }
@@ -119,9 +121,9 @@ SQL;
         /** @var Connection $connection */
         $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sql = <<<SQL
-INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`)
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
 VALUES
-	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512');
+	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512', 'sam', 'Add new feature');
 SQL;
         $connection->executeUpdate($sql);
     }

@@ -6,9 +6,11 @@ namespace Tests\Integration\Infrastructure\Installer\CLI;
 
 use Doctrine\DBAL\Connection;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;

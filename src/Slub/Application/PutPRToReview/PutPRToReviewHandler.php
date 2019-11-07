@@ -6,9 +6,11 @@ namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -20,9 +22,6 @@ class PutPRToReviewHandler
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
-    /** @var GetVCSStatus */
-    private $getVCSStatusFromGithub;
-
     /** @var IsSupportedInterface */
     private $isSupported;
 
@@ -31,12 +30,10 @@ class PutPRToReviewHandler
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        GetVCSStatus $getVCSStatusFromGithub, // Note: Probably this work shouldn't be made here but in the infra
         IsSupportedInterface $isRepositorySupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->getVCSStatusFromGithub = $getVCSStatusFromGithub;
         $this->isSupported = $isRepositorySupported;
         $this->logger = $logger;
     }
@@ -105,18 +102,19 @@ class PutPRToReviewHandler
     private function createNewPR(PutPRToReview $putPRToReview): void
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
-        $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
-        $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->checkStatus->status . ')');
+        $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
 
         $PR = PR::create(
             $PRIdentifier,
             ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
-            $VCSStatus->GTMCount,
-            $VCSStatus->notGTMCount,
-            $VCSStatus->comments,
-            $VCSStatus->checkStatus->status,
-            $VCSStatus->isMerged
+            AuthorIdentifier::fromString($putPRToReview->authorIdentifier),
+            Title::fromString($putPRToReview->title),
+            $putPRToReview->GTMCount,
+            $putPRToReview->notGTMCount,
+            $putPRToReview->comments,
+            $putPRToReview->CIStatus,
+            $putPRToReview->isMerged
         );
         $this->PRRepository->save($PR);
     }

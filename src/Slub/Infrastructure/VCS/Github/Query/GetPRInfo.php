@@ -36,7 +36,9 @@ class GetPRInfo implements GetPRInfoInterface
         $reviews = $this->findReviews->fetch($PRIdentifier);
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
         $isMerged = $this->isMerged($PRDetails);
-        $result = $this->createPRInfo($PRIdentifier, $reviews, $ciStatus, $isMerged);
+        $authorIdentifier = $this->authorIdentifier($PRDetails);
+        $title = $this->title($PRDetails);
+        $result = $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged);
 
         return $result;
     }
@@ -53,12 +55,16 @@ class GetPRInfo implements GetPRInfoInterface
 
     private function createPRInfo(
         PRIdentifier $PRIdentifier,
+        string $authorIdentifier,
+        string $title,
         array $reviews,
         CheckStatus $ciStatus,
         bool $isMerged
     ): PRInfo {
         $result = new PRInfo();
         $result->PRIdentifier = $PRIdentifier->stringValue();
+        $result->authorIdentifier = $authorIdentifier;
+        $result->title = $title;
         $result->GTMCount = $reviews[FindReviews::GTMS];
         $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];
         $result->comments = $reviews[FindReviews::COMMENTS];
@@ -66,5 +72,15 @@ class GetPRInfo implements GetPRInfoInterface
         $result->isMerged = $isMerged;
 
         return $result;
+    }
+
+    private function title(array $PRDetails): string
+    {
+        return $PRDetails['title'];
+    }
+
+    private function authorIdentifier(array $PRDetails): string
+    {
+        return $PRDetails['user']['login'];
     }
 }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query\CIStatus;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
-use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
+use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 use Tests\WebTestCase;
 
 class GetCheckSuiteStatusTest extends WebTestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Psr7\Response;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;

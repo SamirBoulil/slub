@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query\CIStatus;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
-use Tests\Integration\Infrastructure\VCS\Query\GuzzleSpy;
+use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 use Tests\WebTestCase;
 
 class GetCheckRunStatusTest extends WebTestCase

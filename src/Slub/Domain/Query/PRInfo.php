@@ -14,6 +14,12 @@ class PRInfo
     /** @var string */
     public $PRIdentifier;
 
+    /** @var string */
+    public $authorIdentifier;
+
+    /** @var string */
+    public $title;
+
     /** @var int */
     public $GTMCount;
 

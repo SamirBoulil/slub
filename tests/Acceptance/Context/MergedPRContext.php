@@ -11,9 +11,11 @@ use Slub\Application\MergedPR\MergedPRHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -106,7 +108,12 @@ class MergedPRContext extends FeatureContext
 
     private function PRWithGTMsAndGreen(): PR
     {
-        $PR = PR::create($this->currentPRIdentifier, ChannelIdentifier::fromString('squad-raccoons'), $this->currentMessageIdentifier);
+        $PR = PR::create($this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            $this->currentMessageIdentifier,
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
         $PR->GTM();
         $PR->GTM();
         $PR->green();

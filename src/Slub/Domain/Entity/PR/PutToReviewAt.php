@@ -39,7 +39,8 @@ class PutToReviewAt
 
     public function numberOfDaysInReview(): int
     {
-        $today = new \DateTime('now');
+        $today = new \DateTime('now', new \DateTimeZone('UTC'));
+
         $diff = $today->diff($this->putToReviewAt);
 
         return $diff->days;

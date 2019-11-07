@@ -220,7 +220,6 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['IDENTIFIER'], $prIdentifier);
         Assert::assertEquals($pr->normalize()['AUTHOR_IDENTIFIER'], $authorIdentifier);
         Assert::assertEquals($pr->normalize()['TITLE'], $title);
-        Assert::assertEquals($pr->normalize()['IDENTIFIER'], $prIdentifier);
         Assert::assertEquals($pr->normalize()['GTMS'], $gtmCount);
         Assert::assertEquals($pr->normalize()['NOT_GTMS'], $notGtmCount);
         Assert::assertEquals($pr->normalize()['COMMENTS'], $commentsCount);

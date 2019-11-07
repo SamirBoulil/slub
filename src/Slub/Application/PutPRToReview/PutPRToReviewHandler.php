@@ -22,9 +22,6 @@ class PutPRToReviewHandler
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
-    /** @var GetVCSStatus */
-    private $getVCSStatusFromGithub;
-
     /** @var IsSupportedInterface */
     private $isSupported;
 
@@ -33,12 +30,10 @@ class PutPRToReviewHandler
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        GetVCSStatus $getVCSStatusFromGithub, // Note: Probably this work shouldn't be made here but in the infra
         IsSupportedInterface $isRepositorySupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->getVCSStatusFromGithub = $getVCSStatusFromGithub;
         $this->isSupported = $isRepositorySupported;
         $this->logger = $logger;
     }
@@ -107,8 +102,7 @@ class PutPRToReviewHandler
     private function createNewPR(PutPRToReview $putPRToReview): void
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
-        $VCSStatus = $this->getVCSStatusFromGithub->fetch($PRIdentifier);
-        $this->logger->critical('Fetched information from github (CI status: ' . $VCSStatus->checkStatus->status . ')');
+        $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
 
         $PR = PR::create(
             $PRIdentifier,
@@ -116,11 +110,11 @@ class PutPRToReviewHandler
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
             AuthorIdentifier::fromString($putPRToReview->authorIdentifier),
             Title::fromString($putPRToReview->title),
-            $VCSStatus->GTMCount,
-            $VCSStatus->notGTMCount,
-            $VCSStatus->comments,
-            $VCSStatus->checkStatus->status,
-            $VCSStatus->isMerged
+            $putPRToReview->GTMCount,
+            $putPRToReview->notGTMCount,
+            $putPRToReview->comments,
+            $putPRToReview->CIStatus,
+            $putPRToReview->isMerged
         );
         $this->PRRepository->save($PR);
     }

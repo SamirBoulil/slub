@@ -32,7 +32,6 @@ services:
         class: Slub\Application\PutPRToReview\PutPRToReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.vcs.github.query.get_vcs_status_from_github'
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
 

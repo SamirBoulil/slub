@@ -87,6 +87,11 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview->messageIdentifier = $messageId;
         $putPRToReview->authorIdentifier = $authorIdentifier;
         $putPRToReview->title = $title;
+        $putPRToReview->CIStatus = 'PENDING';
+        $putPRToReview->GTMCount = 0;
+        $putPRToReview->notGTMCount = 0;
+        $putPRToReview->comments = 0;
+        $putPRToReview->isMerged = false;
 
         return $putPRToReview;
     }

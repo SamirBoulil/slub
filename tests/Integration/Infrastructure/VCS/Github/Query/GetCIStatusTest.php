@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
@@ -12,7 +11,6 @@ use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
-use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -45,17 +43,22 @@ class GetPRInfoTest extends TestCase
      */
     public function it_creates_a_PR_info(): void
     {
-        $PRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev');
+        $expectedPRIdentifier = 'akeneo/pim-community-dev';
         $commitSHA = 'abc2456';
         $expectedCommentsCount = 1;
         $expectedGTMCount = 2;
         $expectedNotGTMCount = 3;
         $checkStatus = new CheckStatus('PENDING');
+        $expectedTitle = 'Add new feature';
+        $expectedAuthorIdentifier = 'sam';
+        $PRIdentifier = PRIdentifier::fromString($expectedPRIdentifier);
         $this->getPRDetails
             ->fetch($PRIdentifier)
             ->willReturn([
                 'head'  => ['sha' => $commitSHA],
                 'state' => 'closed',
+                'title' => $expectedTitle,
+                'user' => ['login' => $expectedAuthorIdentifier]
             ]);
         $this->findReviews
             ->fetch($PRIdentifier)
@@ -70,7 +73,9 @@ class GetPRInfoTest extends TestCase
 
         $actualPRInfo = $this->getPRInfo->fetch($PRIdentifier);
 
-        self::assertEquals($PRIdentifier->stringValue(), $actualPRInfo->PRIdentifier);
+        self::assertEquals($expectedPRIdentifier, $actualPRInfo->PRIdentifier);
+        self::assertEquals($expectedAuthorIdentifier, $actualPRInfo->authorIdentifier);
+        self::assertEquals($expectedTitle, $actualPRInfo->title);
         self::assertEquals($expectedGTMCount, $actualPRInfo->GTMCount);
         self::assertEquals($expectedNotGTMCount, $actualPRInfo->notGTMCount);
         self::assertEquals($expectedCommentsCount, $actualPRInfo->comments);

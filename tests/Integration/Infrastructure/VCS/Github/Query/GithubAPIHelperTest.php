@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\VCS\Query;
+namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;

@@ -137,6 +137,7 @@ services:
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@slub.infrastructure.query.get_public_channel_information'
             - '@slub.infrastructure.query.get_private_channel_information'
+            - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
             - '%env(BOT_USER_ID)%'

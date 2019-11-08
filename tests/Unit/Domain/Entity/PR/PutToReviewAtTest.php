@@ -33,14 +33,27 @@ class PutToReviewAtTest extends TestCase
 
     /**
      * @test
+     * @dataProvider date
      */
-    public function it_tells_the_number_of_days_between_now_and_the_time_the_PR_has_been_put_in_review()
-    {
-        $aTimestamp = (string) (new \DateTime())->getTimestamp();
-        $putToReviewAt = PutToReviewAt::fromTimestamp($aTimestamp);
+    public function it_tells_the_number_of_days_between_now_and_the_time_the_PR_has_been_put_in_review(
+        string $timestamp,
+        int $expectedNumberOfDays
+    ) {
+        $putToReviewAt = PutToReviewAt::fromTimestamp($timestamp);
 
         $actualNumberOfDaysInReview = $putToReviewAt->numberOfDaysInReview();
 
-        $this->assertEquals(0, $actualNumberOfDaysInReview);
+        $this->assertEquals($expectedNumberOfDays, $actualNumberOfDaysInReview);
+    }
+
+    public function date()
+    {
+        $nowTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
+        $yesterday = (string) (new \DateTime('now', new \DateTimeZone('UTC')))->modify('-1 day')->getTimestamp();
+
+        return [
+            'Today' => [$nowTimestamp, 0],
+            '1 day' => [$yesterday, 1]
+        ];
     }
 }

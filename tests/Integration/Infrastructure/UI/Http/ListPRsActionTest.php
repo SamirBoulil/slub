@@ -46,7 +46,7 @@ class ListPRsActionTest extends WebTestCase
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'MESSAGE_IDS'       => ['1', '2'],
                     'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'MERGED_AT'         => '1561363426',
+                    'CLOSED_AT'         => '1561363426',
                 ]
             )
         );
@@ -67,7 +67,7 @@ class ListPRsActionTest extends WebTestCase
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'MESSAGE_IDS'       => ['1', '2'],
                     'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'MERGED_AT'         => null,
+                    'CLOSED_AT'         => null,
                 ]
             )
         );
@@ -95,7 +95,7 @@ class ListPRsActionTest extends WebTestCase
                     'MESSAGE_IDS'       => ['1', '2'],
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'MERGED_AT'         => null,
+                    'CLOSED_AT'         => null,
                 ],
                 [
                     'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
@@ -112,7 +112,7 @@ class ListPRsActionTest extends WebTestCase
                     'MESSAGE_IDS'       => ['1', '2'],
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'MERGED_AT'         => '1561363426',
+                    'CLOSED_AT'         => '1561363426',
                 ],
             ],
             json_decode($response->getContent(), true)

@@ -15,6 +15,7 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
 
@@ -57,7 +58,7 @@ class PRTest extends TestCase
         $this->assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
         $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         $this->assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
-        $this->assertEmpty($normalizedPR['MERGED_AT']);
+        $this->assertEmpty($normalizedPR['CLOSED_AT']);
         $this->assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
@@ -81,7 +82,7 @@ class PRTest extends TestCase
             'CHANNEL_IDS'       => ['squad-raccoons'],
             'MESSAGE_IDS'       => ['1', '2'],
             'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-            'MERGED_AT'         => self::A_TIMESTAMP,
+            'CLOSED_AT'         => self::A_TIMESTAMP,
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -255,16 +256,31 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_merged()
+    public function it_can_be_closed_and_merged()
     {
         $pr = $this->greenPR();
 
-        $pr->merged();
+        $pr->close(true);
 
+        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
         $this->assertEquals(true, $pr->normalize()['IS_MERGED']);
-        $this->assertNotEmpty($pr->normalize()['MERGED_AT']);
-        $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+        $this->assertInstanceOf(PRClosed::class, last($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_closed_without_being_merged()
+    {
+        $pr = $this->greenPR();
+
+        $pr->close(false);
+
+        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
+        $this->assertFalse($pr->normalize()['IS_MERGED']);
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(PRClosed::class, current($pr->getEvents()));
     }
 
     /**
@@ -401,6 +417,20 @@ class PRTest extends TestCase
         $this->assertEmpty($pr->getEvents());
     }
 
+    /**
+     * @test
+     */
+    public function it_can_be_reopened()
+    {
+        $pr = $this->closedPR();
+
+        $pr->reopen();
+
+        $this->assertNull($pr->normalize()['CLOSED_AT']);
+        $this->assertFalse($pr->normalize()['IS_MERGED']);
+        $this->assertEmpty($pr->getEvents());
+    }
+
     public function normalizedWithMissingInformation(): array
     {
         return [
@@ -477,7 +507,7 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
             ]
         );
 
@@ -502,7 +532,7 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
             ]
         );
 
@@ -527,7 +557,32 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
+            ]
+        );
+
+        return $pr;
+    }
+
+    private function closedPR(): PR
+    {
+        $pr = PR::fromNormalized(
+            [
+                'IDENTIFIER'        => self::PR_IDENTIFIER,
+                'TITLE'             => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS'              => 0,
+                'NOT_GTMS'          => 0,
+                'COMMENTS'          => 0,
+                'CI_STATUS'         => [
+                    'BUILD_RESULT' => 'RED',
+                    'BUILD_LINK'   => '',
+                ],
+                'IS_MERGED'         => false,
+                'CHANNEL_IDS'       => ['squad-raccoons'],
+                'MESSAGE_IDS'       => ['1'],
+                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
+                'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
 

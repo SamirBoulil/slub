@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\MergedPR;
+namespace Slub\Application\ClosePR;
 
 use ConvenientImmutability\Immutable;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class MergedPR
+class ClosePR
 {
     use Immutable;
 
@@ -18,4 +18,7 @@ class MergedPR
 
     /** @var string */
     public $PRIdentifier;
+
+    /** @var bool */
+    public $isMerged;
 }

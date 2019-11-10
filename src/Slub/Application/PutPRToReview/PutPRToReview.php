@@ -42,4 +42,7 @@ class PutPRToReview
 
     /** @var bool */
     public $isMerged;
+
+    /** @var bool */
+    public $isClosed;
 }

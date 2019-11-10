@@ -46,9 +46,9 @@ class PublishRemindersContext extends FeatureContext
     public function somePRsInReviewAndSomePRsMergedInMultipleChannels()
     {
         $this->createMergedPR(self::SQUAD_RACCOONS);
-        $this->createMergedPR(self::SQUAD_RACCOONS);
-        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
+        $this->createClosedPRNotMerged(self::SQUAD_RACCOONS);
         $this->createInReviewPR(self::PR_2, self::SQUAD_RACCOONS, 0, 1);
+        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
 
         $this->createMergedPR(self::GENERAL);
         $this->createInReviewPR(self::PR_3, self::GENERAL, 0, 2);
@@ -141,7 +141,7 @@ CHAT
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $PR->merged();
+        $PR->close(true);
         $this->PRRepository->save($PR);
     }
 
@@ -166,9 +166,78 @@ CHAT
                 'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
                 'CHANNEL_IDS'       => [$channelIdentifier],
                 'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
-                'MERGED_AT'         => null,
+                'CLOSED_AT'         => null,
             ]
         );
         $this->PRRepository->save($PR);
+    }
+
+    private function createClosedPRNotMerged(string $channelIdentifier): void
+    {
+        $PR = PR::create(
+            PRIdentifier::create(Uuid::uuid4()->toString()),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            MessageIdentifier::fromString(Uuid::uuid4()->toString()),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $PR->close(false);
+        $this->PRRepository->save($PR);
+    }
+
+    /**
+     * @Given /^a PR closed$/
+     */
+    public function aPRClosed()
+    {
+        $PR = PR::create(
+            PRIdentifier::create(Uuid::uuid4()->toString()),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            MessageIdentifier::fromString(Uuid::uuid4()->toString()),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $PR->close(false);
+        $this->PRRepository->save($PR);
+    }
+
+    /**
+     * @Given /^a PR in review not GTMed without author nor PR title$/
+     */
+    public function aPRInReviewNotGTMedWithoutAuthorNorPRTitle()
+    {
+        $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
+            ->modify(sprintf('-%d day', 2))
+            ->getTimestamp();
+        $PR = PR::fromNormalized([
+                'IDENTIFIER'        => 'samirboulil/slub/1',
+                'AUTHOR_IDENTIFIER' => '<Didn\'t catch the name yet :/>',
+                'TITLE'             => '<Didn\'t catch the name yet :/>',
+                'GTMS'              => 1,
+                'NOT_GTMS'          => 1,
+                'COMMENTS'          => 1,
+                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                'IS_MERGED'         => false,
+                'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
+                'CHANNEL_IDS'       => [self::SQUAD_RACCOONS],
+                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
+                'CLOSED_AT'         => null,
+            ]
+        );
+        $this->PRRepository->save($PR);
+    }
+
+    /**
+     * @Then /^the reminder should contain the PR without the author not the PR title$/
+     */
+    public function theReminderShouldContainThePRWithoutTheAuthorNotThePRTitle()
+    {
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            <<<CHAT
+Yop, these PRs need reviews!
+ - (2 days ago) https://github.com/samirboulil/slub/pull/1
+CHAT
+        );
     }
 }

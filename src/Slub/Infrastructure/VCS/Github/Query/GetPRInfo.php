@@ -36,9 +36,10 @@ class GetPRInfo implements GetPRInfoInterface
         $reviews = $this->findReviews->fetch($PRIdentifier);
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
         $isMerged = $this->isMerged($PRDetails);
+        $isClosed = $this->isClosed($PRDetails);
         $authorIdentifier = $this->authorIdentifier($PRDetails);
         $title = $this->title($PRDetails);
-        $result = $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged);
+        $result = $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
 
         return $result;
     }
@@ -59,7 +60,8 @@ class GetPRInfo implements GetPRInfoInterface
         string $title,
         array $reviews,
         CheckStatus $ciStatus,
-        bool $isMerged
+        bool $isMerged,
+        bool $isClosed
     ): PRInfo {
         $result = new PRInfo();
         $result->PRIdentifier = $PRIdentifier->stringValue();
@@ -70,6 +72,7 @@ class GetPRInfo implements GetPRInfoInterface
         $result->comments = $reviews[FindReviews::COMMENTS];
         $result->CIStatus = $ciStatus;
         $result->isMerged = $isMerged;
+        $result->isClosed = $isClosed;
 
         return $result;
     }
@@ -82,5 +85,10 @@ class GetPRInfo implements GetPRInfoInterface
     private function authorIdentifier(array $PRDetails): string
     {
         return $PRDetails['user']['login'];
+    }
+
+    private function isClosed(array $PRDetails): bool
+    {
+        return 'closed' === $PRDetails['state'];
     }
 }

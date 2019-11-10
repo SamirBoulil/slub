@@ -34,4 +34,7 @@ class PRInfo
 
     /** @var bool */
     public $isMerged;
+
+    /** @var bool */
+    public $isClosed;
 }

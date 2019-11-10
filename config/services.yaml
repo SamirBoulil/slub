@@ -49,8 +49,8 @@ services:
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
-    slub.application.merged_pr.merged_pr_handler:
-        class: Slub\Application\MergedPR\MergedPRHandler
+    slub.application.close_pr.close_pr_handler:
+        class: Slub\Application\ClosePR\ClosePRHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.query.is_supported'
@@ -204,7 +204,7 @@ services:
                   - '@slub.infrastructure.vcs.github.event_handler.check_run'
             - method: addEventHandler
               arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.pr_merged'
+                  - '@slub.infrastructure.vcs.github.event_handler.pr_closed'
             - method: addEventHandler
               arguments:
                   - '@slub.infrastructure.vcs.github.event_handler.status_updated'
@@ -229,10 +229,10 @@ services:
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
-    slub.infrastructure.vcs.github.event_handler.pr_merged:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\PRMergedEventHandler
+    slub.infrastructure.vcs.github.event_handler.pr_closed:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler
         arguments:
-            - '@slub.application.merged_pr.merged_pr_handler'
+            - '@slub.application.close_pr.close_pr_handler'
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub

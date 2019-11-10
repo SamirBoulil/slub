@@ -2,11 +2,14 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
+use Ramsey\Uuid\Uuid;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -62,7 +65,8 @@ class PutPRToReviewContext extends FeatureContext
             'squad-raccoons',
             '1234',
             'sam',
-            'Add new feature'
+            'Add new feature',
+            false
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -73,7 +77,8 @@ class PutPRToReviewContext extends FeatureContext
         string $channelIdentifier,
         string $messageId,
         string $authorIdentifier,
-        string $title
+        string $title,
+        bool $isClosed
     ): PutPRToReview {
         $this->currentRepositoryIdentifier = $repositoryIdentifier;
         $this->currentPRIdentifier = $PRIdentifier;
@@ -92,6 +97,7 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview->notGTMCount = 0;
         $putPRToReview->comments = 0;
         $putPRToReview->isMerged = false;
+        $putPRToReview->isClosed = $isClosed;
 
         return $putPRToReview;
     }
@@ -107,7 +113,8 @@ class PutPRToReviewContext extends FeatureContext
             'squad-raccoons',
             '1',
             'sam',
-            'Add new feature'
+            'Add new feature',
+            false
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -123,7 +130,8 @@ class PutPRToReviewContext extends FeatureContext
             'unsupported-channel',
             '1',
             'sam',
-            'Add new feature'
+            'Add new feature',
+            false
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -179,7 +187,8 @@ class PutPRToReviewContext extends FeatureContext
             'general',
             '6666',
             'sam',
-            'Add new feature'
+            'Add new feature',
+            false
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -229,7 +238,7 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
         Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);
         Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
-        Assert::assertEmpty($pr->normalize()['MERGED_AT']);
+        Assert::assertEmpty($pr->normalize()['CLOSED_AT']);
     }
 
     /**
@@ -238,5 +247,71 @@ class PutPRToReviewContext extends FeatureContext
     public function theSquadShouldBeNotifiedThatThePRHasBeenSuccessfullyInterpreted()
     {
         $this->chatClientSpy->assertReaction(MessageIdentifier::fromString(last($this->currentMessageIds)), NotifySquad::REACTION_CI_PENDING);
+    }
+
+    /**
+     * @Given /^an author closes a PR that was in review in a channel$/
+     */
+    public function anAuthorClosesAPRThatWasInReviewInAChannel()
+    {
+        $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
+            ->modify(sprintf('-%d day', 2))
+            ->getTimestamp();
+        $closedAtTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
+            ->modify(sprintf('-%d day', 1))
+            ->getTimestamp();
+
+        $PR = PR::fromNormalized([
+                'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'TITLE'             => 'Add new feature',
+                'GTMS'              => 0,
+                'NOT_GTMS'          => 0,
+                'COMMENTS'          => 0,
+                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                'IS_MERGED'         => true,
+                'MESSAGE_IDS'       => [],
+                'CHANNEL_IDS'       => ['squad-raccoons'],
+                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
+                'CLOSED_AT'         => $closedAtTimestamp,
+            ]
+        );
+        $this->PRRepository->save($PR);
+    }
+
+    /**
+     * @When /^an author reopens the PR and puts it to review$/
+     */
+    public function anAuthorReopensThePRAndPutsItToReview()
+    {
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'akeneo/pim-community-dev',
+            'akeneo/pim-community-dev/1111',
+            'squad-raccoons',
+            '1234',
+            'sam',
+            'Add new feature',
+            false
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
+    }
+
+    /**
+     * @Then /^the PR is reopened with the new channel id and message id$/
+     */
+    public function thePRIsReopenedWithTheNewChannelIdAndMessageId()
+    {
+        $this->assertPR(
+            $this->currentPRIdentifier,
+            'sam',
+            'Add new feature',
+            0,
+            0,
+            0,
+            'PENDING',
+            false,
+            $this->currentMessageIds,
+            $this->currentChannelIds
+        );
     }
 }

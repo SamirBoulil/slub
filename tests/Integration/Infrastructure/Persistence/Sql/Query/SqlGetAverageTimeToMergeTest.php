@@ -98,7 +98,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
                     'MESSAGE_IDS'       => ['1', '2'],
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT'  => (string) $now->getTimestamp(),
-                    'MERGED_AT'         => (string) $mergedAt->getTimestamp(),
+                    'CLOSED_AT'         => (string) $mergedAt->getTimestamp(),
                 ]
             )
         );
@@ -109,7 +109,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         /** @var Connection $connection */
         $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sql = <<<SQL
-INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `CLOSED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
 VALUES
 	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 1, '{}', 1, '251512', '251512', 'sam', 'Add new feature');
 SQL;
@@ -121,7 +121,7 @@ SQL;
         /** @var Connection $connection */
         $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sql = <<<SQL
-INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `MERGED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `CLOSED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
 VALUES
 	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512', 'sam', 'Add new feature');
 SQL;

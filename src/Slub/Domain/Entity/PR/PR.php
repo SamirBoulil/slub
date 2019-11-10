@@ -179,7 +179,7 @@ class PR
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
         $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
-        $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
+        $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::CLOSED_AT]);
 
         return new self(
             $identifier,

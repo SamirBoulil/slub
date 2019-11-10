@@ -69,7 +69,8 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR->comment();
         $updatedPR->green();
         $updatedPR->merged();
-        $updatedPR->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'),
+        $updatedPR->putToReviewAgainViaMessage(
+            ChannelIdentifier::fromString('brazil-team'),
             MessageIdentifier::fromString('5151')
         );
         $this->sqlPRRepository->save($updatedPR);
@@ -98,6 +99,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT'  => '1560175073',
                     'MERGED_AT'         => null,
+                    'CLOSED_AT'         => null,
                 ]
             )
         );
@@ -116,6 +118,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'MERGED_AT'        => null,
+                    'CLOSED_AT'        => null,
                 ]
             )
         );
@@ -134,6 +137,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'MERGED_AT'        => null,
+                    'CLOSED_AT'        => null,
                 ]
             )
         );
@@ -153,6 +157,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'MERGED_AT'        => null,
+                    'CLOSED_AT'        => null,
                 ],
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
@@ -167,6 +172,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'MERGED_AT'        => null,
+                    'CLOSED_AT'        => null,
                 ],
                 [
                     'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
@@ -181,6 +187,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'MERGED_AT'        => null,
+                    'CLOSED_AT'        => null,
                 ],
             ],
             $actualPRs

@@ -12,11 +12,11 @@ class ClosedAt
     private const EMPTY_DATE = null;
 
     /** @var ?\DateTime */
-    private $mergedAt;
+    private $closedAt;
 
-    public function __construct(?\DateTime $mergedAt)
+    public function __construct(?\DateTime $closedAt)
     {
-        $this->mergedAt = $mergedAt;
+        $this->closedAt = $closedAt;
     }
 
     public static function create(): self
@@ -31,20 +31,20 @@ class ClosedAt
         return new self(self::EMPTY_DATE);
     }
 
-    public static function fromTimestampIfAny(?string $putToReviewAt): self
+    public static function fromTimestampIfAny(?string $closedAtTimestamp): self
     {
-        if (null === $putToReviewAt) {
+        if (null === $closedAtTimestamp) {
             return new self(self::EMPTY_DATE);
         }
 
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $date->setTimestamp((int) $putToReviewAt);
+        $date->setTimestamp((int) $closedAtTimestamp);
 
         return new self($date);
     }
 
     public function toTimestamp(): ?string
     {
-        return null !== $this->mergedAt ? (string)$this->mergedAt->getTimestamp() : null;
+        return null !== $this->closedAt ? (string)$this->closedAt->getTimestamp() : null;
     }
 }

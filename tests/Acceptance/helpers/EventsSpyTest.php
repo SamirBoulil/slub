@@ -8,6 +8,7 @@ use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
@@ -71,6 +72,16 @@ class EventsSpyTest extends TestCase
         $this->assertFalse($this->eventSpy->CIRedEventDispatched());
         $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010'), BuildLink::none()));
         $this->assertTrue($this->eventSpy->CIRedEventDispatched());
+    }
+
+    /**
+     * @test
+     */
+    public function it_tells_wether_the_pr_has_been_closed_event_has_been_thrown()
+    {
+        $this->assertFalse($this->eventSpy->PRClosedDispatched());
+        $this->eventSpy->notifyPRClosed(PRClosed::forPR(PRIdentifier::fromString('1010')));
+        $this->assertTrue($this->eventSpy->PRClosedDispatched());
     }
 
     /**

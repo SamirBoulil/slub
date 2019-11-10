@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
+use Slub\Application\ClosePR\ClosePR;
+use Slub\Application\ClosePR\ClosePRHandler;
 use Slub\Application\MergedPR\MergedPR;
 use Slub\Application\MergedPR\MergedPRHandler;
-use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
@@ -40,9 +40,13 @@ class MergedPRContext extends FeatureContext
     /** @var ChatClientSpy */
     private $chatClientSpy;
 
+    /** @var ClosePRHandler */
+    private $closePRHandler;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         MergedPRHandler $mergedPRHandler,
+        ClosePRHandler $closePRHandler,
         EventsSpy $eventSpy,
         ChatClientSpy $chatClientSpy
     ) {
@@ -50,6 +54,8 @@ class MergedPRContext extends FeatureContext
         $this->mergedPRHandler = $mergedPRHandler;
         $this->eventSpy = $eventSpy;
         $this->chatClientSpy = $chatClientSpy;
+        $this->PRRepository = $PRRepository;
+        $this->closePRHandler = $closePRHandler;
     }
 
     /**
@@ -106,6 +112,27 @@ class MergedPRContext extends FeatureContext
         $this->mergedPRHandler->handle($mergedPR);
     }
 
+    /**
+     * @When /^the author closes the PR$/
+     */
+    public function theAuthorClosesThePR()
+    {
+        $closePR = new ClosePR();
+        $closePR->repositoryIdentifier = 'akeneo/pim-community-dev';
+        $closePR->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $this->currentPRIdentifier = PRIdentifier::fromString($closePR->PRIdentifier);
+        $this->closePRHandler->handle($closePR);
+    }
+
+    /**
+     * @Then /^the PR is closed$/
+     */
+    public function thePRIsClosed()
+    {
+        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
+        Assert::assertNotEmpty($PR->normalize()['CLOSED_AT'], 'Expects PR to be closed but not date was set on it');
+    }
+
     private function PRWithGTMsAndGreen(): PR
     {
         $PR = PR::create($this->currentPRIdentifier,
@@ -119,5 +146,25 @@ class MergedPRContext extends FeatureContext
         $PR->green();
 
         return $PR;
+    }
+
+    /**
+     * @Given /^the squad should be notified that the PR has been closed$/
+     */
+    public function theSquadShouldBeNotifiedThatThePRHasBeenClosed()
+    {
+        Assert::assertTrue($this->eventSpy->PRClosedDispatched(), 'Expects PRClosed event to be dispatched');
+    }
+
+    /**
+     * @When /^the a PR belonging to an unsupported repository is closed$/
+     */
+    public function theAPRBelongingToAnUnsupportedRepositoryIsClosed()
+    {
+        $closePR = new ClosePR();
+        $closePR->repositoryIdentifier = 'unsupported_repository';
+        $closePR->PRIdentifier = '1010';
+        $this->currentPRIdentifier = PRIdentifier::fromString($closePR->PRIdentifier);
+        $this->closePRHandler->handle($closePR);
     }
 }

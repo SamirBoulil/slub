@@ -1,0 +1,16 @@
+Feature: Improve the signal VS noise of the list of pull requests that needs a review
+  In order for the squad to make the difference between the PRs that are still open from those closed
+  As a squad
+  We want to be notified when a PR is closed
+
+  @nominal
+  Scenario: Notify the squad when the PR is closed
+    Given a PR in review having multiple comments and a CI result
+    When the author closes the PR
+    Then the PR is closed
+    And the squad should be notified that the PR has been closed
+
+  @secondary
+  Scenario: It does not notify when a PR of an unsupported repository is closed
+    When the a PR belonging to an unsupported repository is closed
+    Then the squad should not be not notified

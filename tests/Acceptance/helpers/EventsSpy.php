@@ -7,6 +7,7 @@ namespace Tests\Acceptance\helpers;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
@@ -33,6 +34,7 @@ class EventsSpy implements EventSubscriberInterface
             CIRed::class => 'notifyCIRed',
             CIPending::class => 'notifyCIPending',
             PRMerged::class => 'notifyPRMerged',
+            PRClosed::class => 'notifyPRClosed',
         ];
     }
 
@@ -111,9 +113,19 @@ class EventsSpy implements EventSubscriberInterface
         $this->events[PRMerged::class] = true;
     }
 
+    public function notifyPRClosed(PRClosed $closed): void
+    {
+        $this->events[PRClosed::class] = true;
+    }
+
     public function PRMergedDispatched(): bool
     {
         return $this->events[PRMerged::class] ?? false;
+    }
+
+    public function PRClosedDispatched(): bool
+    {
+        return $this->events[PRClosed::class] ?? false;
     }
 
     public function hasEvents(): bool

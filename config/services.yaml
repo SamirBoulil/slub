@@ -56,6 +56,13 @@ services:
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
+    slub.application.merged_pr.close_pr_handler:
+        class: Slub\Application\ClosePR\ClosePRHandler
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
+
     slub.application.unpublish_pr.unpublish_pr_handler:
         class: Slub\Application\UnpublishPR\UnpublishPRHandler
         arguments:

@@ -24,7 +24,7 @@ class SqlGetAverageTimeToMerge implements GetAverageTimeToMergeInterface
     public function fetch(): ?int
     {
         $query = <<<SQL
-SELECT FLOOR(AVG(TIMESTAMPDIFF(DAY, FROM_UNIXTIME(PUT_TO_REVIEW_AT), FROM_UNIXTIME(MERGED_AT)))) average_time_to_merge
+SELECT FLOOR(AVG(TIMESTAMPDIFF(DAY, FROM_UNIXTIME(PUT_TO_REVIEW_AT), FROM_UNIXTIME(CLOSED_AT)))) average_time_to_merge
 FROM pr
 WHERE
     IS_MERGED is TRUE

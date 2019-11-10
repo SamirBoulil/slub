@@ -4,11 +4,18 @@ Feature: Improve the signal VS noise of the list of pull requests that needs a r
   We want to be notified when a PR is closed
 
   @nominal
-  Scenario: Notify the squad when the PR is closed
+  Scenario: Notify the squad when the PR is closed without being merged
     Given a PR in review having multiple comments and a CI result
-    When the author closes the PR
-    Then the PR is closed
-    And the squad should be notified that the PR has been closed
+    When the author closes the PR without merging
+    Then the PR is only closed
+    And the squad should be notified that the PR has been closed without merging
+
+  @nominal
+  Scenario: Notify the squad when the PR is closed and merged
+    Given a PR in review having multiple comments and a CI result
+    When the author closes the PR by merging it
+    Then the PR is closed and merged
+    And the squad should be notified that the PR has been closed and merged
 
   @secondary
   Scenario: It does not notify when a PR of an unsupported repository is closed

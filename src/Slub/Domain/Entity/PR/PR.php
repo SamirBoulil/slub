@@ -30,7 +30,6 @@ class PR
     private const CHANNEL_IDS = 'CHANNEL_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
-    private const MERGED_AT = 'MERGED_AT';
     private const CLOSED_AT = 'CLOSED_AT';
 
     /** @var Event[] */
@@ -69,9 +68,6 @@ class PR
     /** @var PutToReviewAt */
     private $putToReviewAt;
 
-    /** @var MergedAt */
-    private $mergedAt;
-
     /** @var ClosedAt */
     private $closedAt;
 
@@ -87,7 +83,6 @@ class PR
         CIStatus $CIStatus,
         bool $isMerged,
         PutToReviewAt $putToReviewAt,
-        MergedAt $mergedAt,
         ClosedAt $closedAt
     ) {
         $this->PRIdentifier = $PRIdentifier;
@@ -97,12 +92,11 @@ class PR
         $this->notGTMCount = $notGTMCount;
         $this->comments = $comments;
         $this->CIStatus = $CIStatus;
-        $this->isMerged = $isMerged;
         $this->channelIdentifiers = $channelIdentifiers;
         $this->messageIdentifiers = $messageIds;
         $this->putToReviewAt = $putToReviewAt;
-        $this->mergedAt = $mergedAt;
         $this->closedAt = $closedAt;
+        $this->isMerged = $isMerged;
     }
 
     public static function create(
@@ -132,7 +126,6 @@ class PR
             ),
             $isMerged,
             PutToReviewAt::create(),
-            MergedAt::none(),
             ClosedAt::none()
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
@@ -153,7 +146,6 @@ class PR
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
         Assert::keyExists($normalizedPR, self::CHANNEL_IDS);
         Assert::keyExists($normalizedPR, self::PUT_TO_REVIEW_AT);
-        Assert::keyExists($normalizedPR, self::MERGED_AT);
         Assert::keyExists($normalizedPR, self::CLOSED_AT);
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
 
@@ -178,7 +170,6 @@ class PR
             $normalizedPR[self::CHANNEL_IDS]
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
-        $mergedAt = MergedAt::fromTimestampIfAny($normalizedPR[self::MERGED_AT]);
         $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::CLOSED_AT]);
 
         return new self(
@@ -193,7 +184,6 @@ class PR
             CIStatus::fromNormalized($CIStatus),
             $isMerged,
             $putToReviewAt,
-            $mergedAt,
             $closedAt
         );
     }
@@ -222,7 +212,6 @@ class PR
                 $this->messageIdentifiers
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
-            self::MERGED_AT        => $this->mergedAt->toTimestamp(),
             self::CLOSED_AT        => $this->closedAt->toTimestamp(),
         ];
     }
@@ -296,15 +285,12 @@ class PR
         $this->events[] = CIPending::ForPR($this->PRIdentifier);
     }
 
-    public function merged(): void
+    public function close(bool $isMerged): void
     {
-        $this->isMerged = true;
-        $this->mergedAt = MergedAt::create();
-        $this->events[] = PRMerged::ForPR($this->PRIdentifier);
-    }
-
-    public function closed(): void
-    {
+        if ($isMerged) {
+            $this->isMerged = true;
+            $this->events[] = PRMerged::ForPR($this->PRIdentifier);
+        }
         $this->closedAt = ClosedAt::create();
         $this->events[] = PRClosed::ForPR($this->PRIdentifier);
     }

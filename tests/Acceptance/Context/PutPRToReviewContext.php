@@ -229,7 +229,7 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
         Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);
         Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
-        Assert::assertEmpty($pr->normalize()['MERGED_AT']);
+        Assert::assertEmpty($pr->normalize()['CLOSED_AT']);
     }
 
     /**

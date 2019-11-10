@@ -53,7 +53,7 @@ class ClosePRHandler
     private function closePR(ClosePR $closePR): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($closePR->PRIdentifier));
-        $PR->closed();
+        $PR->close($closePR->isMerged);
         $this->PRRepository->save($PR);
     }
 

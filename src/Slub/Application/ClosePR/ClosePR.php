@@ -18,4 +18,7 @@ class ClosePR
 
     /** @var string */
     public $PRIdentifier;
+
+    /** @var bool */
+    public $isMerged;
 }

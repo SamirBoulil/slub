@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -46,9 +45,9 @@ class PublishRemindersContext extends FeatureContext
     public function somePRsInReviewAndSomePRsMergedInMultipleChannels()
     {
         $this->createMergedPR(self::SQUAD_RACCOONS);
-        $this->createMergedPR(self::SQUAD_RACCOONS);
-        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
+        $this->createClosedPRNotMerged(self::SQUAD_RACCOONS);
         $this->createInReviewPR(self::PR_2, self::SQUAD_RACCOONS, 0, 1);
+        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
 
         $this->createMergedPR(self::GENERAL);
         $this->createInReviewPR(self::PR_3, self::GENERAL, 0, 2);
@@ -141,7 +140,7 @@ CHAT
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $PR->merged();
+        $PR->close(true);
         $this->PRRepository->save($PR);
     }
 
@@ -166,9 +165,22 @@ CHAT
                 'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
                 'CHANNEL_IDS'       => [$channelIdentifier],
                 'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
-                'MERGED_AT'         => null,
+                'CLOSED_AT'         => null,
             ]
         );
+        $this->PRRepository->save($PR);
+    }
+
+    private function createClosedPRNotMerged(string $channelIdentifier): void
+    {
+        $PR = PR::create(
+            PRIdentifier::create(Uuid::uuid4()->toString()),
+            ChannelIdentifier::fromString($channelIdentifier),
+            MessageIdentifier::fromString(Uuid::uuid4()->toString()),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $PR->close(false);
         $this->PRRepository->save($PR);
     }
 }

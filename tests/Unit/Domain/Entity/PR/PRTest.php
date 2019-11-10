@@ -58,7 +58,6 @@ class PRTest extends TestCase
         $this->assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
         $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         $this->assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
-        $this->assertEmpty($normalizedPR['MERGED_AT']);
         $this->assertEmpty($normalizedPR['CLOSED_AT']);
         $this->assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
@@ -83,7 +82,6 @@ class PRTest extends TestCase
             'CHANNEL_IDS'       => ['squad-raccoons'],
             'MESSAGE_IDS'       => ['1', '2'],
             'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-            'MERGED_AT'         => self::A_TIMESTAMP,
             'CLOSED_AT'         => self::A_TIMESTAMP,
         ];
 
@@ -258,28 +256,29 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_merged()
+    public function it_can_be_closed_and_merged()
     {
         $pr = $this->greenPR();
 
-        $pr->merged();
+        $pr->close(true);
 
+        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
         $this->assertEquals(true, $pr->normalize()['IS_MERGED']);
-        $this->assertNotEmpty($pr->normalize()['MERGED_AT']);
-        $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+        $this->assertInstanceOf(PRClosed::class, last($pr->getEvents()));
     }
 
     /**
      * @test
      */
-    public function it_can_be_closed()
+    public function it_can_be_closed_without_being_merged()
     {
         $pr = $this->greenPR();
 
-        $pr->closed();
+        $pr->close(false);
 
-        $this->assertNotEmpty($pr->normalize()['MERGED_AT']);
+        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
+        $this->assertFalse($pr->normalize()['IS_MERGED']);
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRClosed::class, current($pr->getEvents()));
     }
@@ -494,7 +493,6 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
                 'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
@@ -520,7 +518,6 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
                 'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
@@ -546,7 +543,6 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'MERGED_AT'         => self::A_TIMESTAMP,
                 'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );

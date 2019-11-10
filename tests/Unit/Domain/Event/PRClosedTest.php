@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Domain\Event;
 
+use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRClosed;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

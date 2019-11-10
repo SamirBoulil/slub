@@ -68,7 +68,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR->GTM();
         $updatedPR->comment();
         $updatedPR->green();
-        $updatedPR->merged();
+        $updatedPR->close(true);
         $updatedPR->putToReviewAgainViaMessage(
             ChannelIdentifier::fromString('brazil-team'),
             MessageIdentifier::fromString('5151')
@@ -98,7 +98,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'       => ['1', '2'],
                     'CHANNEL_IDS'       => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT'  => '1560175073',
-                    'MERGED_AT'         => null,
                     'CLOSED_AT'         => null,
                 ]
             )
@@ -117,7 +116,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
                     'CLOSED_AT'        => null,
                 ]
             )
@@ -136,7 +134,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS'      => ['1', '2'],
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
                     'CLOSED_AT'        => null,
                 ]
             )
@@ -156,7 +153,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
                     'CLOSED_AT'        => null,
                 ],
                 [
@@ -171,7 +167,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
                     'CLOSED_AT'        => null,
                 ],
                 [
@@ -186,7 +181,6 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CHANNEL_IDS'      => ['squad-raccoons'],
                     'MESSAGE_IDS'      => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'MERGED_AT'        => null,
                     'CLOSED_AT'        => null,
                 ],
             ],
@@ -230,12 +224,13 @@ class SqlPRRepositoryTest extends KernelTestCase
      * @test
      * @throws PRNotFoundException
      */
-    public function it_finds_every_prs_in_review_not_gtmed()
+    public function it_finds_every__open_prs_not_gtmed_twice()
     {
         $PRInReviewNotGTMedIdentifier = 'akeneo/pim-community-dev/1';
         $this->createPRInReview($PRInReviewNotGTMedIdentifier, 0, false);
         $this->createPRInReview('akeneo/pim-community-dev/2', 2, false);
         $this->createPRInReview('akeneo/pim-community-dev/3', 0, true);
+        $this->createClosedPRNotMerged('akeneo/pim-community-dev/4');
 
         $PRs = $this->sqlPRRepository->findPRToReviewNotGTMed();
 
@@ -286,8 +281,22 @@ class SqlPRRepositoryTest extends KernelTestCase
             $PR->GTM();
         }
         if ($isMerged) {
-            $PR->merged();
+            $PR->close(true);
         }
+        $this->sqlPRRepository->save($PR);
+    }
+
+    private function createClosedPRNotMerged(string $PRIdentifier): void
+    {
+        $identifier = PRIdentifier::create($PRIdentifier);
+        $PR = PR::create(
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $PR->close(false);
         $this->sqlPRRepository->save($PR);
     }
 }

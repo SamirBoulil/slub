@@ -82,6 +82,36 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
+    public function it_puts_a_pr_to_review_that_has_been_closed()
+    {
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $savedPR = PR::create(
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $savedPR->close(true);
+        $this->sqlPRRepository->save($savedPR);
+
+        $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
+        $updatedPR = PR::create(
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $this->sqlPRRepository->save($updatedPR);
+
+        $fetchedPR = $this->sqlPRRepository->getBy($identifier);
+        $this->assertSame($updatedPR->normalize(), $fetchedPR->normalize());
+    }
+
+    /**
+     * @test
+     */
     public function it_returns_all_PR_ordered_by_is_merged()
     {
         $this->sqlPRRepository->save(

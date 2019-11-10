@@ -374,4 +374,10 @@ class PR
             true
         );
     }
+
+    public function reopen(): void
+    {
+        $this->isMerged = false;
+        $this->closedAt = ClosedAt::none();
+    }
 }

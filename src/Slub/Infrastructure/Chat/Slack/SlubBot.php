@@ -133,6 +133,7 @@ class SlubBot
         $PRToReview->comments = $PRInfo->comments;
         $PRToReview->CIStatus = $PRInfo->CIStatus->status;
         $PRToReview->isMerged = $PRInfo->isMerged;
+        $PRToReview->isClosed = $PRInfo->isClosed;
 
         $this->logger->info(
             sprintf(

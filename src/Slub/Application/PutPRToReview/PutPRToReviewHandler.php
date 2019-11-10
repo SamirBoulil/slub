@@ -92,6 +92,13 @@ class PutPRToReviewHandler
     private function resendForReview(PutPRToReview $putPRToReview): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
+        if (!$putPRToReview->isClosed) {
+            // If it has not been closed once, make sure we reopen it
+            // so that PR is set to a valid state.
+            // probably they already have the right value, but we enforce it by reopening the
+            // PR directly here.
+            $PR->reopen();
+        }
         $PR->putToReviewAgainViaMessage(
             ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
             MessageIdentifier::create($putPRToReview->messageIdentifier)

@@ -81,5 +81,6 @@ class GetPRInfoTest extends TestCase
         self::assertEquals($expectedCommentsCount, $actualPRInfo->comments);
         self::assertEquals($checkStatus, $actualPRInfo->CIStatus);
         self::assertTrue($actualPRInfo->isMerged);
+        self::assertTrue($actualPRInfo->isClosed);
     }
 }

@@ -417,6 +417,20 @@ class PRTest extends TestCase
         $this->assertEmpty($pr->getEvents());
     }
 
+    /**
+     * @test
+     */
+    public function it_can_be_reopened()
+    {
+        $pr = $this->closedPR();
+
+        $pr->reopen();
+
+        $this->assertNull($pr->normalize()['CLOSED_AT']);
+        $this->assertFalse($pr->normalize()['IS_MERGED']);
+        $this->assertEmpty($pr->getEvents());
+    }
+
     public function normalizedWithMissingInformation(): array
     {
         return [
@@ -493,7 +507,7 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
             ]
         );
 
@@ -518,7 +532,7 @@ class PRTest extends TestCase
                 'CHANNEL_IDS'       => ['squad-raccoons'],
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
             ]
         );
 
@@ -526,6 +540,31 @@ class PRTest extends TestCase
     }
 
     private function redPR(): PR
+    {
+        $pr = PR::fromNormalized(
+            [
+                'IDENTIFIER'        => self::PR_IDENTIFIER,
+                'TITLE'             => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS'              => 0,
+                'NOT_GTMS'          => 0,
+                'COMMENTS'          => 0,
+                'CI_STATUS'         => [
+                    'BUILD_RESULT' => 'RED',
+                    'BUILD_LINK'   => '',
+                ],
+                'IS_MERGED'         => false,
+                'CHANNEL_IDS'       => ['squad-raccoons'],
+                'MESSAGE_IDS'       => ['1'],
+                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
+                'CLOSED_AT'         => null,
+            ]
+        );
+
+        return $pr;
+    }
+
+    private function closedPR(): PR
     {
         $pr = PR::fromNormalized(
             [

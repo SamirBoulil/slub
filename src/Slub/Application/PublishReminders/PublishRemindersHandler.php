@@ -15,6 +15,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class PublishRemindersHandler
 {
+    private const OLD_PR_VALUE = '<Didn\'t catch the name yet :/>';
+
     /** @var PRRepositoryInterface */
     private $PRRepository;
 
@@ -125,6 +127,12 @@ CHAT;
         $title = $PR->title()->stringValue();
         $githubLink = $githubLink($PR);
         $numberOfDaysInReview = $this->formatDuration($PR);
+
+        // TODO: Remove old code
+        if ($PR->authorIdentifier()->stringValue() === self::OLD_PR_VALUE
+            || $PR->title()->stringValue() === self::OLD_PR_VALUE) {
+            return sprintf(' - (%s) %s', $numberOfDaysInReview, $githubLink);
+        }
 
         return sprintf(' - *%s*, _"%s"_ (%s) %s', $author, $title, $numberOfDaysInReview, $githubLink);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -175,7 +176,23 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            ChannelIdentifier::fromString($channelIdentifier),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            MessageIdentifier::fromString(Uuid::uuid4()->toString()),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $PR->close(false);
+        $this->PRRepository->save($PR);
+    }
+
+    /**
+     * @Given /^a PR closed$/
+     */
+    public function aPRClosed()
+    {
+        $PR = PR::create(
+            PRIdentifier::create(Uuid::uuid4()->toString()),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

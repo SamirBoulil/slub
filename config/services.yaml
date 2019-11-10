@@ -49,7 +49,7 @@ services:
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
-    slub.application.merged_pr.close_pr_handler:
+    slub.application.close_pr.close_pr_handler:
         class: Slub\Application\ClosePR\ClosePRHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
@@ -232,7 +232,7 @@ services:
     slub.infrastructure.vcs.github.event_handler.pr_closed:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler
         arguments:
-            - '@slub.application.merged_pr.close_pr_handler'
+            - '@slub.application.close_pr.close_pr_handler'
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub

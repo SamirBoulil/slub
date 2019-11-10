@@ -8,6 +8,7 @@ Feature: Publish a reminder of the pull requests to review for every channels
     Given a PR in review not GTMed
     And a PR in review having 2 GTMs
     And a PR merged
+    And a PR closed
     When the system publishes a reminder
     Then the reminder should only contain the PR not GTMed
 

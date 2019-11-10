@@ -21,7 +21,7 @@ default:
                     - "@slub.infrastructure.chat.slack.slack_client"
                 - Tests\Acceptance\Context\ClosePRContext:
                     - "@slub.infrastructure.persistence.pr_repository"
-                    - "@slub.application.merged_pr.close_pr_handler"
+                    - "@slub.application.close_pr.close_pr_handler"
                     - "@helpers.event_spy"
                     - "@slub.infrastructure.chat.slack.slack_client"
                 - Tests\Acceptance\Context\PublishRemindersContext:

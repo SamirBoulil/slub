@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
+use Ramsey\Uuid\Uuid;
 use Slub\Application\ClosePR\ClosePR;
 use Slub\Application\ClosePR\ClosePRHandler;
 use Slub\Application\Notify\NotifySquad;

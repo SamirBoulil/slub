@@ -15,6 +15,7 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
 
@@ -58,6 +59,7 @@ class PRTest extends TestCase
         $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         $this->assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         $this->assertEmpty($normalizedPR['MERGED_AT']);
+        $this->assertEmpty($normalizedPR['CLOSED_AT']);
         $this->assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
@@ -82,6 +84,7 @@ class PRTest extends TestCase
             'MESSAGE_IDS'       => ['1', '2'],
             'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
             'MERGED_AT'         => self::A_TIMESTAMP,
+            'CLOSED_AT'         => self::A_TIMESTAMP,
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -265,6 +268,20 @@ class PRTest extends TestCase
         $this->assertNotEmpty($pr->normalize()['MERGED_AT']);
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_closed()
+    {
+        $pr = $this->greenPR();
+
+        $pr->closed();
+
+        $this->assertNotEmpty($pr->normalize()['MERGED_AT']);
+        $this->assertCount(1, $pr->getEvents());
+        $this->assertInstanceOf(PRClosed::class, current($pr->getEvents()));
     }
 
     /**
@@ -478,6 +495,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
                 'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
 
@@ -503,6 +521,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
                 'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
 
@@ -528,6 +547,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS'       => ['1'],
                 'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
                 'MERGED_AT'         => self::A_TIMESTAMP,
+                'CLOSED_AT'         => self::A_TIMESTAMP,
             ]
         );
 

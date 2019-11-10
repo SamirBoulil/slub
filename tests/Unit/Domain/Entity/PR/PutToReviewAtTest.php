@@ -53,7 +53,7 @@ class PutToReviewAtTest extends TestCase
 
         return [
             'Today' => [$nowTimestamp, 0],
-            '1 day' => [$yesterday, 1]
+            '1 day' => [$yesterday, 1],
         ];
     }
 }

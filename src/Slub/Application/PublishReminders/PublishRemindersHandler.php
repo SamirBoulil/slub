@@ -68,6 +68,11 @@ class PublishRemindersHandler
         return array_values($channelIdentifiers);
     }
 
+    private function isChannelIsSupportedForFeature(ChannelIdentifier $channelIdentifier): bool
+    {
+        return in_array($channelIdentifier->stringValue(), $this->supportedChannelsForFeature);
+    }
+
     private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
     {
         $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
@@ -115,13 +120,17 @@ CHAT;
         $author = ucfirst($PR->authorIdentifier()->stringValue());
         $title = $PR->title()->stringValue();
         $githubLink = $githubLink($PR);
-        $numberOfDaysInReview = 0 === $PR->numberOfDaysInReview() ? 'Today' : $PR->numberOfDaysInReview();
+        $numberOfDaysInReview = $this->formatDuration($PR);
 
         return sprintf(' - *%s*, _"%s"_ (%s) %s', $author, $title, $numberOfDaysInReview, $githubLink);
     }
 
-    private function isChannelIsSupportedForFeature(ChannelIdentifier $channelIdentifier): bool
+    private function formatDuration(PR $PR): string
     {
-        return in_array($channelIdentifier->stringValue(), $this->supportedChannelsForFeature);
+        switch ($PR->numberOfDaysInReview()) {
+            case 0: return 'Today';
+            case 1: return 'Yesterday';
+            default: return sprintf('%d days ago', $PR->numberOfDaysInReview());
+        }
     }
 }

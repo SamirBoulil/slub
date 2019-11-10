@@ -19,6 +19,9 @@ class PublishRemindersContext extends FeatureContext
     private const SQUAD_RACCOONS = 'squad-raccoons';
     private const GENERAL = 'general';
     private const UNSUPPORTED_CHANNEL = 'UNSUPPORTED_CHANNEL';
+    private const PR_1 = 'samirboulil/slub/1';
+    private const PR_2 = 'samirboulil/slub/2';
+    private const PR_3 = 'samirboulil/slub/3';
 
     /** @var ChatClientSpy */
     private $chatClientSpy;
@@ -44,13 +47,11 @@ class PublishRemindersContext extends FeatureContext
     {
         $this->createMergedPR(self::SQUAD_RACCOONS);
         $this->createMergedPR(self::SQUAD_RACCOONS);
-        $this->createInReviewPR('samirboulil/slub/1', self::SQUAD_RACCOONS, 0);
-        $this->createInReviewPR('samirboulil/slub/2', self::SQUAD_RACCOONS, 0);
+        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
+        $this->createInReviewPR(self::PR_2, self::SQUAD_RACCOONS, 0, 1);
 
         $this->createMergedPR(self::GENERAL);
-        $this->createMergedPR(self::GENERAL);
-        $this->createInReviewPR('samirboulil/slub/3', self::GENERAL, 0);
-        $this->createInReviewPR('samirboulil/slub/4', self::GENERAL, 0);
+        $this->createInReviewPR(self::PR_3, self::GENERAL, 0, 2);
     }
 
     /**
@@ -71,15 +72,14 @@ class PublishRemindersContext extends FeatureContext
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/1
- - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/2
+ - *Sam*, _"Add new feature"_ (Yesterday) https://github.com/samirboulil/slub/pull/2
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
- - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/3
- - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/4
+ - *Sam*, _"Add new feature"_ (2 days ago) https://github.com/samirboulil/slub/pull/3
 CHAT
         );
     }
@@ -90,7 +90,7 @@ CHAT
      */
     public function aPRInReviewHavingNoGTMs()
     {
-        $this->createInReviewPR('samirboulil/slub/1', self::SQUAD_RACCOONS, 0);
+        $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
     }
 
     /**
@@ -98,7 +98,7 @@ CHAT
      */
     public function aPRInReviewHavingGTMs(int $numberOfGTMs)
     {
-        $this->createInReviewPR('samirboulil/slub/2', self::SQUAD_RACCOONS, $numberOfGTMs);
+        $this->createInReviewPR(self::PR_2, self::SQUAD_RACCOONS, $numberOfGTMs, 0);
     }
 
     /**
@@ -129,7 +129,7 @@ CHAT
      */
     public function aPRNotGTMedPublishedInAUnsupportedChannel()
     {
-        $this->createInReviewPR('samirboulil/slub/5', self::UNSUPPORTED_CHANNEL, 0);
+        $this->createInReviewPR('samirboulil/slub/5', self::UNSUPPORTED_CHANNEL, 0, 0);
     }
 
     private function createMergedPR($channelIdentifier): void
@@ -145,20 +145,30 @@ CHAT
         $this->PRRepository->save($PR);
     }
 
-    private function createInReviewPR(string $PRIdentifier, string $channel, $GTMs): void
-    {
-        $PR = PR::create(
-            PRIdentifier::create($PRIdentifier),
-            ChannelIdentifier::fromString($channel),
-            MessageIdentifier::fromString(Uuid::uuid4()->toString()),
-            AuthorIdentifier::fromString('sam'),
-            Title::fromString('Add new feature')
+    private function createInReviewPR(
+        string $PRIdentifier,
+        string $channelIdentifier,
+        int $GTMs,
+        int $putInReviewDaysAgo
+    ): void {
+        $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
+            ->modify(sprintf('-%d day', $putInReviewDaysAgo))
+            ->getTimestamp();
+        $PR = PR::fromNormalized([
+                'IDENTIFIER'        => $PRIdentifier,
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'TITLE'             => 'Add new feature',
+                'GTMS'              => $GTMs,
+                'NOT_GTMS'          => 1,
+                'COMMENTS'          => 1,
+                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                'IS_MERGED'         => false,
+                'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
+                'CHANNEL_IDS'       => [$channelIdentifier],
+                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
+                'MERGED_AT'         => null,
+            ]
         );
-
-        for ($i = 0; $i < $GTMs; $i++) {
-            $PR->GTM();
-        }
-
         $this->PRRepository->save($PR);
     }
 }

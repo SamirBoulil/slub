@@ -233,24 +233,39 @@ class PR
 
     public function GTM(): void
     {
+        if ($this->isMerged) {
+            return;
+        }
+
         $this->GTMCount++;
         $this->events[] = PRGTMed::forPR($this->PRIdentifier);
     }
 
     public function notGTM(): void
     {
+        if ($this->isMerged) {
+            return;
+        }
+
         $this->notGTMCount++;
         $this->events[] = PRNotGTMed::forPR($this->PRIdentifier);
     }
 
     public function comment(): void
     {
+        if ($this->isMerged) {
+            return;
+        }
+
         $this->comments++;
         $this->events[] = PRCommented::forPR($this->PRIdentifier);
     }
 
     public function green(): void
     {
+        if ($this->isMerged) {
+            return;
+        }
         if ($this->CIStatus->isGreen()) {
             return;
         }
@@ -264,6 +279,9 @@ class PR
 
     public function red(BuildLink $buildLink): void
     {
+        if ($this->isMerged) {
+            return;
+        }
         if ($this->CIStatus->isRedWithLink($buildLink)) {
             return;
         }
@@ -274,6 +292,10 @@ class PR
 
     public function pending(): void
     {
+        if ($this->isMerged) {
+            return;
+        }
+
         if ($this->CIStatus->isPending()) {
             return;
         }

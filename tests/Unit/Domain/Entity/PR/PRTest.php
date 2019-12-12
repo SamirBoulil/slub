@@ -126,6 +126,25 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_cannot_be_gtmed_once_it_is_closed()
+    {
+        $pr = PR::create(
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $pr->close(true);
+        $this->assertEquals(0, $pr->normalize()['GTMS']);
+
+        $pr->GTM();
+        $this->assertEquals(0, $pr->normalize()['GTMS']);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_NOT_GTMed_multiple_times()
     {
         $pr = PR::create(
@@ -142,6 +161,25 @@ class PRTest extends TestCase
 
         $pr->notGTM();
         $this->assertEquals(2, $pr->normalize()['NOT_GTMS']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_cannot_be_NOT_GTMed_once_it_is_closed()
+    {
+        $pr = PR::create(
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $pr->close(true);
+        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
+
+        $pr->notGTM();
+        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
     }
 
     /**
@@ -168,6 +206,25 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_cannot_be_commented_once_it_is_closed()
+    {
+        $pr = PR::create(
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $pr->close(true);
+        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+
+        $pr->comment();
+        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_become_green()
     {
         $pr = $this->pendingPR();
@@ -180,6 +237,47 @@ class PRTest extends TestCase
         $this->assertInstanceOf(CIGreen::class, $event);
         $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
     }
+
+    /**
+     * @test
+     */
+    public function it_cannot_change_CI_status_once_it_is_closed()
+    {
+        $pr = PR::create(
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $pr->close(true);
+        $this->assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+
+        $pr->green();
+        $pr->red(BuildLink::fromURL('https://travis.com/build/123'));
+        $this->assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+    }
+
+    /**
+     * @test
+     */
+    public function it_cannot_become_pending_once_it_is_closed()
+    {
+        $pr = PR::create(
+            PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
+            MessageIdentifier::fromString('1'),
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature')
+        );
+        $pr->green();
+        $this->assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+        $pr->close(true);
+
+        $pr->pending();
+        $this->assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+    }
+
 
     /**
      * @test

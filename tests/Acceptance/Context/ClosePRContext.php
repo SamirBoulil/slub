@@ -16,6 +16,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -127,8 +128,8 @@ class ClosePRContext extends FeatureContext
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $PR->GTM();
-        $PR->GTM();
+        $PR->GTM(ReviewerName::fromString('samir'));
+        $PR->GTM(ReviewerName::fromString('samir'));
         $PR->green();
 
         return $PR;

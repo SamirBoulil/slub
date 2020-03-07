@@ -11,6 +11,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlPRRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -61,12 +62,13 @@ class SqlPRRepositoryTest extends KernelTestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
+        $reviewerName = ReviewerName::fromString('samir');
         $this->sqlPRRepository->save($savedPR);
 
         $updatedPR = $savedPR;
-        $updatedPR->notGTM();
-        $updatedPR->GTM();
-        $updatedPR->comment();
+        $updatedPR->notGTM($reviewerName);
+        $updatedPR->GTM($reviewerName);
+        $updatedPR->comment($reviewerName);
         $updatedPR->green();
         $updatedPR->close(true);
         $updatedPR->putToReviewAgainViaMessage(
@@ -307,8 +309,9 @@ class SqlPRRepositoryTest extends KernelTestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
+        $reviewerName = ReviewerName::fromString('samir');
         for ($i = 0; $i < $GTMs; $i++) {
-            $PR->GTM();
+            $PR->GTM($reviewerName);
         }
         if ($isMerged) {
             $PR->close(true);

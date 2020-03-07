@@ -20,5 +20,8 @@ class NewReview
     public $PRIdentifier;
 
     /** @var string */
+    public $reviewerName;
+
+    /** @var string */
     public $reviewStatus;
 }

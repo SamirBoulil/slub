@@ -44,6 +44,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
         $newPRReview->PRIdentifier = $this->getPRIdentifier($PRStatusUpdate);
         $newPRReview->repositoryIdentifier = $this->getRepositoryIdentifier($PRStatusUpdate);
         $newPRReview->reviewStatus = $this->reviewStatus($PRStatusUpdate);
+        $newPRReview->reviewerName = $this->reviewerName($PRStatusUpdate);
 
         return $newPRReview;
     }
@@ -66,6 +67,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
             case 'approved':
                 return 'accepted';
             case 'request_changes':
+            case 'changes_requested':
                 return 'refused';
             case 'commented':
                 return 'commented';
@@ -82,5 +84,10 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     private function authorReviewedHisOwnPR($PRStatusUpdate): bool
     {
         return $PRStatusUpdate['review']['user']['id'] === $PRStatusUpdate['pull_request']['user']['id'];
+    }
+
+    private function reviewerName(array $PRStatusUpdate): string
+    {
+        return $PRStatusUpdate['review']['user']['login'];
     }
 }

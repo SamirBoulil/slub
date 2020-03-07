@@ -7,6 +7,7 @@ namespace Slub\Application\NewReview;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -53,15 +54,16 @@ class NewReviewHandler
     private function updatePRWithReview(NewReview $review): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::create($review->PRIdentifier));
+        $reviewerName = ReviewerName::fromString($review->reviewerName);
         switch ($review->reviewStatus) {
             case 'accepted':
-                $PR->GTM();
+                $PR->GTM($reviewerName);
                 break;
             case 'refused':
-                $PR->notGTM();
+                $PR->notGTM($reviewerName);
                 break;
             case 'commented':
-                $PR->comment();
+                $PR->comment($reviewerName);
                 break;
             default:
                 throw new \InvalidArgumentException(

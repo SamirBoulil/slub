@@ -20,6 +20,7 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class ReviewContext extends FeatureContext
 {
+    const REVIEWER_NAME = 'samir';
     /** @var NewReviewHandler */
     private $reviewHandler;
 
@@ -73,6 +74,7 @@ class ReviewContext extends FeatureContext
         $gtm = new NewReview();
         $gtm->repositoryIdentifier = 'akeneo/pim-community-dev';
         $gtm->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $gtm->reviewerName = self::REVIEWER_NAME;
         $gtm->reviewStatus = 'accepted';
         $this->reviewHandler->handle($gtm);
     }
@@ -110,6 +112,7 @@ class ReviewContext extends FeatureContext
         $notGTM = new NewReview();
         $notGTM->repositoryIdentifier = 'akeneo/pim-community-dev';
         $notGTM->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $notGTM->reviewerName = self::REVIEWER_NAME;
         $notGTM->reviewStatus = 'refused';
         $this->reviewHandler->handle($notGTM);
     }
@@ -168,6 +171,7 @@ class ReviewContext extends FeatureContext
         $comment = new NewReview();
         $comment->repositoryIdentifier = 'akeneo/pim-community-dev';
         $comment->PRIdentifier = 'akeneo/pim-community-dev/1010';
+        $comment->reviewerName = self::REVIEWER_NAME;
         $comment->reviewStatus = 'commented';
         $this->reviewHandler->handle($comment);
     }
@@ -186,15 +190,9 @@ class ReviewContext extends FeatureContext
      */
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreComment()
     {
-        Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not commented');
-        $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
-        $notGTMCount = $PR->normalize()['COMMENTS'];
-        Assert::assertEquals(1, $notGTMCount, sprintf('The PR has %d COMMENTS, expected %d', $notGTMCount, 1));
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
-        $this->chatClientSpy->assertReaction(
-            $this->currentMessageIdentifier,
-            NotifyAuthor::MESSAGE_PR_COMMENTED
-        );
+        $commentMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_COMMENTED);
+        $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $commentMessage);
     }
 
     /**
@@ -202,10 +200,9 @@ class ReviewContext extends FeatureContext
      */
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM()
     {
-        $this->chatClientSpy->assertReaction(
-            $this->currentMessageIdentifier,
-            NotifyAuthor::MESSAGE_PR_GTMED
-        );
+        Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
+        $gtmedMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_GTMED);
+        $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $gtmedMessage);
     }
 
     /**
@@ -213,9 +210,8 @@ class ReviewContext extends FeatureContext
      */
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM()
     {
-        $this->chatClientSpy->assertReaction(
-            $this->currentMessageIdentifier,
-            NotifyAuthor::MESSAGE_PR_NOT_GTMED
-        );
+        Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
+        $notGtmedMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_NOT_GTMED);
+        $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $notGtmedMessage);
     }
 }

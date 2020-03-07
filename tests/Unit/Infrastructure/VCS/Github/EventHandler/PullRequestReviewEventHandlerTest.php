@@ -51,9 +51,9 @@ class PullRequestReviewEventHandlerTest extends TestCase
     public function it_listens_to_accepted_PR(string $reviewState, string $expectedReviewStatus)
     {
         $newReview = [
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1]],
+            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie']],
             'repository'   => ['full_name' => self::REPOSITORY_IDENTIFIER],
-            'review'       => ['state' => $reviewState, 'user' => ['id' => 2]]
+            'review'       => ['state' => $reviewState, 'user' => ['id' => 2, 'login' => 'samir']]
         ];
 
         $this->handler->handle(
@@ -73,7 +73,8 @@ class PullRequestReviewEventHandlerTest extends TestCase
     {
         return [
             'Accepted'  => ['approved', 'accepted'],
-            'Refused'   => ['request_changes', 'refused'],
+            'Refused1'  => ['request_changes', 'refused'],
+            'Refused2'  => ['changes_requested', 'refused'],
             'Commented' => ['commented', 'commented']
         ];
     }
@@ -94,16 +95,15 @@ class PullRequestReviewEventHandlerTest extends TestCase
         $this->pullRequestReviewHandler->handle($authorsOwnComment);
     }
 
-
     /**
      * @test
      */
     public function it_throws_if_the_status_is_not_supported()
     {
         $unsupportedReviewStatus = [
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1]],
+            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie']],
             'repository'   => ['full_name' => self::REPOSITORY_IDENTIFIER],
-            'review'       => ['state' => 'UNSUPPORTED_STATUS', 'user' => ['id' => 2]]
+            'review'       => ['state' => 'UNSUPPORTED_STATUS', 'user' => ['id' => 2, 'login' => 'samir']]
         ];
 
         $this->expectException(\InvalidArgumentException::class);

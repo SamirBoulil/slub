@@ -22,9 +22,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class NotifyAuthor implements EventSubscriberInterface
 {
     public const BUILD_LINK_PLACEHOLDER = '{{build_link}}';
-    public const MESSAGE_PR_GTMED = ':+1: GTM';
-    public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: PR Refused';
-    public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: PR Commented';
+    public const REVIEWER_NAME_PLACEHOLDER = '{{reviewer_name}}';
+    public const MESSAGE_PR_GTMED = ':+1: '. self::REVIEWER_NAME_PLACEHOLDER . ' GTMed';
+    public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: '. self::REVIEWER_NAME_PLACEHOLDER . ' refused';
+    public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: '. self::REVIEWER_NAME_PLACEHOLDER . ' commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed ' . self::BUILD_LINK_PLACEHOLDER;
 
@@ -60,19 +61,22 @@ class NotifyAuthor implements EventSubscriberInterface
 
     public function whenPRHasBeenGTM(PRGTMed $event): void
     {
-        $this->replyInThread($event->PRIdentifier(), self::MESSAGE_PR_GTMED);
+        $gtmedMessage = str_replace(self::REVIEWER_NAME_PLACEHOLDER, $event->reviewerName()->stringValue(), self::MESSAGE_PR_GTMED);
+        $this->replyInThread($event->PRIdentifier(), $gtmedMessage);
         $this->logger->info(sprintf('Author has been notified PR "%s" has been GTMed', $event->PRIdentifier()->stringValue()));
     }
 
     public function whenPRHasBeenNotGTM(PRNotGTMed $event): void
     {
-        $this->replyInThread($event->PRIdentifier(), self::MESSAGE_PR_NOT_GTMED);
+        $notGtmedMessage = str_replace(self::REVIEWER_NAME_PLACEHOLDER, $event->reviewerName()->stringValue(), self::MESSAGE_PR_NOT_GTMED);
+        $this->replyInThread($event->PRIdentifier(), $notGtmedMessage);
         $this->logger->info(sprintf('Author has been notified PR "%s" has been NOT GTMed', $event->PRIdentifier()->stringValue()));
     }
 
     public function whenPRComment(PRCommented $event): void
     {
-        $this->replyInThread($event->PRIdentifier(), self::MESSAGE_PR_COMMENTED);
+        $commentedMessage = str_replace(self::REVIEWER_NAME_PLACEHOLDER, $event->reviewerName()->stringValue(), self::MESSAGE_PR_COMMENTED);
+        $this->replyInThread($event->PRIdentifier(), $commentedMessage);
         $this->logger->info(sprintf('Author has been notified PR "%s" has been commented', $event->PRIdentifier()->stringValue()));
     }
 

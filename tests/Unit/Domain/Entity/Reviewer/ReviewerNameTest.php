@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Domain\Entity\PR;
+namespace Tests\Unit\Domain\Entity\Reviewer;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\AuthorIdentifier;

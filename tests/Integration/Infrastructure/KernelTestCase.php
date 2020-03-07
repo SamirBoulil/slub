@@ -23,7 +23,7 @@ class KernelTestCase extends SymfonyTestCase
 
     public function get(string $serviceOrParameterId)
     {
-        if (self::$kernel->getContainer() === null) {
+        if (null === self::$kernel->getContainer()) {
             return new \LogicException('Kernel should not be null');
         }
 

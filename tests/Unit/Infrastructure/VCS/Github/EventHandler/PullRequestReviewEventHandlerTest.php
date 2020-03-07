@@ -73,7 +73,8 @@ class PullRequestReviewEventHandlerTest extends TestCase
     {
         return [
             'Accepted'  => ['approved', 'accepted'],
-            'Refused'   => ['request_changes', 'refused'],
+            'Refused1'  => ['request_changes', 'refused'],
+            'Refused2'  => ['changes_requested', 'refused'],
             'Commented' => ['commented', 'commented']
         ];
     }

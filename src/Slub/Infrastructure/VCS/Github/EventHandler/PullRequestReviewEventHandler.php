@@ -67,6 +67,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
             case 'approved':
                 return 'accepted';
             case 'request_changes':
+            case 'changes_requested':
                 return 'refused';
             case 'commented':
                 return 'commented';

@@ -12,6 +12,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
@@ -114,12 +115,13 @@ class PRTest extends TestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['GTMS']);
 
-        $pr->GTM();
+        $pr->GTM($reviewerName);
         $this->assertEquals(1, $pr->normalize()['GTMS']);
 
-        $pr->GTM();
+        $pr->GTM($reviewerName);
         $this->assertEquals(2, $pr->normalize()['GTMS']);
     }
 
@@ -136,9 +138,10 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $pr->close(true);
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['GTMS']);
 
-        $pr->GTM();
+        $pr->GTM($reviewerName);
         $this->assertEquals(0, $pr->normalize()['GTMS']);
     }
 
@@ -154,12 +157,13 @@ class PRTest extends TestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
-        $pr->notGTM();
+        $pr->notGTM($reviewerName);
         $this->assertEquals(1, $pr->normalize()['NOT_GTMS']);
 
-        $pr->notGTM();
+        $pr->notGTM($reviewerName);
         $this->assertEquals(2, $pr->normalize()['NOT_GTMS']);
     }
 
@@ -176,9 +180,10 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $pr->close(true);
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
-        $pr->notGTM();
+        $pr->notGTM($reviewerName);
         $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
     }
 
@@ -194,12 +199,13 @@ class PRTest extends TestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
 
-        $pr->comment();
+        $pr->comment($reviewerName);
         $this->assertEquals(1, $pr->normalize()['COMMENTS']);
 
-        $pr->comment();
+        $pr->comment($reviewerName);
         $this->assertEquals(2, $pr->normalize()['COMMENTS']);
     }
 
@@ -216,9 +222,10 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $pr->close(true);
+        $reviewerName = ReviewerName::fromString('samir');
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
 
-        $pr->comment();
+        $pr->comment($reviewerName);
         $this->assertEquals(0, $pr->normalize()['COMMENTS']);
     }
 

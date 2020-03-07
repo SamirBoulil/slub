@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Domain\Entity\PR;
 
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
@@ -231,34 +232,34 @@ class PR
         return $this->title;
     }
 
-    public function GTM(): void
+    public function GTM(ReviewerName $reviewerName): void
     {
         if ($this->isMerged) {
             return;
         }
 
         $this->GTMCount++;
-        $this->events[] = PRGTMed::forPR($this->PRIdentifier);
+        $this->events[] = PRGTMed::forPR($this->PRIdentifier, $reviewerName);
     }
 
-    public function notGTM(): void
+    public function notGTM(ReviewerName $reviewerName): void
     {
         if ($this->isMerged) {
             return;
         }
 
         $this->notGTMCount++;
-        $this->events[] = PRNotGTMed::forPR($this->PRIdentifier);
+        $this->events[] = PRNotGTMed::forPR($this->PRIdentifier, $reviewerName);
     }
 
-    public function comment(): void
+    public function comment(ReviewerName $reviewerName): void
     {
         if ($this->isMerged) {
             return;
         }
 
         $this->comments++;
-        $this->events[] = PRCommented::forPR($this->PRIdentifier);
+        $this->events[] = PRCommented::forPR($this->PRIdentifier, $reviewerName);
     }
 
     public function green(): void

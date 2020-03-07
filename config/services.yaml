@@ -310,3 +310,10 @@ services:
             - '@slub.application.publish_reminders.publish_reminders_handler'
         tags:
             - { name: console.command }
+
+    slub.infrastructure.installer.cli.purge_delivered_events:
+        class: Slub\Infrastructure\UI\CLI\PurgeDeliveredEventsCLI
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+        tags:
+            - { name: console.command }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\UI\CLI;
 
-use Doctrine\DBAL\Connection;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

@@ -6,6 +6,8 @@ namespace Tests\Unit\Domain\Event;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 
 /**
@@ -19,10 +21,18 @@ class PRGTMedTest extends TestCase
     public function it_is_created_with_a_pr_identifier_and_returns_it()
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
-        $event = PRGTMed::forPR($expectedIdentifier);
+        $expectedReviewerName = ReviewerName::fromString('Samir');
+
+        $event = PRGTMed::forPR($expectedIdentifier, $expectedReviewerName);
+
         $this->assertTrue(
             $event->PRIdentifier()->equals($expectedIdentifier),
-            'Expected identifier to be the same than the one the event was created with, found different.'
+            'Expected PR identifier to be the same than the one the event was created with, found different.'
+        );
+        $this->assertEquals(
+            $event->reviewerName()->stringValue(),
+            $expectedReviewerName->stringValue(),
+            'Expected reviewer name to be the same than the one the event was created with, found different.'
         );
     }
 }

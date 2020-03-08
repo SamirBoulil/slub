@@ -35,8 +35,8 @@ class PublishRemindersCLITest extends KernelTestCase
      */
     public function it_executes()
     {
-        $this->commandTester->execute(['command' => self::COMMAND_NAME]);
         $this->publishRemindersHandlerMock->handle()->shouldBeCalled();
+        $this->commandTester->execute(['command' => self::COMMAND_NAME]);
         $this->assertContains('Reminders published!', $this->commandTester->getDisplay());
     }
 

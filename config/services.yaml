@@ -317,3 +317,10 @@ services:
             - '@slub.infrastructure.persistence.sql.database_connection'
         tags:
             - { name: console.command }
+
+    slub.infrastructure.installer.cli.debug_ci_status:
+        class: Slub\Infrastructure\UI\CLI\DebugCIStatusCLI
+        arguments:
+            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+        tags:
+            - { name: console.command }

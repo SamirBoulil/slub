@@ -29,7 +29,7 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: ' . self::PLACEHOLDER_REVIEWER_NAME . ' refused';
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: ' . self::PLACEHOLDER_REVIEWER_NAME . ' commented';
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
-    public const MESSAGE_CI_RED = ':octagonal_sign: <' . self::PLACEHOLDER_BUILD_LINK . '|CI Failed>';
+    public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
 
     /** @var GetMessageIdsForPR */

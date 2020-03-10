@@ -16,6 +16,7 @@ use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
@@ -69,21 +70,21 @@ class PRTest extends TestCase
     public function it_is_created_from_normalized()
     {
         $normalizedPR = [
-            'IDENTIFIER'        => self::PR_IDENTIFIER,
+            'IDENTIFIER' => self::PR_IDENTIFIER,
             'AUTHOR_IDENTIFIER' => 'sam',
-            'TITLE'             => 'Add new fixtures',
-            'GTMS'              => 2,
-            'NOT_GTMS'          => 0,
-            'COMMENTS'          => 0,
-            'CI_STATUS'         => [
+            'TITLE' => 'Add new fixtures',
+            'GTMS' => 2,
+            'NOT_GTMS' => 0,
+            'COMMENTS' => 0,
+            'CI_STATUS' => [
                 'BUILD_RESULT' => 'GREEN',
-                'BUILD_LINK'   => '',
+                'BUILD_LINK' => '',
             ],
-            'IS_MERGED'         => true,
-            'CHANNEL_IDS'       => ['squad-raccoons'],
-            'MESSAGE_IDS'       => ['1', '2'],
-            'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-            'CLOSED_AT'         => self::A_TIMESTAMP,
+            'IS_MERGED' => true,
+            'CHANNEL_IDS' => ['squad-raccoons'],
+            'MESSAGE_IDS' => ['1', '2'],
+            'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+            'CLOSED_AT' => self::A_TIMESTAMP,
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -285,7 +286,6 @@ class PRTest extends TestCase
         $this->assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
     }
 
-
     /**
      * @test
      */
@@ -386,6 +386,70 @@ class PRTest extends TestCase
         $this->assertFalse($pr->normalize()['IS_MERGED']);
         $this->assertCount(1, $pr->getEvents());
         $this->assertInstanceOf(PRClosed::class, current($pr->getEvents()));
+    }
+
+    /**
+     * @test
+     */
+    public function when_the_pr_had_its_last_GTM_it_tells_the_PR_is_good_to_merge()
+    {
+        $prWithOneGTMMissing = PR::fromNormalized(
+            [
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS' => 1,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
+                    'BUILD_RESULT' => 'GREEN',
+                    'BUILD_LINK' => '',
+                ],
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
+            ]
+        );
+
+        $prWithOneGTMMissing->GTM(ReviewerName::fromString('samir'));
+
+        $this->assertCount(2, $prWithOneGTMMissing->getEvents());
+        $event = last($prWithOneGTMMissing->getEvents());
+        $this->assertInstanceOf(GoodToMerge::class, $event);
+    }
+
+    /**
+     * @test
+     */
+    public function when_the_pr_had_its_green_ci_it_tells_the_PR_is_good_to_merge()
+    {
+        $prWithOneGTMMissing = PR::fromNormalized(
+            [
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS' => 4,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
+                    'BUILD_RESULT' => 'RED',
+                    'BUILD_LINK' => '',
+                ],
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
+            ]
+        );
+
+        $prWithOneGTMMissing->green();
+
+        $this->assertCount(2, $prWithOneGTMMissing->getEvents());
+        $event = last($prWithOneGTMMissing->getEvents());
+        $this->assertInstanceOf(GoodToMerge::class, $event);
     }
 
     /**
@@ -539,45 +603,44 @@ class PRTest extends TestCase
     public function normalizedWithMissingInformation(): array
     {
         return [
-            'Missing identifier'     => [
+            'Missing identifier' => [
                 [
-                    'GTMS'      => 0,
-                    'NOT_GTMS'  => 0,
+                    'GTMS' => 0,
+                    'NOT_GTMS' => 0,
                     'CI_STATUS' => 'PENDING',
                     'IS_MERGED' => false,
                 ],
             ],
-            'Missing GTMS'           => [
+            'Missing GTMS' => [
                 [
                     'IDENTIFIER' => self::PR_IDENTIFIER,
-                    'NOT_GTMS'   => 0,
-                    'CI_STATUS'  => 'PENDING',
-                    'IS_MERGED'  => false,
+                    'NOT_GTMS' => 0,
+                    'CI_STATUS' => 'PENDING',
+                    'IS_MERGED' => false,
                 ],
             ],
-            'Missing NOT GTMS'       => [
+            'Missing NOT GTMS' => [
                 [
                     'IDENTIFIER' => self::PR_IDENTIFIER,
-                    'GTMS'       => 0,
-                    'CI_STATUS'  => 'PENDING',
-                    'IS_MERGED'  => false,
+                    'GTMS' => 0,
+                    'CI_STATUS' => 'PENDING',
+                    'IS_MERGED' => false,
                 ],
             ],
-            'Missing CI status'      => [
+            'Missing CI status' => [
                 [
                     'IDENTIFIER' => self::PR_IDENTIFIER,
-                    'GTMS'       => 0,
-                    'NOT_GTMS'   => 0,
-                    'IS_MERGED'  => false,
-
+                    'GTMS' => 0,
+                    'NOT_GTMS' => 0,
+                    'IS_MERGED' => false,
                 ],
             ],
             'Missing is merged flag' => [
                 [
                     'IDENTIFIER' => self::PR_IDENTIFIER,
-                    'GTMS'       => 0,
-                    'NOT_GTMS'   => 0,
-                    'CI_STATUS'  => 'PENDING',
+                    'GTMS' => 0,
+                    'NOT_GTMS' => 0,
+                    'CI_STATUS' => 'PENDING',
                 ],
             ],
         ];
@@ -598,21 +661,21 @@ class PRTest extends TestCase
     private function pendingPR(): PR
     {
         $pr = PR::fromNormalized([
-                'IDENTIFIER'        => self::PR_IDENTIFIER,
-                'TITLE'             => 'Add new feature',
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'GTMS'              => 0,
-                'NOT_GTMS'          => 0,
-                'COMMENTS'          => 0,
-                'CI_STATUS'         => [
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
                     'BUILD_RESULT' => 'PENDING',
-                    'BUILD_LINK'   => '',
+                    'BUILD_LINK' => '',
                 ],
-                'IS_MERGED'         => false,
-                'CHANNEL_IDS'       => ['squad-raccoons'],
-                'MESSAGE_IDS'       => ['1'],
-                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => null,
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
             ]
         );
 
@@ -623,21 +686,21 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'        => self::PR_IDENTIFIER,
-                'TITLE'             => 'Add new feature',
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'GTMS'              => 0,
-                'NOT_GTMS'          => 0,
-                'COMMENTS'          => 0,
-                'CI_STATUS'         => [
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
                     'BUILD_RESULT' => 'GREEN',
-                    'BUILD_LINK'   => '',
+                    'BUILD_LINK' => '',
                 ],
-                'IS_MERGED'         => false,
-                'CHANNEL_IDS'       => ['squad-raccoons'],
-                'MESSAGE_IDS'       => ['1'],
-                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => null,
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
             ]
         );
 
@@ -648,21 +711,21 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'        => self::PR_IDENTIFIER,
-                'TITLE'             => 'Add new feature',
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'GTMS'              => 0,
-                'NOT_GTMS'          => 0,
-                'COMMENTS'          => 0,
-                'CI_STATUS'         => [
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
                     'BUILD_RESULT' => 'RED',
-                    'BUILD_LINK'   => '',
+                    'BUILD_LINK' => '',
                 ],
-                'IS_MERGED'         => false,
-                'CHANNEL_IDS'       => ['squad-raccoons'],
-                'MESSAGE_IDS'       => ['1'],
-                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => null,
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
             ]
         );
 
@@ -673,21 +736,21 @@ class PRTest extends TestCase
     {
         $pr = PR::fromNormalized(
             [
-                'IDENTIFIER'        => self::PR_IDENTIFIER,
-                'TITLE'             => 'Add new feature',
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'GTMS'              => 0,
-                'NOT_GTMS'          => 0,
-                'COMMENTS'          => 0,
-                'CI_STATUS'         => [
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
                     'BUILD_RESULT' => 'RED',
-                    'BUILD_LINK'   => '',
+                    'BUILD_LINK' => '',
                 ],
-                'IS_MERGED'         => false,
-                'CHANNEL_IDS'       => ['squad-raccoons'],
-                'MESSAGE_IDS'       => ['1'],
-                'PUT_TO_REVIEW_AT'  => self::A_TIMESTAMP,
-                'CLOSED_AT'         => self::A_TIMESTAMP,
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => self::A_TIMESTAMP,
             ]
         );
 

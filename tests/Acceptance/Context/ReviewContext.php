@@ -20,7 +20,8 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class ReviewContext extends FeatureContext
 {
-    const REVIEWER_NAME = 'samir';
+    private const REVIEWER_NAME = 'samir';
+
     /** @var NewReviewHandler */
     private $reviewHandler;
 
@@ -191,7 +192,7 @@ class ReviewContext extends FeatureContext
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreComment()
     {
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
-        $commentMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_COMMENTED);
+        $commentMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_COMMENTED);
         $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $commentMessage);
     }
 
@@ -201,7 +202,7 @@ class ReviewContext extends FeatureContext
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM()
     {
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
-        $gtmedMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_GTMED);
+        $gtmedMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_GTMED);
         $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $gtmedMessage);
     }
 
@@ -211,7 +212,7 @@ class ReviewContext extends FeatureContext
     public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM()
     {
         Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
-        $notGtmedMessage = str_replace(NotifyAuthor::REVIEWER_NAME_PLACEHOLDER, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_NOT_GTMED);
+        $notGtmedMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_NOT_GTMED);
         $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $notGtmedMessage);
     }
 }

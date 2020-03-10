@@ -9,6 +9,7 @@ use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
@@ -193,27 +194,27 @@ class PR
     {
         return [
             self::IDENTIFIER_KEY => $this->PRIdentifier()->stringValue(),
-            self::AUTHOR_ID_KEY  => $this->authorIdentifier->stringValue(),
-            self::TITLE_KEY      => $this->title->stringValue(),
-            self::GTM_KEY        => $this->GTMCount,
-            self::NOT_GTM_KEY    => $this->notGTMCount,
-            self::COMMENTS_KEY   => $this->comments,
-            self::CI_STATUS_KEY  => $this->CIStatus->normalize(),
-            self::IS_MERGED_KEY  => $this->isMerged,
-            self::CHANNEL_IDS      => array_map(
+            self::AUTHOR_ID_KEY => $this->authorIdentifier->stringValue(),
+            self::TITLE_KEY => $this->title->stringValue(),
+            self::GTM_KEY => $this->GTMCount,
+            self::NOT_GTM_KEY => $this->notGTMCount,
+            self::COMMENTS_KEY => $this->comments,
+            self::CI_STATUS_KEY => $this->CIStatus->normalize(),
+            self::IS_MERGED_KEY => $this->isMerged,
+            self::CHANNEL_IDS => array_map(
                 function (ChannelIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers
             ),
-            self::MESSAGE_IDS      => array_map(
+            self::MESSAGE_IDS => array_map(
                 function (MessageIdentifier $messageIdentifier) {
                     return $messageIdentifier->stringValue();
                 },
                 $this->messageIdentifiers
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
-            self::CLOSED_AT        => $this->closedAt->toTimestamp(),
+            self::CLOSED_AT => $this->closedAt->toTimestamp(),
         ];
     }
 
@@ -238,8 +239,9 @@ class PR
             return;
         }
 
-        $this->GTMCount++;
+        ++$this->GTMCount;
         $this->events[] = PRGTMed::forPR($this->PRIdentifier, $reviewerName);
+        $this->checkThePRIsGoodToMerge();
     }
 
     public function notGTM(ReviewerName $reviewerName): void
@@ -248,7 +250,7 @@ class PR
             return;
         }
 
-        $this->notGTMCount++;
+        ++$this->notGTMCount;
         $this->events[] = PRNotGTMed::forPR($this->PRIdentifier, $reviewerName);
     }
 
@@ -258,7 +260,7 @@ class PR
             return;
         }
 
-        $this->comments++;
+        ++$this->comments;
         $this->events[] = PRCommented::forPR($this->PRIdentifier, $reviewerName);
     }
 
@@ -276,6 +278,7 @@ class PR
             BuildLink::none()
         );
         $this->events[] = CIGreen::ForPR($this->PRIdentifier);
+        $this->checkThePRIsGoodToMerge();
     }
 
     public function red(BuildLink $buildLink): void
@@ -402,5 +405,13 @@ class PR
     {
         $this->isMerged = false;
         $this->closedAt = ClosedAt::none();
+    }
+
+    private function checkThePRIsGoodToMerge(): void
+    {
+        $isGoodToMerge = 0 === $this->notGTMCount && $this->GTMCount >= 2 && $this->CIStatus->isGreen();
+        if ($isGoodToMerge) {
+            $this->events[] = GoodToMerge::forPR($this->PRIdentifier);
+        }
     }
 }

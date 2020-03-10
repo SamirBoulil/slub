@@ -10,6 +10,7 @@ use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
+use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
@@ -90,6 +91,16 @@ class EventsSpyTest extends TestCase
     /**
      * @test
      */
+    public function it_tells_wether_the_good_to_merge_event_has_been_thrown()
+    {
+        $this->assertFalse($this->eventSpy->PRGoodToMergeDispatched());
+        $this->eventSpy->notifyPRGoodToMerge(GoodToMerge::forPR(PRIdentifier::fromString('1010')));
+        $this->assertTrue($this->eventSpy->PRGoodToMergeDispatched());
+    }
+
+    /**
+     * @test
+     */
     public function it_tells_if_it_has_events()
     {
         $this->assertFalse($this->eventSpy->hasEvents());
@@ -112,7 +123,8 @@ class EventsSpyTest extends TestCase
                 PRMerged::class      => 'notifyPRMerged',
                 PRPutToReview::class => 'notifyPRPutToReview',
                 CIPending::class     => 'notifyCIPending',
-                PRClosed::class      => 'notifyPRClosed'
+                PRClosed::class      => 'notifyPRClosed',
+                GoodToMerge::class   => 'notifyPRGoodToMerge'
             ],
             EventsSpy::getSubscribedEvents()
         );

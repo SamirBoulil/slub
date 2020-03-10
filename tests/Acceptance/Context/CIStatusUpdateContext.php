@@ -189,7 +189,7 @@ class CIStatusUpdateContext extends FeatureContext
             $this->eventSpy->CIRedEventDispatched(),
             'Expected CIRedEvent to be dispatched, but was not found'
         );
-        $expectedMessage = str_replace(NotifyAuthor::BUILD_LINK_PLACEHOLDER,
+        $expectedMessage = str_replace(NotifyAuthor::PLACEHOLDER_BUILD_LINK,
             self::BUILD_LINK,
             NotifyAuthor::MESSAGE_CI_RED
         );

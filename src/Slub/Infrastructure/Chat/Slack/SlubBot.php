@@ -81,7 +81,8 @@ class SlubBot
         $this->bot = BotManFactory::create(['slack' => ['token' => $this->slackToken]]);
         $this->listensToNewPR($this->bot);
         $this->listenToPRToUnpublish($this->bot);
-        $this->healthCheck($this->bot);
+        $this->answersToHealthChecks($this->bot);
+        $this->providesToHelp($this->bot);
         $this->bot->listen();
     }
 
@@ -155,7 +156,7 @@ class SlubBot
         $this->logger->info(sprintf('Bot hears an unpublish request for "%s".', $unpublishPR->PRIdentifier));
     }
 
-    private function healthCheck(BotMan $bot): void
+    private function answersToHealthChecks(BotMan $bot): void
     {
         $bot->hears(
             'alive',
@@ -163,6 +164,7 @@ class SlubBot
                 $bot->reply('yes :+1:');
             }
         );
+        $bot->listen();
     }
 
     private function getChannelIdentifier(BotMan $bot): string
@@ -205,5 +207,36 @@ class SlubBot
     private function PRIdentifier(string $PRNumber, string $repositoryIdentifier): string
     {
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
+    }
+
+    private function providesToHelp(BotMan $bot)
+    {
+        $userHelp = function (Botman $bot) {
+            $message = <<<MESSAGE
+*Hello I'm Yeee!*
+I'm here to improve the feedback loop between you and your PR statuses.
+
+Ever wonder how to work with me ? Here are some advices ;)
+
+*1. I track the PRs you put to review directly in slack. Make sure they have the following structure:*
+```
+... TR ... {PR link} ...
+... PR ... {PR link} ...
+... review ... {PR link} ...
+```
+
+*2. I post daily reminders for you and your teams to review PRs. To unpublish a PR from it, just let me know like this:*
+```@Yeee Unpublish {PR link}```
+
+*3. If you found a bug, <https://github.com/SamirBoulil/slub/issues/new|you can open a new issue>!*
+
+That's it! Have a wonderful day :yee:
+MESSAGE;
+            $bot->reply($message);
+        };
+        $yeeeHelp = sprintf('<@%s>.*help.*', $this->botUserId);
+        $helpYeee = sprintf('.*help.*<@%s>.*', $this->botUserId);
+        $bot->hears($yeeeHelp, $userHelp);
+        $bot->hears($helpYeee, $userHelp);
     }
 }

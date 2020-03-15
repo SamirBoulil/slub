@@ -76,15 +76,15 @@ class PublishRemindersContext extends FeatureContext
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/1
- - *Sam*, _"Add new feature"_ (Yesterday) https://github.com/samirboulil/slub/pull/2
+ - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
+ - *Sam*, _<https://github.com/samirboulil/slub/pull/2|"Add new feature">_ (Yesterday)
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
- - *Sam*, _"Add new feature"_ (2 days ago) https://github.com/samirboulil/slub/pull/3
+ - *Sam*, _<https://github.com/samirboulil/slub/pull/3|"Add new feature">_ (2 days ago)
 CHAT
         );
     }
@@ -124,7 +124,7 @@ CHAT
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
- - *Sam*, _"Add new feature"_ (Today) https://github.com/samirboulil/slub/pull/1
+ - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
 CHAT
         );
     }
@@ -204,46 +204,6 @@ CHAT
         );
         $PR->close(false);
         $this->PRRepository->save($PR);
-    }
-
-    /**
-     * @Given /^a PR in review not GTMed without author nor PR title$/
-     */
-    public function aPRInReviewNotGTMedWithoutAuthorNorPRTitle()
-    {
-        $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
-            ->modify(sprintf('-%d day', 2))
-            ->getTimestamp();
-        $PR = PR::fromNormalized([
-                'IDENTIFIER'        => 'samirboulil/slub/1',
-                'AUTHOR_IDENTIFIER' => '<Didn\'t catch the name yet :/>',
-                'TITLE'             => '<Didn\'t catch the name yet :/>',
-                'GTMS'              => 1,
-                'NOT_GTMS'          => 1,
-                'COMMENTS'          => 1,
-                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                'IS_MERGED'         => false,
-                'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
-                'CHANNEL_IDS'       => [self::SQUAD_RACCOONS],
-                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
-                'CLOSED_AT'         => null,
-            ]
-        );
-        $this->PRRepository->save($PR);
-    }
-
-    /**
-     * @Then /^the reminder should contain the PR without the author not the PR title$/
-     */
-    public function theReminderShouldContainThePRWithoutTheAuthorNotThePRTitle()
-    {
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
-            <<<CHAT
-Yop, these PRs need reviews!
- - (2 days ago) https://github.com/samirboulil/slub/pull/1
-CHAT
-        );
     }
 
     /**

@@ -19,6 +19,13 @@ You can [open a new issue](https://github.com/SamirBoulil/slub/issues/new) in th
 # The project
 This project has been designed and first put in production in march 2019. It is currently maintained by [Samir Boulil](https://github.com/samirboulil).
 
+## Release notes
+Each new version of Slub comes with a new set of features and bug fixes.
+
+Find the published release notes below:
+- November 2019, [Releasing Yeee 1.1](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)
+- March 2019, [Releasing Yeee 1.0](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)
+
 ## Features
 Slub improves the feedback loop of your PRs in multiple ways:
 - it notifies the author of a pull request when a PR is reviewed by a teammate.
@@ -30,9 +37,9 @@ Slub improves the feedback loop of your PRs in multiple ways:
 Slub listens to any PR sent to review in a slack channel which slub is configured to listen to.
 
 Once Slub hears a PR to review, it will start keeping track of some information like:
-- The number of comments (GTMS, Refused and simple comments), the
+- The number of comments (GTMS, Refused and simple comments)
 - The CI status (Green, Red, or Pending)
-- When The PR is merged
+- The PR status (open, closed, or merged)
 
 ## Notifications
 Whenever a new change happens to a PR, Slub will notify the author and/or the squad of the change using Slack.
@@ -66,7 +73,7 @@ The team can then quickly see at a glance the PRs that needs review from those b
 
 ## Reminders
 
-A reminder is a synthesized list of all the PRs that are in review in a channel, and that do not have 2 GTMs yet.
+A reminder is a synthesized list of all the PRs that are to review in a channel and that do not have 2 GTMs yet.
 
 ### How does it work ?
 
@@ -80,8 +87,6 @@ When available you get the following information for one PR to review:
 - How many days it has been put to review
 - The PR link
 
-By default, the reminder feature will be activated for everyone but it’s possible to deactivate it for your team (Slack me if that’s your case).
-
 ### Unpublishing
 
 If you have put a PR to review, had some comments back and need to rework on it. You might want to remove this PR from the daily reminder. That’s what “unpublishing a PR” is all about.
@@ -93,10 +98,3 @@ The way you unpublish a PR from the reminder is by telling Slub in the following
 *In this example, the slub bot name is @Yeee*
 
 ![Unpublishing reminders](https://miro.medium.com/max/1760/1*lKYEB13fVb1lQzvL5pVtKg.png)
-
-## Release notes
-Each new version of Slub comes with a new set of features and bug fixes.
-
-Find the published release notes below:
-- November 2019, [Releasing Yeee 1.1](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)
-- March 2019, [Releasing Yeee 1.0](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)

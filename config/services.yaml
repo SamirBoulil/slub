@@ -85,8 +85,13 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
+            - '@slub.infrastructure.common.query.clock'
 
     # Infrastructure
+    ## Common
+    slub.infrastructure.common.query.clock:
+        class: Slub\Infrastructure\Common\Clock
+
     ## Persistence
     slub.infrastructure.persistence.sql.database_connection:
         class: Doctrine\DBAL\Connection

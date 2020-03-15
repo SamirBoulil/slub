@@ -10,7 +10,7 @@ use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class InMemoryGetPRInfo implements GetPRInfoInterface
 {

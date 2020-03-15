@@ -24,6 +24,9 @@ services:
         arguments:
             - '%env(SUPPORTED_CHANNELS)%'
 
+    slub.infrastructure.common.query.clock:
+        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock
+
     slub.infrastructure.query.get_private_channel_information:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
         arguments:

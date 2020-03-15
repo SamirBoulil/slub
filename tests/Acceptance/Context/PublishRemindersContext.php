@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -12,6 +11,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock;
 use Tests\Acceptance\helpers\ChatClientSpy;
 
 class PublishRemindersContext extends FeatureContext
@@ -29,15 +29,20 @@ class PublishRemindersContext extends FeatureContext
     /** @var PublishRemindersHandler */
     private $publishRemindersHandler;
 
+    /** @var InMemoryClock */
+    private $clock;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         PublishRemindersHandler $publishRemindersHandler,
-        ChatClientSpy $chatClientSpy
+        ChatClientSpy $chatClientSpy,
+        InMemoryClock $clock
     ) {
         parent::__construct($PRRepository);
 
         $this->chatClientSpy = $chatClientSpy;
         $this->publishRemindersHandler = $publishRemindersHandler;
+        $this->clock = $clock;
     }
 
     /**
@@ -239,5 +244,21 @@ Yop, these PRs need reviews!
  - (2 days ago) https://github.com/samirboulil/slub/pull/1
 CHAT
         );
+    }
+
+    /**
+     * @Given /^we are on a week\-end$/
+     */
+    public function weAreOnAWeekEnd()
+    {
+        $this->clock->YesWeAReOneWeekEnd();
+    }
+
+    /**
+     * @Then /^the reminder should be empty$/
+     */
+    public function theReminderShouldBeEmpty()
+    {
+        $this->chatClientSpy->assertEmpty();
     }
 }

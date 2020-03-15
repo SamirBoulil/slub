@@ -72,6 +72,11 @@ class ChatClientSpy implements ChatClient
         $this->recordedMessages = [];
     }
 
+    public function assertEmpty(): void
+    {
+        Assert::assertEmpty($this->recordedMessages);
+    }
+
     private function reactionsForIdentifier(string $expectedIdentifier): array
     {
         Assert::assertArrayHasKey(

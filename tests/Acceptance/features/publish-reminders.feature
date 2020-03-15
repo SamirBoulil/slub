@@ -12,13 +12,6 @@ Feature: Publish a reminder of the pull requests to review for every channels
     When the system publishes a reminder
     Then the reminder should only contain the PR not GTMed
 
-  # TODO: At some point remove this scenario & associated code.
-  @nominal
-  Scenario: Publish a PR in review missing GTMS without author nor PR title
-    Given a PR in review not GTMed without author nor PR title
-    When the system publishes a reminder
-    Then the reminder should contain the PR without the author not the PR title
-
   @nominal
   Scenario: Publish a reminder of a PR in review for each slack channels
     Given some PRs in review and some PRs merged in multiple channels

@@ -28,6 +28,7 @@ default:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.publish_reminders.publish_reminders_handler"
                     - "@slub.infrastructure.chat.slack.slack_client"
+                    - "@slub.infrastructure.common.query.clock"
                 - Tests\Acceptance\Context\UnpublishPRContext:
                     - "@slub.infrastructure.persistence.pr_repository"
                     - "@slub.application.unpublish_pr.unpublish_pr_handler"

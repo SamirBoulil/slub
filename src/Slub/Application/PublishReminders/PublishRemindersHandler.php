@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
+use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -26,18 +27,27 @@ class PublishRemindersHandler
     /** @var ChatClient */
     private $chatClient;
 
+    /** @var ClockInterface */
+    private $clock;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         ChatClient $chatClient,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ClockInterface $clock
     ) {
         $this->logger = $logger;
         $this->chatClient = $chatClient;
         $this->PRRepository = $PRRepository;
+        $this->clock = $clock;
     }
 
     public function handle(): void
     {
+        if ($this->clock->areWeOnWeekEnd()) {
+            return;
+        }
+
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {

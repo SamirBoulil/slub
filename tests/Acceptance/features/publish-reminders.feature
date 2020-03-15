@@ -32,3 +32,10 @@ Feature: Publish a reminder of the pull requests to review for every channels
     And a PR not GTMed published in a unsupported channel
     When the system publishes a reminder
     Then the reminder should only contain the PR not GTMed in the supported channel
+
+  @secondary
+  Scenario: Does not publish a reminder on the week-end
+    Given a PR in review having 1 GTMs
+    And we are on a week-end
+    When the system publishes a reminder
+    Then the reminder should be empty

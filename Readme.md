@@ -11,7 +11,6 @@ The name Slub comes from the contraction of Slack & Github: **Sl** (ack+gith) **
 ***Yeee** is the name of the bot in your slack team.*
 
 [![Yeee](https://img.youtube.com/vi/2Jvvz8n_hZ0/0.jpg)](https://www.youtube.com/watch?v=2Jvvz8n_hZ0 "Yeeee")
-<iframe width="1955" height="956" src="https://www.youtube.com/embed/2Jvvz8n_hZ0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 # Found a bug ?
 You can [open a new issue](https://github.com/SamirBoulil/slub/issues/new) in the issue's repository section.
@@ -40,6 +39,12 @@ Once Slub hears a PR to review, it will start keeping track of some information 
 - The number of comments (GTMS, Refused and simple comments)
 - The CI status (Green, Red, or Pending)
 - The PR status (open, closed, or merged)
+
+Any message having the following structure can be tracked by @Yeee
+
+    Slub user: ... TR ... {PR link} ...
+    Slub user: ... review ... {PR link} ...
+    Slub user: ... PR ... {PR link} ...
 
 ## Notifications
 Whenever a new change happens to a PR, Slub will notify the author and/or the squad of the change using Slack.
@@ -75,7 +80,7 @@ The team can then quickly see at a glance the PRs that needs review from those b
 
 A reminder is a synthesized list of all the PRs that are to review in a channel and that do not have 2 GTMs yet.
 
-### How does it work ?
+### Remind me!
 
 It is published once a day around 9:30 AM (GMT+1) in this form:
 

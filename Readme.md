@@ -4,13 +4,14 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub?ref=badge_shield)
 
 # Welcome to Slub
-Slub improves the feedback loop of your pull requests (PR) within your team.
+Slub improves the feedback loop of your pull requests (PRs) within your team.
 
 The name Slub comes from the contraction of Slack & Github: **Sl** (ack+gith) **ub**.
 
 ***Yeee** is the name of the bot in your slack team.*
 
-https://www.youtube.com/watch?v=2Jvvz8n_hZ0
+[![Yeee](https://img.youtube.com/vi/2Jvvz8n_hZ0/0.jpg)](https://www.youtube.com/watch?v=2Jvvz8n_hZ0 "Yeeee")
+<iframe width="1955" height="956" src="https://www.youtube.com/embed/2Jvvz8n_hZ0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 # Found a bug ?
 You can [open a new issue](https://github.com/SamirBoulil/slub/issues/new) in the issue's repository section.
@@ -26,7 +27,6 @@ Slub improves the feedback loop of your PRs in multiple ways:
 - it sends daily reminders to your team regarding the PRs missing reviews.
 
 ## How to use
-
 Slub listens to any PR sent to review in a slack channel which slub is configured to listen to.
 
 Once Slub hears a PR to review, it will start keeping track of some information like:
@@ -35,29 +35,32 @@ Once Slub hears a PR to review, it will start keeping track of some information 
 - When The PR is merged
 
 ## Notifications
-
 Whenever a new change happens to a PR, Slub will notify the author and/or the squad of the change using Slack.
 
 ### Notifying the author
-<< Image notify author >>
+![Notify author](https://miro.medium.com/max/872/1*Sd9GpS2aXwo9KYYfkeAVAQ.png)
 
 Author notifications such as “Your PR has been commented” will be sent to Slack in the thread where the PR link was sent (hence, only the author is notified that a new message was sent in a thread).
 - The author is notified whenever a review is added to the PR
 - The CI status changes
 
 ### Notifying the squad
-<< Image notify squad >>
 The squad is not notified per say, but it can follow the PR statuses by looking at the emojis added to the PR link.
 
+![Notify squad](https://miro.medium.com/max/1350/1*wYmeULsOHzn_oX9UZLp9Xg.png)
+
 The squad can directly see:
-The number of GTMS the PR currently has
-<< Image number of GTMs >>
+- The number of GTMS the PR currently has
 
-The CI status (pending, red or green)
-<< Image CI statuses >>
+![Number of GTMs](https://miro.medium.com/max/146/1*UE2fYlXN13cgHM5jqng1wg.png)
 
-When the PR is merged
-<< Image PR merged >>
+- The CI status (pending, red or green)
+
+![CI statuses](https://miro.medium.com/max/202/1*3-zBCweArdz6YZ6T0cHhOg.png)
+
+- When the PR is merged
+
+![PR merged](https://miro.medium.com/max/82/1*Wpc21XHITPgQMedSmfntgw.png)
 
 The team can then quickly see at a glance the PRs that needs review from those being already merged.
 
@@ -69,7 +72,7 @@ A reminder is a synthesized list of all the PRs that are in review in a channel,
 
 It is published once a day around 9:30 AM (GMT+1) in this form:
 
-<< Photo of reminders >>
+![Reminders](https://miro.medium.com/max/1262/1*o7zWCsXAQpSiy4a5n6jWeg.png)
 
 When available you get the following information for one PR to review:
 - The author of the PR
@@ -88,6 +91,8 @@ The way you unpublish a PR from the reminder is by telling Slub in the following
         @Yeee unpublish {Link of the Github PR}
 
 *In this example, the slub bot name is @Yeee*
+
+![Unpublishing reminders](https://miro.medium.com/max/1760/1*lKYEB13fVb1lQzvL5pVtKg.png)
 
 ## Release notes
 Each new version of Slub comes with a new set of features and bug fixes.

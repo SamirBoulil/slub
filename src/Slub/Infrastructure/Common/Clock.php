@@ -8,13 +8,19 @@ use Slub\Domain\Query\ClockInterface;
 
 class Clock implements ClockInterface
 {
-    private const SATURDAY = 5;
-    private const SUNDAY = 6;
+    private const SATURDAY = 6;
+    private const SUNDAY = 7;
 
     public function areWeOnWeekEnd(): bool
     {
-        $dayOfTheWeek = (int) date('w');
+        $now = $this->getDate();
+        $dayOfTheWeek = (int) $now->format('N');
 
         return self::SATURDAY === $dayOfTheWeek || self::SUNDAY === $dayOfTheWeek;
+    }
+
+    public function getDate(): \DateTime
+    {
+        return new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

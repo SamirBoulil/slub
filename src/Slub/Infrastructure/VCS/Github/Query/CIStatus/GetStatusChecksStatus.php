@@ -36,9 +36,9 @@ class GetStatusChecksStatus
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
-        $ciStatuses = $this->statuses($PRIdentifier, $commitRef);
+        $uniqueCiStatus = $this->sortAndUniqueStatuses($this->statuses($PRIdentifier, $commitRef));
 
-        return $this->deductCIStatus($ciStatuses);
+        return $this->deductCIStatus($uniqueCiStatus);
     }
 
     private function statuses(PRIdentifier $PRIdentifier, string $ref): array
@@ -116,5 +116,35 @@ class GetStatusChecksStatus
         $headers = array_merge($headers, GithubAPIHelper::acceptPreviewEndpointsHeader());
 
         return $headers;
+    }
+
+    private function sortAndUniqueStatuses(array $ciStatuses): array
+    {
+        $ciStatuses = $this->sortStatusesByUpdatedAt($ciStatuses);
+
+        return array_reduce($ciStatuses, function (array $statuses, $status) {
+            $statuses[$status['context']] = $status;
+
+            return $statuses;
+        }, []);
+    }
+
+    private function sortStatusesByUpdatedAt(array $ciStatuses): array
+    {
+        usort(
+            $ciStatuses,
+            function ($a, $b) {
+                $ad = new \DateTime($a['updated_at']);
+                $bd = new \DateTime($b['updated_at']);
+
+                if ($ad == $bd) {
+                    return 0;
+                }
+
+                return $ad < $bd ? -1 : 1;
+            }
+        );
+
+        return $ciStatuses;
     }
 }

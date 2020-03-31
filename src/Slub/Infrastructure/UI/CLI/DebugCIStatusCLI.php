@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\UI\CLI;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\PRInfo;
-use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

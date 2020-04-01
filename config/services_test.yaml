@@ -54,6 +54,7 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.get_pr_info:
         class: Slub\Infrastructure\VCS\InMemory\InMemoryGetPRInfo

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 
@@ -14,7 +15,7 @@ class ConnectionFactory
 {
     public static function create(string $databaseUrl): Connection
     {
-        $config = new \Doctrine\DBAL\Configuration();
+        $config = new Configuration();
         $connectionParams = ['url' => $databaseUrl];
         $sqlConnection = DriverManager::getConnection($connectionParams, $config);
 

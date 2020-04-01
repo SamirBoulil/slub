@@ -223,7 +223,6 @@ services:
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
-            - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler
@@ -231,7 +230,6 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
-            - '%env(SUPPORTED_CI_CHECKS)%'
 
     slub.infrastructure.vcs.github.event_handler.pr_closed:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler

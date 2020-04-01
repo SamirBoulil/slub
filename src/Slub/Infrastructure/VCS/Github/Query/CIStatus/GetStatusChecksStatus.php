@@ -42,8 +42,9 @@ class GetStatusChecksStatus
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
-        $uniqueCiStatus = $this->sortAndUniqueStatuses($this->statuses($PRIdentifier, $commitRef));
-        $this->logger->critical(var_export($uniqueCiStatus, true));
+        $ciStatuses = $this->statuses($PRIdentifier, $commitRef);
+        $this->logger->critical((string) json_encode($ciStatuses));
+        $uniqueCiStatus = $this->sortAndUniqueStatuses($ciStatuses);
 
         return $this->deductCIStatus($uniqueCiStatus);
     }

@@ -70,6 +70,8 @@ class NewEventAction
             throw new BadRequestHttpException('Expected event to have a type string');
         }
 
+        $this->logger->critical(sprintf('Event type:%s', $eventType));
+
         return $eventType;
     }
 

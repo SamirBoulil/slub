@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
@@ -34,7 +35,8 @@ class GetStatusChecksStatusTest extends WebTestCase
             $this->requestSpy->client(),
             self::AUTH_TOKEN,
             implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3]),
-            'https://api.github.com'
+            'https://api.github.com',
+            new NullLogger()
         );
     }
 

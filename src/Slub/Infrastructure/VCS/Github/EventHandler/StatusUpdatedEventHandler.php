@@ -49,42 +49,10 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     public function handle(array $statusUpdate): void
     {
-        if ($this->isStatusGreenButNotSupported($statusUpdate)) {
-            return;
-        }
-        $this->updateCIStatus($statusUpdate);
-    }
-
-    private function isStatusGreenButNotSupported(array $statusUpdate): bool
-    {
-        $isGreen = 'GREEN' === $this->statusCheckStatus($statusUpdate);
-        $isSupported = in_array($statusUpdate['name'], $this->supportedStatusNames);
-
-        return $isGreen && !$isSupported;
-    }
-
-    private function statusCheckStatus(array $statusUpdate): string
-    {
-        $status = $statusUpdate['state'];
-        switch ($status) {
-            case 'pending':
-                return 'PENDING';
-            case 'success':
-                return 'GREEN';
-            case 'error':
-            case 'failure':
-                return 'RED';
-            default:
-                throw new \InvalidArgumentException(sprintf('Unsupported status "%s"', $status));
-        }
-    }
-
-    private function updateCIStatus(array $CIStatusUpdate): void
-    {
         $command = new CIStatusUpdate();
-        $command->PRIdentifier = $this->getPRIdentifier($CIStatusUpdate)->stringValue();
-        $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
-        $checkStatus = $this->getCIStatusFromGithub($this->getPRIdentifier($CIStatusUpdate), $CIStatusUpdate['sha']);
+        $command->PRIdentifier = $this->getPRIdentifier($statusUpdate)->stringValue();
+        $command->repositoryIdentifier = $statusUpdate['repository']['full_name'];
+        $checkStatus = $this->getCIStatusFromGithub($this->getPRIdentifier($statusUpdate), $statusUpdate['sha']);
         $command->status = $checkStatus->status;
         $command->buildLink = $checkStatus->buildLink;
 

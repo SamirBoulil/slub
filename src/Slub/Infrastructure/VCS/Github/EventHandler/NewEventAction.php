@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
+use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,20 +34,26 @@ class NewEventAction
     /** @var SqlHasEventAlreadyBeenDelivered */
     private $sqlHasEventAlreadyBeenDelivered;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         EventHandlerRegistry $eventHandlerRegistry,
         SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered,
         SqlDeliveredEventRepository $sqlDeliveredEventRepository,
+        LoggerInterface $logger,
         string $secret
     ) {
         $this->eventHandlerRegistry = $eventHandlerRegistry;
         $this->secret = $secret;
         $this->sqlDeliveredEventRepository = $sqlDeliveredEventRepository;
         $this->sqlHasEventAlreadyBeenDelivered = $sqlHasEventAlreadyBeenDelivered;
+        $this->logger = $logger;
     }
 
     public function executeAction(Request $request): Response
     {
+        $this->logger->critical((string) $request->getContent());
         $this->checkSecret($request);
         $eventType = $this->eventTypeOrThrow($request);
         $event = $this->event($request);

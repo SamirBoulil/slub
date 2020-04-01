@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
@@ -46,6 +47,7 @@ class NewEventActionTest extends TestCase
             $this->eventHandlerRegistry->reveal(),
             $this->hasEventAlreadyBeenDelivered->reveal(),
             $this->deliveredEventRepository->reveal(),
+            new NullLogger(),
             self::SECRET
         );
     }

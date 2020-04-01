@@ -194,6 +194,7 @@ services:
             - '@slub.infrastructure.vcs.github.event_handler_registry'
             - '@slub.infrastructure.persistence.has_event_already_been_delivered'
             - '@slub.infrastructure.persistence.delivered_event_repository'
+            - '@logger'
             - '%env(GITHUB_WEBHOOK_SECRET)%'
 
     slub.infrastructure.vcs.github.event_handler_registry:

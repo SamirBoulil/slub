@@ -25,9 +25,6 @@ class CheckRunEventHandlerTest extends TestCase
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    private const SUPPORTED_CHECK_RUN = 'travis';
-    private const UNSUPPORTED_CHECK_RUN = 'UNSUPPORTED';
-
     private const CI_STATUS = 'A_CI_STATUS';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
@@ -49,8 +46,7 @@ class CheckRunEventHandlerTest extends TestCase
         $this->getPRInfo = $this->prophesize(GetPRInfo::class);
         $this->checkRunEventHandler = new CheckRunEventHandler(
             $this->handler->reveal(),
-            $this->getPRInfo->reveal(),
-            self::SUPPORTED_CHECK_RUN . ',circle ci'
+            $this->getPRInfo->reveal()
         );
     }
 
@@ -105,17 +101,6 @@ class CheckRunEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_to_handle_unsupported_and_green_check_runs()
-    {
-        $this->getPRInfo->fetch()->shouldNotBeCalled();
-        $this->handler->handle()->shouldNotBeCalled();
-
-        $this->checkRunEventHandler->handle($this->unsupportedGreenCI());
-    }
-
-    /**
-     * @test
-     */
     public function it_has_a_queued_check_run_we_fetch_the_ci_status()
     {
         $prInfo = new PRInfo();
@@ -139,26 +124,15 @@ class CheckRunEventHandlerTest extends TestCase
         $this->checkRunEventHandler->handle($this->queuedCheckRun());
     }
 
-
-    /**
-     * @test
-     */
-    public function it_throws_for_unsupported_conclusion()
-    {
-        $this->expectException(\Exception::class);
-        $this->checkRunEventHandler->handle($this->unsupportedResult());
-    }
-
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $checkRunName = self::SUPPORTED_CHECK_RUN;
         $json = <<<JSON
 {
   "action": "completed",
   "check_run": {
     "status": "completed",
     "conclusion": "success",
-    "name": "${checkRunName}",
+    "name": "travis",
     "check_suite": {
       "pull_requests": [
         {
@@ -178,14 +152,13 @@ JSON;
 
     private function unsupportedRedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $checkRunName = self::UNSUPPORTED_CHECK_RUN;
         $json = <<<JSON
 {
   "action": "completed",
   "check_run": {
     "status": "completed",
     "conclusion": "failure",
-    "name": "${checkRunName}",
+    "name": "UNSUPPORTED",
     "check_suite": {
       "pull_requests": [
         {
@@ -196,54 +169,6 @@ JSON;
   },
   "repository": {
     "full_name": "${repositoryIdentifier}"
-  }
-}
-JSON;
-
-        return json_decode($json, true);
-    }
-
-    private function unsupportedGreenCI(): array
-    {
-        $json = <<<JSON
-{
-  "action": "completed",
-  "check_run": {
-    "status": "completed",
-    "conclusion": "success",
-    "name": "UNSUPPORTED_CHECK_RUN"
-  }
-}
-JSON;
-
-        return json_decode($json, true);
-    }
-
-    private function unsupportedResult(): array
-    {
-        $json = <<<JSON
-{
-  "action": "completed",
-  "check_run": {
-    "status": "completed",
-    "conclusion": "WRONG_CONCLUSION",
-    "name": "travis",
-    "check_suite": {
-      "pull_requests": [
-        {
-          "number": 10
-        }
-      ]
-    },
-    "pull_requests": [
-      {
-        "url": "https://api.github.com/repos/SamirBoulil/slub/pulls/26",
-        "number": 26
-      }
-    ]
-  },
-  "repository": {
-    "full_name": "SamirBoulil/slub"
   }
 }
 JSON;

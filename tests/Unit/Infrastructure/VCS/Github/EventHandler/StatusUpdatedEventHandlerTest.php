@@ -24,9 +24,6 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    private const SUPPORTED_STATUS = 'travis';
-    private const UNSUPPORTED_STATUS = 'UNSUPPORTED';
-
     private const CI_STATUS = 'A_CI_STATUS';
     private const COMMIT_REF = 'commit-ref';
 
@@ -55,8 +52,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->statusUpdateEventHandler = new StatusUpdatedEventHandler(
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
-            $this->getCIStatus->reveal(),
-            implode(',', [self::SUPPORTED_STATUS, 'circle ci'])
+            $this->getCIStatus->reveal()
         );
     }
 
@@ -83,7 +79,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
                 }
             ),
             Argument::that(
-                function (string $commitRef) {
+                function ($commitRef) {
                     return self::COMMIT_REF === $commitRef;
                 }
             )
@@ -106,27 +102,26 @@ class StatusUpdatedEventHandlerTest extends TestCase
         return [
             'it handles supported status'       => [
                 $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
-                self::SUPPORTED_STATUS
+                'travis'
             ],
             'it handles unsupported red status' => [
                 $this->unsupportedRedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
-                self::UNSUPPORTED_STATUS,
+                'UNSUPPORTED',
             ],
             'it handles unsupported pending status' => [
                 $this->unsupportedPendingEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
-                self::UNSUPPORTED_STATUS,
+                'UNSUPPORTED',
             ],
         ];
     }
 
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $status = self::SUPPORTED_STATUS;
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
   "sha": "${commitRef}",
-  "name": "${status}",
+  "name": "travis",
   "state": "success",
   "number": ${prNumber},
   "repository": {
@@ -140,12 +135,11 @@ JSON;
 
     private function unsupportedRedEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $status = self::UNSUPPORTED_STATUS;
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
   "sha": "${commitRef}",
-  "name": "${status}",
+  "name": "UNSUPPORTED",
   "state": "failure",
   "number": ${prNumber},
   "repository": {
@@ -159,53 +153,17 @@ JSON;
 
     private function unsupportedPendingEvent(string $repositoryIdentifier, string $prNumber): array
     {
-        $status = self::UNSUPPORTED_STATUS;
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
   "sha": "${commitRef}",
-  "name": "${status}",
+  "name": "UNSUPPORTED",
   "state": "pending",
   "number": ${prNumber},
   "repository": {
     "full_name": "${repositoryIdentifier}"
   }
 }
-JSON;
-
-        return json_decode($json, true);
-    }
-
-    private function unsupportedGreenStatus(): array
-    {
-        $json = <<<JSON
-{
-  "sha": "commit-ref",
-  "name": "UNSUPPORTED STATUS",
-  "state": "success",
-  "number": 10,
-  "repository": {
-    "full_name": "SamirBoulil/slub"
-  }
-}
-JSON;
-
-        return json_decode($json, true);
-    }
-
-    private function unsupportedResult(): array
-    {
-        $json = <<<JSON
-{
-  "sha": "commit-ref",
-  "name": "travis",
-  "state": "UNSUPPORTED_RESULT",
-  "number": 10,
-  "repository": {
-    "full_name": "SamirBoulil/slub"
-  }
-}
-
 JSON;
 
         return json_decode($json, true);

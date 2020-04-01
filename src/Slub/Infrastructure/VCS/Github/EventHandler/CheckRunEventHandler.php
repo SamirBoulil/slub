@@ -28,11 +28,9 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,
-        GetPRInfoInterface $getPRInfo,
-        string $supportedCheckRunNames
+        GetPRInfoInterface $getPRInfo
     ) {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
-        $this->supportedCheckRunNames = explode(',', $supportedCheckRunNames);
         $this->getPRInfo = $getPRInfo;
     }
 
@@ -43,29 +41,12 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     public function handle(array $checkRunEvent): void
     {
-        if ($this->isCICheckGreenButNotSupported($checkRunEvent)) {
-            return;
-        }
-
-        $this->updateCIStatus($checkRunEvent);
-    }
-
-    private function isCICheckGreenButNotSupported(array $checkRunEvent): bool
-    {
-        $isGreen = 'GREEN' === $this->getStatus($checkRunEvent);
-        $isSupported = in_array($checkRunEvent['check_run']['name'], $this->supportedCheckRunNames);
-
-        return $isGreen && !$isSupported;
-    }
-
-    private function updateCIStatus(array $CIStatusUpdate): void
-    {
-        $PRIdentifier = $this->getPRIdentifier($CIStatusUpdate);
+        $PRIdentifier = $this->getPRIdentifier($checkRunEvent);
         $PRInfo = $this->getCIStatusFromGithub($PRIdentifier);
 
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $PRIdentifier->stringValue();
-        $command->repositoryIdentifier = $CIStatusUpdate['repository']['full_name'];
+        $command->repositoryIdentifier = $checkRunEvent['repository']['full_name'];
         $command->status = $PRInfo->CIStatus->status;
         $command->buildLink = $PRInfo->CIStatus->buildLink;
         $this->CIStatusUpdateHandler->handle($command);
@@ -78,29 +59,6 @@ class CheckRunEventHandler implements EventHandlerInterface
                 '%s/%s',
                 $CIStatusUpdate['repository']['full_name'],
                 $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
-            )
-        );
-    }
-
-    private function getStatus(array $CIStatusUpdate): string
-    {
-        if ('queued' === $CIStatusUpdate['check_run']['status']) {
-            return 'PENDING';
-        }
-
-        $conclusion = $CIStatusUpdate['check_run']['conclusion'];
-        switch ($conclusion) {
-            case 'success': return 'GREEN';
-            case 'failure':
-            case 'error':
-            case 'action_required':
-            case 'default': return 'RED';
-        }
-
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Expected conclusion to be one of "success" or "failure", but "%s" found',
-                $conclusion
             )
         );
     }

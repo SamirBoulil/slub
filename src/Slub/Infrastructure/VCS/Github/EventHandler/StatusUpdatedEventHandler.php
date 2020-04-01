@@ -33,12 +33,10 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,
         FindPRNumberInterface $findPRNumber,
-        GetCIStatus $getCIStatus,
-        string $supportedStatusNames
+        GetCIStatus $getCIStatus
     ) {
         $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
         $this->findPRNumber = $findPRNumber;
-        $this->supportedStatusNames = explode(',', $supportedStatusNames);
         $this->getCIStatus = $getCIStatus;
     }
 

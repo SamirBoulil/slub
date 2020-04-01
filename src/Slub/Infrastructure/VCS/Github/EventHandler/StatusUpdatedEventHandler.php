@@ -27,9 +27,6 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     /** @var GetCIStatus */
     private $getCIStatus;
 
-    /** @var string[] */
-    private $supportedStatusNames;
-
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,
         FindPRNumberInterface $findPRNumber,

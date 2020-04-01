@@ -23,9 +23,6 @@ class CheckRunEventHandler implements EventHandlerInterface
     /** @var GetPRInfoInterface */
     private $getPRInfo;
 
-    /** @var string[] */
-    private $supportedCheckRunNames;
-
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,
         GetPRInfoInterface $getPRInfo

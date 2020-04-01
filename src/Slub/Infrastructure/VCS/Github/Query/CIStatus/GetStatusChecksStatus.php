@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
@@ -22,21 +23,27 @@ class GetStatusChecksStatus
     /** @var string */
     private $domainName;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(
         Client $httpClient,
         string $authToken,
         string $supportedCIChecks,
-        string $domainName
+        string $domainName,
+        LoggerInterface $logger
     ) {
         $this->httpClient = $httpClient;
         $this->authToken = $authToken;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
         $this->domainName = $domainName;
+        $this->logger = $logger;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $uniqueCiStatus = $this->sortAndUniqueStatuses($this->statuses($PRIdentifier, $commitRef));
+        $this->logger->critical(var_export($uniqueCiStatus, true));
 
         return $this->deductCIStatus($uniqueCiStatus);
     }

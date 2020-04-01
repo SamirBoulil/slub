@@ -280,6 +280,7 @@ services:
             - '%env(GITHUB_TOKEN)%'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
+            - '@logger'
 
     slub.infrastructure.vcs.github.query.find_pr_number:
         class: Slub\Infrastructure\VCS\Github\Query\FindPRNumber

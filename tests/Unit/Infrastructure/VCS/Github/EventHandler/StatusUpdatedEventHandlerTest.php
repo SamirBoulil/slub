@@ -119,27 +119,6 @@ class StatusUpdatedEventHandlerTest extends TestCase
         ];
     }
 
-    /**
-     * @test
-     */
-    public function it_does_not_to_handle_unsupported_and_green_check_runs()
-    {
-        $this->findPRNumber->fetch()->shouldNotBeCalled();
-        $this->getCIStatus->fetch()->shouldNotBeCalled();
-        $this->handler->handle()->shouldNotBeCalled();
-
-        $this->statusUpdateEventHandler->handle($this->unsupportedGreenStatus());
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_for_unsupported_conclusion()
-    {
-        $this->expectException(\Exception::class);
-        $this->statusUpdateEventHandler->handle($this->unsupportedResult());
-    }
-
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
         $status = self::SUPPORTED_STATUS;

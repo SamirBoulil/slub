@@ -29,7 +29,7 @@ class PR
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
-    private const CHANNEL_IDS = 'CHANNEL_IDS';
+    private const WORKSPACE_IDS = 'WORKSPACE_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
     private const CLOSED_AT = 'CLOSED_AT';
@@ -146,7 +146,7 @@ class PR
         Assert::keyExists($normalizedPR, self::CI_STATUS_KEY);
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
-        Assert::keyExists($normalizedPR, self::CHANNEL_IDS);
+        Assert::keyExists($normalizedPR, self::WORKSPACE_IDS);
         Assert::keyExists($normalizedPR, self::PUT_TO_REVIEW_AT);
         Assert::keyExists($normalizedPR, self::CLOSED_AT);
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
@@ -169,7 +169,7 @@ class PR
             function (string $channelIdentifiers) {
                 return WorkspaceIdentifier::fromString($channelIdentifiers);
             },
-            $normalizedPR[self::CHANNEL_IDS]
+            $normalizedPR[self::WORKSPACE_IDS]
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
         $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::CLOSED_AT]);
@@ -201,7 +201,7 @@ class PR
             self::COMMENTS_KEY => $this->comments,
             self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
-            self::CHANNEL_IDS => array_map(
+            self::WORKSPACE_IDS => array_map(
                 function (WorkspaceIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },

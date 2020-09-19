@@ -48,20 +48,20 @@ class PRTest extends TestCase
         );
 
         $normalizedPR = $pr->normalize();
-        $this->assertEquals($prIdentifier, $normalizedPR['IDENTIFIER']);
-        $this->assertEquals($author, $normalizedPR['AUTHOR_IDENTIFIER']);
-        $this->assertEquals($title, $normalizedPR['TITLE']);
-        $this->assertEquals(0, $normalizedPR['GTMS']);
-        $this->assertEquals(0, $normalizedPR['NOT_GTMS']);
-        $this->assertEquals(0, $normalizedPR['COMMENTS']);
-        $this->assertEquals('PENDING', $normalizedPR['CI_STATUS']['BUILD_RESULT']);
-        $this->assertEquals('', $normalizedPR['CI_STATUS']['BUILD_LINK']);
-        $this->assertEquals(false, $normalizedPR['IS_MERGED']);
-        $this->assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
-        $this->assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
-        $this->assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
-        $this->assertEmpty($normalizedPR['CLOSED_AT']);
-        $this->assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
+        self::assertEquals($prIdentifier, $normalizedPR['IDENTIFIER']);
+        self::assertEquals($author, $normalizedPR['AUTHOR_IDENTIFIER']);
+        self::assertEquals($title, $normalizedPR['TITLE']);
+        self::assertEquals(0, $normalizedPR['GTMS']);
+        self::assertEquals(0, $normalizedPR['NOT_GTMS']);
+        self::assertEquals(0, $normalizedPR['COMMENTS']);
+        self::assertEquals('PENDING', $normalizedPR['CI_STATUS']['BUILD_RESULT']);
+        self::assertEquals('', $normalizedPR['CI_STATUS']['BUILD_LINK']);
+        self::assertEquals(false, $normalizedPR['IS_MERGED']);
+        self::assertEquals([$channelIdentifier], $normalizedPR['WORKSPACE_IDS']);
+        self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
+        self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
+        self::assertEmpty($normalizedPR['CLOSED_AT']);
+        self::assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
     /**
@@ -81,7 +81,7 @@ class PRTest extends TestCase
                 'BUILD_LINK' => '',
             ],
             'IS_MERGED' => true,
-            'CHANNEL_IDS' => ['akeneo'],
+            'WORKSPACE_IDS' => ['akeneo'],
             'MESSAGE_IDS' => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
             'CLOSED_AT' => self::A_TIMESTAMP,
@@ -89,8 +89,8 @@ class PRTest extends TestCase
 
         $pr = PR::fromNormalized($normalizedPR);
 
-        $this->assertSame($normalizedPR, $pr->normalize());
-        $this->assertEmpty($pr->getEvents());
+        self::assertSame($normalizedPR, $pr->normalize());
+        self::assertEmpty($pr->getEvents());
     }
 
     /**
@@ -117,13 +117,13 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['GTMS']);
+        self::assertEquals(0, $pr->normalize()['GTMS']);
 
         $pr->GTM($reviewerName);
-        $this->assertEquals(1, $pr->normalize()['GTMS']);
+        self::assertEquals(1, $pr->normalize()['GTMS']);
 
         $pr->GTM($reviewerName);
-        $this->assertEquals(2, $pr->normalize()['GTMS']);
+        self::assertEquals(2, $pr->normalize()['GTMS']);
     }
 
     /**
@@ -140,10 +140,10 @@ class PRTest extends TestCase
         );
         $pr->close(true);
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['GTMS']);
+        self::assertEquals(0, $pr->normalize()['GTMS']);
 
         $pr->GTM($reviewerName);
-        $this->assertEquals(0, $pr->normalize()['GTMS']);
+        self::assertEquals(0, $pr->normalize()['GTMS']);
     }
 
     /**
@@ -159,13 +159,13 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
+        self::assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
         $pr->notGTM($reviewerName);
-        $this->assertEquals(1, $pr->normalize()['NOT_GTMS']);
+        self::assertEquals(1, $pr->normalize()['NOT_GTMS']);
 
         $pr->notGTM($reviewerName);
-        $this->assertEquals(2, $pr->normalize()['NOT_GTMS']);
+        self::assertEquals(2, $pr->normalize()['NOT_GTMS']);
     }
 
     /**
@@ -182,10 +182,10 @@ class PRTest extends TestCase
         );
         $pr->close(true);
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
+        self::assertEquals(0, $pr->normalize()['NOT_GTMS']);
 
         $pr->notGTM($reviewerName);
-        $this->assertEquals(0, $pr->normalize()['NOT_GTMS']);
+        self::assertEquals(0, $pr->normalize()['NOT_GTMS']);
     }
 
     /**
@@ -201,13 +201,13 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+        self::assertEquals(0, $pr->normalize()['COMMENTS']);
 
         $pr->comment($reviewerName);
-        $this->assertEquals(1, $pr->normalize()['COMMENTS']);
+        self::assertEquals(1, $pr->normalize()['COMMENTS']);
 
         $pr->comment($reviewerName);
-        $this->assertEquals(2, $pr->normalize()['COMMENTS']);
+        self::assertEquals(2, $pr->normalize()['COMMENTS']);
     }
 
     /**
@@ -224,10 +224,10 @@ class PRTest extends TestCase
         );
         $pr->close(true);
         $reviewerName = ReviewerName::fromString('samir');
-        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+        self::assertEquals(0, $pr->normalize()['COMMENTS']);
 
         $pr->comment($reviewerName);
-        $this->assertEquals(0, $pr->normalize()['COMMENTS']);
+        self::assertEquals(0, $pr->normalize()['COMMENTS']);
     }
 
     /**
@@ -239,11 +239,11 @@ class PRTest extends TestCase
 
         $pr->green();
 
-        $this->assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'GREEN');
-        $this->assertCount(1, $pr->getEvents());
+        self::assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'GREEN');
+        self::assertCount(1, $pr->getEvents());
         $event = current($pr->getEvents());
-        $this->assertInstanceOf(CIGreen::class, $event);
-        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+        self::assertInstanceOf(CIGreen::class, $event);
+        self::assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
     }
 
     /**
@@ -259,11 +259,11 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $pr->close(true);
-        $this->assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+        self::assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
 
         $pr->green();
         $pr->red(BuildLink::fromURL('https://travis.com/build/123'));
-        $this->assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+        self::assertEquals('PENDING', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
     }
 
     /**
@@ -279,11 +279,11 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
         $pr->green();
-        $this->assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+        self::assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
         $pr->close(true);
 
         $pr->pending();
-        $this->assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
+        self::assertEquals('GREEN', $pr->normalize()['CI_STATUS']['BUILD_RESULT']);
     }
 
     /**
@@ -295,7 +295,7 @@ class PRTest extends TestCase
 
         $pr->green();
 
-        $this->assertEmpty($pr->getEvents());
+        self::assertEmpty($pr->getEvents());
     }
 
     /**
@@ -309,13 +309,13 @@ class PRTest extends TestCase
         $pr->red(BuildLink::fromURL($buildLink));
 
         $CI_STATUS = $pr->normalize()['CI_STATUS'];
-        $this->assertEquals($CI_STATUS['BUILD_RESULT'], 'RED');
-        $this->assertEquals($CI_STATUS['BUILD_LINK'], $buildLink);
-        $this->assertCount(1, $pr->getEvents());
+        self::assertEquals($CI_STATUS['BUILD_RESULT'], 'RED');
+        self::assertEquals($CI_STATUS['BUILD_LINK'], $buildLink);
+        self::assertCount(1, $pr->getEvents());
         $event = current($pr->getEvents());
-        $this->assertInstanceOf(CIRed::class, $event);
-        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
-        $this->assertEquals($buildLink, $event->buildLink()->stringValue());
+        self::assertInstanceOf(CIRed::class, $event);
+        self::assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+        self::assertEquals($buildLink, $event->buildLink()->stringValue());
     }
 
     /**
@@ -327,7 +327,7 @@ class PRTest extends TestCase
 
         $pr->red(BuildLink::none());
 
-        $this->assertEmpty($pr->getEvents());
+        self::assertEmpty($pr->getEvents());
     }
 
     /**
@@ -339,11 +339,11 @@ class PRTest extends TestCase
 
         $pr->pending();
 
-        $this->assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'PENDING');
-        $this->assertCount(1, $pr->getEvents());
+        self::assertEquals($pr->normalize()['CI_STATUS']['BUILD_RESULT'], 'PENDING');
+        self::assertCount(1, $pr->getEvents());
         $event = current($pr->getEvents());
-        $this->assertInstanceOf(CIPending::class, $event);
-        $this->assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+        self::assertInstanceOf(CIPending::class, $event);
+        self::assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
     }
 
     /**
@@ -355,7 +355,7 @@ class PRTest extends TestCase
 
         $pr->pending();
 
-        $this->assertEmpty($pr->getEvents());
+        self::assertEmpty($pr->getEvents());
     }
 
     /**
@@ -367,10 +367,10 @@ class PRTest extends TestCase
 
         $pr->close(true);
 
-        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
-        $this->assertEquals(true, $pr->normalize()['IS_MERGED']);
-        $this->assertInstanceOf(PRMerged::class, current($pr->getEvents()));
-        $this->assertInstanceOf(PRClosed::class, last($pr->getEvents()));
+        self::assertNotEmpty($pr->normalize()['CLOSED_AT']);
+        self::assertEquals(true, $pr->normalize()['IS_MERGED']);
+        self::assertInstanceOf(PRMerged::class, current($pr->getEvents()));
+        self::assertInstanceOf(PRClosed::class, last($pr->getEvents()));
     }
 
     /**
@@ -382,10 +382,10 @@ class PRTest extends TestCase
 
         $pr->close(false);
 
-        $this->assertNotEmpty($pr->normalize()['CLOSED_AT']);
-        $this->assertFalse($pr->normalize()['IS_MERGED']);
-        $this->assertCount(1, $pr->getEvents());
-        $this->assertInstanceOf(PRClosed::class, current($pr->getEvents()));
+        self::assertNotEmpty($pr->normalize()['CLOSED_AT']);
+        self::assertFalse($pr->normalize()['IS_MERGED']);
+        self::assertCount(1, $pr->getEvents());
+        self::assertInstanceOf(PRClosed::class, current($pr->getEvents()));
     }
 
     /**
@@ -406,7 +406,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
@@ -415,9 +415,9 @@ class PRTest extends TestCase
 
         $prWithOneGTMMissing->GTM(ReviewerName::fromString('samir'));
 
-        $this->assertCount(2, $prWithOneGTMMissing->getEvents());
+        self::assertCount(2, $prWithOneGTMMissing->getEvents());
         $event = last($prWithOneGTMMissing->getEvents());
-        $this->assertInstanceOf(GoodToMerge::class, $event);
+        self::assertInstanceOf(GoodToMerge::class, $event);
     }
 
     /**
@@ -438,7 +438,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
@@ -447,9 +447,9 @@ class PRTest extends TestCase
 
         $prWithOneGTMMissing->green();
 
-        $this->assertCount(2, $prWithOneGTMMissing->getEvents());
+        self::assertCount(2, $prWithOneGTMMissing->getEvents());
         $event = last($prWithOneGTMMissing->getEvents());
-        $this->assertInstanceOf(GoodToMerge::class, $event);
+        self::assertInstanceOf(GoodToMerge::class, $event);
     }
 
     /**
@@ -466,7 +466,7 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
 
-        $this->assertTrue($pr->PRIdentifier()->equals($identifier));
+        self::assertTrue($pr->PRIdentifier()->equals($identifier));
     }
 
     /**
@@ -484,7 +484,7 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
 
-        $this->assertEquals($expectedAuthorIdentifier, $pr->authorIdentifier()->stringValue());
+        self::assertEquals($expectedAuthorIdentifier, $pr->authorIdentifier()->stringValue());
     }
 
     /**
@@ -502,7 +502,7 @@ class PRTest extends TestCase
             Title::fromString($expectedTitle)
         );
 
-        $this->assertEquals($expectedTitle, $pr->title()->stringValue());
+        self::assertEquals($expectedTitle, $pr->title()->stringValue());
     }
 
     /**
@@ -517,7 +517,7 @@ class PRTest extends TestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $this->assertEquals('1', current($pr->messageIdentifiers())->stringValue());
+        self::assertEquals('1', current($pr->messageIdentifiers())->stringValue());
     }
 
     /**
@@ -532,7 +532,7 @@ class PRTest extends TestCase
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $this->assertEquals('akeneo', current($pr->channelIdentifiers())->stringValue());
+        self::assertEquals('akeneo', current($pr->channelIdentifiers())->stringValue());
     }
 
     /**
@@ -548,7 +548,7 @@ class PRTest extends TestCase
             Title::fromString('Add new feature')
         );
 
-        $this->assertEquals(0, $pr->numberOfDaysInReview());
+        self::assertEquals(0, $pr->numberOfDaysInReview());
     }
 
     /**
@@ -561,8 +561,8 @@ class PRTest extends TestCase
 
         $pr->putToReviewAgainViaMessage(WorkspaceIdentifier::fromString('brazil-team'), $expectedMessageId);
 
-        $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1', '2']);
-        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['akeneo', 'brazil-team']);
+        self::assertEquals(['1', '2'], $pr->normalize()['MESSAGE_IDS']);
+        self::assertEquals(['akeneo', 'brazil-team'], $pr->normalize()['WORKSPACE_IDS']);
         $this->assertPRPutToReviewEvent(
             $pr->getEvents(),
             PRIdentifier::fromString(self::PR_IDENTIFIER),
@@ -581,9 +581,9 @@ class PRTest extends TestCase
             MessageIdentifier::create('1')
         );
 
-        $this->assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
-        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['akeneo']);
-        $this->assertEmpty($pr->getEvents());
+        self::assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
+        self::assertEquals($pr->normalize()['WORKSPACE_IDS'], ['akeneo']);
+        self::assertEmpty($pr->getEvents());
     }
 
     /**
@@ -595,9 +595,9 @@ class PRTest extends TestCase
 
         $pr->reopen();
 
-        $this->assertNull($pr->normalize()['CLOSED_AT']);
-        $this->assertFalse($pr->normalize()['IS_MERGED']);
-        $this->assertEmpty($pr->getEvents());
+        self::assertNull($pr->normalize()['CLOSED_AT']);
+        self::assertFalse($pr->normalize()['IS_MERGED']);
+        self::assertEmpty($pr->getEvents());
     }
 
     public function normalizedWithMissingInformation(): array
@@ -651,11 +651,11 @@ class PRTest extends TestCase
         PRIdentifier $expectedPRIdentifier,
         MessageIdentifier $expectedMessageId
     ): void {
-        $this->assertCount(1, $events);
+        self::assertCount(1, $events);
         $PRPutToReviewEvent = current($events);
-        $this->assertInstanceOf(PRPutToReview::class, $PRPutToReviewEvent);
-        $this->assertTrue($PRPutToReviewEvent->PRIdentifier()->equals($expectedPRIdentifier));
-        $this->assertTrue($PRPutToReviewEvent->messageIdentifier()->equals($expectedMessageId));
+        self::assertInstanceOf(PRPutToReview::class, $PRPutToReviewEvent);
+        self::assertTrue($PRPutToReviewEvent->PRIdentifier()->equals($expectedPRIdentifier));
+        self::assertTrue($PRPutToReviewEvent->messageIdentifier()->equals($expectedMessageId));
     }
 
     private function pendingPR(): PR
@@ -672,7 +672,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
@@ -697,7 +697,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
@@ -722,7 +722,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
@@ -747,7 +747,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
-                'CHANNEL_IDS' => ['akeneo'],
+                'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => self::A_TIMESTAMP,

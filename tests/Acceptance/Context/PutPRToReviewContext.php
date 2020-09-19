@@ -234,7 +234,7 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEmpty($pr->normalize()['CI_STATUS']['BUILD_LINK']);
         Assert::assertEquals($pr->normalize()['IS_MERGED'], $isMerged);
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
-        Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);
+        Assert::assertEquals($pr->normalize()['WORKSPACE_IDS'], $channelIds);
         Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
         Assert::assertEmpty($pr->normalize()['CLOSED_AT']);
     }
@@ -269,7 +269,7 @@ class PutPRToReviewContext extends FeatureContext
                 'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                 'IS_MERGED'         => true,
                 'MESSAGE_IDS'       => [],
-                'CHANNEL_IDS'       => ['akeneo'],
+                'WORKSPACE_IDS'       => ['akeneo'],
                 'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
                 'CLOSED_AT'         => $closedAtTimestamp,
             ]

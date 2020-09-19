@@ -119,54 +119,54 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'         => false,
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'CHANNEL_IDS'       => ['akeneo'],
-                    'PUT_TO_REVIEW_AT'  => '1560175073',
-                    'CLOSED_AT'         => null,
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => false,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'PUT_TO_REVIEW_AT' => '1560175073',
+                    'CLOSED_AT' => null,
                 ]
             )
         );
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => true,
-                    'MESSAGE_IDS'      => ['1', '2'],
-                    'CHANNEL_IDS'      => ['akeneo'],
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => true,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'CLOSED_AT'        => null,
+                    'CLOSED_AT' => null,
                 ]
             )
         );
         $this->sqlPRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/3333',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => false,
-                    'MESSAGE_IDS'      => ['1', '2'],
-                    'CHANNEL_IDS'      => ['akeneo'],
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => false,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'CLOSED_AT'        => null,
+                    'CLOSED_AT' => null,
                 ]
             )
         );
@@ -174,46 +174,46 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->assertPRs(
             [
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => false,
-                    'CHANNEL_IDS'      => ['akeneo'],
-                    'MESSAGE_IDS'      => ['1', '2'],
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => false,
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'CLOSED_AT'        => null,
+                    'CLOSED_AT' => null,
                 ],
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/3333',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/3333',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => false,
-                    'CHANNEL_IDS'      => ['akeneo'],
-                    'MESSAGE_IDS'      => ['1', '2'],
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => false,
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'CLOSED_AT'        => null,
+                    'CLOSED_AT' => null,
                 ],
                 [
-                    'IDENTIFIER'       => 'akeneo/pim-community-dev/2222',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'             => 1,
-                    'NOT_GTMS'         => 1,
-                    'COMMENTS'         => 1,
-                    'CI_STATUS'        => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                    'IS_MERGED'        => true,
-                    'CHANNEL_IDS'      => ['akeneo'],
-                    'MESSAGE_IDS'      => ['1', '2'],
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                    'IS_MERGED' => true,
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
-                    'CLOSED_AT'        => null,
+                    'CLOSED_AT' => null,
                 ],
             ],
             $actualPRs
@@ -222,6 +222,7 @@ class SqlPRRepositoryTest extends KernelTestCase
 
     /**
      * @test
+     *
      * @throws PRNotFoundException
      */
     public function it_throws_if_it_does_not_find_the_pr()
@@ -232,6 +233,7 @@ class SqlPRRepositoryTest extends KernelTestCase
 
     /**
      * @test
+     *
      * @throws PRNotFoundException
      */
     public function it_resets_itself()
@@ -254,6 +256,7 @@ class SqlPRRepositoryTest extends KernelTestCase
 
     /**
      * @test
+     *
      * @throws PRNotFoundException
      */
     public function it_finds_every__open_prs_not_gtmed_twice()
@@ -310,7 +313,7 @@ class SqlPRRepositoryTest extends KernelTestCase
             Title::fromString('Add new feature')
         );
         $reviewerName = ReviewerName::fromString('samir');
-        for ($i = 0; $i < $GTMs; $i++) {
+        for ($i = 0; $i < $GTMs; ++$i) {
             $PR->GTM($reviewerName);
         }
         if ($isMerged) {

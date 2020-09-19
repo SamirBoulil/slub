@@ -17,7 +17,7 @@ class PutPRToReview
     public $PRIdentifier;
 
     /** @var string */
-    public $channelIdentifier;
+    public $workspaceIdentifier;
 
     /** @var string */
     public $messageIdentifier;

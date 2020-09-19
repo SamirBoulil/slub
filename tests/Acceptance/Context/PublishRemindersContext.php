@@ -4,19 +4,19 @@ namespace Tests\Acceptance\Context;
 
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock;
 use Tests\Acceptance\helpers\ChatClientSpy;
 
 class PublishRemindersContext extends FeatureContext
 {
-    private const SQUAD_RACCOONS = 'squad-raccoons';
+    private const SQUAD_RACCOONS = 'akeneo';
     private const GENERAL = 'general';
     private const UNSUPPORTED_CHANNEL = 'UNSUPPORTED_CHANNEL';
     private const PR_1 = 'samirboulil/slub/1';
@@ -73,7 +73,7 @@ class PublishRemindersContext extends FeatureContext
     public function theRemindersShouldOnlyContainAReferenceToThePRsInReview()
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
@@ -81,7 +81,7 @@ Yop, these PRs need reviews!
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            ChannelIdentifier::fromString(self::GENERAL),
+            WorkspaceIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/3|"Add new feature">_ (2 days ago)
@@ -121,7 +121,7 @@ CHAT
     public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(): void
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
@@ -141,7 +141,7 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            ChannelIdentifier::fromString($channelIdentifier),
+            WorkspaceIdentifier::fromString($channelIdentifier),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -181,7 +181,7 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -197,7 +197,7 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

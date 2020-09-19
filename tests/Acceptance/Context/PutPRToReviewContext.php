@@ -2,9 +2,7 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
-use Ramsey\Uuid\Uuid;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
@@ -55,14 +53,14 @@ class PutPRToReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^an author puts a PR to review in a channel$/
+     * @When /^an author puts a PR to review in a workspace$/
      */
     public function anAuthorPutsAPRToReview()
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'squad-raccoons',
+            'akeneo',
             '1234',
             'sam',
             'Add new feature',
@@ -86,7 +84,7 @@ class PutPRToReviewContext extends FeatureContext
         $this->currentChannelIds[] = $channelIdentifier;
 
         $putPRToReview = new PutPRToReview();
-        $putPRToReview->channelIdentifier = $channelIdentifier;
+        $putPRToReview->workspaceIdentifier = $channelIdentifier;
         $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
         $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
         $putPRToReview->messageIdentifier = $messageId;
@@ -110,7 +108,7 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview = $this->createPutPRToReviewCommand(
             'unknown/unknown',
             'unknown/unknown/1111',
-            'squad-raccoons',
+            'akeneo',
             '1',
             'sam',
             'Add new feature',
@@ -151,7 +149,7 @@ class PutPRToReviewContext extends FeatureContext
             'PENDING',
             false,
             $this->currentMessageIds,
-            ['squad-raccoons']
+            ['akeneo']
         );
         Assert::assertTrue($this->eventSpy->PRPutToReviewDispatched());
     }
@@ -271,7 +269,7 @@ class PutPRToReviewContext extends FeatureContext
                 'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                 'IS_MERGED'         => true,
                 'MESSAGE_IDS'       => [],
-                'CHANNEL_IDS'       => ['squad-raccoons'],
+                'CHANNEL_IDS'       => ['akeneo'],
                 'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
                 'CLOSED_AT'         => $closedAtTimestamp,
             ]
@@ -287,7 +285,7 @@ class PutPRToReviewContext extends FeatureContext
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'squad-raccoons',
+            'akeneo',
             '1234',
             'sam',
             'Add new feature',

@@ -125,7 +125,7 @@ class SlubBot
         $PRToReview = new PutPRToReview();
         $PRToReview->PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
         $PRToReview->repositoryIdentifier = $repositoryIdentifier;
-        $PRToReview->channelIdentifier = $channelIdentifier;
+        $PRToReview->workspaceIdentifier = $channelIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
         $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
         $PRToReview->title = $PRInfo->title;

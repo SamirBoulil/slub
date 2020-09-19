@@ -11,13 +11,13 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\Notify\NotifyAuthor;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -64,7 +64,7 @@ class GoodToMergeContext extends FeatureContext
 
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
-            ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -107,7 +107,7 @@ class GoodToMergeContext extends FeatureContext
 
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
-            ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

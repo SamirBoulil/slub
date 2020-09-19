@@ -7,12 +7,12 @@ namespace Tests\Acceptance\Context;
 use PHPUnit\Framework\Assert;
 use Slub\Application\UnpublishPR\UnpublishPR;
 use Slub\Application\UnpublishPR\UnpublishPRHandler;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -41,7 +41,7 @@ class UnpublishPRContext extends FeatureContext
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create(self::PR_IDENTIFIER_MISTAKENLY_TO_REVIEW),
-                ChannelIdentifier::fromString('squad-raccoons'),
+                WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::fromString('CHANNEL_ID@1'),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

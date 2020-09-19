@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\InMemory\Query;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
 use Webmozart\Assert\Assert;
 
@@ -15,16 +15,40 @@ class InMemoryIsSupported implements IsSupportedInterface
     private $supportedRepositories;
 
     /** @var array */
-    private $supportedChannels;
+    private $supportedWorkspace;
 
     public function __construct(string $commaSeparatedRepositories, string $commaSeparatedchannels)
     {
         $supportedRepositories = explode(',', $commaSeparatedRepositories);
-        $supportedChannels = explode(',', $commaSeparatedchannels);
+        $supportedWorkspacess = explode(',', $commaSeparatedchannels);
         Assert::allString($supportedRepositories);
-        Assert::allString($supportedChannels);
+        Assert::allString($supportedWorkspacess);
         $this->supportedRepositories = $this->createIdentifiers($supportedRepositories);
-        $this->supportedChannels = $this->createChannels($supportedChannels);
+        $this->supportedWorkspace = $this->createWorkspaces($supportedWorkspacess);
+    }
+
+    public function repository(RepositoryIdentifier $repositoryIdentifierToCheck): bool
+    {
+        $repositoriesFound = array_filter(
+            $this->supportedRepositories,
+            function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
+                return $supportedRepository->equals($repositoryIdentifierToCheck);
+            }
+        );
+
+        return 1 === \count($repositoriesFound);
+    }
+
+    public function workspace(WorkspaceIdentifier $workspaceIdentifierToCheck): bool
+    {
+        $found = array_filter(
+            $this->supportedWorkspace,
+            function (WorkspaceIdentifier $supportedChannel) use ($workspaceIdentifierToCheck) {
+                return $supportedChannel->equals($workspaceIdentifierToCheck);
+            }
+        );
+
+        return 1 === \count($found);
     }
 
     /**
@@ -41,39 +65,15 @@ class InMemoryIsSupported implements IsSupportedInterface
     }
 
     /**
-     * return ChannelIdentifier[]
+     * @return WorkspaceIdentifier[]
      */
-    private function createChannels(array $normalizedChannels): array
+    private function createWorkspaces(array $normalizedWorkspaceIdentifiers): array
     {
         return array_map(
             function (string $normalizedIdentifier) {
-                return ChannelIdentifier::fromString($normalizedIdentifier);
+                return WorkspaceIdentifier::fromString($normalizedIdentifier);
             },
-            $normalizedChannels
+            $normalizedWorkspaceIdentifiers
         );
-    }
-
-    public function repository(RepositoryIdentifier $repositoryIdentifierToCheck): bool
-    {
-        $repositoriesFound = array_filter(
-            $this->supportedRepositories,
-            function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
-                return $supportedRepository->equals($repositoryIdentifierToCheck);
-            }
-        );
-
-        return \count($repositoriesFound) === 1;
-    }
-
-    public function channel(ChannelIdentifier $channelIdentifierToCheck): bool
-    {
-        $channelsFound = array_filter(
-            $this->supportedChannels,
-            function (ChannelIdentifier $supportedChannel) use ($channelIdentifierToCheck) {
-                return $supportedChannel->equals($channelIdentifierToCheck);
-            }
-        );
-
-        return \count($channelsFound) === 1;
     }
 }

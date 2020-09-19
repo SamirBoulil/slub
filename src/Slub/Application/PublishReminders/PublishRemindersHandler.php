@@ -6,8 +6,8 @@ namespace Slub\Application\PublishReminders;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -56,7 +56,7 @@ class PublishRemindersHandler
     }
 
     /**
-     * @return ChannelIdentifier[]
+     * @return WorkspaceIdentifier[]
      */
     private function channelIdentifiers(array $PRsInReview): array
     {
@@ -71,21 +71,21 @@ class PublishRemindersHandler
         return array_values($channelIdentifiers);
     }
 
-    private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
+    private function publishReminderForChannel(WorkspaceIdentifier $channelIdentifier, array $PRsInReview): void
     {
         $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
         $message = $this->formatReminders($PRsToPublish);
         $this->chatClient->publishInChannel($channelIdentifier, $message);
     }
 
-    private function prsPutToReviewInChannel(ChannelIdentifier $expectedChannelIdentifier, array $PRsInReview): array
+    private function prsPutToReviewInChannel(WorkspaceIdentifier $expectedChannelIdentifier, array $PRsInReview): array
     {
         return array_filter(
             $PRsInReview,
             function (PR $PR) use ($expectedChannelIdentifier) {
                 return array_filter(
                     $PR->channelIdentifiers(),
-                    function (ChannelIdentifier $actualChannelIdentifier) use ($expectedChannelIdentifier) {
+                    function (WorkspaceIdentifier $actualChannelIdentifier) use ($expectedChannelIdentifier) {
                         return $expectedChannelIdentifier->equals($actualChannelIdentifier);
                     }
                 );

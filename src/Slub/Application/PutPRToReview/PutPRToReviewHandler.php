@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRNotFoundException;
@@ -50,10 +50,10 @@ class PutPRToReviewHandler
     private function isSupported(PutPRToReview $putPRToReview): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
-        $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
+        $channelIdentifier = WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier);
 
         $isSupported = $this->isSupported->repository($repositoryIdentifier)
-            && $this->isSupported->channel($channelIdentifier);
+            && $this->isSupported->workspace($channelIdentifier);
 
         if (!$isSupported) {
             $this->logger->info(
@@ -61,7 +61,7 @@ class PutPRToReviewHandler
                     'PR "%s" was not put to review because it is not supported for channel "%s", and repository "%s"',
                     $putPRToReview->PRIdentifier,
                     $putPRToReview->repositoryIdentifier,
-                    $putPRToReview->channelIdentifier
+                    $putPRToReview->workspaceIdentifier
                 )
             );
         }
@@ -100,7 +100,7 @@ class PutPRToReviewHandler
             $PR->reopen();
         }
         $PR->putToReviewAgainViaMessage(
-            ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
+            WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier),
             MessageIdentifier::create($putPRToReview->messageIdentifier)
         );
         $this->PRRepository->save($PR);
@@ -113,7 +113,7 @@ class PutPRToReviewHandler
 
         $PR = PR::create(
             $PRIdentifier,
-            ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
+            WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier),
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
             AuthorIdentifier::fromString($putPRToReview->authorIdentifier),
             Title::fromString($putPRToReview->title),

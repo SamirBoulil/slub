@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Functional;
 
 use Ramsey\Uuid\Uuid;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Tests\WebTestCase;
@@ -56,7 +56,7 @@ class PRMergedTest extends WebTestCase
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create(self::PR_IDENTIFIER),
-                ChannelIdentifier::fromString('squad-raccoons'),
+                WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::create('CHANNEL_ID@1111'),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

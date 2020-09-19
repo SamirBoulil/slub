@@ -10,12 +10,12 @@ use BotMan\BotMan\Drivers\Tests\FakeDriver;
 use BotMan\BotMan\Drivers\Tests\ProxyDriver;
 use BotMan\Studio\Testing\BotManTester;
 use Ramsey\Uuid\Uuid;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Chat\Slack\SlubBot;
@@ -151,7 +151,7 @@ class SlubBotTest extends KernelTestCase
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create($PRIdentifier),
-                ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
+                WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
                 MessageIdentifier::fromString(Uuid::uuid4()->toString()),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

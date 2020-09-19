@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Installer\CLI;
 
 use Doctrine\DBAL\Connection;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -107,7 +107,7 @@ class InstallerCLITest extends KernelTestCase
         $prRepository->save(
             PR::create(
                 $this->currentPRIdentifier,
-                ChannelIdentifier::fromString('squad-raccoons'),
+                WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::create('CHANNEL_ID@1111'),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

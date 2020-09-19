@@ -10,13 +10,13 @@ use Ramsey\Uuid\Uuid;
 use Slub\Application\ClosePR\ClosePR;
 use Slub\Application\ClosePR\ClosePRHandler;
 use Slub\Application\Notify\NotifySquad;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -123,7 +123,7 @@ class ClosePRContext extends FeatureContext
     private function PRWithGTMsAndGreen(): PR
     {
         $PR = PR::create($this->currentPRIdentifier,
-            ChannelIdentifier::fromString('squad-raccoons'),
+            WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

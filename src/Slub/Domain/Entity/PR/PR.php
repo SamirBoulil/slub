@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 use Slub\Domain\Event\CIRed;
@@ -40,7 +40,7 @@ class PR
     /** @var PRIdentifier */
     private $PRIdentifier;
 
-    /** @var ChannelIdentifier[] */
+    /** @var WorkspaceIdentifier[] */
     private $channelIdentifiers;
 
     /** @var MessageIdentifier[] */
@@ -103,7 +103,7 @@ class PR
 
     public static function create(
         PRIdentifier $PRIdentifier,
-        ChannelIdentifier $channelIdentifier,
+        WorkspaceIdentifier $channelIdentifier,
         MessageIdentifier $messageIdentifier,
         AuthorIdentifier $authorIdentifier,
         Title $title,
@@ -167,7 +167,7 @@ class PR
         );
         $channelIdentifiers = array_map(
             function (string $channelIdentifiers) {
-                return ChannelIdentifier::fromString($channelIdentifiers);
+                return WorkspaceIdentifier::fromString($channelIdentifiers);
             },
             $normalizedPR[self::CHANNEL_IDS]
         );
@@ -202,7 +202,7 @@ class PR
             self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
             self::CHANNEL_IDS => array_map(
-                function (ChannelIdentifier $channelIdentifier) {
+                function (WorkspaceIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers
@@ -338,7 +338,7 @@ class PR
     }
 
     public function putToReviewAgainViaMessage(
-        ChannelIdentifier $newChannelIdentifier,
+        WorkspaceIdentifier $newChannelIdentifier,
         MessageIdentifier $newMessageIdentifier
     ): void {
         if ($this->hasMessageIdentifier($newMessageIdentifier) && $this->hasChannelIdentifier($newChannelIdentifier)) {
@@ -361,7 +361,7 @@ class PR
     }
 
     /**
-     * @return ChannelIdentifier[]
+     * @return WorkspaceIdentifier[]
      */
     public function channelIdentifiers(): array
     {
@@ -387,12 +387,12 @@ class PR
         );
     }
 
-    private function hasChannelIdentifier(ChannelIdentifier $newChannelIdentifier): bool
+    private function hasChannelIdentifier(WorkspaceIdentifier $newChannelIdentifier): bool
     {
         return in_array(
             $newChannelIdentifier->stringValue(),
             array_map(
-                function (ChannelIdentifier $channelIdentifier) {
+                function (WorkspaceIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers

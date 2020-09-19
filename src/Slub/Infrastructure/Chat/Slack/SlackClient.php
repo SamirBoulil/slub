@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
-use Nette\NotImplementedException;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -80,7 +79,7 @@ class SlackClient implements ChatClient
         $this->addReactions($messageIdentifier, $reactionsToAdd);
     }
 
-    public function publishInChannel(WorkspaceIdentifier $channelIdentifier, string $text)
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
     {
         APIHelper::checkResponse(
             $this->client->post(

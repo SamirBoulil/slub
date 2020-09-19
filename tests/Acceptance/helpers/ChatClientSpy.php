@@ -6,8 +6,8 @@ namespace Tests\Acceptance\helpers;
 
 use PHPUnit\Framework\Assert;
 use Slub\Application\Common\ChatClient;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -28,7 +28,7 @@ class ChatClientSpy implements ChatClient
             $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
-    public function publishInChannel(WorkspaceIdentifier $channelIdentifier, string $text)
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
     {
         $this->recordedMessages[$channelIdentifier->stringValue()][] = $text;
     }
@@ -39,7 +39,7 @@ class ChatClientSpy implements ChatClient
         Assert::assertContains($expectedText, $reactions);
     }
 
-    public function assertHasBeenCalledWithChannelIdentifierAndMessage(WorkspaceIdentifier $expectedChannelIdentifier, string $expectedText): void
+    public function assertHasBeenCalledWithChannelIdentifierAndMessage(ChannelIdentifier $expectedChannelIdentifier, string $expectedText): void
     {
         $actualText = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
         Assert::assertContains($expectedText, $actualText);

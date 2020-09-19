@@ -6,8 +6,8 @@ namespace Tests\Acceptance\helpers;
 
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -80,7 +80,7 @@ class ChatClientSpyTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $slackClientSpy = new ChatClientSpy();
-        $slackClientSpy->publishInChannel(WorkspaceIdentifier::fromString('general@12345'), 'text');
+        $slackClientSpy->publishInChannel(ChannelIdentifier::fromString('general@12345'), 'text');
 
         $this->expectException(AssertionFailedError::class);
         $slackClientSpy->assertEmpty();

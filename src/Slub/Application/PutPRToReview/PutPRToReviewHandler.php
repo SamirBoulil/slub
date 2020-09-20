@@ -58,10 +58,10 @@ class PutPRToReviewHandler
         if (!$isSupported) {
             $this->logger->info(
                 sprintf(
-                    'PR "%s" was not put to review because it is not supported for channel "%s", and repository "%s"',
+                    'PR "%s" was not put to review because it is not supported for workspace "%s", and repository "%s"',
                     $putPRToReview->PRIdentifier,
-                    $putPRToReview->repositoryIdentifier,
-                    $putPRToReview->workspaceIdentifier
+                    $putPRToReview->workspaceIdentifier,
+                    $putPRToReview->repositoryIdentifier
                 )
             );
         }

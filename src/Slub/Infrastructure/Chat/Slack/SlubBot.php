@@ -246,7 +246,7 @@ MESSAGE;
     {
         $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
-        $result = $payload['team_id'];
+        $result = $payload['team'];
 
         return $result;
     }

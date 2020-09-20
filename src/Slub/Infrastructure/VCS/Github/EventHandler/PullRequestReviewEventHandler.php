@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class PullRequestReviewEventHandler implements EventHandlerInterface
 {
     private const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
+    const EDITED_ACTION_TYPE = 'edited';
 
     /** @var NewReviewHandler */
     private $newReviewHandler;
@@ -30,7 +31,9 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
 
     public function handle(array $PRStatusUpdate): void
     {
-        if ($this->authorReviewedHisOwnPR($PRStatusUpdate)) {
+        if ($this->reviewIsAnEdit($PRStatusUpdate)
+            || $this->authorReviewedHisOwnPR($PRStatusUpdate)
+        ) {
             return;
         }
 
@@ -74,7 +77,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
             default:
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Unkown review status "%s", expected one of "approved", "request_changes", "commented"',
+                        'Unknown review status "%s", expected one of "approved", "request_changes", "commented"',
                         $PRStatus
                     )
                 );
@@ -89,5 +92,10 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     private function reviewerName(array $PRStatusUpdate): string
     {
         return $PRStatusUpdate['review']['user']['login'];
+    }
+
+    private function reviewIsAnEdit(array $PRStatusUpdate): bool
+    {
+        return self::EDITED_ACTION_TYPE === $PRStatusUpdate['action'];
     }
 }

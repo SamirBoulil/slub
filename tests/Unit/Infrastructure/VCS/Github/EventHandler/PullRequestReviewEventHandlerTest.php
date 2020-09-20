@@ -51,9 +51,10 @@ class PullRequestReviewEventHandlerTest extends TestCase
     public function it_listens_to_accepted_PR(string $reviewState, string $expectedReviewStatus)
     {
         $newReview = [
+            'action' => 'submitted',
             'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie']],
-            'repository'   => ['full_name' => self::REPOSITORY_IDENTIFIER],
-            'review'       => ['state' => $reviewState, 'user' => ['id' => 2, 'login' => 'samir']]
+            'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
+            'review' => ['state' => $reviewState, 'user' => ['id' => 2, 'login' => 'samir']],
         ];
 
         $this->handler->handle(
@@ -72,10 +73,10 @@ class PullRequestReviewEventHandlerTest extends TestCase
     public function reviewStates()
     {
         return [
-            'Accepted'  => ['approved', 'accepted'],
-            'Refused1'  => ['request_changes', 'refused'],
-            'Refused2'  => ['changes_requested', 'refused'],
-            'Commented' => ['commented', 'commented']
+            'Accepted' => ['approved', 'accepted'],
+            'Refused1' => ['request_changes', 'refused'],
+            'Refused2' => ['changes_requested', 'refused'],
+            'Commented' => ['commented', 'commented'],
         ];
     }
 
@@ -86,8 +87,9 @@ class PullRequestReviewEventHandlerTest extends TestCase
     {
         $authorUserId = 1;
         $authorsOwnComment = [
+            'action' => 'submitted',
             'pull_request' => ['user' => ['id' => $authorUserId]],
-            'review'       => ['user' => ['id' => $authorUserId]]
+            'review' => ['user' => ['id' => $authorUserId]],
         ];
 
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
@@ -98,12 +100,25 @@ class PullRequestReviewEventHandlerTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_take_into_account_edited_comments()
+    {
+        $commentEdited = ['action' => 'edited', 'review' => []];
+
+        $this->handler->handle(Argument::any())->shouldNotBeCalled();
+
+        $this->pullRequestReviewHandler->handle($commentEdited);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_if_the_status_is_not_supported()
     {
         $unsupportedReviewStatus = [
+            'action' => 'submitted',
             'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie']],
-            'repository'   => ['full_name' => self::REPOSITORY_IDENTIFIER],
-            'review'       => ['state' => 'UNSUPPORTED_STATUS', 'user' => ['id' => 2, 'login' => 'samir']]
+            'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
+            'review' => ['state' => 'UNSUPPORTED_STATUS', 'user' => ['id' => 2, 'login' => 'samir']],
         ];
 
         $this->expectException(\InvalidArgumentException::class);

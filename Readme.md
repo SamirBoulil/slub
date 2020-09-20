@@ -35,6 +35,7 @@ This project has been designed and first put in production in march 2019. It is 
 Each new version of Slub comes with a new set of features and bug fixes.
 
 Find the published release notes below:
+- April 2020, [Releasing Yeee 1.2](https://medium.com/@samir.boulil/releasing-yeee-1-2-36573723b92e)
 - November 2019, [Releasing Yeee 1.1](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)
 - March 2019, [Releasing Yeee 1.0](https://medium.com/@samir.boulil/releasing-slub-1-0-63c58756f923)
 

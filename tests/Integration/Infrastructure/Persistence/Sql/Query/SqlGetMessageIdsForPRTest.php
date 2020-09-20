@@ -10,6 +10,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -67,12 +68,14 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
             ChannelIdentifier::fromString('squad-raccoons'),
+            WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString(current($messageIds)),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
         for ($i = 1, $iMax = \count($messageIds); $i < $iMax; $i++) {
-            $PR->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'),
+            $PR->putToReviewAgainViaMessage(
+                ChannelIdentifier::fromString('brazil-team'),
                 MessageIdentifier::fromString($messageIds[$i])
             );
         }
@@ -84,7 +87,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
         $normalizedActualMessageIds = array_map(function (MessageIdentifier $messageId) {
             return $messageId->stringValue();
         }, $actualMessageIds);
-        $this->assertEquals($expectedMessageIds, $normalizedActualMessageIds);
+        self::assertEquals($expectedMessageIds, $normalizedActualMessageIds);
     }
 
     private function resetDB(): void

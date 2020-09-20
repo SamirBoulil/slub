@@ -20,6 +20,9 @@ class PutPRToReview
     public $channelIdentifier;
 
     /** @var string */
+    public $workspaceIdentifier;
+
+    /** @var string */
     public $messageIdentifier;
 
     /** @var string */

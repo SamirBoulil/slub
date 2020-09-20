@@ -13,6 +13,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -60,6 +61,7 @@ class ReviewContext extends FeatureContext
         $this->PRRepository->save(PR::create(
             $this->currentPRIdentifier,
             ChannelIdentifier::fromString('squad-raccoons'),
+            WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

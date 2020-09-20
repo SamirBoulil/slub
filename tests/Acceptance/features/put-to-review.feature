@@ -29,6 +29,6 @@ Feature: Collect the pull requests put to review
     Then the PR is not added to the list of followed PRs
 
   @secondary
-  Scenario: Put a PR to review on an unsupported channel
-    When an author puts a PR to review on an unsupported channel
+  Scenario: Put a PR to review on an unsupported workspace
+    When an author puts a PR to review on an unsupported workspace
     Then the PR is not added to the list of followed PRs

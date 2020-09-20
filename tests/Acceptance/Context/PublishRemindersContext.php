@@ -10,6 +10,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -142,6 +143,7 @@ CHAT
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
             ChannelIdentifier::fromString($channelIdentifier),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -160,18 +162,19 @@ CHAT
             ->modify(sprintf('-%d day', $putInReviewDaysAgo))
             ->getTimestamp();
         $PR = PR::fromNormalized([
-                'IDENTIFIER'        => $PRIdentifier,
+                'IDENTIFIER' => $PRIdentifier,
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'TITLE'             => 'Add new feature',
-                'GTMS'              => $GTMs,
-                'NOT_GTMS'          => 1,
-                'COMMENTS'          => 1,
-                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                'IS_MERGED'         => false,
-                'MESSAGE_IDS'       => [Uuid::uuid4()->toString()],
-                'CHANNEL_IDS'       => [$channelIdentifier],
-                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
-                'CLOSED_AT'         => null,
+                'TITLE' => 'Add new feature',
+                'GTMS' => $GTMs,
+                'NOT_GTMS' => 1,
+                'COMMENTS' => 1,
+                'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                'IS_MERGED' => false,
+                'MESSAGE_IDS' => [Uuid::uuid4()->toString()],
+                'CHANNEL_IDS' => [$channelIdentifier],
+                'WORKSPACE_IDS' => [Uuid::uuid4()->toString()],
+                'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
+                'CLOSED_AT' => null,
             ]
         );
         $this->PRRepository->save($PR);
@@ -182,6 +185,7 @@ CHAT
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -198,6 +202,7 @@ CHAT
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
-use Ramsey\Uuid\Uuid;
 use Slub\Application\ClosePR\ClosePR;
 use Slub\Application\ClosePR\ClosePRHandler;
 use Slub\Application\Notify\NotifySquad;
@@ -17,6 +15,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Acceptance\helpers\EventsSpy;
@@ -122,8 +121,10 @@ class ClosePRContext extends FeatureContext
 
     private function PRWithGTMsAndGreen(): PR
     {
-        $PR = PR::create($this->currentPRIdentifier,
+        $PR = PR::create(
+            $this->currentPRIdentifier,
             ChannelIdentifier::fromString('squad-raccoons'),
+            WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

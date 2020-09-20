@@ -16,6 +16,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Chat\Slack\SlubBot;
@@ -61,7 +62,7 @@ class SlubBotTest extends KernelTestCase
      */
     public function it_answers_to_new_PR_messages_in_public_channels(string $message): void
     {
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'channel'])->assertReplyNothing();
+        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'channel', 'team' => 'akeneo'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
 
@@ -70,7 +71,7 @@ class SlubBotTest extends KernelTestCase
      */
     public function it_answers_to_new_PR_messages_in_private_channels(): void
     {
-        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group'])->assertReplyNothing();
+        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
 
@@ -94,7 +95,7 @@ class SlubBotTest extends KernelTestCase
             $this->botUserId
         );
 
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group']);
+        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo']);
 
         $this->assertPRHasBeenUnpublished($PRIdentifier);
         $this->assertBotHasRepliedWithOneOf(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
@@ -152,6 +153,7 @@ class SlubBotTest extends KernelTestCase
             PR::create(
                 PRIdentifier::create($PRIdentifier),
                 ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
+                WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
                 MessageIdentifier::fromString(Uuid::uuid4()->toString()),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

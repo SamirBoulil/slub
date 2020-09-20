@@ -11,6 +11,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -50,11 +51,11 @@ class InstallerCLITest extends KernelTestCase
     public function it_installs_slub_for_the_first_time()
     {
         $this->dropDatabase();
-        $this->assertFalse($this->existsDatabase());
+        self::assertFalse($this->existsDatabase());
         $output = $this->installSlub();
         $this->assertTableExists();
-        $this->assertTrue($this->existsDatabase());
-        $this->assertContains('Slub installed', $output);
+        self::assertTrue($this->existsDatabase());
+        self::assertContains('Slub installed', $output);
     }
 
     /**
@@ -108,6 +109,7 @@ class InstallerCLITest extends KernelTestCase
             PR::create(
                 $this->currentPRIdentifier,
                 ChannelIdentifier::fromString('squad-raccoons'),
+                WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::create('CHANNEL_ID@1111'),
                 AuthorIdentifier::fromString('sam'),
                 Title::fromString('Add new feature')

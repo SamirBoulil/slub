@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Domain\Entity\Channel;
+namespace Tests\Unit\Domain\Entity\Workspace;
 
 use PHPUnit\Framework\TestCase;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 
-class ChannelIdentifierTest extends TestCase
+class WorkspaceIdentifierTest extends TestCase
 {
     /**
      * @test
      */
     public function it_creates_an_identifier_from_its_string_value()
     {
-        $identifier = ChannelIdentifier::fromString('squad-raccoons');
-        self::assertEquals('squad-raccoons', $identifier->stringValue());
+        $identifier = WorkspaceIdentifier::fromString('akeneo');
+        self::assertEquals('akeneo', $identifier->stringValue());
     }
 
     /**
@@ -23,8 +23,8 @@ class ChannelIdentifierTest extends TestCase
      */
     public function it_tells_if_it_is_equal_to_another_identifier()
     {
-        $identifier = ChannelIdentifier::fromString('squad-raccoons');
-        $anotherIdentifier = ChannelIdentifier::fromString('unknown/unknown/unknown');
+        $identifier = WorkspaceIdentifier::fromString('akeneo');
+        $anotherIdentifier = WorkspaceIdentifier::fromString('unknown/unknown/unknown');
         self::assertTrue($identifier->equals($identifier));
         self::assertFalse($identifier->equals($anotherIdentifier));
     }
@@ -35,6 +35,6 @@ class ChannelIdentifierTest extends TestCase
     public function it_cannot_be_created_out_of_an_empty_string()
     {
         $this->expectException(\InvalidArgumentException::class);
-        ChannelIdentifier::fromString('');
+        WorkspaceIdentifier::fromString('');
     }
 }

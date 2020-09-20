@@ -99,10 +99,18 @@ class SlubBot
     private function listensToNewPR(BotMan $bot): void
     {
         $createNewPr = function (Botman $bot, string $repositoryIdentifier, string $PRNumber) {
+            $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
             $PRInfo = $this->PRInfo($PRNumber, $repositoryIdentifier);
-            $this->putPRToReview($PRNumber, $repositoryIdentifier, $channelIdentifier, $messageIdentifier, $PRInfo);
+            $this->putPRToReview(
+                $PRNumber,
+                $repositoryIdentifier,
+                $channelIdentifier,
+                $workspaceIdentifier,
+                $messageIdentifier,
+                $PRInfo
+            );
         };
         $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
@@ -120,12 +128,19 @@ class SlubBot
         $bot->hears($unpublishMessage, $unpublishPR);
     }
 
-    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier, PRInfo $PRInfo): void
-    {
+    private function putPRToReview(
+        string $PRNumber,
+        string $repositoryIdentifier,
+        string $channelIdentifier,
+        string $workspaceIdentifier,
+        string $messageIdentifier,
+        PRInfo $PRInfo
+    ): void {
         $PRToReview = new PutPRToReview();
         $PRToReview->PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
         $PRToReview->repositoryIdentifier = $repositoryIdentifier;
         $PRToReview->channelIdentifier = $channelIdentifier;
+        $PRToReview->workspaceIdentifier = $workspaceIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
         $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
         $PRToReview->title = $PRInfo->title;
@@ -209,7 +224,7 @@ class SlubBot
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
     }
 
-    private function providesToHelp(BotMan $bot)
+    private function providesToHelp(BotMan $bot): void
     {
         $userHelp = function (Botman $bot) {
             $message = <<<MESSAGE
@@ -238,5 +253,14 @@ MESSAGE;
         $helpYeee = sprintf('.*help.*<@%s>.*', $this->botUserId);
         $bot->hears($yeeeHelp, $userHelp);
         $bot->hears($helpYeee, $userHelp);
+    }
+
+    private function getWorkspaceIdentifier(BotMan $bot): string
+    {
+        $this->logger->info('Now fetching channel information for channel');
+        $payload = $bot->getMessage()->getPayload();
+        $result = $payload['team'];
+
+        return $result;
     }
 }

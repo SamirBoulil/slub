@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\InMemory\Query;
 
 use PHPUnit\Framework\TestCase;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported;
 
@@ -20,7 +20,7 @@ class InMemoryIsSupportedTest extends TestCase
         parent::setUp();
         $this->isSupportedQuery = new InMemoryIsSupported(
             'akeneo/pim-community-dev,akeneo/pim-enterprise-dev',
-            'squad-raccoons,squad-chipmunks'
+            'akeneo,slack_user_group'
         );
     }
 
@@ -40,13 +40,13 @@ class InMemoryIsSupportedTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_the_channel_is_supported()
+    public function it_tells_if_the_workspace_is_supported()
     {
         $this->assertTrue(
-            $this->isSupportedQuery->channel(ChannelIdentifier::fromString('squad-raccoons'))
+            $this->isSupportedQuery->workspace(WorkspaceIdentifier::fromString('akeneo'))
         );
         $this->assertFalse(
-            $this->isSupportedQuery->channel(ChannelIdentifier::fromString('unknown'))
+            $this->isSupportedQuery->workspace(WorkspaceIdentifier::fromString('unknown'))
         );
     }
 }

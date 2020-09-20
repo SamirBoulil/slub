@@ -5,7 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
-    SUPPORTED_CHANNELS: 'squad-raccoons,general'
+    SUPPORTED_WORKSPACES: 'akeneo,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
     GITHUB_URI: 'https://api.github.com'
     BOT_USER_ID: 'my_bot_user_id'
@@ -119,7 +119,7 @@ services:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
         arguments:
             - '%env(SUPPORTED_REPOSITORIES)%'
-            - '%env(SUPPORTED_CHANNELS)%'
+            - '%env(SUPPORTED_WORKSPACES)%'
 
     slub.infrastructure.persistence.delivered_event_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository

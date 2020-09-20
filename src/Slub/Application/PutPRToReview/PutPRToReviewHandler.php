@@ -12,7 +12,7 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
-use Slub\Domain\Query\GetVCSStatus;
+use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
@@ -50,18 +50,18 @@ class PutPRToReviewHandler
     private function isSupported(PutPRToReview $putPRToReview): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
-        $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
+        $workspaceIdentifier = WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier);
 
         $isSupported = $this->isSupported->repository($repositoryIdentifier)
-            && $this->isSupported->channel($channelIdentifier);
+            && $this->isSupported->workspace($workspaceIdentifier);
 
         if (!$isSupported) {
             $this->logger->info(
                 sprintf(
-                    'PR "%s" was not put to review because it is not supported for channel "%s", and repository "%s"',
+                    'PR "%s" was not put to review because it is not supported for workspace "%s", and repository "%s"',
                     $putPRToReview->PRIdentifier,
-                    $putPRToReview->repositoryIdentifier,
-                    $putPRToReview->channelIdentifier
+                    $putPRToReview->workspaceIdentifier,
+                    $putPRToReview->repositoryIdentifier
                 )
             );
         }
@@ -111,9 +111,11 @@ class PutPRToReviewHandler
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
         $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
 
+        $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
         $PR = PR::create(
             $PRIdentifier,
-            ChannelIdentifier::fromString($putPRToReview->channelIdentifier),
+            $channelIdentifier,
+            WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier),
             MessageIdentifier::fromString($putPRToReview->messageIdentifier),
             AuthorIdentifier::fromString($putPRToReview->authorIdentifier),
             Title::fromString($putPRToReview->title),

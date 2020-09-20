@@ -2,9 +2,7 @@
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
-use Ramsey\Uuid\Uuid;
 use Slub\Application\Notify\NotifySquad;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
@@ -39,6 +37,9 @@ class PutPRToReviewContext extends FeatureContext
     /** @var array */
     private $currentChannelIds = [];
 
+    /** @var array */
+    private $currentWorkspaceIds = [];
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         PutPRToReviewHandler $putPRToReviewHandler,
@@ -63,6 +64,7 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'squad-raccoons',
+            'akeneo',
             '1234',
             'sam',
             'Add new feature',
@@ -75,6 +77,7 @@ class PutPRToReviewContext extends FeatureContext
         string $repositoryIdentifier,
         string $PRIdentifier,
         string $channelIdentifier,
+        string $workspaceIdentifier,
         string $messageId,
         string $authorIdentifier,
         string $title,
@@ -84,9 +87,11 @@ class PutPRToReviewContext extends FeatureContext
         $this->currentPRIdentifier = $PRIdentifier;
         $this->currentMessageIds[] = $messageId;
         $this->currentChannelIds[] = $channelIdentifier;
+        $this->currentWorkspaceIds[] = $workspaceIdentifier;
 
         $putPRToReview = new PutPRToReview();
         $putPRToReview->channelIdentifier = $channelIdentifier;
+        $putPRToReview->workspaceIdentifier = $workspaceIdentifier;
         $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
         $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
         $putPRToReview->messageIdentifier = $messageId;
@@ -111,6 +116,7 @@ class PutPRToReviewContext extends FeatureContext
             'unknown/unknown',
             'unknown/unknown/1111',
             'squad-raccoons',
+            'akeneo',
             '1',
             'sam',
             'Add new feature',
@@ -120,14 +126,15 @@ class PutPRToReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^an author puts a PR to review on an unsupported channel$/
+     * @When /^an author puts a PR to review on an unsupported workspace/
      */
     public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel()
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
-            'unsupported-channel',
+            'general',
+            'unsupported-workspace',
             '1',
             'sam',
             'Add new feature',
@@ -151,7 +158,8 @@ class PutPRToReviewContext extends FeatureContext
             'PENDING',
             false,
             $this->currentMessageIds,
-            ['squad-raccoons']
+            ['squad-raccoons'],
+            ['akeneo']
         );
         Assert::assertTrue($this->eventSpy->PRPutToReviewDispatched());
     }
@@ -185,6 +193,7 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'general',
+            'akeneo',
             '6666',
             'sam',
             'Add new feature',
@@ -208,7 +217,8 @@ class PutPRToReviewContext extends FeatureContext
             'PENDING',
             false,
             $this->currentMessageIds,
-            $this->currentChannelIds
+            $this->currentChannelIds,
+            ['akeneo']
         );
     }
 
@@ -222,7 +232,8 @@ class PutPRToReviewContext extends FeatureContext
         string $ciStatus,
         bool $isMerged,
         array $messageIds,
-        array $channelIds
+        array $channelIds,
+        array $workspaceIds
     ): void {
         Assert::assertTrue($this->PRExists($prIdentifier));
         $pr = $this->PRRepository->getBy(PRIdentifier::create($prIdentifier));
@@ -237,6 +248,7 @@ class PutPRToReviewContext extends FeatureContext
         Assert::assertEquals($pr->normalize()['IS_MERGED'], $isMerged);
         Assert::assertEquals($pr->normalize()['MESSAGE_IDS'], $messageIds);
         Assert::assertEquals($pr->normalize()['CHANNEL_IDS'], $channelIds);
+        Assert::assertEquals($pr->normalize()['WORKSPACE_IDS'], $workspaceIds);
         Assert::assertNotEmpty($pr->normalize()['PUT_TO_REVIEW_AT']);
         Assert::assertEmpty($pr->normalize()['CLOSED_AT']);
     }
@@ -262,18 +274,19 @@ class PutPRToReviewContext extends FeatureContext
             ->getTimestamp();
 
         $PR = PR::fromNormalized([
-                'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
                 'AUTHOR_IDENTIFIER' => 'sam',
-                'TITLE'             => 'Add new feature',
-                'GTMS'              => 0,
-                'NOT_GTMS'          => 0,
-                'COMMENTS'          => 0,
-                'CI_STATUS'         => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
-                'IS_MERGED'         => true,
-                'MESSAGE_IDS'       => [],
-                'CHANNEL_IDS'       => ['squad-raccoons'],
-                'PUT_TO_REVIEW_AT'  => $putToReviewTimestamp,
-                'CLOSED_AT'         => $closedAtTimestamp,
+                'TITLE' => 'Add new feature',
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
+                'IS_MERGED' => true,
+                'MESSAGE_IDS' => [],
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'WORKSPACE_IDS' => ['akeneo'],
+                'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
+                'CLOSED_AT' => $closedAtTimestamp,
             ]
         );
         $this->PRRepository->save($PR);
@@ -288,6 +301,7 @@ class PutPRToReviewContext extends FeatureContext
             'akeneo/pim-community-dev',
             'akeneo/pim-community-dev/1111',
             'squad-raccoons',
+            'akeneo',
             '1234',
             'sam',
             'Add new feature',
@@ -311,7 +325,8 @@ class PutPRToReviewContext extends FeatureContext
             'PENDING',
             false,
             $this->currentMessageIds,
-            $this->currentChannelIds
+            $this->currentChannelIds,
+            $this->currentWorkspaceIds
         );
     }
 }

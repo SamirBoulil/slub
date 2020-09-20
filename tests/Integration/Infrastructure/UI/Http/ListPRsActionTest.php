@@ -32,42 +32,44 @@ class ListPRsActionTest extends WebTestCase
         $this->PRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => [
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK'   => '',
+                        'BUILD_LINK' => '',
                     ],
-                    'IS_MERGED'         => true,
-                    'CHANNEL_IDS'       => ['squad-raccoons'],
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'CLOSED_AT'         => '1561363426',
+                    'IS_MERGED' => true,
+                    'CHANNEL_IDS' => ['squad-raccoons'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'CLOSED_AT' => '1561363426',
                 ]
             )
         );
         $this->PRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'        => 'akeneo/pim-community-dev/2222',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => [
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK'   => '',
+                        'BUILD_LINK' => '',
                     ],
-                    'IS_MERGED'         => false,
-                    'CHANNEL_IDS'       => ['squad-raccoons'],
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'CLOSED_AT'         => null,
+                    'IS_MERGED' => false,
+                    'CHANNEL_IDS' => ['squad-raccoons'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'CLOSED_AT' => null,
                 ]
             )
         );
@@ -76,43 +78,45 @@ class ListPRsActionTest extends WebTestCase
         $client->request('GET', '/');
         $response = $client->getResponse();
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(
             [
                 'AVERAGE_TIME_TO_MERGE' => 13,
                 [
-                    'IDENTIFIER'        => 'akeneo/pim-community-dev/2222',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => [
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK'   => '',
+                        'BUILD_LINK' => '',
                     ],
-                    'IS_MERGED'         => false,
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'CHANNEL_IDS'       => ['squad-raccoons'],
-                    'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'CLOSED_AT'         => null,
+                    'IS_MERGED' => false,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS' => ['squad-raccoons'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'CLOSED_AT' => null,
                 ],
                 [
-                    'IDENTIFIER'        => 'akeneo/pim-community-dev/1111',
+                    'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => [
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK'   => '',
+                        'BUILD_LINK' => '',
                     ],
-                    'IS_MERGED'         => true,
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'CHANNEL_IDS'       => ['squad-raccoons'],
-                    'PUT_TO_REVIEW_AT'  => '1560177798',
-                    'CLOSED_AT'         => '1561363426',
+                    'IS_MERGED' => true,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS' => ['squad-raccoons'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'PUT_TO_REVIEW_AT' => '1560177798',
+                    'CLOSED_AT' => '1561363426',
                 ],
             ],
             json_decode($response->getContent(), true)

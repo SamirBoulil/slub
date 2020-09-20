@@ -155,9 +155,9 @@ class SlackClientTest extends KernelTestCase
         $this->slackClient->publishInChannel(ChannelIdentifier::fromString($channel), $message);
 
         $generatedRequest = $this->httpClientMock->getLastRequest();
-        $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
-        $this->assertEquals(
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
+        self::assertEquals(
             ['channel' => $channel, 'text' => $message],
             $this->getBodyContent($generatedRequest)
         );

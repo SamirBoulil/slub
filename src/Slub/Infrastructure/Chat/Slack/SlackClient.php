@@ -57,7 +57,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken,
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -79,14 +79,14 @@ class SlackClient implements ChatClient
         $this->addReactions($messageIdentifier, $reactionsToAdd);
     }
 
-    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
         APIHelper::checkResponse(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken,
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -114,7 +114,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.add',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken,
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -142,7 +142,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.remove',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken,
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [

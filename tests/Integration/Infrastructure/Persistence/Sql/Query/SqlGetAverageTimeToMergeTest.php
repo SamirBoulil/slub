@@ -84,21 +84,22 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
         $this->PRRepository->save(
             PR::fromNormalized(
                 [
-                    'IDENTIFIER'        => Uuid::uuid4()->toString(),
+                    'IDENTIFIER' => Uuid::uuid4()->toString(),
                     'AUTHOR_IDENTIFIER' => 'sam',
-                    'TITLE'             => 'Add new feature',
-                    'GTMS'              => 1,
-                    'NOT_GTMS'          => 1,
-                    'COMMENTS'          => 1,
-                    'CI_STATUS'         => [
+                    'TITLE' => 'Add new feature',
+                    'GTMS' => 1,
+                    'NOT_GTMS' => 1,
+                    'COMMENTS' => 1,
+                    'CI_STATUS' => [
                         'BUILD_RESULT' => 'PENDING',
-                        'BUILD_LINK'   => '',
+                        'BUILD_LINK' => '',
                     ],
-                    'IS_MERGED'         => true,
-                    'MESSAGE_IDS'       => ['1', '2'],
-                    'WORKSPACE_IDS'       => ['akeneo'],
-                    'PUT_TO_REVIEW_AT'  => (string) $now->getTimestamp(),
-                    'CLOSED_AT'         => (string) $mergedAt->getTimestamp(),
+                    'IS_MERGED' => true,
+                    'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
+                    'WORKSPACE_IDS' => ['akeneo'],
+                    'PUT_TO_REVIEW_AT' => (string) $now->getTimestamp(),
+                    'CLOSED_AT' => (string) $mergedAt->getTimestamp(),
                 ]
             )
         );

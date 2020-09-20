@@ -7,6 +7,7 @@ use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -59,6 +60,7 @@ class ReviewContext extends FeatureContext
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $this->PRRepository->save(PR::create(
             $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),

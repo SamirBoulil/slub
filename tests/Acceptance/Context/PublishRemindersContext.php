@@ -4,6 +4,7 @@ namespace Tests\Acceptance\Context;
 
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -16,7 +17,7 @@ use Tests\Acceptance\helpers\ChatClientSpy;
 
 class PublishRemindersContext extends FeatureContext
 {
-    private const SQUAD_RACCOONS = 'akeneo';
+    private const SQUAD_RACCOONS = 'squad-raccoons';
     private const GENERAL = 'general';
     private const UNSUPPORTED_CHANNEL = 'UNSUPPORTED_CHANNEL';
     private const PR_1 = 'samirboulil/slub/1';
@@ -73,7 +74,7 @@ class PublishRemindersContext extends FeatureContext
     public function theRemindersShouldOnlyContainAReferenceToThePRsInReview()
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
@@ -81,7 +82,7 @@ Yop, these PRs need reviews!
 CHAT
         );
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            WorkspaceIdentifier::fromString(self::GENERAL),
+            ChannelIdentifier::fromString(self::GENERAL),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/3|"Add new feature">_ (2 days ago)
@@ -121,7 +122,7 @@ CHAT
     public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(): void
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
-            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
             <<<CHAT
 Yop, these PRs need reviews!
  - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
@@ -141,7 +142,8 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            WorkspaceIdentifier::fromString($channelIdentifier),
+            ChannelIdentifier::fromString($channelIdentifier),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -169,7 +171,8 @@ CHAT
                 'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                 'IS_MERGED' => false,
                 'MESSAGE_IDS' => [Uuid::uuid4()->toString()],
-                'WORKSPACE_IDS' => [$channelIdentifier],
+                'CHANNEL_IDS' => [$channelIdentifier],
+                'WORKSPACE_IDS' => [Uuid::uuid4()->toString()],
                 'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
                 'CLOSED_AT' => null,
             ]
@@ -181,7 +184,8 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
@@ -197,7 +201,8 @@ CHAT
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
-            WorkspaceIdentifier::fromString(self::SQUAD_RACCOONS),
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             MessageIdentifier::fromString(Uuid::uuid4()->toString()),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')

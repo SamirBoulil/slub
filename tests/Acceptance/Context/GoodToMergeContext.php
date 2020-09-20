@@ -11,6 +11,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Application\Notify\NotifyAuthor;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -64,6 +65,7 @@ class GoodToMergeContext extends FeatureContext
 
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
             WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
@@ -107,6 +109,7 @@ class GoodToMergeContext extends FeatureContext
 
         $PR = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
             WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),

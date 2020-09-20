@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
-use Ramsey\Uuid\Uuid;
 use Slub\Application\ClosePR\ClosePR;
 use Slub\Application\ClosePR\ClosePRHandler;
 use Slub\Application\Notify\NotifySquad;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -122,7 +121,9 @@ class ClosePRContext extends FeatureContext
 
     private function PRWithGTMsAndGreen(): PR
     {
-        $PR = PR::create($this->currentPRIdentifier,
+        $PR = PR::create(
+            $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),

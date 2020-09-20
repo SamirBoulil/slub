@@ -10,6 +10,7 @@ use BotMan\BotMan\Drivers\Tests\FakeDriver;
 use BotMan\BotMan\Drivers\Tests\ProxyDriver;
 use BotMan\Studio\Testing\BotManTester;
 use Ramsey\Uuid\Uuid;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -61,7 +62,7 @@ class SlubBotTest extends KernelTestCase
      */
     public function it_answers_to_new_PR_messages_in_public_channels(string $message): void
     {
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'channel'])->assertReplyNothing();
+        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'channel', 'team_id' => 'akeneo'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
 
@@ -70,7 +71,7 @@ class SlubBotTest extends KernelTestCase
      */
     public function it_answers_to_new_PR_messages_in_private_channels(): void
     {
-        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group'])->assertReplyNothing();
+        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team_id' => 'akeneo'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
     }
 
@@ -94,7 +95,7 @@ class SlubBotTest extends KernelTestCase
             $this->botUserId
         );
 
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group']);
+        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team_id' => 'akeneo']);
 
         $this->assertPRHasBeenUnpublished($PRIdentifier);
         $this->assertBotHasRepliedWithOneOf(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
@@ -151,6 +152,7 @@ class SlubBotTest extends KernelTestCase
         $this->PRRepository->save(
             PR::create(
                 PRIdentifier::create($PRIdentifier),
+                ChannelIdentifier::fromString(Uuid::uuid4()->toString()),
                 WorkspaceIdentifier::fromString(Uuid::uuid4()->toString()),
                 MessageIdentifier::fromString(Uuid::uuid4()->toString()),
                 AuthorIdentifier::fromString('sam'),

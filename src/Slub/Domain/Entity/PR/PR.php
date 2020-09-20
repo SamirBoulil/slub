@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Domain\Entity\PR;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Event\CIGreen;
@@ -29,6 +30,7 @@ class PR
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
+    private const CHANNEL_IDS = 'CHANNEL_IDS';
     private const WORKSPACE_IDS = 'WORKSPACE_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
@@ -40,8 +42,11 @@ class PR
     /** @var PRIdentifier */
     private $PRIdentifier;
 
-    /** @var WorkspaceIdentifier[] */
+    /** @var ChannelIdentifier[] */
     private $channelIdentifiers;
+
+    /** @var WorkspaceIdentifier[] */
+    private $workspaceIdentifiers;
 
     /** @var MessageIdentifier[] */
     private $messageIdentifiers;
@@ -76,6 +81,7 @@ class PR
     private function __construct(
         PRIdentifier $PRIdentifier,
         array $channelIdentifiers,
+        array $workspaceIdentifiers,
         array $messageIds,
         AuthorIdentifier $authorIdentifier,
         Title $title,
@@ -95,6 +101,7 @@ class PR
         $this->comments = $comments;
         $this->CIStatus = $CIStatus;
         $this->channelIdentifiers = $channelIdentifiers;
+        $this->workspaceIdentifiers = $workspaceIdentifiers;
         $this->messageIdentifiers = $messageIds;
         $this->putToReviewAt = $putToReviewAt;
         $this->closedAt = $closedAt;
@@ -103,7 +110,8 @@ class PR
 
     public static function create(
         PRIdentifier $PRIdentifier,
-        WorkspaceIdentifier $channelIdentifier,
+        ChannelIdentifier $channelIdentifier,
+        WorkspaceIdentifier $workspaceIdentifier,
         MessageIdentifier $messageIdentifier,
         AuthorIdentifier $authorIdentifier,
         Title $title,
@@ -116,6 +124,7 @@ class PR
         $pr = new self(
             $PRIdentifier,
             [$channelIdentifier],
+            [$workspaceIdentifier],
             [$messageIdentifier],
             $authorIdentifier,
             $title,
@@ -147,6 +156,7 @@ class PR
         Assert::keyExists($normalizedPR, self::IS_MERGED_KEY);
         Assert::keyExists($normalizedPR, self::MESSAGE_IDS);
         Assert::keyExists($normalizedPR, self::WORKSPACE_IDS);
+        Assert::keyExists($normalizedPR, self::CHANNEL_IDS);
         Assert::keyExists($normalizedPR, self::PUT_TO_REVIEW_AT);
         Assert::keyExists($normalizedPR, self::CLOSED_AT);
         Assert::isArray($normalizedPR[self::MESSAGE_IDS]);
@@ -160,14 +170,20 @@ class PR
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(
-            function (string $messageId) {
+            static function (string $messageId) {
                 return MessageIdentifier::fromString($messageId);
             },
             $normalizedPR[self::MESSAGE_IDS]
         );
         $channelIdentifiers = array_map(
-            function (string $channelIdentifiers) {
-                return WorkspaceIdentifier::fromString($channelIdentifiers);
+            static function (string $channelIdentifier) {
+                return ChannelIdentifier::fromString($channelIdentifier);
+            },
+            $normalizedPR[self::CHANNEL_IDS]
+        );
+        $workspaceIdentifiers = array_map(
+            static function (string $workspaceIdentifier) {
+                return WorkspaceIdentifier::fromString($workspaceIdentifier);
             },
             $normalizedPR[self::WORKSPACE_IDS]
         );
@@ -177,6 +193,7 @@ class PR
         return new self(
             $identifier,
             $channelIdentifiers,
+            $workspaceIdentifiers,
             $messageIds,
             $author,
             $title,
@@ -201,11 +218,17 @@ class PR
             self::COMMENTS_KEY => $this->comments,
             self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
-            self::WORKSPACE_IDS => array_map(
-                function (WorkspaceIdentifier $channelIdentifier) {
+            self::CHANNEL_IDS => array_map(
+                static function (ChannelIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers
+            ),
+            self::WORKSPACE_IDS => array_map(
+                static function (WorkspaceIdentifier $workspaceIdentifier) {
+                    return $workspaceIdentifier->stringValue();
+                },
+                $this->workspaceIdentifiers
             ),
             self::MESSAGE_IDS => array_map(
                 function (MessageIdentifier $messageIdentifier) {
@@ -338,7 +361,7 @@ class PR
     }
 
     public function putToReviewAgainViaMessage(
-        WorkspaceIdentifier $newChannelIdentifier,
+        ChannelIdentifier $newChannelIdentifier,
         MessageIdentifier $newMessageIdentifier
     ): void {
         if ($this->hasMessageIdentifier($newMessageIdentifier) && $this->hasChannelIdentifier($newChannelIdentifier)) {
@@ -361,7 +384,7 @@ class PR
     }
 
     /**
-     * @return WorkspaceIdentifier[]
+     * @return ChannelIdentifier[]
      */
     public function channelIdentifiers(): array
     {
@@ -387,12 +410,12 @@ class PR
         );
     }
 
-    private function hasChannelIdentifier(WorkspaceIdentifier $newChannelIdentifier): bool
+    private function hasChannelIdentifier(ChannelIdentifier $newChannelIdentifier): bool
     {
         return in_array(
             $newChannelIdentifier->stringValue(),
             array_map(
-                function (WorkspaceIdentifier $channelIdentifier) {
+                function (ChannelIdentifier $channelIdentifier) {
                     return $channelIdentifier->stringValue();
                 },
                 $this->channelIdentifiers

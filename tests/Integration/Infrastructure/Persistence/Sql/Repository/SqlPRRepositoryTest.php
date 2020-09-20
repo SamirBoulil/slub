@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
@@ -36,6 +37,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -46,7 +48,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save($savedPR);
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);
 
-        $this->assertSame($savedPR->normalize(), $fetchedPR->normalize());
+        self::assertSame($savedPR->normalize(), $fetchedPR->normalize());
     }
 
     /**
@@ -57,6 +59,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -72,7 +75,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR->green();
         $updatedPR->close(true);
         $updatedPR->putToReviewAgainViaMessage(
-            WorkspaceIdentifier::fromString('brazil-team'),
+            ChannelIdentifier::fromString('brazil-team'),
             MessageIdentifier::fromString('5151')
         );
         $this->sqlPRRepository->save($updatedPR);
@@ -89,6 +92,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -100,6 +104,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $updatedPR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -108,7 +113,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save($updatedPR);
 
         $fetchedPR = $this->sqlPRRepository->getBy($identifier);
-        $this->assertSame($updatedPR->normalize(), $fetchedPR->normalize());
+        self::assertSame($updatedPR->normalize(), $fetchedPR->normalize());
     }
 
     /**
@@ -128,6 +133,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => false,
                     'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
@@ -146,6 +152,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => true,
                     'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
@@ -164,6 +171,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => false,
                     'MESSAGE_IDS' => ['1', '2'],
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
@@ -182,6 +190,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'COMMENTS' => 1,
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => false,
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
@@ -196,6 +205,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'COMMENTS' => 1,
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => false,
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
@@ -210,6 +220,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'COMMENTS' => 1,
                     'CI_STATUS' => ['BUILD_RESULT' => 'PENDING', 'BUILD_LINK' => ''],
                     'IS_MERGED' => true,
+                    'CHANNEL_IDS'       => ['squad-raccoons'],
                     'WORKSPACE_IDS' => ['akeneo'],
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
@@ -242,6 +253,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $this->sqlPRRepository->save(
             PR::create(
                 $identifier,
+                ChannelIdentifier::fromString('squad-raccoons'),
                 WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::fromString('1'),
                 AuthorIdentifier::fromString('sam'),
@@ -269,10 +281,10 @@ class SqlPRRepositoryTest extends KernelTestCase
 
         $PRs = $this->sqlPRRepository->findPRToReviewNotGTMed();
 
-        $this->assertCount(1, $PRs);
+        self::assertCount(1, $PRs);
         /** @var PR $PR */
         $PR = current($PRs);
-        $this->assertEquals($PRInReviewNotGTMedIdentifier, $PR->normalize()['IDENTIFIER']);
+        self::assertEquals($PRInReviewNotGTMedIdentifier, $PR->normalize()['IDENTIFIER']);
     }
 
     /**
@@ -299,7 +311,7 @@ class SqlPRRepositoryTest extends KernelTestCase
             $normalizedFetchedPR[] = $actualPR->normalize();
         }
 
-        $this->assertSame($expectedPRs, $normalizedFetchedPR);
+        self::assertSame($expectedPRs, $normalizedFetchedPR);
     }
 
     private function createPRInReview(string $PRIdentifier, $GTMs, $isMerged): void
@@ -307,6 +319,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create($PRIdentifier);
         $PR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -327,6 +340,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $identifier = PRIdentifier::create($PRIdentifier);
         $PR = PR::create(
             $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),

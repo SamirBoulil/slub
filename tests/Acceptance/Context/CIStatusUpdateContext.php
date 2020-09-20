@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use PHPUnit\Framework\Assert;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Application\Notify\NotifyAuthor;
 use Slub\Application\Notify\NotifySquad;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -64,6 +64,7 @@ class CIStatusUpdateContext extends FeatureContext
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $this->PRRepository->save(PR::create(
             $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),
@@ -208,6 +209,7 @@ class CIStatusUpdateContext extends FeatureContext
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
         $PR = PR::create(
             $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             $this->currentMessageIdentifier,
             AuthorIdentifier::fromString('sam'),

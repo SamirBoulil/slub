@@ -99,6 +99,7 @@ class SlubBot
     private function listensToNewPR(BotMan $bot): void
     {
         $createNewPr = function (Botman $bot, string $repositoryIdentifier, string $PRNumber) {
+            $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
             $PRInfo = $this->PRInfo($PRNumber, $repositoryIdentifier);
@@ -125,7 +126,8 @@ class SlubBot
         $PRToReview = new PutPRToReview();
         $PRToReview->PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
         $PRToReview->repositoryIdentifier = $repositoryIdentifier;
-        $PRToReview->workspaceIdentifier = $channelIdentifier;
+        $PRToReview->channelIdentifier = $channelIdentifier;
+        $PRToReview->workspaceIdentifier = 'akeneo';
         $PRToReview->messageIdentifier = $messageIdentifier;
         $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
         $PRToReview->title = $PRInfo->title;
@@ -209,7 +211,7 @@ class SlubBot
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
     }
 
-    private function providesToHelp(BotMan $bot)
+    private function providesToHelp(BotMan $bot): void
     {
         $userHelp = function (Botman $bot) {
             $message = <<<MESSAGE
@@ -238,5 +240,14 @@ MESSAGE;
         $helpYeee = sprintf('.*help.*<@%s>.*', $this->botUserId);
         $bot->hears($yeeeHelp, $userHelp);
         $bot->hears($helpYeee, $userHelp);
+    }
+
+    private function getWorkspaceIdentifier(BotMan $bot): string
+    {
+        $this->logger->info('Now fetching channel information for channel');
+        $payload = $bot->getMessage()->getPayload();
+        $result = $payload['team_id'];
+
+        return $result;
     }
 }

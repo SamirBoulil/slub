@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\MessageIdentifier;
@@ -32,16 +33,20 @@ class PRTest extends TestCase
     public function it_creates_a_PR_and_normalizes_itself()
     {
         $prIdentifier = self::PR_IDENTIFIER;
-        $channelIdentifier = 'akeneo';
+        $channelIdentifier = 'squad-raccoons';
+        $workspaceIdentifier = 'akeneo';
         $messageId = '1';
         $author = 'sam';
         $title = 'Add new feature';
         $expectedPRIdentifier = PRIdentifier::create($prIdentifier);
-        $expectedChannelIdentifier = WorkspaceIdentifier::fromString($channelIdentifier);
+        $expectedChannelIdentifier = ChannelIdentifier::fromString($channelIdentifier);
+        $expectedWorkspaceIdentifier = WorkspaceIdentifier::fromString($workspaceIdentifier);
         $expectedMessageIdentifier = MessageIdentifier::fromString($messageId);
 
-        $pr = PR::create($expectedPRIdentifier,
+        $pr = PR::create(
+            $expectedPRIdentifier,
             $expectedChannelIdentifier,
+            $expectedWorkspaceIdentifier,
             $expectedMessageIdentifier,
             AuthorIdentifier::fromString($author),
             Title::fromString($title)
@@ -57,7 +62,8 @@ class PRTest extends TestCase
         self::assertEquals('PENDING', $normalizedPR['CI_STATUS']['BUILD_RESULT']);
         self::assertEquals('', $normalizedPR['CI_STATUS']['BUILD_LINK']);
         self::assertEquals(false, $normalizedPR['IS_MERGED']);
-        self::assertEquals([$channelIdentifier], $normalizedPR['WORKSPACE_IDS']);
+        self::assertEquals([$channelIdentifier], $normalizedPR['CHANNEL_IDS']);
+        self::assertEquals([$workspaceIdentifier], $normalizedPR['WORKSPACE_IDS']);
         self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         self::assertEmpty($normalizedPR['CLOSED_AT']);
@@ -81,6 +87,7 @@ class PRTest extends TestCase
                 'BUILD_LINK' => '',
             ],
             'IS_MERGED' => true,
+            'CHANNEL_IDS' => ['squad-raccoons'],
             'WORKSPACE_IDS' => ['akeneo'],
             'MESSAGE_IDS' => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -111,6 +118,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -133,6 +141,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -153,6 +162,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -175,6 +185,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -195,6 +206,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -217,6 +229,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -253,6 +266,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -273,6 +287,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -406,6 +421,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -438,6 +454,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -459,7 +476,9 @@ class PRTest extends TestCase
     {
         $identifier = PRIdentifier::create(self::PR_IDENTIFIER);
 
-        $pr = PR::create($identifier,
+        $pr = PR::create(
+            $identifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -478,6 +497,7 @@ class PRTest extends TestCase
 
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev'),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString($expectedAuthorIdentifier),
@@ -496,6 +516,7 @@ class PRTest extends TestCase
 
         $pr = PR::create(
             PRIdentifier::create('akeneo/pim-community-dev'),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -512,6 +533,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -527,12 +549,13 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        self::assertEquals('akeneo', current($pr->channelIdentifiers())->stringValue());
+        self::assertEquals('squad-raccoons', current($pr->channelIdentifiers())->stringValue());
     }
 
     /**
@@ -542,6 +565,7 @@ class PRTest extends TestCase
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
+            ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
             MessageIdentifier::fromString('1'),
             AuthorIdentifier::fromString('sam'),
@@ -559,10 +583,10 @@ class PRTest extends TestCase
         $pr = $this->greenPR();
         $expectedMessageId = MessageIdentifier::create('2');
 
-        $pr->putToReviewAgainViaMessage(WorkspaceIdentifier::fromString('brazil-team'), $expectedMessageId);
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('brazil-team'), $expectedMessageId);
 
         self::assertEquals(['1', '2'], $pr->normalize()['MESSAGE_IDS']);
-        self::assertEquals(['akeneo', 'brazil-team'], $pr->normalize()['WORKSPACE_IDS']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons', 'brazil-team']);
         $this->assertPRPutToReviewEvent(
             $pr->getEvents(),
             PRIdentifier::fromString(self::PR_IDENTIFIER),
@@ -577,12 +601,12 @@ class PRTest extends TestCase
     {
         $pr = $this->pendingPR();
 
-        $pr->putToReviewAgainViaMessage(WorkspaceIdentifier::fromString('akeneo'),
+        $pr->putToReviewAgainViaMessage(ChannelIdentifier::fromString('squad-raccoons'),
             MessageIdentifier::create('1')
         );
 
         self::assertEquals($pr->normalize()['MESSAGE_IDS'], ['1']);
-        self::assertEquals($pr->normalize()['WORKSPACE_IDS'], ['akeneo']);
+        $this->assertEquals($pr->normalize()['CHANNEL_IDS'], ['squad-raccoons']);
         self::assertEmpty($pr->getEvents());
     }
 
@@ -672,6 +696,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -697,6 +722,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -722,6 +748,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
@@ -747,6 +774,7 @@ class PRTest extends TestCase
                     'BUILD_LINK' => '',
                 ],
                 'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,

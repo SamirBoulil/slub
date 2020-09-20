@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Installer\CLI;
 
 use Doctrine\DBAL\Connection;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
@@ -50,11 +51,11 @@ class InstallerCLITest extends KernelTestCase
     public function it_installs_slub_for_the_first_time()
     {
         $this->dropDatabase();
-        $this->assertFalse($this->existsDatabase());
+        self::assertFalse($this->existsDatabase());
         $output = $this->installSlub();
         $this->assertTableExists();
-        $this->assertTrue($this->existsDatabase());
-        $this->assertContains('Slub installed', $output);
+        self::assertTrue($this->existsDatabase());
+        self::assertContains('Slub installed', $output);
     }
 
     /**
@@ -107,6 +108,7 @@ class InstallerCLITest extends KernelTestCase
         $prRepository->save(
             PR::create(
                 $this->currentPRIdentifier,
+                ChannelIdentifier::fromString('squad-raccoons'),
                 WorkspaceIdentifier::fromString('akeneo'),
                 MessageIdentifier::create('CHANNEL_ID@1111'),
                 AuthorIdentifier::fromString('sam'),

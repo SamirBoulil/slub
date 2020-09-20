@@ -103,7 +103,14 @@ class SlubBot
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
             $PRInfo = $this->PRInfo($PRNumber, $repositoryIdentifier);
-            $this->putPRToReview($PRNumber, $repositoryIdentifier, $channelIdentifier, $messageIdentifier, $PRInfo);
+            $this->putPRToReview(
+                $PRNumber,
+                $repositoryIdentifier,
+                $channelIdentifier,
+                $workspaceIdentifier,
+                $messageIdentifier,
+                $PRInfo
+            );
         };
         $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
@@ -121,13 +128,19 @@ class SlubBot
         $bot->hears($unpublishMessage, $unpublishPR);
     }
 
-    private function putPRToReview(string $PRNumber, string $repositoryIdentifier, string $channelIdentifier, string $messageIdentifier, PRInfo $PRInfo): void
-    {
+    private function putPRToReview(
+        string $PRNumber,
+        string $repositoryIdentifier,
+        string $channelIdentifier,
+        string $workspaceIdentifier,
+        string $messageIdentifier,
+        PRInfo $PRInfo
+    ): void {
         $PRToReview = new PutPRToReview();
         $PRToReview->PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
         $PRToReview->repositoryIdentifier = $repositoryIdentifier;
         $PRToReview->channelIdentifier = $channelIdentifier;
-        $PRToReview->workspaceIdentifier = 'akeneo';
+        $PRToReview->workspaceIdentifier = $workspaceIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
         $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
         $PRToReview->title = $PRInfo->title;

@@ -19,6 +19,7 @@
     "botman/studio": "^1.3",
     "doctrine/dbal": "^2.9",
     "doctrine/doctrine-migrations-bundle": "^2.0",
+    "firebase/php-jwt": "^5.2",
     "guzzlehttp/guzzle": "~6.0",
     "matthiasnoback/convenient-immutability": "^0.2.1",
     "symfony/apache-pack": "^1.0",

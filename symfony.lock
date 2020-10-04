@@ -153,6 +153,9 @@
     "fideloper/proxy": {
         "version": "4.4.0"
     },
+    "firebase/php-jwt": {
+        "version": "v5.2.0"
+    },
     "friendsofphp/php-cs-fixer": {
         "version": "2.2",
         "recipe": {

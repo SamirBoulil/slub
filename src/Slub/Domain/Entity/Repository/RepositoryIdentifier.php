@@ -26,4 +26,9 @@ class RepositoryIdentifier
     {
         return $this->repositoryIdentifier === $repositoryIdentifier->repositoryIdentifier;
     }
+
+    public function normalize(): string
+    {
+        return $this->repositoryIdentifier;
+    }
 }

@@ -188,6 +188,16 @@ services:
         class: GuzzleHttp\Client
 
     ## VCS
+    slub.infrastructure.vcs.github.client.app_installation_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
+    slub.infrastructure.vcs.github.client.client_factory:
+        class: Slub\Infrastructure\VCS\Github\Client\GithubClientFactory
+        arguments:
+            - 'AccessTokenRepository'
+
     slub.infrastructure.vcs.github.new_event_action:
         class: Slub\Infrastructure\VCS\Github\EventHandler\NewEventAction
         arguments:

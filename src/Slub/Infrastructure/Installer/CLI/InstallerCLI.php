@@ -37,6 +37,7 @@ class InstallerCLI extends Command
         $this->createDatabaseIfNotExists();
         $this->createPRTableIfNotExists();
         $this->createDeliveredEventTableIfNotExists();
+        $this->createAppInstallationTableIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
     }
 
@@ -85,7 +86,19 @@ SQL;
     private function createDeliveredEventTableIfNotExists()
     {
         $createTable = <<<SQL
-CREATE TABLE IF NOT EXISTS delivered_event (IDENTIFIER VARCHAR(255) PRIMARY KEY );
+CREATE TABLE IF NOT EXISTS delivered_event (IDENTIFIER VARCHAR(255) PRIMARY KEY);
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createAppInstallationTableIfNotExists()
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS app_installation (
+    REPOSITORY_IDENTIFIER VARCHAR(255) PRIMARY KEY,
+    INSTALLATION_ID VARCHAR(255),
+    ACCESS_TOKEN VARCHAR(255)
+);
 SQL;
         $this->sqlConnection->executeUpdate($createTable);
     }

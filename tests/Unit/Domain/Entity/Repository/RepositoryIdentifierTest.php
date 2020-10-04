@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\Repository;
 
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 
 class RepositoryIdentifierTest extends TestCase
@@ -12,10 +13,12 @@ class RepositoryIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_repository_identifier()
+    public function it_creates_a_repository_identifier_and_normalizes_it()
     {
-        $identifier = RepositoryIdentifier::fromString('akeneo/pim-community-dev');
-        $this->assertNotNull($identifier);
+        $expected = 'akeneo/pim-community-dev';
+        $actual = RepositoryIdentifier::fromString($expected)->normalize();
+
+        self::assertEquals($expected, $actual);
     }
 
     /**

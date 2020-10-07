@@ -41,8 +41,7 @@
     "jangregor/phpstan-prophecy": "^0.3.0",
     "johnkary/phpunit-speedtrap": "^3.1",
     "phpstan/phpstan": "^0.11.0",
-    "phpunit/phpunit": "^7.5",
-    "roave/security-advisories": "dev-master"
+    "phpunit/phpunit": "^7.5"
   },
   "config": {
     "preferred-install": {

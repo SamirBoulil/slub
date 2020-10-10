@@ -11,10 +11,10 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
  */
-class NewInstallationEventHandler implements EventHandlerInterface
+class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInterface
 {
-    private const EVENT_TYPE = 'installation';
-    private const INSTALLATION_TYPE = 'created';
+    private const EVENT_TYPE = 'installation_repositories';
+    private const INSTALLATION_TYPE = 'added';
 
     /** @var SqlAppInstallationRepository */
     private $sqlAppInstallationRepository;
@@ -57,9 +57,11 @@ class NewInstallationEventHandler implements EventHandlerInterface
         $accessTokenUrl = $request['installation']['access_tokens_url'];
         // Patapouille avec le json web token
         $response = $this->httpClient->get($accessTokenUrl);
-        $content = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl));
+            throw new \RuntimeException(
+                sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl)
+            );
         }
 
         return $content['token'];
@@ -81,7 +83,7 @@ class NewInstallationEventHandler implements EventHandlerInterface
 
                 return $appInstallation;
             },
-            $request['repositories']
+            $request['repositories_added']
         );
     }
 

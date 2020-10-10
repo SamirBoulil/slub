@@ -52,13 +52,7 @@ class FindReviews
 
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(
-                sprintf(
-                    'There was a problem when fetching the reviews for PR "%s" at %s',
-                    $PRIdentifier->stringValue(),
-                    $url
-                )
-            );
+            throw new \RuntimeException(sprintf('There was a problem when fetching the reviews for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 
         return $content;

@@ -57,11 +57,12 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
         $accessTokenUrl = $request['installation']['access_tokens_url'];
         // Patapouille avec le json web token
         $response = $this->httpClient->get($accessTokenUrl);
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException('Impossible to get the access token at: %s', $accessTokenUrl);
+        }
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(
-                sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl)
-            );
+            throw new \RuntimeException(sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl));
         }
 
         return $content['token'];
@@ -79,7 +80,7 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
                 $appInstallation = new AppInstallation();
                 $appInstallation->repositoryIdentifier = $repository['full_name'];
                 $appInstallation->installationId = (string) $installationId;
-                $appInstallation->accessToken = $accessToken;
+                $appInstallation->accessToken = $accessToken; // Probably should not fetch the access token directly
 
                 return $appInstallation;
             },

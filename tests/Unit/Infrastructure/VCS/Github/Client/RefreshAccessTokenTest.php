@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Unit\Infrastructure\VCS\Github\Client;
 
 use GuzzleHttp\Psr7\Response;
-use Slub\Infrastructure\VCS\Github\Client\GetAccessToken;
+use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Tests\Integration\Infrastructure\KernelTestCase;
 use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 
-class GetAccessTokenTest extends KernelTestCase
+class RefreshAccessTokenTest extends KernelTestCase
 {
     private const MY_APP_ID = 'MY_APP_ID';
     const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
@@ -17,7 +17,7 @@ class GetAccessTokenTest extends KernelTestCase
     /** @var GuzzleSpy */
     private $requestSpy;
 
-    /** @var GetAccessToken */
+    /** @var RefreshAccessToken */
     private $getAccessToken;
 
     public function setUp(): void
@@ -41,7 +41,7 @@ B2zNzvrlgRmgBrklMTrMYgm1NPcW+bRLGcwgW2PTvNM=
 -----END RSA PRIVATE KEY-----
 EOD;
         $this->requestSpy = new GuzzleSpy();
-        $this->getAccessToken = new GetAccessToken($this->requestSpy->client(), self::MY_APP_ID, $githubPrivateKey);
+        $this->getAccessToken = new RefreshAccessToken($this->requestSpy->client(), self::MY_APP_ID, $githubPrivateKey);
     }
 
     /** @test */
@@ -60,11 +60,11 @@ EOD;
         $this->requestSpy->assertMethod('GET', $actualRequest);
         self::assertEquals('application/vnd.github.machine-man-preview+json', $actualRequest->getHeader('Accept')[0]);
         $authorization = $actualRequest->getHeader('Authorization')[0];
-        self::assertStringStartsWith('Bearer', (string)$authorization);
+        self::assertStringStartsWith('Bearer', (string) $authorization);
     }
 
     private function accessTokenResponse(): string
     {
-        return (string) json_encode(['token' => self::ACCESS_TOKEN]);
+        return (string) json_encode(['token' => self::ACCESS_TOKEN], JSON_THROW_ON_ERROR);
     }
 }

@@ -18,7 +18,7 @@ use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class UnpublishPRContext extends FeatureContext
 {

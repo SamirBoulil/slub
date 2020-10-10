@@ -12,8 +12,10 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
  */
-class GetAccessToken
+class RefreshAccessToken
 {
+    private const ACCESS_TOKEN_URL_TEMPLATE = 'https://api.github.com/app/installations/%s/access_tokens';
+
     /** @var Client */
     private $httpClient;
 
@@ -32,7 +34,7 @@ class GetAccessToken
 
     public function fetch(string $installationId): string
     {
-        $accessTokenUrl = sprintf('/app/installations/%s/access_tokens', $installationId);
+        $accessTokenUrl = sprintf(self::ACCESS_TOKEN_URL_TEMPLATE, $installationId);
         $response = $this->fetchAccessToken($accessTokenUrl);
 
         return $this->accessToken($response, $accessTokenUrl);
@@ -50,9 +52,7 @@ class GetAccessToken
     {
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(
-                sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl)
-            );
+            throw new \RuntimeException(sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl));
         }
 
         return (string) $content['token'];

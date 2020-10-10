@@ -41,6 +41,23 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     }
 
     /** @test */
+    public function it_saves_an_app_installation_without_access_token_and_returns_it()
+    {
+        $repositoryIdentifier = 'akeneo/pim-community-dev';
+        $expected = new AppInstallation();
+        $expected->repositoryIdentifier = $repositoryIdentifier;
+        $expected->installationId = Uuid::uuid4()->toString();
+
+        $this->appInstallationRepository->save($expected);
+        $actual = $this->appInstallationRepository->getBy($repositoryIdentifier);
+
+        self::assertSame($expected->repositoryIdentifier, $actual->repositoryIdentifier);
+        self::assertSame($expected->installationId, $actual->installationId);
+        self::assertNull($expected->accessToken);
+    }
+
+
+    /** @test */
     public function it_updates_the_app_installation()
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';

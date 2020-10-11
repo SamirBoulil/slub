@@ -70,16 +70,10 @@ class GithubAPIClient
         return $appInstallation;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return array
-     *
-     */
     private function disableClientFromThrowingExceptions(array $options): array
     {
         $options['http_errors'] = false;
 
         return $options;
-}
+    }
 }

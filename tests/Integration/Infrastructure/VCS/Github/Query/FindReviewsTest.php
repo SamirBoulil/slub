@@ -5,29 +5,31 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class FindReviewsTest extends WebTestCase
 {
-    private const AUTH_TOKEN = 'TOKEN';
+    private const REPOSITORY_NAME = 'SamirBoulil/slub';
+    private const PR_NUMBER = '36';
 
     /** @var FindReviews */
     private $findReviews;
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    private $githubAPIClient;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->requestSpy = new GuzzleSpy();
-        $this->findReviews = new FindReviews($this->requestSpy->client(), self::AUTH_TOKEN);
+        $this->githubAPIClient = $this->prophesize(GithubAPIClient::class);
+        $this->findReviews = new FindReviews($this->githubAPIClient->reveal());
     }
 
     /**
@@ -36,16 +38,15 @@ class FindReviewsTest extends WebTestCase
      */
     public function it_successfully_fetches_the_reviews(array $someReviews, array $expectedCounts): void
     {
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($someReviews)));
+        $this->githubAPIClient->get(
+            sprintf('https://api.github.com/repos/%s/pulls/%s/reviews', self::REPOSITORY_NAME, self::PR_NUMBER),
+            [],
+            self::REPOSITORY_NAME
+        )->willReturn(new Response(200, [], (string) json_encode($someReviews)));
 
         $actualReviews = $this->findReviews->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));
 
-        $this->assertEquals($expectedCounts, $actualReviews);
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI('/repos/SamirBoulil/slub/pulls/36/reviews', $generatedRequest);
-        $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
+        self::assertEquals($expectedCounts, $actualReviews);
     }
 
     public function reviewsExamples(): array
@@ -54,8 +55,8 @@ class FindReviewsTest extends WebTestCase
             'No reviews' => [[], ['GTMS' => 0, 'NOT_GTMS' => 0, 'COMMENTS' => 0]],
             'Some reviews' => [
                 [['state' => 'APPROVED'], ['state' => 'REFUSED'], ['state' => 'COMMENTED']],
-                ['GTMS' => 1, 'NOT_GTMS' => 1, 'COMMENTS' => 1]
-            ]
+                ['GTMS' => 1, 'NOT_GTMS' => 1, 'COMMENTS' => 1],
+            ],
         ];
     }
 
@@ -64,7 +65,8 @@ class FindReviewsTest extends WebTestCase
      */
     public function it_throws_if_the_response_is_malformed(): void
     {
-        $this->requestSpy->stubResponse(new Response(200, [], '{'));
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(200, [], (string) '{'));
         $this->expectException(\RuntimeException::class);
 
         $this->findReviews->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));

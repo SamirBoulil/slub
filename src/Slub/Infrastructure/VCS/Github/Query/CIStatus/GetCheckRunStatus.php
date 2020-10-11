@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query\CIStatus;
 
-use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetCheckRunStatus
 {
-    /** @var Client */
-    private $httpClient;
-
-    /** @var string */
-    private $authToken;
+    /** @var GithubAPIClient */
+    private $githubAPIClient;
 
     /** @var string[] */
     private $supportedCIChecks;
@@ -27,14 +24,12 @@ class GetCheckRunStatus
     private $logger;
 
     public function __construct(
-        Client $httpClient,
-        string $authToken,
+        GithubAPIClient $githubAPIClient,
         string $supportedCIChecks,
         string $domainName,
         LoggerInterface $logger
     ) {
-        $this->httpClient = $httpClient;
-        $this->authToken = $authToken;
+        $this->githubAPIClient = $githubAPIClient;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
         $this->domainName = $domainName;
         $this->logger = $logger;
@@ -52,18 +47,16 @@ class GetCheckRunStatus
         $url = $this->checkRunsUrl($PRIdentifier, $ref);
         $this->logger->critical($url);
 
-        $headers = $this->getHeaders();
-        $response = $this->httpClient->get($url, ['headers' => $headers]);
+        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
+        $response = $this->githubAPIClient->get(
+            $url,
+            ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
+            $repositoryIdentifier
+        );
 
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(
-                sprintf(
-                    'There was a problem when fetching the check runs for PR "%s" at %s',
-                    $PRIdentifier->stringValue(),
-                    $url
-                )
-            );
+            throw new \RuntimeException(sprintf('There was a problem when fetching the check runs for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 
         return $content['check_runs'];
@@ -118,16 +111,13 @@ class GetCheckRunStatus
         return $url;
     }
 
-    private function getHeaders(): array
-    {
-        $headers = GithubAPIHelper::authorizationHeader($this->authToken);
-        $headers = array_merge($headers, GithubAPIHelper::acceptPreviewEndpointsHeader());
-
-        return $headers;
-    }
-
     private function isCheckRunSupported(array $checkRun): bool
     {
         return in_array($checkRun['name'], $this->supportedCIChecks);
+    }
+
+    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
+    {
+        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

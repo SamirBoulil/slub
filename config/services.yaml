@@ -187,16 +187,26 @@ services:
     slub.infrastructure.http.guzzle_client:
         class: GuzzleHttp\Client
 
+    # Add missing service definitions
+    slub.infrastructure.vcs.github.client.github_api_client:
+        class: Slub\Infrastructure\VCS\Github\Client\GithubAPIClient
+        arguments:
+            - '@slub.infrastructure.vcs.github.client.refresh_access_token'
+            - '@slub.infrastructure.vcs.github.client.app_installation_repository'
+            - '@slub.infrastructure.http.guzzle_client'
+
     ## VCS
+    slub.infrastructure.vcs.github.client.refresh_access_token:
+        class: Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '%env(GITHUB_APP_ID)%'
+            - '%env(GITHUB_PRIVATE_KEY)%'
+
     slub.infrastructure.vcs.github.client.app_installation_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
-
-    slub.infrastructure.vcs.github.client.client_factory:
-        class: Slub\Infrastructure\VCS\Github\Client\GithubClientFactory
-        arguments:
-            - 'AccessTokenRepository'
 
     slub.infrastructure.vcs.github.new_event_action:
         class: Slub\Infrastructure\VCS\Github\EventHandler\NewEventAction
@@ -257,14 +267,12 @@ services:
     slub.infrastructure.vcs.github.query.get_pr_details:
         class: Slub\Infrastructure\VCS\Github\Query\GetPRDetails
         arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
 
     slub.infrastructure.vcs.github.query.find_reviews:
         class: Slub\Infrastructure\VCS\Github\Query\FindReviews
         arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
 
     slub.infrastructure.vcs.github.query.get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus
@@ -276,8 +284,7 @@ services:
     slub.infrastructure.vcs.github.query.ci_status.get_check_run_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus
         arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
             - '@logger'
@@ -285,8 +292,7 @@ services:
     slub.infrastructure.vcs.github.query.ci_status.get_status_check_status:
         class: Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus
         arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
             - '%env(SUPPORTED_CI_CHECKS)%'
             - '%GITHUB_URI%'
             - '@logger'
@@ -294,8 +300,7 @@ services:
     slub.infrastructure.vcs.github.query.find_pr_number:
         class: Slub\Infrastructure\VCS\Github\Query\FindPRNumber
         arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(GITHUB_TOKEN)%'
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
 
     slub.infrastructure.vcs.github.query.get_pr_info:
         class: Slub\Infrastructure\VCS\Github\Query\GetPRInfo

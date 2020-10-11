@@ -70,7 +70,7 @@ class RefreshAccessToken
     private function jwt(): string
     {
         $this->logger->critical($this->githubAppId);
-        $this->logger->critical($this->$this->githubPrivateKey);
+        $this->logger->critical($this->githubPrivateKey);
 
         $jwt = JWT::encode(['iss' => $this->githubAppId], $this->githubPrivateKey, 'RS256');
         $this->logger->critical($jwt);

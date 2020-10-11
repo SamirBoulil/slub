@@ -254,14 +254,14 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationEventHandler
         arguments:
             - '@slub.infrastructure.vcs.github.client.app_installation_repository'
-            - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.vcs.github.client.refresh_access_token'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation_for_all_repositories:
         class: Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationForAllRepositoriesEventHandler
         arguments:
             - '@slub.infrastructure.vcs.github.client.app_installation_repository'
-            - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.vcs.github.client.refresh_access_token'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:

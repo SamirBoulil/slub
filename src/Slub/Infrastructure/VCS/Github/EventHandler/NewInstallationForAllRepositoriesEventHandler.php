@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use GuzzleHttp\Client;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
@@ -19,13 +19,13 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
     /** @var SqlAppInstallationRepository */
     private $sqlAppInstallationRepository;
 
-    /** @var Client */
-    private $httpClient;
+    /** @var RefreshAccessToken */
+    private $refreshAccessToken;
 
-    public function __construct(SqlAppInstallationRepository $sqlAppInstallationRepository, Client $httpClient)
+    public function __construct(SqlAppInstallationRepository $sqlAppInstallationRepository, RefreshAccessToken $refreshAccessToken)
     {
         $this->sqlAppInstallationRepository = $sqlAppInstallationRepository;
-        $this->httpClient = $httpClient;
+        $this->refreshAccessToken = $refreshAccessToken;
     }
 
     public function supports(string $eventType): bool
@@ -54,18 +54,9 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
 
     private function accessToken(array $request): string
     {
-        $accessTokenUrl = $request['installation']['access_tokens_url'];
-        // Patapouille avec le json web token
-        $response = $this->httpClient->get($accessTokenUrl);
-        if (200 !== $response->getStatusCode()) {
-            throw new \RuntimeException('Impossible to get the access token at: %s', $accessTokenUrl);
-        }
-        $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
-            throw new \RuntimeException(sprintf('There was a problem when fetching the access token for url "%s"', $accessTokenUrl));
-        }
+        $installationId = (string) $request['installation']['id'];
 
-        return $content['token'];
+        return $this->refreshAccessToken->fetch($installationId);
     }
 
     /**

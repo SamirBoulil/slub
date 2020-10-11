@@ -49,8 +49,12 @@ class RefreshAccessToken
     {
         $headers = GithubAPIHelper::acceptMachineManPreviewHeader();
         $headers = array_merge($headers, GithubAPIHelper::authorizationHeaderWithJWT($this->jwt()));
+        $response = $this->httpClient->get($accessTokenUrl, ['headers' => $headers]);
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException('Impossible to get the access token at: %s', $accessTokenUrl);
+        }
 
-        return $this->httpClient->get($accessTokenUrl, ['headers' => $headers]);
+        return $response;
     }
 
     private function accessToken(ResponseInterface $response, string $accessTokenUrl): string

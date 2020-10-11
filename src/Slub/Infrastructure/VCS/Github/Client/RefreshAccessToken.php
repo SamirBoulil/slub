@@ -7,6 +7,7 @@ namespace Slub\Infrastructure\VCS\Github\Client;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 /**
@@ -25,11 +26,15 @@ class RefreshAccessToken
     /** @var string */
     private $githubPrivateKey;
 
-    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey, LoggerInterface $logger)
     {
         $this->httpClient = $httpClient;
         $this->githubAppId = $githubAppId;
         $this->githubPrivateKey = $githubPrivateKey;
+        $this->logger = $logger;
     }
 
     public function fetch(string $installationId): string
@@ -60,6 +65,12 @@ class RefreshAccessToken
 
     private function jwt(): string
     {
-        return JWT::encode(['iss' => $this->githubAppId], $this->githubPrivateKey, 'RS256');
+        $this->logger->critical($this->githubAppId);
+        $this->logger->critical($this->$this->githubPrivateKey);
+
+        $jwt = JWT::encode(['iss' => $this->githubAppId], $this->githubPrivateKey, 'RS256');
+        $this->logger->critical($jwt);
+
+        return $jwt;
     }
 }

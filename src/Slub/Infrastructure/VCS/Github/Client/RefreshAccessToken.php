@@ -48,10 +48,22 @@ class RefreshAccessToken
     private function fetchAccessToken(string $accessTokenUrl): ResponseInterface
     {
         $headers = GithubAPIHelper::acceptMachineManPreviewHeader();
-        $headers = array_merge($headers, GithubAPIHelper::authorizationHeaderWithJWT($this->jwt()));
-        $response = $this->httpClient->get($accessTokenUrl, ['headers' => $headers]);
-        if (200 !== $response->getStatusCode()) {
-            throw new \RuntimeException('Impossible to get the access token at: %s', $accessTokenUrl);
+        $jwt = $this->jwt();
+        $headers = array_merge($headers, GithubAPIHelper::authorizationHeaderWithJWT($jwt));
+        $this->logger->critical('Fetching access token');
+        $this->logger->critical($accessTokenUrl);
+        $this->logger->critical($accessTokenUrl);
+        $this->logger->critical($jwt);
+        $response = $this->httpClient->post($accessTokenUrl, ['headers' => $headers]);
+        if (201 !== $response->getStatusCode()) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Impossible to get the access token at %s, %d: %s',
+                    $accessTokenUrl,
+                    $response->getStatusCode(),
+                    $response->getBody()->getContents()
+                )
+            );
         }
 
         return $response;
@@ -69,11 +81,16 @@ class RefreshAccessToken
 
     private function jwt(): string
     {
-        $this->logger->critical($this->githubAppId);
-        $this->logger->critical($this->githubPrivateKey);
-
-        $jwt = JWT::encode(['iss' => $this->githubAppId], $this->githubPrivateKey, 'RS256');
-        $this->logger->critical($jwt);
+        $now = new \DateTime('now');
+        $jwt = JWT::encode(
+            [
+                'iat' => $now->getTimestamp(),
+                'exp' => $now->getTimestamp() + (10 * 60),
+                'iss' => $this->githubAppId,
+            ],
+            $this->githubPrivateKey,
+            'RS256'
+        );
 
         return $jwt;
     }

@@ -219,30 +219,21 @@ services:
 
     slub.infrastructure.vcs.github.event_handler_registry:
         class: Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry
-        calls:
-            - method: addEventHandler
-              arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.new_review'
-            - method: addEventHandler
-              arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.check_run'
-            - method: addEventHandler
-              arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.pr_closed'
-            - method: addEventHandler
-              arguments:
-                  - '@slub.infrastructure.vcs.github.event_handler.status_updated'
+        arguments:
+            - !tagged github.event_handler
 
     slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
         arguments:
             - '@slub.application.new_review.new_review_handler'
+        tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.check_run:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+        tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler
@@ -250,11 +241,27 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
+        tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.pr_closed:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler
         arguments:
             - '@slub.application.close_pr.close_pr_handler'
+        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.new_installation:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationEventHandler
+        arguments:
+            - '@slub.infrastructure.vcs.github.client.app_installation_repository'
+            - '@slub.infrastructure.http.guzzle_client'
+        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.new_installation_for_all_repositories:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationForAllRepositoriesEventHandler
+        arguments:
+            - '@slub.infrastructure.vcs.github.client.app_installation_repository'
+            - '@slub.infrastructure.http.guzzle_client'
+        tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Slub\Infrastructure\VCS\Github\Query\GetVCSStatusFromGithub

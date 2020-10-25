@@ -29,12 +29,11 @@ class RefreshAccessToken
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey, LoggerInterface $logger)
+    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey)
     {
         $this->httpClient = $httpClient;
         $this->githubAppId = $githubAppId;
         $this->githubPrivateKey = $githubPrivateKey;
-        $this->logger = $logger;
     }
 
     public function fetch(string $installationId): string
@@ -50,10 +49,6 @@ class RefreshAccessToken
         $headers = GithubAPIHelper::acceptMachineManPreviewHeader();
         $jwt = $this->jwt();
         $headers = array_merge($headers, GithubAPIHelper::authorizationHeaderWithJWT($jwt));
-        $this->logger->critical('Fetching access token');
-        $this->logger->critical($accessTokenUrl);
-        $this->logger->critical($accessTokenUrl);
-        $this->logger->critical($jwt);
         $response = $this->httpClient->post($accessTokenUrl, ['headers' => $headers]);
         if (201 !== $response->getStatusCode()) {
             throw new \RuntimeException(

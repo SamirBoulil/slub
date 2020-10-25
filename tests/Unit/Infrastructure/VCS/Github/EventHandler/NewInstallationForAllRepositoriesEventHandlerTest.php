@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationForAllRepositoriesEventHandler;
-use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -21,7 +20,6 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
     private const ACCESS_TOKEN_URI = '/installations/1/access_tokens';
     private const ACCESS_TOKENS_URL = 'https://api.github.com'.self::ACCESS_TOKEN_URI;
     private const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
-    private const JWT_TOKEN = 'token xaze12312faze';
 
     /** @var NewInstallationForAllRepositoriesEventHandler */
     private $newInstallationEventHandler;
@@ -29,16 +27,16 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
     /** @var ObjectProphecy|SqlAppInstallationRepository */
     private $appInformationRepository;
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    /** @var ObjectProphecy|RefreshAccessToken */
+    private $refreshAccessToken;
 
     public function setUp(): void
     {
         $this->appInformationRepository = $this->prophesize(SqlAppInstallationRepository::class);
-        $this->requestSpy = new GuzzleSpy();
+        $this->refreshAccessToken = $this->prophesize(RefreshAccessToken::class);
         $this->newInstallationEventHandler = new NewInstallationForAllRepositoriesEventHandler(
             $this->appInformationRepository->reveal(),
-            $this->requestSpy->client()
+            $this->refreshAccessToken->reveal()
         );
     }
 
@@ -66,7 +64,7 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
             'repositories_added' => [['full_name' => $repository1], ['full_name' => $repository2]],
         ];
 
-        $this->requestSpy->stubResponse(new Response(200, [], $this->accessTokenResponse()));
+        $this->refreshAccessToken->fetch((string) $installationId)->willReturn(self::ACCESS_TOKEN);
 
         $this->appInformationRepository->save(
             Argument::that(
@@ -88,12 +86,6 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
         )->shouldBeCalled();
 
         $this->newInstallationEventHandler->handle($newInstallationEvent);
-
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI(self::ACCESS_TOKEN_URI, $generatedRequest);
-//        $this->requestSpy->assertAuthToken(self::JWT_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
     }
 
     /** @test */
@@ -103,10 +95,5 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->newInstallationEventHandler->handle($installationEventWithUnsupportedAction);
-    }
-
-    private function accessTokenResponse(): string
-    {
-        return (string) json_encode(['token' => self::ACCESS_TOKEN], JSON_THROW_ON_ERROR);
     }
 }

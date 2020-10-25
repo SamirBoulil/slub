@@ -10,6 +10,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationEventHandler;
 use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 
@@ -21,7 +22,6 @@ class NewInstallationEventHandlerTest extends TestCase
     private const ACCESS_TOKEN_URI = '/installations/1/access_tokens';
     private const ACCESS_TOKENS_URL = 'https://api.github.com'.self::ACCESS_TOKEN_URI;
     private const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
-    private const JWT_TOKEN = 'token xaze12312faze';
 
     /** @var NewInstallationEventHandler */
     private $newInstallationEventHandler;
@@ -29,16 +29,16 @@ class NewInstallationEventHandlerTest extends TestCase
     /** @var ObjectProphecy|SqlAppInstallationRepository */
     private $appInformationRepository;
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    /** @var ObjectProphecy|RefreshAccessToken */
+    private $refreshAccessToken;
 
     public function setUp(): void
     {
         $this->appInformationRepository = $this->prophesize(SqlAppInstallationRepository::class);
-        $this->requestSpy = new GuzzleSpy();
+        $this->refreshAccessToken = $this->prophesize(RefreshAccessToken::class);
         $this->newInstallationEventHandler = new NewInstallationEventHandler(
             $this->appInformationRepository->reveal(),
-            $this->requestSpy->client()
+            $this->refreshAccessToken->reveal()
         );
     }
 
@@ -69,8 +69,7 @@ class NewInstallationEventHandlerTest extends TestCase
             ],
         ];
 
-        $this->requestSpy->stubResponse(new Response(200, [], $this->accessTokenResponse()));
-
+        $this->refreshAccessToken->fetch((string) $installationId)->willReturn(self::ACCESS_TOKEN);
         $this->appInformationRepository->save(
             Argument::that(
                 function (AppInstallation $appInstallation) use ($installationId, $repository1) {
@@ -91,12 +90,6 @@ class NewInstallationEventHandlerTest extends TestCase
         )->shouldBeCalled();
 
         $this->newInstallationEventHandler->handle($newInstallationEvent);
-
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI(self::ACCESS_TOKEN_URI, $generatedRequest);
-//        $this->requestSpy->assertAuthToken(self::JWT_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
     }
 
     /** @test */
@@ -106,12 +99,5 @@ class NewInstallationEventHandlerTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->newInstallationEventHandler->handle($installationEventWithUnsupportedAction);
-    }
-
-    // throw if malformed response
-
-    private function accessTokenResponse(): string
-    {
-        return (string) json_encode(['token' => self::ACCESS_TOKEN]);
     }
 }

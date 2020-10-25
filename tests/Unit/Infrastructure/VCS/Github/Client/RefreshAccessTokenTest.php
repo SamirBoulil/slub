@@ -48,7 +48,7 @@ EOD;
     public function it_fetches_an_access_token_for_an_app_id()
     {
         $installationId = '123a456b';
-        $this->requestSpy->stubResponse(new Response(200, [], $this->accessTokenResponse()));
+        $this->requestSpy->stubResponse(new Response(201, [], $this->accessTokenResponse()));
 
         $actualAccesstoken = $this->getAccessToken->fetch($installationId);
 
@@ -57,7 +57,7 @@ EOD;
         $expectedURI = sprintf('/app/installations/%s/access_tokens', $installationId);
         $actualRequest = $this->requestSpy->getRequest();
         $this->requestSpy->assertURI($expectedURI, $actualRequest);
-        $this->requestSpy->assertMethod('GET', $actualRequest);
+        $this->requestSpy->assertMethod('POST', $actualRequest);
         self::assertEquals('application/vnd.github.machine-man-preview+json', $actualRequest->getHeader('Accept')[0]);
         $authorization = $actualRequest->getHeader('Authorization')[0];
         self::assertStringStartsWith('Bearer', (string) $authorization);

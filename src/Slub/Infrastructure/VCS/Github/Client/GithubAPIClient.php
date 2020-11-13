@@ -15,7 +15,7 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
  */
 class GithubAPIClient
 {
-    const UNAUTHORIZED_STATUS_CODE = 401;
+    private const UNAUTHORIZED_STATUS_CODE = 401;
     /** @var RefreshAccessToken */
     private $refreshAccessToken;
 

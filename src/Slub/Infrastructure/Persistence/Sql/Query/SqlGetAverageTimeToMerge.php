@@ -41,7 +41,7 @@ SQL;
         return $this->convertToInteger($result);
     }
 
-    private function isResultEmpty($result): bool
+    private function isResultEmpty(?string $result): bool
     {
         return null === $result;
     }

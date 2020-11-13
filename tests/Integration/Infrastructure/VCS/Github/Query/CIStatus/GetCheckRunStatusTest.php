@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
-use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
+use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
 
 class GetCheckRunStatusTest extends WebTestCase
 {
-    private const AUTH_TOKEN = 'TOKEN';
     private const PR_COMMIT_REF = 'pr_commit_ref';
     private const SUPPORTED_CI_CHECK_1 = 'supported_1';
     private const SUPPORTED_CI_CHECK_2 = 'supported_2';
@@ -24,16 +25,16 @@ class GetCheckRunStatusTest extends WebTestCase
     /** @var GetCheckRunStatus */
     private $getCheckRunStatus;
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    private $githubAPIClient;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->requestSpy = new GuzzleSpy();
+        $this->githubAPIClient = $this->prophesize(GithubAPIClient::class);
+
         $this->getCheckRunStatus = new GetCheckRunStatus(
-            $this->requestSpy->client(),
-            self::AUTH_TOKEN,
+            $this->githubAPIClient->reveal(),
             implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
             'https://api.github.com',
             new NullLogger()
@@ -49,7 +50,13 @@ class GetCheckRunStatusTest extends WebTestCase
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciCheckRuns)));
+        $uri = 'https://api.github.com/repos/SamirBoulil/slub/commits/'.self::PR_COMMIT_REF.'/check-runs';
+        $repositoryIdentifier = 'SamirBoulil/slub';
+        $this->githubAPIClient->get(
+            $uri,
+            ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
+            $repositoryIdentifier
+        )->willReturn(new Response(200, [], (string) json_encode($ciCheckRuns)));
 
         $actualCheckStatus = $this->getCheckRunStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
@@ -58,20 +65,12 @@ class GetCheckRunStatusTest extends WebTestCase
 
         $this->assertEquals($expectedCIStatus, $actualCheckStatus->status);
         $this->assertEquals($expectedBuildLink, $actualCheckStatus->buildLink);
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI(
-            '/repos/SamirBoulil/slub/commits/' . self::PR_COMMIT_REF . '/check-runs',
-            $generatedRequest
-        );
-        $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
     }
 
     public function checkRunsExamples(): array
     {
         return [
-            'CI Checks not supported'         => [
+            'CI Checks not supported' => [
                 [
                     'check_runs' => [
                         ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
@@ -80,7 +79,7 @@ class GetCheckRunStatusTest extends WebTestCase
                     ],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
             'Supported CI Checks not run'     => [
                 [
@@ -153,7 +152,8 @@ class GetCheckRunStatusTest extends WebTestCase
      */
     public function it_throws_if_the_response_is_malformed(): void
     {
-        $this->requestSpy->stubResponse(new Response(200, [], '{'));
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(200, [], (string) '{'));
         $this->expectException(\RuntimeException::class);
 
         $this->getCheckRunStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');

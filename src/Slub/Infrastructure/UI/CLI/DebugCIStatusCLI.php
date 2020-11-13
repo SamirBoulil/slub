@@ -44,6 +44,8 @@ class DebugCIStatusCLI extends Command
         $PRInfo = $this->getPRInfo->fetch($this->PRIdentifier($matches));
 
         $output->writeln(sprintf('<info>CI status: %s</info>', $PRInfo->CIStatus->status));
+        $output->writeln(sprintf('<info>CI closed: %s</info>', $PRInfo->isClosed ? 'yes' : 'no'));
+        $output->writeln(sprintf('<info>CI isMerged: %s</info>', $PRInfo->isClosed ? 'yes' : 'no'));
     }
 
     private function PRIdentifier($matches): PRIdentifier

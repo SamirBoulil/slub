@@ -20,7 +20,7 @@ class GithubAPIHelperTest extends TestCase
             [
                 'SamirBoulil',
                 'slub',
-                '36'
+                '36',
             ]
         );
     }
@@ -31,9 +31,21 @@ class GithubAPIHelperTest extends TestCase
     public function it_generates_a_authorization_header_for_a_token()
     {
         $expectedToken = 'token_123';
-        $this->assertEquals(
+        self::assertEquals(
             GithubAPIHelper::authorizationHeader($expectedToken),
-            ['Authorization' => 'token ' . $expectedToken]
+            ['Authorization' => 'token '.$expectedToken]
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_authorization_header_for_a_jwt()
+    {
+        $expectedToken = 'token_123';
+        self::assertEquals(
+            GithubAPIHelper::authorizationHeaderWithJWT($expectedToken),
+            ['Authorization' => 'Bearer '.$expectedToken]
         );
     }
 
@@ -42,9 +54,20 @@ class GithubAPIHelperTest extends TestCase
      */
     public function it_generates_a_accept_header_for_preview_endpoints()
     {
-        $this->assertEquals(
+        self::assertEquals(
             GithubAPIHelper::acceptPreviewEndpointsHeader(),
             ['Accept' => 'application/vnd.github.antiope-preview+json']
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_generates_a_accept_header_for_machine_man_preview_endpoints()
+    {
+        self::assertEquals(
+            GithubAPIHelper::acceptMachineManPreviewHeader(),
+            ['Accept' => 'application/vnd.github.machine-man-preview+json']
         );
     }
 }

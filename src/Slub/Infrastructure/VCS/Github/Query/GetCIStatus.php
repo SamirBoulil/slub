@@ -37,13 +37,13 @@ class GetCIStatus
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('Check run CI: ' . $checkRunStatus->status);
+        $this->logger->critical('Check run CI: '.$checkRunStatus->status);
 
         $statusCheckStatus = $this->getStatusChecksStatus->fetch($PRIdentifier, $commitRef);
-        $this->logger->critical('status check: ' . $statusCheckStatus->status);
+        $this->logger->critical('status check: '.$statusCheckStatus->status);
 
         $deductCIStatus = $this->deductCIStatus($checkRunStatus, $statusCheckStatus);
-        $this->logger->critical('status = ' . $deductCIStatus->status);
+        $this->logger->critical('status = '.$deductCIStatus->status);
 
         return $deductCIStatus;
     }

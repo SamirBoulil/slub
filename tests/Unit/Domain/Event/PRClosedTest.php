@@ -9,7 +9,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Event\PRClosed;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRClosedTest extends TestCase
 {

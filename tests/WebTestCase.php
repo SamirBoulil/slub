@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -19,6 +20,7 @@ class WebTestCase extends SymfonyWebTestCase
         parent::setUp();
 
         $this->resetDatabase();
+        $this->addDefaultGithubAppInstallation();
     }
 
     public function get(string $serviceOrParameterId)
@@ -38,5 +40,15 @@ class WebTestCase extends SymfonyWebTestCase
     {
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $fileBasedPRRepository->reset();
+    }
+
+    private function addDefaultGithubAppInstallation(): void
+    {
+        $appInstallationRepository = $this->get('slub.infrastructure.vcs.github.client.app_installation_repository');
+        $appInstallation = new AppInstallation();
+        $appInstallation->repositoryIdentifier = 'Samirboulil/slub';
+        $appInstallation->installationId = 'installation_id';
+        $appInstallation->accessToken = 'access_token';
+        $appInstallationRepository->save($appInstallation);
     }
 }

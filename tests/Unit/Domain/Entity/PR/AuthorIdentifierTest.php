@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class AuthorIdentifierTest extends TestCase
 {

@@ -119,7 +119,7 @@ class CIStatusUpdatedTest extends WebTestCase
         );
 
         $client = $this->callAPI($this->supportedGreenCI());
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        self::assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
     private function supportedGreenCI(): string

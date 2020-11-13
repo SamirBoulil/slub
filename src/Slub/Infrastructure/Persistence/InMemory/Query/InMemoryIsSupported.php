@@ -31,7 +31,7 @@ class InMemoryIsSupported implements IsSupportedInterface
     {
         $repositoriesFound = array_filter(
             $this->supportedRepositories,
-            function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
+            static function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
                 return $supportedRepository->equals($repositoryIdentifierToCheck);
             }
         );

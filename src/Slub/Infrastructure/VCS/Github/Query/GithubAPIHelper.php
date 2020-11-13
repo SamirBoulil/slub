@@ -16,6 +16,10 @@ class GithubAPIHelper
     {
         return ['Authorization' => sprintf('token %s', $authToken)];
     }
+    public static function authorizationHeaderWithJWT(string $jwt): array
+    {
+        return ['Authorization' => sprintf('Bearer %s', $jwt)];
+    }
 
     public static function acceptPreviewEndpointsHeader(): array
     {
@@ -29,5 +33,10 @@ class GithubAPIHelper
         Assert::count($matches, 3);
 
         return $matches;
+    }
+
+    public static function acceptMachineManPreviewHeader(): array
+    {
+        return ['Accept' => 'application/vnd.github.machine-man-preview+json'];
     }
 }

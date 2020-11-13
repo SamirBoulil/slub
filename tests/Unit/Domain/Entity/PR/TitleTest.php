@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\Title;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class TitleTest extends TestCase
 {

@@ -41,7 +41,7 @@ class GuzzleSpy
 
     public function assertAuthToken(string $authToken, RequestInterface $generatedRequest): void
     {
-        Assert::assertEquals('token ' . $authToken, current($generatedRequest->getHeaders()['Authorization']));
+        Assert::assertEquals('token '.$authToken, current($generatedRequest->getHeader('Authorization')));
     }
 
     public function assertURI(string $uri, RequestInterface $generatedRequest): void

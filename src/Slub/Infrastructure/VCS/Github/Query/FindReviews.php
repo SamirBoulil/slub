@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Client;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -22,16 +23,12 @@ class FindReviews
     private const REFUSED = 'REFUSED';
     private const COMMENTED = 'COMMENTED';
 
-    /** @var Client */
-    private $httpClient;
+    /** @var GithubAPIClient */
+    private $githubAPIClient;
 
-    /** @var string */
-    private $authToken;
-
-    public function __construct(Client $httpClient, string $authToken)
+    public function __construct(GithubAPIClient $githubAPIClient)
     {
-        $this->httpClient = $httpClient;
-        $this->authToken = $authToken;
+        $this->githubAPIClient = $githubAPIClient;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): array
@@ -48,17 +45,14 @@ class FindReviews
     private function reviews(PRIdentifier $PRIdentifier): array
     {
         $url = $this->getUrl($PRIdentifier);
-        $response = $this->httpClient->get($url, ['headers' => GithubAPIHelper::authorizationHeader($this->authToken)]);
+        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
+        $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
+
+        // TODO: Check status code
 
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(
-                sprintf(
-                    'There was a problem when fetching the reviews for PR "%s" at %s',
-                    $PRIdentifier->stringValue(),
-                    $url
-                )
-            );
+            throw new \RuntimeException(sprintf('There was a problem when fetching the reviews for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 
         return $content;
@@ -82,5 +76,10 @@ class FindReviews
                 }
             )
         );
+    }
+
+    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
+    {
+        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

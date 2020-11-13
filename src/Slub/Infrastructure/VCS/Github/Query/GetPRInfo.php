@@ -49,9 +49,14 @@ class GetPRInfo implements GetPRInfoInterface
         return $PRDetails['head']['sha'];
     }
 
-    private function isMerged(array $PRdetails): bool
+    private function isMerged(array $PRDetails): bool
     {
-        return 'closed' === $PRdetails['state'];
+        return 'closed' === $PRDetails['state'];
+    }
+
+    private function isClosed(array $PRDetails): bool
+    {
+        return 'closed' === $PRDetails['state'];
     }
 
     private function createPRInfo(
@@ -85,10 +90,5 @@ class GetPRInfo implements GetPRInfoInterface
     private function authorIdentifier(array $PRDetails): string
     {
         return $PRDetails['user']['login'];
-    }
-
-    private function isClosed(array $PRDetails): bool
-    {
-        return 'closed' === $PRDetails['state'];
     }
 }

@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
-use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
+use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
 
 class GetStatusChecksStatusTest extends WebTestCase
 {
-    private const AUTH_TOKEN = 'TOKEN';
     private const PR_COMMIT_REF = 'pr_commit_ref';
     private const SUPPORTED_CI_STATUS_1 = 'supported_1';
     private const SUPPORTED_CI_STATUS_2 = 'supported_2';
@@ -24,16 +25,15 @@ class GetStatusChecksStatusTest extends WebTestCase
     /** @var GetStatusChecksStatus */
     private $getStatusCheckStatus;
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    private $githubAPIClient;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->requestSpy = new GuzzleSpy();
+        $this->githubAPIClient = $this->prophesize(GithubAPIClient::class);
         $this->getStatusCheckStatus = new GetStatusChecksStatus(
-            $this->requestSpy->client(),
-            self::AUTH_TOKEN,
+            $this->githubAPIClient->reveal(),
             implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3]),
             'https://api.github.com',
             new NullLogger()
@@ -49,23 +49,21 @@ class GetStatusChecksStatusTest extends WebTestCase
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciStatuses)));
+        $uri = 'https://api.github.com/repos/SamirBoulil/slub/statuses/'.self::PR_COMMIT_REF;
+        $repositoryIdentifier = 'SamirBoulil/slub';
+        $this->githubAPIClient->get(
+            $uri,
+            ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
+            $repositoryIdentifier
+        )->willReturn(new Response(200, [], (string) json_encode($ciStatuses)));
 
         $actualCIStatus = $this->getStatusCheckStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
             self::PR_COMMIT_REF
         );
 
-        $this->assertEquals($expectedCIStatus, $actualCIStatus->status);
-        $this->assertEquals($expectedBuildLink, $actualCIStatus->buildLink);
-        $generatedRequest = $this->requestSpy->getRequest();
-        $this->requestSpy->assertMethod('GET', $generatedRequest);
-        $this->requestSpy->assertURI(
-            '/repos/SamirBoulil/slub/statuses/' . self::PR_COMMIT_REF,
-            $generatedRequest
-        );
-        $this->requestSpy->assertAuthToken(self::AUTH_TOKEN, $generatedRequest);
-        $this->requestSpy->assertContentEmpty($generatedRequest);
+        self::assertEquals($expectedCIStatus, $actualCIStatus->status);
+        self::assertEquals($expectedBuildLink, $actualCIStatus->buildLink);
     }
 
     /**
@@ -79,17 +77,18 @@ class GetStatusChecksStatusTest extends WebTestCase
             ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'updated_at' => $day],
             ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => $tomorrow],
         ];
-        $this->requestSpy->stubResponse(new Response(200, [], (string) json_encode($ciStatuses)));
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(200, [], (string) json_encode($ciStatuses)));
 
         $actualCIStatus = $this->getStatusCheckStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), self::PR_COMMIT_REF);
 
-        $this->assertEquals('GREEN', $actualCIStatus->status);
+        self::assertEquals('GREEN', $actualCIStatus->status);
     }
 
     public function ciStatusesExamples(): array
     {
         return [
-            'Status not supported'     => [
+            'Status not supported' => [
                 [
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
@@ -107,7 +106,7 @@ class GetStatusChecksStatusTest extends WebTestCase
                 'PENDING',
                 '',
             ],
-            'Multiple Status Green'    => [
+            'Multiple Status Green' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
@@ -115,19 +114,19 @@ class GetStatusChecksStatusTest extends WebTestCase
                 'GREEN',
                 '',
             ],
-            'Multiple status Red'      => [
+            'Multiple status Red' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context'    => self::SUPPORTED_CI_STATUS_2,
-                     'state'      => 'failure',
+                    ['context' => self::SUPPORTED_CI_STATUS_2,
+                     'state' => 'failure',
                      'target_url' => 'http://my-ci.com/build/456',
-                     'updated_at' => '2020-03-31T10:26:20Z'
+                     'updated_at' => '2020-03-31T10:26:20Z',
                     ],
                 ],
                 'RED',
                 self::BUILD_LINK,
             ],
-            'Multiple status Pending'  => [
+            'Multiple status Pending' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'pending', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'pending', 'updated_at' => '2020-03-31T10:26:20Z'],
@@ -135,7 +134,7 @@ class GetStatusChecksStatusTest extends WebTestCase
                 'PENDING',
                 '',
             ],
-            'Mixed statuses: red'      => [
+            'Mixed statuses: red' => [
                 [
                     ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
@@ -144,7 +143,7 @@ class GetStatusChecksStatusTest extends WebTestCase
                 'RED',
                 self::BUILD_LINK,
             ],
-            'Mixed statuses: green'    => [
+            'Mixed statuses: green' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
@@ -161,7 +160,8 @@ class GetStatusChecksStatusTest extends WebTestCase
      */
     public function it_throws_if_the_response_is_malformed(): void
     {
-        $this->requestSpy->stubResponse(new Response(200, [], '{'));
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(200, [], (string) '{'));
         $this->expectException(\RuntimeException::class);
 
         $this->getStatusCheckStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');

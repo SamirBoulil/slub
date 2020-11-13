@@ -92,7 +92,9 @@ class InstallerCLITest extends KernelTestCase
         /** @var Connection $sqlConnection */
         $sqlConnection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sm = $sqlConnection->getSchemaManager();
-        $this->assertTrue($sm->tablesExist(['pr']));
+        self::assertTrue($sm->tablesExist(['pr']));
+        self::assertTrue($sm->tablesExist(['delivered_event']));
+        self::assertTrue($sm->tablesExist(['app_installation']));
     }
 
     private function dropDatabase(): void

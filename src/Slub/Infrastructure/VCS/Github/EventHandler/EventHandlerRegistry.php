@@ -9,11 +9,14 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
  */
 class EventHandlerRegistry
 {
+    /** @var EventHandlerInterface[] */
     private $eventHandlers = [];
 
-    public function addEventHandler(EventHandlerInterface $eventHandler): void
+    public function __construct(iterable $eventHandlers)
     {
-        $this->eventHandlers[] = $eventHandler;
+        if ($eventHandlers instanceof \Traversable) {
+            $this->eventHandlers = iterator_to_array($eventHandlers);
+        }
     }
 
     public function get(string $eventType): ?EventHandlerInterface

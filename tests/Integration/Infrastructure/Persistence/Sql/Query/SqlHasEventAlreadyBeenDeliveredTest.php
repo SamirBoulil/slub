@@ -53,7 +53,6 @@ class SqlHasEventAlreadyBeenDeliveredTest extends KernelTestCase
         self::assertFalse($result);
     }
 
-
     private function resetDB(): void
     {
         $sqlPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');

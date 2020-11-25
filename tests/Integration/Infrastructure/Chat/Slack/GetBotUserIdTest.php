@@ -13,7 +13,6 @@ use Slub\Infrastructure\Chat\Slack\GetBotUserId;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetBotUserIdTest extends TestCase
 {

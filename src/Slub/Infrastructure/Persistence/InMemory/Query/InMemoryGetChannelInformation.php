@@ -9,7 +9,6 @@ use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class InMemoryGetChannelInformation implements GetChannelInformationInterface
 {

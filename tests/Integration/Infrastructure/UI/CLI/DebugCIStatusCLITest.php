@@ -59,10 +59,6 @@ class DebugCIStatusCLITest extends KernelTestCase
         $this->commandTester = new CommandTester($command);
     }
 
-    /**
-     * @return PRInfo
-     *
-     */
     protected function aPRInfo(): PRInfo
     {
         $prInfo = new PRInfo();

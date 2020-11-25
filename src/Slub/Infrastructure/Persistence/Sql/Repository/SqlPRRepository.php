@@ -156,8 +156,6 @@ SQL;
     }
 
     /**
-     * @param PR $PR
-     *
      * @throws DBALException
      */
     private function updatePR(PR $PR): void
@@ -213,9 +211,6 @@ SQL;
     }
 
     /**
-     * @param array $PRsInReviewNotGtmed
-     *
-     * @return array
      *
      */
     private function hydrateAll(array $PRsInReviewNotGtmed): array

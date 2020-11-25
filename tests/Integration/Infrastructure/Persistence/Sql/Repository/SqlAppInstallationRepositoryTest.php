@@ -57,7 +57,6 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
         self::assertNull($expected->accessToken);
     }
 
-
     /** @test */
     public function it_updates_the_app_installation(): void
     {

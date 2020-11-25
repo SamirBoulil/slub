@@ -301,7 +301,6 @@ class SqlPRRepositoryTest extends KernelTestCase
     }
 
     /**
-     * @param array $expectedPRs
      * @param PR[]  $actualPRs
      */
     private function assertPRs(array $expectedPRs, array $actualPRs): void

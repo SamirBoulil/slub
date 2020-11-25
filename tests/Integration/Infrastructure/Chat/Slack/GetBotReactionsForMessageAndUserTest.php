@@ -13,7 +13,6 @@ use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetBotReactionsForMessageAndUserTest extends TestCase
 {

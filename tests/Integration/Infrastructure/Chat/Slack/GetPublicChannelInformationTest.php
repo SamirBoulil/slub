@@ -15,7 +15,6 @@ use Slub\Infrastructure\Chat\Slack\GetPublicChannelInformation;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetPublicChannelInformationTest extends TestCase
 {

@@ -23,7 +23,6 @@ class PurgeDeliveredEventsCLI extends Command
         $this->connection = $sqlConnection;
     }
 
-
     protected function configure(): void
     {
         $this->setDescription('Maintenance of operation consisting in purging the delivered events from the databases to keep its size minimal')

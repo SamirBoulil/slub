@@ -17,7 +17,6 @@ use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetVCSStatusFromGithubTest extends WebTestCase
 {

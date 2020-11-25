@@ -68,7 +68,6 @@ class PRClosedEventHandlerTest extends TestCase
         $this->PRCloseEventHandler->handle($closePREvent);
     }
 
-
     /**
      * @test
      */

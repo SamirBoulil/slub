@@ -14,14 +14,11 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetPRInfo implements GetPRInfoInterface
 {
-    /** @var GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails $getPRDetails;
 
-    /** @var FindReviews */
-    private $findReviews;
+    private FindReviews $findReviews;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
     public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus)
     {

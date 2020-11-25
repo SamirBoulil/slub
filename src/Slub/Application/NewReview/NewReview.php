@@ -13,15 +13,11 @@ class NewReview
 {
     use Immutable;
 
-    /** @var string */
-    public $repositoryIdentifier;
+    public string $repositoryIdentifier;
 
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var string */
-    public $reviewerName;
+    public string $reviewerName;
 
-    /** @var string */
-    public $reviewStatus;
+    public string $reviewStatus;
 }

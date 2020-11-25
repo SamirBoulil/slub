@@ -12,14 +12,11 @@ use GuzzleHttp\ClientInterface;
  */
 class GetBotUserId
 {
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
-    /** @var ?string */
-    private $cachedResult;
+    private ?string $cachedResult = null;
 
     public function __construct(ClientInterface $client, string $slackToken)
     {

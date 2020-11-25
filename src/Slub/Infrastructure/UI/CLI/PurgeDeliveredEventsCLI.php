@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\UI\CLI;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Console\Command\Command;
@@ -14,10 +15,9 @@ class PurgeDeliveredEventsCLI extends Command
 {
     protected static $defaultName = 'slub:maintenance:purge-delivered-events';
 
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
+    public function __construct(Connection $sqlConnection)
     {
         parent::__construct(self::$defaultName);
         $this->connection = $sqlConnection;

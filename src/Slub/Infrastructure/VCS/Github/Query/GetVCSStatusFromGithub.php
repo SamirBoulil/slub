@@ -15,17 +15,13 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetVCSStatusFromGithub implements GetVCSStatus
 {
-    /** @var GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails $getPRDetails;
 
-    /** @var FindReviews */
-    private $findReviews;
+    private FindReviews $findReviews;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus, LoggerInterface $logger)
     {

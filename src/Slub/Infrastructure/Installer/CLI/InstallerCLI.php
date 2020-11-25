@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Installer\CLI;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\Console\Command\Command;
@@ -17,10 +18,9 @@ class InstallerCLI extends Command
 {
     protected static $defaultName = 'slub:install';
 
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
+    public function __construct(Connection $sqlConnection)
     {
         parent::__construct(self::$defaultName);
         $this->sqlConnection = $sqlConnection;

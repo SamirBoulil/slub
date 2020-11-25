@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -11,10 +12,9 @@ use Doctrine\DBAL\Connection;
  */
 class SqlHasEventAlreadyBeenDelivered
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
+    public function __construct(Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }

@@ -13,11 +13,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class PRPutToReview extends Event
 {
-    /** @var PRIdentifier */
-    private $PRIdentifier;
+    private PRIdentifier $PRIdentifier;
 
-    /** @var MessageIdentifier */
-    private $messageIdentifier;
+    private MessageIdentifier $messageIdentifier;
 
     private function __construct(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier)
     {

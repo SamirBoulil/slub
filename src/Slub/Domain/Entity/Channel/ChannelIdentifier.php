@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class ChannelIdentifier
 {
-    /** @var string */
-    private $channelIdentifier;
+    private string $channelIdentifier;
 
     private function __construct(string $channelIdentifier)
     {

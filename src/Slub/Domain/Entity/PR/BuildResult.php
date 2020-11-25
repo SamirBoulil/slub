@@ -15,8 +15,7 @@ class BuildResult
     private const GREEN = 'GREEN';
     private const RED = 'RED';
 
-    /** @var string */
-    private $status;
+    private string $status;
 
     private function __construct(string $status)
     {

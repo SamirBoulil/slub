@@ -11,11 +11,9 @@ use Webmozart\Assert\Assert;
 
 class InMemoryIsSupported implements IsSupportedInterface
 {
-    /** @var array */
-    private $supportedRepositories;
+    private array $supportedRepositories;
 
-    /** @var array */
-    private $supportedWorkspace;
+    private array $supportedWorkspace;
 
     public function __construct(string $commaSeparatedRepositories, string $commaSeparatedchannels)
     {

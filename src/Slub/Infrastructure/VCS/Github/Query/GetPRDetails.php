@@ -13,8 +13,7 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
  */
 class GetPRDetails
 {
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function __construct(GithubAPIClient $githubAPIClient)
     {

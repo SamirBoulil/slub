@@ -13,11 +13,9 @@ class CheckStatus
 {
     use Immutable;
 
-    /** @var string */
-    public $status;
+    public string $status;
 
-    /** @var string */
-    public $buildLink;
+    public string $buildLink;
 
     public function __construct(
         string $status,

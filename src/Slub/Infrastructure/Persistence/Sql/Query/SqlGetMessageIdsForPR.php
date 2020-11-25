@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -15,10 +16,9 @@ use Slub\Domain\Repository\PRNotFoundException;
  */
 class SqlGetMessageIdsForPR implements GetMessageIdsForPR
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
+    public function __construct(Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }

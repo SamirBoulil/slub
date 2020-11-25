@@ -26,35 +26,25 @@ class SlubBot
 {
     public const UNPUBLISH_CONFIRMATION_MESSAGES = ['Okaay! :ok_hand:', 'Will do! :+1:', 'Oki doki!', 'Yeeee '];
 
-    /** @var PutPRToReviewHandler */
-    private $putPRToReviewHandler;
+    private PutPRToReviewHandler $putPRToReviewHandler;
 
-    /** @var UnpublishPRHandler */
-    private $unpublishPRHandler;
+    private UnpublishPRHandler $unpublishPRHandler;
 
-    /** @var GetChannelInformationInterface */
-    private $getPublicChannelInformation;
+    private GetChannelInformationInterface $getPublicChannelInformation;
 
-    /** @var GetChannelInformationInterface */
-    private $getPrivateChannelInformation;
+    private GetChannelInformationInterface $getPrivateChannelInformation;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var BotMan */
-    private $bot;
+    private BotMan $bot;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
-    /** @var string */
-    private $botUserId;
+    private string $botUserId;
 
-    /** @var ChatClient */
-    private $chatClient;
+    private ChatClient $chatClient;
 
-    /** @var GetPRInfoInterface */
-    private $getPRInfo;
+    private GetPRInfoInterface $getPRInfo;
 
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
@@ -98,7 +88,7 @@ class SlubBot
 
     private function listensToNewPR(BotMan $bot): void
     {
-        $createNewPr = function (\BotMan\BotMan\BotMan $bot, string $repositoryIdentifier, string $PRNumber) {
+        $createNewPr = function (BotMan $bot, string $repositoryIdentifier, string $PRNumber) {
             $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
@@ -119,7 +109,7 @@ class SlubBot
 
     private function listenToPRToUnpublish(BotMan $bot): void
     {
-        $unpublishPR = function (\BotMan\BotMan\BotMan $bot, string $repository, $PRNumber) {
+        $unpublishPR = function (BotMan $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
             $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
             $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
@@ -175,7 +165,7 @@ class SlubBot
     {
         $bot->hears(
             'alive',
-            function (\BotMan\BotMan\BotMan $bot) {
+            function (BotMan $bot) {
                 $bot->reply('yes :+1:');
             }
         );
@@ -199,7 +189,7 @@ class SlubBot
         return $channelInformation->channelName;
     }
 
-    private function getMessageIdentifier(\BotMan\BotMan\BotMan $bot): string
+    private function getMessageIdentifier(BotMan $bot): string
     {
         $channel = $bot->getMessage()->getPayload()['channel'];
         $ts = $bot->getMessage()->getPayload()['ts'];
@@ -226,7 +216,7 @@ class SlubBot
 
     private function providesToHelp(BotMan $bot): void
     {
-        $userHelp = function (\BotMan\BotMan\BotMan $bot) {
+        $userHelp = function (BotMan $bot) {
             $message = <<<MESSAGE
 *Hello I'm Yeee!*
 I'm here to improve the feedback loop between you and your PR statuses.

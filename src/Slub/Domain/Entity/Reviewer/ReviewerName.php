@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class ReviewerName
 {
-    /** @var string */
-    private $name;
+    private string $name;
 
     private function __construct(string $name)
     {

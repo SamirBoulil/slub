@@ -22,8 +22,7 @@ class FindReviews
     private const REFUSED = 'REFUSED';
     private const COMMENTED = 'COMMENTED';
 
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function __construct(GithubAPIClient $githubAPIClient)
     {

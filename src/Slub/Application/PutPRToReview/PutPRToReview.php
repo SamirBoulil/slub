@@ -10,42 +10,29 @@ class PutPRToReview
 {
     use Immutable;
 
-    /** @var string */
-    public $repositoryIdentifier;
+    public string $repositoryIdentifier;
 
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var string */
-    public $channelIdentifier;
+    public string $channelIdentifier;
 
-    /** @var string */
-    public $workspaceIdentifier;
+    public string $workspaceIdentifier;
 
-    /** @var string */
-    public $messageIdentifier;
+    public string $messageIdentifier;
 
-    /** @var string */
-    public $authorIdentifier;
+    public string $authorIdentifier;
 
-    /** @var string */
-    public $title;
+    public string $title;
 
-    /** @var int */
-    public $GTMCount;
+    public int $GTMCount;
 
-    /** @var int */
-    public $comments;
+    public int $comments;
 
-    /** @var int */
-    public $notGTMCount;
+    public int $notGTMCount;
 
-    /** @var string */
-    public $CIStatus;
+    public string $CIStatus;
 
-    /** @var bool */
-    public $isMerged;
+    public bool $isMerged;
 
-    /** @var bool */
-    public $isClosed;
+    public bool $isClosed;
 }

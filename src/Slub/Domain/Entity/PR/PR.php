@@ -37,46 +37,36 @@ class PR
     private const CLOSED_AT = 'CLOSED_AT';
 
     /** @var Event[] */
-    private $events = [];
+    private array $events = [];
 
-    /** @var PRIdentifier */
-    private $PRIdentifier;
+    private PRIdentifier $PRIdentifier;
 
     /** @var ChannelIdentifier[] */
-    private $channelIdentifiers;
+    private array $channelIdentifiers;
 
     /** @var WorkspaceIdentifier[] */
-    private $workspaceIdentifiers;
+    private array $workspaceIdentifiers;
 
     /** @var MessageIdentifier[] */
-    private $messageIdentifiers;
+    private array $messageIdentifiers;
 
-    /** @var AuthorIdentifier */
-    private $authorIdentifier;
+    private AuthorIdentifier $authorIdentifier;
 
-    /** @var Title */
-    private $title;
+    private Title $title;
 
-    /** @var int */
-    private $GTMCount;
+    private int $GTMCount;
 
-    /** @var int */
-    private $comments;
+    private int $comments;
 
-    /** @var int */
-    private $notGTMCount;
+    private int $notGTMCount;
 
-    /** @var CIStatus */
-    private $CIStatus;
+    private CIStatus $CIStatus;
 
-    /** @var bool */
-    private $isMerged;
+    private bool $isMerged;
 
-    /** @var PutToReviewAt */
-    private $putToReviewAt;
+    private PutToReviewAt $putToReviewAt;
 
-    /** @var ClosedAt */
-    private $closedAt;
+    private ClosedAt $closedAt;
 
     private function __construct(
         PRIdentifier $PRIdentifier,

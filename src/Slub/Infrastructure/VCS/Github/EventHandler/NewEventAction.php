@@ -22,20 +22,15 @@ class NewEventAction
     private const EVENT_TYPE = 'X-GitHub-Event';
     private const DELIVERY = 'X-GitHub-Delivery';
 
-    /** @var EventHandlerRegistry */
-    private $eventHandlerRegistry;
+    private EventHandlerRegistry $eventHandlerRegistry;
 
-    /** @var string */
-    private $secret;
+    private string $secret;
 
-    /** @var SqlDeliveredEventRepository */
-    private $sqlDeliveredEventRepository;
+    private SqlDeliveredEventRepository $sqlDeliveredEventRepository;
 
-    /** @var SqlHasEventAlreadyBeenDelivered */
-    private $sqlHasEventAlreadyBeenDelivered;
+    private SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         EventHandlerRegistry $eventHandlerRegistry,

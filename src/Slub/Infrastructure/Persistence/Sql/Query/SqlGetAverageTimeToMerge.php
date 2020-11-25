@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
@@ -13,10 +14,9 @@ use Slub\Domain\Query\GetAverageTimeToMergeInterface;
  */
 class SqlGetAverageTimeToMerge implements GetAverageTimeToMergeInterface
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
+    public function __construct(Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }

@@ -8,7 +8,7 @@ use Slub\Domain\Query\ClockInterface;
 
 class InMemoryClock implements ClockInterface
 {
-    private $areWeOnWeekEnd = false;
+    private bool $areWeOnWeekEnd = false;
 
     public function areWeOnWeekEnd(): bool
     {

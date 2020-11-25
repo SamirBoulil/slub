@@ -11,8 +11,7 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
  */
 class FindPRNumber implements FindPRNumberInterface
 {
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function __construct(GithubAPIClient $githubAPIClient)
     {

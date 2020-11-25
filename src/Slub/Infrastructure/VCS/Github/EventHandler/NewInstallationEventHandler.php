@@ -17,11 +17,9 @@ class NewInstallationEventHandler implements EventHandlerInterface
     private const EVENT_TYPE = 'installation';
     private const INSTALLATION_TYPE = 'created';
 
-    /** @var SqlAppInstallationRepository */
-    private $sqlAppInstallationRepository;
+    private SqlAppInstallationRepository $sqlAppInstallationRepository;
 
-    /** @var RefreshAccessToken */
-    private $refreshAccessToken;
+    private RefreshAccessToken $refreshAccessToken;
 
     public function __construct(SqlAppInstallationRepository $sqlAppInstallationRepository, RefreshAccessToken $refreshAccessToken)
     {

@@ -16,11 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ListPRsAction
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var GetAverageTimeToMergeInterface */
-    private $averageTimeToMerge;
+    private GetAverageTimeToMergeInterface $averageTimeToMerge;
 
     public function __construct(PRRepositoryInterface $PRRepository, GetAverageTimeToMergeInterface $averageTimeToMerge)
     {

@@ -16,8 +16,7 @@ class PublishRemindersCLI extends Command
 {
     protected static $defaultName = 'slub:send-reminders';
 
-    /** @var PublishRemindersHandler */
-    private $publishRemindersHandler;
+    private PublishRemindersHandler $publishRemindersHandler;
 
     public function __construct(PublishRemindersHandler $publishRemindersHandler)
     {

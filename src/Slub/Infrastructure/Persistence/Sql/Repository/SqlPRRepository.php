@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
@@ -15,13 +16,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SqlPRRepository implements PRRepositoryInterface
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
-    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection, EventDispatcherInterface $eventDispatcher)
+    public function __construct(Connection $sqlConnection, EventDispatcherInterface $eventDispatcher)
     {
         $this->sqlConnection = $sqlConnection;
         $this->eventDispatcher = $eventDispatcher;

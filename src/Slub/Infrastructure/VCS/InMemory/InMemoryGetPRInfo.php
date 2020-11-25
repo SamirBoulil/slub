@@ -14,8 +14,7 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class InMemoryGetPRInfo implements GetPRInfoInterface
 {
-    /** @var PRInfo */
-    private $PRInfo;
+    private PRInfo $PRInfo;
 
     public function __construct()
     {

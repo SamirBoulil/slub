@@ -9,12 +9,9 @@ namespace Slub\Infrastructure\Persistence\Sql\Repository;
  */
 class AppInstallation
 {
-    /** @var string */
-    public $repositoryIdentifier;
+    public string $repositoryIdentifier;
 
-    /** @var string */
-    public $installationId;
+    public string $installationId;
 
-    /** @var string */
-    public $accessToken;
+    public string $accessToken;
 }

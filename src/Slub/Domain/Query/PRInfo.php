@@ -11,30 +11,21 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class PRInfo
 {
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var string */
-    public $authorIdentifier;
+    public string $authorIdentifier;
 
-    /** @var string */
-    public $title;
+    public string $title;
 
-    /** @var int */
-    public $GTMCount;
+    public int $GTMCount;
 
-    /** @var int */
-    public $comments;
+    public int $comments;
 
-    /** @var int */
-    public $notGTMCount;
+    public int $notGTMCount;
 
-    /** @var CheckStatus */
-    public $CIStatus;
+    public CheckStatus $CIStatus;
 
-    /** @var bool */
-    public $isMerged;
+    public bool $isMerged;
 
-    /** @var bool */
-    public $isClosed;
+    public bool $isClosed;
 }

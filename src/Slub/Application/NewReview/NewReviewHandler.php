@@ -16,14 +16,11 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class NewReviewHandler
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var IsSupportedInterface */
-    private $isSupported;
+    private IsSupportedInterface $isSupported;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,

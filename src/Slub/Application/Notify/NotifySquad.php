@@ -41,14 +41,11 @@ class NotifySquad implements EventSubscriberInterface
     public const REACTION_PR_MERGED = 'rocket';
     public const REACTION_CI_PENDING = 'small_orange_diamond';
 
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var ChatClient */
-    private $chatClient;
+    private ChatClient $chatClient;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(PRRepositoryInterface $PRRepository, ChatClient $chatClient, LoggerInterface $logger)
     {

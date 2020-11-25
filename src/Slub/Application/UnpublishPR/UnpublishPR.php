@@ -11,6 +11,5 @@ use Slub\Domain\Entity\PR\PRIdentifier;
  */
 class UnpublishPR
 {
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 }

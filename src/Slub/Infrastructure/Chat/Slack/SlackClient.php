@@ -16,23 +16,17 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class SlackClient implements ChatClient
 {
-    /** @var GetBotUserId */
-    private $getBotUserId;
+    private GetBotUserId $getBotUserId;
 
-    /** @var GetBotReactionsForMessageAndUser */
-    private $getBotReactionsForMessageAndUser;
+    private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
 
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
-    /** @var string */
-    private $slackBotUserId;  // TODO: remove,  call slack API
+    private string $slackBotUserId;  // TODO: remove,  call slack API
 
     public function __construct(
         GetBotUserId $getBotUserId,

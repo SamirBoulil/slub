@@ -14,11 +14,9 @@ use Slub\Domain\Query\ChannelInformation;
  */
 class GetPublicChannelInformation implements GetChannelInformationInterface
 {
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
     public function __construct(ClientInterface $client, string $slackToken)
     {

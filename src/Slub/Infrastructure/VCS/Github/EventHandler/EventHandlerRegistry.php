@@ -10,7 +10,7 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 class EventHandlerRegistry
 {
     /** @var EventHandlerInterface[] */
-    private $eventHandlers = [];
+    private array $eventHandlers = [];
 
     public function __construct(iterable $eventHandlers)
     {

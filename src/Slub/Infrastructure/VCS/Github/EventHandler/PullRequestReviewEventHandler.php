@@ -16,8 +16,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     private const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
     const EDITED_ACTION_TYPE = 'edited';
 
-    /** @var NewReviewHandler */
-    private $newReviewHandler;
+    private NewReviewHandler $newReviewHandler;
 
     public function __construct(NewReviewHandler $newReviewHandler)
     {

@@ -14,11 +14,9 @@ class CIStatus
     private const BUILD_RESULT_KEY = 'BUILD_RESULT';
     private const BUILD_LINK_KEY = 'BUILD_LINK';
 
-    /** @var BuildResult */
-    private $buildResult;
+    private BuildResult $buildResult;
 
-    /** @var BuildLink */
-    private $buildLink;
+    private BuildLink $buildLink;
 
     private function __construct(
         BuildResult $buildResult,

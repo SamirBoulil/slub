@@ -17,14 +17,11 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 class GithubAPIClient
 {
     private const UNAUTHORIZED_STATUS_CODE = 401;
-    /** @var RefreshAccessToken */
-    private $refreshAccessToken;
+    private RefreshAccessToken $refreshAccessToken;
 
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var SqlAppInstallationRepository */
-    private $sqlAppInstallationRepository;
+    private SqlAppInstallationRepository $sqlAppInstallationRepository;
 
     public function __construct(
         RefreshAccessToken $refreshAccessToken,

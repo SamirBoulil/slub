@@ -17,17 +17,13 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class PublishRemindersHandler
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var ChatClient */
-    private $chatClient;
+    private ChatClient $chatClient;
 
-    /** @var ClockInterface */
-    private $clock;
+    private ClockInterface $clock;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,

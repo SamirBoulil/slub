@@ -11,8 +11,7 @@ use Webmozart\Assert\Assert;
  */
 class AuthorIdentifier
 {
-    /** @var string */
-    private $title;
+    private string $title;
 
     private function __construct(string $title)
     {

@@ -7,7 +7,6 @@ namespace Tests\Unit\Domain\Event;
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
-use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 
 /**

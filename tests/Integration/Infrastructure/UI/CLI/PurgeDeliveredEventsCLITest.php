@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\UI\CLI;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Infrastructure\UI\CLI\PurgeDeliveredEventsCLI;
 use Symfony\Bundle\FrameworkBundle\Console\Application;

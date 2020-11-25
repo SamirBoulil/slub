@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\InMemory\Query;
 
 use PHPUnit\Framework\TestCase;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation;
 

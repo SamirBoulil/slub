@@ -6,7 +6,6 @@ namespace Tests\Unit\Domain\Event;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 
 /**

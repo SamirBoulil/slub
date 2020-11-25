@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query;
 
-use GuzzleHttp\Client;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;

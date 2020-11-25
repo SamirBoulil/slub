@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Entity\Repository;
 
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 
 class RepositoryIdentifierTest extends TestCase

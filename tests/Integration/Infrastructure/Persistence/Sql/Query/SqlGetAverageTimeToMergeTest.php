@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
 
-use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;

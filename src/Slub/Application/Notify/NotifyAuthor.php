@@ -14,7 +14,6 @@ use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Query\GetMessageIdsForPR;
-use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

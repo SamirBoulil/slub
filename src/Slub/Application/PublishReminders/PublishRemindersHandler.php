@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 

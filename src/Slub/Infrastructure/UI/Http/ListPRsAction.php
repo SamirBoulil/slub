@@ -8,8 +8,6 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

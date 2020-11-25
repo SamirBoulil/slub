@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use PHPUnit\Framework\TestCase;
-use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry;
 
 /**

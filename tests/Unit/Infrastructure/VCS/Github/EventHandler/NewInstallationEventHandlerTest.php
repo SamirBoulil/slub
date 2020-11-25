@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -12,7 +11,6 @@ use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationEventHandler;
-use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

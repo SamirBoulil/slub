@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Chat\Slack;
 
-use Symfony\Component\HttpKernel\Client;
 use Tests\WebTestCase;
 
 /**

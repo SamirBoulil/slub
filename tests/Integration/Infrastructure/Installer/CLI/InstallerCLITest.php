@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Installer\CLI;
 
-use Doctrine\DBAL\Connection;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;

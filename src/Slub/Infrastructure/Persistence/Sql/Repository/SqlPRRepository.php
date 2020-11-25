@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
-use Doctrine\DBAL\Driver\Connection;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;

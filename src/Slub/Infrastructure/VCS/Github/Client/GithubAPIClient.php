@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Client;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;

@@ -5,7 +5,6 @@ namespace Tests\Unit\Domain\Entity\PR;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\BuildLink;
-use Slub\Domain\Entity\PR\BuildResult;
 
 class BuildLinkTest extends TestCase
 {

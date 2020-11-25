@@ -6,7 +6,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>

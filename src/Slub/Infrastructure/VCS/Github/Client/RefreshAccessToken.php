@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Client;
 
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;

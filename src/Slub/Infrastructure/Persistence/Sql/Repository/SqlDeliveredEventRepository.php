@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\Driver\Connection;
-use Doctrine\DBAL\Connection;
 
 /**
  * Repository only used for the infrastructure layer, to make sure we only treat a delivered event once.

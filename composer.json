@@ -21,7 +21,7 @@
     "doctrine/doctrine-migrations-bundle": "^2.0",
     "firebase/php-jwt": "^5.2",
     "guzzlehttp/guzzle": "~6.0",
-    "matthiasnoback/convenient-immutability": "^0.2.1",
+    "matthiasnoback/convenient-immutability": "^0.3",
     "symfony/apache-pack": "^1.0",
     "symfony/browser-kit": "4.4.*",
     "symfony/console": "4.4.*",

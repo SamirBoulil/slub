@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\UI\CLI;
 
-use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\UI\CLI\DebugCIStatusCLI;
-use Slub\Infrastructure\UI\CLI\PublishRemindersCLI;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
-use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;

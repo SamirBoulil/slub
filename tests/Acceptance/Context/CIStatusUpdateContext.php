@@ -58,7 +58,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^a PR in review waiting for the CI results$/
      */
-    public function aPRInReviewWaitingForTheCIResults()
+    public function aPRInReviewWaitingForTheCIResults(): void
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
@@ -76,7 +76,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @When /^the CI is green for the PR$/
      */
-    public function theCIIsGreenForThePullRequest()
+    public function theCIIsGreenForThePullRequest(): void
     {
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -88,7 +88,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Then /^the PR should be green$/
      */
-    public function thePRShouldBeGreen()
+    public function thePRShouldBeGreen(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'GREEN', 'PR is expected to be green, but it wasn\'t');
@@ -97,7 +97,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Then /^the squad should be notified that the ci is green for the PR$/
      */
-    public function theSquadShouldBeNotifiedThatTheCiIsGreenForThePullRequest()
+    public function theSquadShouldBeNotifiedThatTheCiIsGreenForThePullRequest(): void
     {
         Assert::assertTrue(
             $this->eventSpy->CIGreenEventDispatched(),
@@ -112,7 +112,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @When /^the CI is red for the PR$/
      */
-    public function theCIIsRedForThePullRequest()
+    public function theCIIsRedForThePullRequest(): void
     {
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -125,7 +125,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Then /^the PR should be red$/
      */
-    public function thePRShouldBeRed()
+    public function thePRShouldBeRed(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'RED', 'PR is expected to be red, but it wasn\'t');
@@ -134,7 +134,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^the squad should be notified that the ci is red for the PR$/
      */
-    public function theSquadShouldBeNotifiedThatTheCiIsRedForThePullRequest()
+    public function theSquadShouldBeNotifiedThatTheCiIsRedForThePullRequest(): void
     {
         Assert::assertTrue(
             $this->eventSpy->CIRedEventDispatched(),
@@ -149,7 +149,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @When /^the CI status changes for a PR belonging to an unsupported repository$/
      */
-    public function theCIStatusChangesForAPRBelongingToAnUnsupportedRepository()
+    public function theCIStatusChangesForAPRBelongingToAnUnsupportedRepository(): void
     {
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'unsupported_repository';
@@ -161,7 +161,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Then /^the squad should not be not notified$/
      */
-    public function theSquadShouldNotBeNotNotified()
+    public function theSquadShouldNotBeNotNotified(): void
     {
         Assert::assertFalse($this->eventSpy->hasEvents(), 'Expected to have no events, but some were found');
     }
@@ -169,7 +169,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^the author should be notified that the ci is green for the PR$/
      */
-    public function theAuthorShouldBeNotifiedThatTheCiIsGreenForThePR()
+    public function theAuthorShouldBeNotifiedThatTheCiIsGreenForThePR(): void
     {
         Assert::assertTrue(
             $this->eventSpy->CIGreenEventDispatched(),
@@ -184,7 +184,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^the author should be notified that the ci is red for the PR with the CI build link$/
      */
-    public function theAuthorShouldBeNotifiedThatTheCiIsRedForThePR()
+    public function theAuthorShouldBeNotifiedThatTheCiIsRedForThePR(): void
     {
         Assert::assertTrue(
             $this->eventSpy->CIRedEventDispatched(),
@@ -203,7 +203,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^a PR in review being green$/
      */
-    public function aPRInReviewBeingGreen()
+    public function aPRInReviewBeingGreen(): void
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
@@ -223,7 +223,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @When /^the CI is being running for the PR$/
      */
-    public function theCIIsBeingRunningForThePR()
+    public function theCIIsBeingRunningForThePR(): void
     {
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -235,7 +235,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Then /^the PR should be pending$/
      */
-    public function thePRShouldBePending()
+    public function thePRShouldBePending(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals($PR->normalize()['CI_STATUS']['BUILD_RESULT'], 'PENDING', 'PR is expected to be pending, but it wasn\'t');
@@ -244,7 +244,7 @@ class CIStatusUpdateContext extends FeatureContext
     /**
      * @Given /^the squad should be notified that the ci is pending for the PR$/
      */
-    public function theSquadShouldBeNotifiedThatTheCiIsPendingForThePR()
+    public function theSquadShouldBeNotifiedThatTheCiIsPendingForThePR(): void
     {
         Assert::assertTrue(
             $this->eventSpy->CIPendingEventDispatched(),

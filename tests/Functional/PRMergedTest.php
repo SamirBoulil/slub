@@ -14,6 +14,7 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Tests\WebTestCase;
 
 /**
@@ -46,7 +47,7 @@ class PRMergedTest extends WebTestCase
         // Check Slack calls
     }
 
-    private function assertIsMerged(bool $isMerged)
+    private function assertIsMerged(bool $isMerged): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER));
         $this->assertEquals($isMerged, $PR->normalize()['IS_MERGED']);
@@ -66,7 +67,7 @@ class PRMergedTest extends WebTestCase
         );
     }
 
-    private function WhenAPRIsMerged(): Client
+    private function WhenAPRIsMerged(): KernelBrowser
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRMerged(), $this->get('GITHUB_WEBHOOK_SECRET')));
@@ -84,7 +85,7 @@ class PRMergedTest extends WebTestCase
 
     private function PRMerged(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
     "pull_request": {
         "number": 10,
@@ -95,7 +96,5 @@ class PRMergedTest extends WebTestCase
     }
 }
 JSON;
-
-        return $json;
     }
 }

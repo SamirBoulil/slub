@@ -15,7 +15,7 @@ class MessageIdentifierHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_string_out_of_a_channel_and_ts()
+    public function it_creates_a_string_out_of_a_channel_and_ts(): void
     {
         $this->assertEquals('general@12345', MessageIdentifierHelper::from('general', '12345'));
     }
@@ -23,7 +23,7 @@ class MessageIdentifierHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_the_channel_and_ts_out_of_a_normalized_channel_identifier()
+    public function it_returns_the_channel_and_ts_out_of_a_normalized_channel_identifier(): void
     {
         $this->assertEquals(['channel' => 'general', 'ts' => '12345'], MessageIdentifierHelper::split('general@12345'));
     }

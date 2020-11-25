@@ -15,7 +15,7 @@ class AuthorIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_string_and_normalizes_itself()
+    public function it_is_created_from_string_and_normalizes_itself(): void
     {
         $AuthorIdentifier = 'Add new feature';
         self::assertEquals(AuthorIdentifier::fromString($AuthorIdentifier)->stringValue(), $AuthorIdentifier);
@@ -24,7 +24,7 @@ class AuthorIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_created_from_an_empty_string()
+    public function it_cannot_be_created_from_an_empty_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         AuthorIdentifier::fromString('');

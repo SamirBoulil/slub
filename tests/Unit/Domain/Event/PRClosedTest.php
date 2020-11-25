@@ -16,7 +16,7 @@ class PRClosedTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_with_a_pr_identifier_and_returns_it()
+    public function it_is_created_with_a_pr_identifier_and_returns_it(): void
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $event = PRClosed::forPR($expectedIdentifier);

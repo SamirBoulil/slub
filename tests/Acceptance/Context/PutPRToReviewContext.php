@@ -58,7 +58,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @When /^an author puts a PR to review in a channel$/
      */
-    public function anAuthorPutsAPRToReview()
+    public function anAuthorPutsAPRToReview(): void
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
@@ -110,7 +110,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @When /^an author puts a PR belonging to an unsupported repository to review$/
      */
-    public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview()
+    public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview(): void
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'unknown/unknown',
@@ -128,7 +128,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @When /^an author puts a PR to review on an unsupported workspace/
      */
-    public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel()
+    public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel(): void
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
@@ -146,7 +146,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Then /^the PR is added to the list of followed PRs$/
      */
-    public function thePRIsAddedToTheListOfFollowedPRs()
+    public function thePRIsAddedToTheListOfFollowedPRs(): void
     {
         $this->assertPR(
             $this->currentPRIdentifier,
@@ -179,7 +179,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Then /^the PR is not added to the list of followed PRs$/
      */
-    public function thePRIsNotAddedToTheListOfFollowedPRs()
+    public function thePRIsNotAddedToTheListOfFollowedPRs(): void
     {
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
     }
@@ -187,7 +187,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @When /^an author puts a PR to review a second time in another channel$/
      */
-    public function anAuthorPutsAPRToReviewASecondTime()
+    public function anAuthorPutsAPRToReviewASecondTime(): void
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
@@ -205,7 +205,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Then /^the PR is updated with the new channel id and message id$/
      */
-    public function thePRIsUpdatedWithTheNewMessageId()
+    public function thePRIsUpdatedWithTheNewMessageId(): void
     {
         $this->assertPR(
             $this->currentPRIdentifier,
@@ -256,7 +256,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Given /^the squad should be notified that the PR has been successfully put to review$/
      */
-    public function theSquadShouldBeNotifiedThatThePRHasBeenSuccessfullyInterpreted()
+    public function theSquadShouldBeNotifiedThatThePRHasBeenSuccessfullyInterpreted(): void
     {
         $this->chatClientSpy->assertReaction(MessageIdentifier::fromString(last($this->currentMessageIds)), NotifySquad::REACTION_CI_PENDING);
     }
@@ -264,7 +264,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Given /^an author closes a PR that was in review in a channel$/
      */
-    public function anAuthorClosesAPRThatWasInReviewInAChannel()
+    public function anAuthorClosesAPRThatWasInReviewInAChannel(): void
     {
         $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
             ->modify(sprintf('-%d day', 2))
@@ -295,7 +295,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @When /^an author reopens the PR and puts it to review$/
      */
-    public function anAuthorReopensThePRAndPutsItToReview()
+    public function anAuthorReopensThePRAndPutsItToReview(): void
     {
         $putPRToReview = $this->createPutPRToReviewCommand(
             'akeneo/pim-community-dev',
@@ -313,7 +313,7 @@ class PutPRToReviewContext extends FeatureContext
     /**
      * @Then /^the PR is reopened with the new channel id and message id$/
      */
-    public function thePRIsReopenedWithTheNewChannelIdAndMessageId()
+    public function thePRIsReopenedWithTheNewChannelIdAndMessageId(): void
     {
         $this->assertPR(
             $this->currentPRIdentifier,

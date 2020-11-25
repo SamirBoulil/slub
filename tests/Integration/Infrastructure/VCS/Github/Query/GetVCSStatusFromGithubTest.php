@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\VCSStatus;
@@ -27,16 +28,16 @@ class GetVCSStatusFromGithubTest extends WebTestCase
     private const EXPECTED_CI_STATUS = 'GREEN';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/36';
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GetCIStatus */
+    /** @var ObjectProphecy|GetCIStatus */
     protected $getCIStatusStub;
 
     /** @var GetVCSStatusFromGithub */
     private $getVCSStatus;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GetPRDetails */
+    /** @var ObjectProphecy|GetPRDetails */
     private $getPRDetailsStub;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|FindReviews */
+    /** @var ObjectProphecy|FindReviews */
     protected $findReviewsStub;
 
     public function setUp(): void
@@ -84,7 +85,7 @@ class GetVCSStatusFromGithubTest extends WebTestCase
         $this->assertEquals($expectedIsMerged, $vcsStatus->isMerged);
     }
 
-    public function prStatesExamples()
+    public function prStatesExamples(): array
     {
         return [
             'PR is closed' => ['closed', true],

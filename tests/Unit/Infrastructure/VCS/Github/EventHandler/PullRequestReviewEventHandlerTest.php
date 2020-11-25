@@ -38,7 +38,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_only_listens_to_pull_request_review_events()
+    public function it_only_listens_to_pull_request_review_events(): void
     {
         self::assertTrue($this->pullRequestReviewHandler->supports('pull_request_review'));
         self::assertFalse($this->pullRequestReviewHandler->supports('unsupported_event'));
@@ -48,7 +48,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
      * @test
      * @dataProvider reviewStates
      */
-    public function it_listens_to_accepted_PR(string $reviewState, string $expectedReviewStatus)
+    public function it_listens_to_accepted_PR(string $reviewState, string $expectedReviewStatus): void
     {
         $newReview = [
             'action' => 'submitted',
@@ -59,18 +59,16 @@ class PullRequestReviewEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                function (NewReview $newReview) use ($expectedReviewStatus) {
-                    return self::PR_IDENTIFIER === $newReview->PRIdentifier
-                        && self::REPOSITORY_IDENTIFIER === $newReview->repositoryIdentifier
-                        && $expectedReviewStatus === $newReview->reviewStatus;
-                }
+                fn (NewReview $newReview) => self::PR_IDENTIFIER === $newReview->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $newReview->repositoryIdentifier
+                    && $expectedReviewStatus === $newReview->reviewStatus
             )
         )->shouldBeCalled();
 
         $this->pullRequestReviewHandler->handle($newReview);
     }
 
-    public function reviewStates()
+    public function reviewStates(): array
     {
         return [
             'Accepted' => ['approved', 'accepted'],
@@ -83,7 +81,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_take_into_account_comments_coming_from_author()
+    public function it_does_not_take_into_account_comments_coming_from_author(): void
     {
         $authorUserId = 1;
         $authorsOwnComment = [
@@ -100,7 +98,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_take_into_account_edited_comments()
+    public function it_does_not_take_into_account_edited_comments(): void
     {
         $commentEdited = ['action' => 'edited', 'review' => []];
 
@@ -112,7 +110,7 @@ class PullRequestReviewEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_status_is_not_supported()
+    public function it_throws_if_the_status_is_not_supported(): void
     {
         $unsupportedReviewStatus = [
             'action' => 'submitted',

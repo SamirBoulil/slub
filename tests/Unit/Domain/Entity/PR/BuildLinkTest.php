@@ -12,7 +12,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_with_an_string_url_and_normalizes_itself()
+    public function it_can_be_constructed_with_an_string_url_and_normalizes_itself(): void
     {
         $buildLink = 'https://my-ci.com/build/123';
         $noStatus = BuildLink::fromURL($buildLink);
@@ -22,7 +22,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_constructed_from_an_empty_string()
+    public function it_cannot_be_constructed_from_an_empty_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         BuildLink::fromURL('');
@@ -31,7 +31,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_constructed_from_a_non_url_string()
+    public function it_cannot_be_constructed_from_a_non_url_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         BuildLink::fromURL('build/123');
@@ -40,7 +40,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_can_have_no_url()
+    public function it_can_have_no_url(): void
     {
         $buildLink = BuildLink::none();
         self::assertEmpty($buildLink->stringValue());
@@ -49,7 +49,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_created_from_normalized()
+    public function it_can_be_created_from_normalized(): void
     {
         $normalizedBuildLink = 'https://my-ci.com/1213';
 
@@ -63,7 +63,7 @@ class BuildLinkTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_equal_to_another_build_link()
+    public function it_tells_if_it_is_equal_to_another_build_link(): void
     {
         $buildLink = BuildLink::fromNormalized('https://my-ci.com/1213');
         $otherBuildLink = BuildLink::fromNormalized('https://my-ci.com/567');

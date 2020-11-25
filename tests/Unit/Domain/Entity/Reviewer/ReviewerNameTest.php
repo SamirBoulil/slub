@@ -15,7 +15,7 @@ class ReviewerNameTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_string_and_normalizes_itself()
+    public function it_is_created_from_string_and_normalizes_itself(): void
     {
         $reviewerName = 'Samir';
         self::assertEquals(AuthorIdentifier::fromString($reviewerName)->stringValue(), $reviewerName);
@@ -24,7 +24,7 @@ class ReviewerNameTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_created_from_an_empty_string()
+    public function it_cannot_be_created_from_an_empty_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         AuthorIdentifier::fromString('');

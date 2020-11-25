@@ -24,7 +24,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     }
 
     /** @test */
-    public function it_saves_an_app_installation_and_returns_it()
+    public function it_saves_an_app_installation_and_returns_it(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
         $expected = new AppInstallation();
@@ -41,7 +41,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     }
 
     /** @test */
-    public function it_saves_an_app_installation_without_access_token_and_returns_it()
+    public function it_saves_an_app_installation_without_access_token_and_returns_it(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
         $expected = new AppInstallation();
@@ -58,7 +58,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
 
 
     /** @test */
-    public function it_updates_the_app_installation()
+    public function it_updates_the_app_installation(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
         $expected = new AppInstallation();
@@ -79,7 +79,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     }
 
     /** @test */
-    public function it_throws_if_there_is_no_app_installation_for_a_repository()
+    public function it_throws_if_there_is_no_app_installation_for_a_repository(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appInstallationRepository->getBy('unknown_repository');

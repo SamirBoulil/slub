@@ -25,7 +25,7 @@ class SqlDeliveredEventRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_retrieves_a_delivered_event_by_ID()
+    public function it_retrieves_a_delivered_event_by_ID(): void
     {
         $expectedDeliveredEvent = Uuid::uuid4()->toString();
         $this->deliveredEventRepository->save($expectedDeliveredEvent);
@@ -38,7 +38,7 @@ class SqlDeliveredEventRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_throws_if_the_delivered_event_does_not_exist()
+    public function it_throws_if_the_delivered_event_does_not_exist(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->deliveredEventRepository->getBy('UNKNOWN_EVENT');

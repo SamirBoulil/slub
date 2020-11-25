@@ -39,7 +39,7 @@ class DebugCIStatusCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_executes()
+    public function it_executes(): void
     {
         $ciStatus = 'GREEN';
         $prInfo = new PRInfo();

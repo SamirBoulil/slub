@@ -15,7 +15,7 @@ class InMemoryIsSupportedTest extends TestCase
     /** @var IsSupportedInterface */
     private $isSupportedQuery;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->isSupportedQuery = new InMemoryIsSupported(
@@ -27,7 +27,7 @@ class InMemoryIsSupportedTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_the_repository_is_supported()
+    public function it_tells_if_the_repository_is_supported(): void
     {
         $this->assertTrue(
             $this->isSupportedQuery->repository(RepositoryIdentifier::fromString('akeneo/pim-community-dev'))
@@ -40,7 +40,7 @@ class InMemoryIsSupportedTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_the_workspace_is_supported()
+    public function it_tells_if_the_workspace_is_supported(): void
     {
         $this->assertTrue(
             $this->isSupportedQuery->workspace(WorkspaceIdentifier::fromString('akeneo'))

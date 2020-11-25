@@ -11,7 +11,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_with_status_pending_and_normalizes_itself()
+    public function it_can_be_constructed_with_status_pending_and_normalizes_itself(): void
     {
         $noStatus = BuildResult::pending();
         $this->assertEquals('PENDING', $noStatus->stringValue());
@@ -20,7 +20,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_with_green_status_and_normalizes_itself()
+    public function it_can_be_constructed_with_green_status_and_normalizes_itself(): void
     {
         $noStatus = BuildResult::green();
         $this->assertEquals('GREEN', $noStatus->stringValue());
@@ -29,7 +29,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_with_red_status_and_normalizes_itself()
+    public function it_can_be_constructed_with_red_status_and_normalizes_itself(): void
     {
         $noStatus = BuildResult::red();
         $this->assertEquals('RED', $noStatus->stringValue());
@@ -38,7 +38,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_constructed_from_normalized()
+    public function it_can_be_constructed_from_normalized(): void
     {
         $noStatus = BuildResult::fromNormalized('GREEN');
         $this->assertEquals('GREEN', $noStatus->stringValue());
@@ -47,7 +47,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_it_does_not_support_a_status()
+    public function it_throws_if_it_does_not_support_a_status(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         BuildResult::fromNormalized('UNSUPPORTED');
@@ -56,7 +56,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_is_normalizable()
+    public function it_is_normalizable(): void
     {
         $this->assertEquals(BuildResult::green()->stringValue(), 'GREEN');
         $this->assertEquals(BuildResult::pending()->stringValue(), 'PENDING');
@@ -66,7 +66,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_green()
+    public function it_tells_if_it_is_green(): void
     {
         $this->assertTrue(BuildResult::green()->isGreen());
         $this->assertFalse(BuildResult::green()->isRed());
@@ -76,7 +76,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_red()
+    public function it_tells_if_it_is_red(): void
     {
         $this->assertTrue(BuildResult::red()->isRed());
         $this->assertFalse(BuildResult::red()->isGreen());
@@ -86,7 +86,7 @@ class BuildResultTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_pending()
+    public function it_tells_if_it_is_pending(): void
     {
         $this->assertTrue(BuildResult::pending()->isPending());
         $this->assertFalse(BuildResult::pending()->isRed());

@@ -85,11 +85,9 @@ class GithubAPIClientTest extends KernelTestCase
         $this->refreshAccessToken->fetch(self::INSTALLATION_ID)->willReturn($newAccessToken);
         $this->sqlAppInstallationRepository->save(
             Argument::that(
-                function (AppInstallation $appInstallation) use ($newAccessToken) {
-                    return $appInstallation->accessToken === $newAccessToken
-                        && self::INSTALLATION_ID === $appInstallation->installationId
-                        && self::REPOSITORY_IDENTIFIER === $appInstallation->repositoryIdentifier;
-                }
+                fn (AppInstallation $appInstallation) => $appInstallation->accessToken === $newAccessToken
+                    && self::INSTALLATION_ID === $appInstallation->installationId
+                    && self::REPOSITORY_IDENTIFIER === $appInstallation->repositoryIdentifier
             )
         )->shouldBeCalled();
         $response = $this->githubAPIClient->get($url, [], self::REPOSITORY_IDENTIFIER);

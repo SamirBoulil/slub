@@ -12,7 +12,7 @@ class ChannelIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_an_identifier_from_its_string_value()
+    public function it_creates_an_identifier_from_its_string_value(): void
     {
         $identifier = ChannelIdentifier::fromString('squad-raccoons');
         self::assertEquals('squad-raccoons', $identifier->stringValue());
@@ -21,7 +21,7 @@ class ChannelIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_equal_to_another_identifier()
+    public function it_tells_if_it_is_equal_to_another_identifier(): void
     {
         $identifier = ChannelIdentifier::fromString('squad-raccoons');
         $anotherIdentifier = ChannelIdentifier::fromString('unknown/unknown/unknown');
@@ -32,7 +32,7 @@ class ChannelIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_created_out_of_an_empty_string()
+    public function it_cannot_be_created_out_of_an_empty_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         ChannelIdentifier::fromString('');

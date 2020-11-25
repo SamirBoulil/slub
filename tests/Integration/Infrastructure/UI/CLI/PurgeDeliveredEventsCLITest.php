@@ -34,7 +34,7 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_purges_the_delivered_events_from_the_database()
+    public function it_purges_the_delivered_events_from_the_database(): void
     {
         $this->assertThereAreSomeDeliveredEventsInDatabase();
 
@@ -53,7 +53,7 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
         $this->commandTester = new CommandTester($command);
     }
 
-    private function assertThereAreSomeDeliveredEventsInDatabase()
+    private function assertThereAreSomeDeliveredEventsInDatabase(): void
     {
         $insertDeliveredEvents = <<<SQL
 DELETE FROM delivered_event;
@@ -81,8 +81,6 @@ SQL;
             ->executeQuery('SELECT COUNT(*) FROM delivered_event;')
             ->fetch(\PDO::FETCH_COLUMN);
 
-        $count = $this->connection->convertToPHPValue($result, Type::INTEGER);
-
-        return $count;
+        return $this->connection->convertToPHPValue($result, Type::INTEGER);
     }
 }

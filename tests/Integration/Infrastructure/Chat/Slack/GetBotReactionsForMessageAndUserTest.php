@@ -41,7 +41,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     /**
      * @test
      */
-    public function it_fetches_the_bot_reactions()
+    public function it_fetches_the_bot_reactions(): void
     {
         $this->mockGuzzleWith(new Response(200, [], $this->reactions()));
 
@@ -57,7 +57,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_no_reaction()
+    public function it_returns_no_reaction(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "message": {}}'));
 
@@ -73,7 +73,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_http_status_is_not_200()
+    public function it_throws_if_the_http_status_is_not_200(): void
     {
         $this->mockGuzzleWith(new Response(400, [], ''));
 
@@ -84,7 +84,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_ok_flag_is_false()
+    public function it_throws_if_the_ok_flag_is_false(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
@@ -96,9 +96,8 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     {
         $this->httpMock = new MockHandler([]);
         $handler = HandlerStack::create($this->httpMock);
-        $client = new Client(['handler' => $handler]);
 
-        return $client;
+        return new Client(['handler' => $handler]);
     }
 
     private function mockGuzzleWith(Response $response): void
@@ -108,7 +107,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
 
     private function reactions(): string
     {
-        $reactions = <<<json
+        return <<<json
 {
     "message": {
         "reactions": [
@@ -140,6 +139,5 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     "ok": true
 }
 json;
-        return $reactions;
     }
 }

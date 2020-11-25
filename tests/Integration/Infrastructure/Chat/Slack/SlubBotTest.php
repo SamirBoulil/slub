@@ -40,7 +40,7 @@ class SlubBotTest extends KernelTestCase
     /** @var string */
     private $botUserId;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         DriverManager::loadDriver(ProxyDriver::class);
     }
@@ -108,9 +108,8 @@ class SlubBotTest extends KernelTestCase
         ProxyDriver::setInstance($fakeDriver);
         /** @var BotMan $bot */
         $bot = $this->get('slub.infrastructure.chat.slack.slub_bot')->getBot();
-        $botManTester = new BotmanTester($bot, $fakeDriver);
 
-        return $botManTester;
+        return new BotmanTester($bot, $fakeDriver);
     }
 
     private function assertNewPRRequestReceived(string $prIdentifier, string $messageId): void

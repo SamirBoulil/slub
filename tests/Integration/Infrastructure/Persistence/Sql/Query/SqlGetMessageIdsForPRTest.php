@@ -36,7 +36,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_returns_the_message_ids_for_a_given_PR_identifier()
+    public function it_returns_the_message_ids_for_a_given_PR_identifier(): void
     {
         $this->createPRWithMessageIds(['1', '2']);
         $messageIds = $this->getMessageIdsForPR->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER));
@@ -46,7 +46,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_throws_if_the_PR_does_not_exists()
+    public function it_throws_if_the_PR_does_not_exists(): void
     {
         $this->expectException(PRNotFoundException::class);
         $this->getMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
@@ -55,7 +55,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_throws_if_the_PR_does_not_have_any_message()
+    public function it_throws_if_the_PR_does_not_have_any_message(): void
     {
         $this->expectException(PRNotFoundException::class);
         $this->getMessageIdsForPR->fetch(PRIdentifier::fromString('unknown_identifier'));
@@ -84,9 +84,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
 
     private function assertMessageIds(array $expectedMessageIds, array $actualMessageIds): void
     {
-        $normalizedActualMessageIds = array_map(function (MessageIdentifier $messageId) {
-            return $messageId->stringValue();
-        }, $actualMessageIds);
+        $normalizedActualMessageIds = array_map(fn (MessageIdentifier $messageId) => $messageId->stringValue(), $actualMessageIds);
         self::assertEquals($expectedMessageIds, $normalizedActualMessageIds);
     }
 

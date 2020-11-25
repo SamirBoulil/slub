@@ -12,7 +12,7 @@ class PutToReviewAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_put_to_review_at_date()
+    public function it_creates_a_put_to_review_at_date(): void
     {
         $putToReviewAt = PutToReviewAt::create();
         $this->assertNotEmpty($putToReviewAt);
@@ -21,7 +21,7 @@ class PutToReviewAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_put_to_review_date_from_timestamp()
+    public function it_creates_a_put_to_review_date_from_timestamp(): void
     {
         $aTimestamp = (string) (new \DateTime())->getTimestamp();
 
@@ -38,7 +38,7 @@ class PutToReviewAtTest extends TestCase
     public function it_tells_the_number_of_days_between_now_and_the_time_the_PR_has_been_put_in_review(
         string $timestamp,
         int $expectedNumberOfDays
-    ) {
+    ): void {
         $putToReviewAt = PutToReviewAt::fromTimestamp($timestamp);
 
         $actualNumberOfDaysInReview = $putToReviewAt->numberOfDaysInReview();

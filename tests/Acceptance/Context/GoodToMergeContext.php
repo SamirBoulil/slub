@@ -59,7 +59,7 @@ class GoodToMergeContext extends FeatureContext
     /**
      * @Given /^a green PR missing one GTM$/
      */
-    public function aGreenPRMissingOneGTM()
+    public function aGreenPRMissingOneGTM(): void
     {
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
 
@@ -79,7 +79,7 @@ class GoodToMergeContext extends FeatureContext
     /**
      * @When /^the PR gets its last GTM$/
      */
-    public function thePRGetsItsLastGTM()
+    public function thePRGetsItsLastGTM(): void
     {
         $lastGTM = new NewReview();
         $lastGTM->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -92,7 +92,7 @@ class GoodToMergeContext extends FeatureContext
     /**
      * @Then /^the author should be notified that the PR is good to merge$/
      */
-    public function theAuthorShouldBeNotifiedThatThePRIsGoodToMerge()
+    public function theAuthorShouldBeNotifiedThatThePRIsGoodToMerge(): void
     {
         Assert::assertTrue($this->eventSpy->PRGoodToMergeDispatched(), 'Expect a Good To Merge event to be dispatched');
         $PRLink = sprintf('https://github.com/akeneo/pim-community-dev/pull/1234');
@@ -103,7 +103,7 @@ class GoodToMergeContext extends FeatureContext
     /**
      * @Given /^a PR having 2 GTMS$/
      */
-    public function aPRHavingGTMS()
+    public function aPRHavingGTMS(): void
     {
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
 
@@ -123,7 +123,7 @@ class GoodToMergeContext extends FeatureContext
     /**
      * @When /^the PR gets a green CI$/
      */
-    public function thePRGetsAGreenCI()
+    public function thePRGetsAGreenCI(): void
     {
         $CIStatusUpdate = new CIStatusUpdate();
         $CIStatusUpdate->repositoryIdentifier = 'akeneo/pim-community-dev';

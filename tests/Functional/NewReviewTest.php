@@ -14,6 +14,7 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Tests\WebTestCase;
 
 /**
@@ -37,7 +38,7 @@ class NewReviewTest extends WebTestCase
     /**
      * @test
      */
-    public function it_listens_to_accepted_PR()
+    public function it_listens_to_accepted_PR(): void
     {
         $client = $this->WhenAPRIsAcceptedByAReviewer();
 
@@ -48,7 +49,7 @@ class NewReviewTest extends WebTestCase
     /**
      * @test
      */
-    public function it_listens_to_refused_PR()
+    public function it_listens_to_refused_PR(): void
     {
         $client = $this->WhenAPRIsRefusedByAReviewer();
 
@@ -59,7 +60,7 @@ class NewReviewTest extends WebTestCase
     /**
      * @test
      */
-    public function it_listens_to_commented_PR()
+    public function it_listens_to_commented_PR(): void
     {
         $client = $this->WhenAPRIsCommentedByAReviewer();
 
@@ -70,7 +71,7 @@ class NewReviewTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_listen_authors_own_comments()
+    public function it_does_not_listen_authors_own_comments(): void
     {
         $client = $this->WhenAPRIsCommentedByItsOwnAuthor();
 
@@ -112,7 +113,7 @@ class NewReviewTest extends WebTestCase
         return $this->CallAPI($this->PRCommentedByOwnAuthor());
     }
 
-    private function CallAPI(string $review): Client
+    private function CallAPI(string $review): KernelBrowser
     {
         $client = static::createClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $review, $this->get('GITHUB_WEBHOOK_SECRET')));
@@ -137,7 +138,7 @@ class NewReviewTest extends WebTestCase
 
     private function PRAccepted(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
     "action": "submitted",
     "review": {
@@ -625,13 +626,11 @@ class NewReviewTest extends WebTestCase
     }
 }
 JSON;
-
-        return $json;
     }
 
-    private function PRRefused()
+    private function PRRefused(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
     "action": "submitted",
     "review": {
@@ -1119,13 +1118,11 @@ JSON;
     }
 }
 JSON;
-
-        return $json;
     }
 
     private function PRCommented(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
   "action": "submitted",
   "review": {
@@ -1621,13 +1618,11 @@ JSON;
   }
 }
 JSON;
-
-        return $json;
     }
 
     private function PRCommentedByOwnAuthor(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
   "action": "submitted",
   "review": {
@@ -2123,7 +2118,5 @@ JSON;
   }
 }
 JSON;
-
-        return $json;
     }
 }

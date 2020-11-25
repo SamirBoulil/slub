@@ -14,7 +14,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_a_build_result_and_a_build_link_and_normalizes_it_self()
+    public function it_is_created_from_a_build_result_and_a_build_link_and_normalizes_it_self(): void
     {
         $buildLink = 'https://my-ci.com/build/123';
         $buildResult = BuildResult::green();
@@ -34,7 +34,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_a_build_result_and_no_build_link_and_normalizes_it_self()
+    public function it_is_created_from_a_build_result_and_no_build_link_and_normalizes_it_self(): void
     {
         $buildResult = BuildResult::green();
 
@@ -53,7 +53,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_a_normalized_version()
+    public function it_is_created_from_a_normalized_version(): void
     {
         $expectedNormalizedCIStatus = [
             'BUILD_RESULT' => 'GREEN',
@@ -69,7 +69,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_is_the_result_is_green()
+    public function it_tells_is_the_result_is_green(): void
     {
         $CIStatus = CIStatus::endedWith(BuildResult::green(), BuildLink::none());
         self::assertTrue($CIStatus->isGreen());
@@ -78,7 +78,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_is_the_result_is_pending()
+    public function it_tells_is_the_result_is_pending(): void
     {
         $CIStatus = CIStatus::endedWith(BuildResult::pending(), BuildLink::none());
         self::assertTrue($CIStatus->isPending());
@@ -87,7 +87,7 @@ class CIStatusTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_is_the_result_is_red_with_the_same_link()
+    public function it_tells_is_the_result_is_red_with_the_same_link(): void
     {
         $buildLink = BuildLink::fromURL('https://my-ci.org/build/123');
         $CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);

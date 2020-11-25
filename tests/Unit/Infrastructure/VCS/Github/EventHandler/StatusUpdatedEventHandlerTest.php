@@ -59,7 +59,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_only_listens_to_status_update_review_events()
+    public function it_only_listens_to_status_update_review_events(): void
     {
         self::assertTrue($this->statusUpdateEventHandler->supports('status'));
         self::assertFalse($this->statusUpdateEventHandler->supports('unsupported_event'));
@@ -69,35 +69,29 @@ class StatusUpdatedEventHandlerTest extends TestCase
      * @test
      * @dataProvider events
      */
-    public function it_handles_ci_status___fetches_information_and_calls_the_handler(array $events, string $status)
+    public function it_handles_ci_status___fetches_information_and_calls_the_handler(array $events, string $status): void
     {
         $this->findPRNumber->fetch($status, self::COMMIT_REF)->willReturn(self::PR_NUMBER);
         $this->getCIStatus->fetch(
             Argument::that(
-                function (PRIdentifier $PRIdentifier) {
-                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
-                }
+                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
             ),
             Argument::that(
-                function ($commitRef) {
-                    return self::COMMIT_REF === $commitRef;
-                }
+                fn ($commitRef) => self::COMMIT_REF === $commitRef
             )
         )->willReturn(new CheckStatus(self::CI_STATUS, ''));
         $this->handler->handle(
             Argument::that(
-                function (CIStatusUpdate $command) {
-                    return self::PR_IDENTIFIER === $command->PRIdentifier
-                        && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
-                        && self::CI_STATUS === $command->status;
-                }
+                fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                    && self::CI_STATUS === $command->status
             )
         )->shouldBeCalled();
 
         $this->statusUpdateEventHandler->handle($events);
     }
 
-    public function events()
+    public function events(): array
     {
         return [
             'it handles supported status'       => [

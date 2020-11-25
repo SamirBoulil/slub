@@ -53,7 +53,7 @@ class CheckRunEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_only_listens_to_check_run_events()
+    public function it_only_listens_to_check_run_events(): void
     {
         self::assertTrue($this->checkRunEventHandler->supports('check_run'));
         self::assertFalse($this->checkRunEventHandler->supports('unsupported_event'));
@@ -63,24 +63,20 @@ class CheckRunEventHandlerTest extends TestCase
      * @test
      * @dataProvider events
      */
-    public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent)
+    public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent): void
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus = new CheckStatus(self::CI_STATUS, self::BUILD_LINK);
         $this->getPRInfo->fetch(
             Argument::that(
-                function (PRIdentifier $PRIdentifier) {
-                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
-                }
+                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
             )
         )->willReturn($prInfo);
 
         $this->handler->handle(
-            Argument::that(function (CIStatusUpdate $command) {
-                return self::PR_IDENTIFIER === $command->PRIdentifier
-                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
-                    && self::CI_STATUS === $command->status;
-            })
+            Argument::that(fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
+                && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                && self::CI_STATUS === $command->status)
         )->shouldBeCalled();
 
         $this->checkRunEventHandler->handle($CheckRunEvent);
@@ -101,24 +97,20 @@ class CheckRunEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_has_a_queued_check_run_we_fetch_the_ci_status()
+    public function it_has_a_queued_check_run_we_fetch_the_ci_status(): void
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus =  new CheckStatus(self::CI_STATUS);
         $this->getPRInfo->fetch(
             Argument::that(
-                function (PRIdentifier $PRIdentifier) {
-                    return $PRIdentifier->stringValue() === self::PR_IDENTIFIER;
-                }
+                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
             )
         )->willReturn($prInfo);
 
         $this->handler->handle(
-            Argument::that(function (CIStatusUpdate $command) {
-                return self::PR_IDENTIFIER === $command->PRIdentifier
-                    && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
-                    && self::CI_STATUS === $command->status;
-            })
+            Argument::that(fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
+                && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
+                && self::CI_STATUS === $command->status)
         )->shouldBeCalled();
 
         $this->checkRunEventHandler->handle($this->queuedCheckRun());

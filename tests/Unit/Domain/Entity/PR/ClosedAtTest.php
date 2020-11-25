@@ -12,7 +12,7 @@ class ClosedAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_closed_at_date()
+    public function it_creates_a_closed_at_date(): void
     {
         $ClosedAt = ClosedAt::create();
         $this->assertNotEmpty($ClosedAt);
@@ -21,7 +21,7 @@ class ClosedAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_closed_at_value_with_no_date()
+    public function it_creates_a_closed_at_value_with_no_date(): void
     {
         $emptyClosedAt = ClosedAt::none();
         $this->assertEmpty($emptyClosedAt->toTimestamp());
@@ -33,7 +33,7 @@ class ClosedAtTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_closed_at_date_from_timestamp()
+    public function it_creates_a_closed_at_date_from_timestamp(): void
     {
         $aTimestamp = $this->aTimestamp();
 

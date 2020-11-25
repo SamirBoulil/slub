@@ -6,6 +6,7 @@ namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
@@ -25,7 +26,7 @@ class GetStatusChecksStatusTest extends WebTestCase
     /** @var GetStatusChecksStatus */
     private $getStatusCheckStatus;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    /** @var ObjectProphecy|GithubAPIClient */
     private $githubAPIClient;
 
     public function setUp(): void

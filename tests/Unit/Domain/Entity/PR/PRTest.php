@@ -30,7 +30,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_PR_and_normalizes_itself()
+    public function it_creates_a_PR_and_normalizes_itself(): void
     {
         $prIdentifier = self::PR_IDENTIFIER;
         $channelIdentifier = 'squad-raccoons';
@@ -73,7 +73,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_from_normalized()
+    public function it_is_created_from_normalized(): void
     {
         $normalizedPR = [
             'IDENTIFIER' => self::PR_IDENTIFIER,
@@ -106,7 +106,7 @@ class PRTest extends TestCase
      */
     public function it_throws_if_there_is_not_enough_information_to_create_from_normalized(
         array $normalizedWithMissingInformation
-    ) {
+    ): void {
         $this->expectException(\InvalidArgumentException::class);
         PR::fromNormalized($normalizedWithMissingInformation);
     }
@@ -114,7 +114,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_GTMed_multiple_times()
+    public function it_can_be_GTMed_multiple_times(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -137,7 +137,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_gtmed_once_it_is_closed()
+    public function it_cannot_be_gtmed_once_it_is_closed(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -158,7 +158,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_NOT_GTMed_multiple_times()
+    public function it_can_be_NOT_GTMed_multiple_times(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -181,7 +181,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_NOT_GTMed_once_it_is_closed()
+    public function it_cannot_be_NOT_GTMed_once_it_is_closed(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -202,7 +202,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_commented_multiple_times()
+    public function it_can_be_commented_multiple_times(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -225,7 +225,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_commented_once_it_is_closed()
+    public function it_cannot_be_commented_once_it_is_closed(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -246,7 +246,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_become_green()
+    public function it_can_become_green(): void
     {
         $pr = $this->pendingPR();
 
@@ -262,7 +262,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_change_CI_status_once_it_is_closed()
+    public function it_cannot_change_CI_status_once_it_is_closed(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -283,7 +283,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_become_pending_once_it_is_closed()
+    public function it_cannot_become_pending_once_it_is_closed(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -304,7 +304,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_create_event_if_the_pr_is_already_green()
+    public function it_does_not_create_event_if_the_pr_is_already_green(): void
     {
         $pr = $this->greenPR();
 
@@ -316,7 +316,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_become_red_with_a_build_link()
+    public function it_can_become_red_with_a_build_link(): void
     {
         $buildLink = 'https://build_link';
         $pr = $this->pendingPR();
@@ -336,7 +336,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_creates_event_if_the_pr_is_already_red()
+    public function it_does_not_creates_event_if_the_pr_is_already_red(): void
     {
         $pr = $this->redPR();
 
@@ -348,7 +348,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_become_pending()
+    public function it_can_become_pending(): void
     {
         $pr = $this->greenPR();
 
@@ -364,7 +364,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_creates_event_if_the_pr_is_already_pending()
+    public function it_does_not_creates_event_if_the_pr_is_already_pending(): void
     {
         $pr = $this->pendingPR();
 
@@ -376,7 +376,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_closed_and_merged()
+    public function it_can_be_closed_and_merged(): void
     {
         $pr = $this->greenPR();
 
@@ -391,7 +391,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_closed_without_being_merged()
+    public function it_can_be_closed_without_being_merged(): void
     {
         $pr = $this->greenPR();
 
@@ -406,7 +406,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function when_the_pr_had_its_last_GTM_it_tells_the_PR_is_good_to_merge()
+    public function when_the_pr_had_its_last_GTM_it_tells_the_PR_is_good_to_merge(): void
     {
         $prWithOneGTMMissing = PR::fromNormalized(
             [
@@ -439,7 +439,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function when_the_pr_had_its_green_ci_it_tells_the_PR_is_good_to_merge()
+    public function when_the_pr_had_its_green_ci_it_tells_the_PR_is_good_to_merge(): void
     {
         $prWithOneGTMMissing = PR::fromNormalized(
             [
@@ -472,7 +472,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_its_identifier()
+    public function it_returns_its_identifier(): void
     {
         $identifier = PRIdentifier::create(self::PR_IDENTIFIER);
 
@@ -491,7 +491,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_its_author_identifier()
+    public function it_returns_its_author_identifier(): void
     {
         $expectedAuthorIdentifier = 'sam';
 
@@ -510,7 +510,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_its_title()
+    public function it_returns_its_title(): void
     {
         $expectedTitle = 'Add new feature';
 
@@ -529,7 +529,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_the_message_ids()
+    public function it_returns_the_message_ids(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -545,7 +545,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_the_channel_ids()
+    public function it_returns_the_channel_ids(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -561,7 +561,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_the_number_of_days_the_pr_is_in_review()
+    public function it_tells_the_number_of_days_the_pr_is_in_review(): void
     {
         $pr = PR::create(
             PRIdentifier::create(self::PR_IDENTIFIER),
@@ -578,7 +578,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times_in_different_channels()
+    public function it_can_be_put_to_review_multiple_times_in_different_channels(): void
     {
         $pr = $this->greenPR();
         $expectedMessageId = MessageIdentifier::create('2');
@@ -597,7 +597,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_put_to_review_multiple_times_in_the_same_channel_with_the_same_message_id()
+    public function it_can_be_put_to_review_multiple_times_in_the_same_channel_with_the_same_message_id(): void
     {
         $pr = $this->pendingPR();
 
@@ -613,7 +613,7 @@ class PRTest extends TestCase
     /**
      * @test
      */
-    public function it_can_be_reopened()
+    public function it_can_be_reopened(): void
     {
         $pr = $this->closedPR();
 
@@ -684,7 +684,7 @@ class PRTest extends TestCase
 
     private function pendingPR(): PR
     {
-        $pr = PR::fromNormalized([
+        return PR::fromNormalized([
                 'IDENTIFIER' => self::PR_IDENTIFIER,
                 'TITLE' => 'Add new feature',
                 'AUTHOR_IDENTIFIER' => 'sam',
@@ -703,13 +703,11 @@ class PRTest extends TestCase
                 'CLOSED_AT' => null,
             ]
         );
-
-        return $pr;
     }
 
     private function greenPR(): PR
     {
-        $pr = PR::fromNormalized(
+        return PR::fromNormalized(
             [
                 'IDENTIFIER' => self::PR_IDENTIFIER,
                 'TITLE' => 'Add new feature',
@@ -729,13 +727,11 @@ class PRTest extends TestCase
                 'CLOSED_AT' => null,
             ]
         );
-
-        return $pr;
     }
 
     private function redPR(): PR
     {
-        $pr = PR::fromNormalized(
+        return PR::fromNormalized(
             [
                 'IDENTIFIER' => self::PR_IDENTIFIER,
                 'TITLE' => 'Add new feature',
@@ -755,13 +751,11 @@ class PRTest extends TestCase
                 'CLOSED_AT' => null,
             ]
         );
-
-        return $pr;
     }
 
     private function closedPR(): PR
     {
-        $pr = PR::fromNormalized(
+        return PR::fromNormalized(
             [
                 'IDENTIFIER' => self::PR_IDENTIFIER,
                 'TITLE' => 'Add new feature',
@@ -781,7 +775,5 @@ class PRTest extends TestCase
                 'CLOSED_AT' => self::A_TIMESTAMP,
             ]
         );
-
-        return $pr;
     }
 }

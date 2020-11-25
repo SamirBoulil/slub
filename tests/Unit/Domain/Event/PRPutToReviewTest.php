@@ -17,7 +17,7 @@ class PRPutToReviewTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_with_a_pr_identifier_and_message_id_returns_them()
+    public function it_is_created_with_a_pr_identifier_and_message_id_returns_them(): void
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $expectedMessageIdentifier = MessageIdentifier::fromString('channel@1541');

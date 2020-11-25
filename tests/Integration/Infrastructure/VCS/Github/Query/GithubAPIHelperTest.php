@@ -13,7 +13,7 @@ class GithubAPIHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_breaks_out_a_pr_identifier()
+    public function it_breaks_out_a_pr_identifier(): void
     {
         $this->assertEquals(
             GithubAPIHelper::breakoutPRIdentifier(PRIdentifier::fromString('SamirBoulil/slub/36')),
@@ -28,7 +28,7 @@ class GithubAPIHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_generates_a_authorization_header_for_a_token()
+    public function it_generates_a_authorization_header_for_a_token(): void
     {
         $expectedToken = 'token_123';
         self::assertEquals(
@@ -40,7 +40,7 @@ class GithubAPIHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_generates_a_authorization_header_for_a_jwt()
+    public function it_generates_a_authorization_header_for_a_jwt(): void
     {
         $expectedToken = 'token_123';
         self::assertEquals(
@@ -52,7 +52,7 @@ class GithubAPIHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_generates_a_accept_header_for_preview_endpoints()
+    public function it_generates_a_accept_header_for_preview_endpoints(): void
     {
         self::assertEquals(
             GithubAPIHelper::acceptPreviewEndpointsHeader(),
@@ -63,7 +63,7 @@ class GithubAPIHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_generates_a_accept_header_for_machine_man_preview_endpoints()
+    public function it_generates_a_accept_header_for_machine_man_preview_endpoints(): void
     {
         self::assertEquals(
             GithubAPIHelper::acceptMachineManPreviewHeader(),

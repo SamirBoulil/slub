@@ -45,7 +45,7 @@ EOD;
     }
 
     /** @test */
-    public function it_fetches_an_access_token_for_an_app_id()
+    public function it_fetches_an_access_token_for_an_app_id(): void
     {
         $installationId = '123a456b';
         $this->requestSpy->stubResponse(new Response(201, [], $this->accessTokenResponse()));

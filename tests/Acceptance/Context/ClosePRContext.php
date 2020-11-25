@@ -56,7 +56,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Given /^a PR in review having multiple comments and a CI result$/
      */
-    public function aPullRequestInReview()
+    public function aPullRequestInReview(): void
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
@@ -67,7 +67,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @When /^the author closes the PR by merging it$/
      */
-    public function theAuthorMergesThePR()
+    public function theAuthorMergesThePR(): void
     {
         $closePR = new ClosePR();
         $closePR->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -80,7 +80,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Then /^the PR is merged$/
      */
-    public function thePRIsMerged()
+    public function thePRIsMerged(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals(true, $PR->normalize()['IS_MERGED'], 'Expects PR to be merged but was not');
@@ -89,7 +89,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Given /^the squad should be notified that the PR has been closed and merged$/
      */
-    public function theSquadShouldBeNotifiedThatThePRHasBeenMerged()
+    public function theSquadShouldBeNotifiedThatThePRHasBeenMerged(): void
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
         $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
@@ -99,7 +99,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @When /^the author closes the PR without merging$/
      */
-    public function theAuthorClosesThePR()
+    public function theAuthorClosesThePR(): void
     {
         $closePR = new ClosePR();
         $closePR->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -112,7 +112,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Then /^the PR is only closed$/
      */
-    public function thePRIsClosed()
+    public function thePRIsClosed(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertNotEmpty($PR->normalize()['CLOSED_AT'], 'Expects PR to be closed but not date was set on it');
@@ -139,7 +139,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Given /^the squad should be notified that the PR has been closed without merging$/
      */
-    public function theSquadShouldBeNotifiedThatThePRHasBeenClosed()
+    public function theSquadShouldBeNotifiedThatThePRHasBeenClosed(): void
     {
         Assert::assertTrue($this->eventSpy->PRClosedDispatched(), 'Expects PRClosed event to be dispatched');
     }
@@ -147,7 +147,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @When /^the a PR belonging to an unsupported repository is closed$/
      */
-    public function theAPRBelongingToAnUnsupportedRepositoryIsClosed()
+    public function theAPRBelongingToAnUnsupportedRepositoryIsClosed(): void
     {
         $closePR = new ClosePR();
         $closePR->repositoryIdentifier = 'unsupported_repository';
@@ -160,7 +160,7 @@ class ClosePRContext extends FeatureContext
     /**
      * @Then /^the PR is closed and merged$/
      */
-    public function thePRIsClosedAndMerged()
+    public function thePRIsClosedAndMerged(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertNotEmpty($PR->normalize()['CLOSED_AT'], 'Expects PR to be closed but not date was set on it');

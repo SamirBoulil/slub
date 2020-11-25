@@ -48,7 +48,7 @@ class InstallerCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_installs_slub_for_the_first_time()
+    public function it_installs_slub_for_the_first_time(): void
     {
         $this->dropDatabase();
         self::assertFalse($this->existsDatabase());
@@ -61,7 +61,7 @@ class InstallerCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_re_installs_slub_without_dropping_the_database_nor_the_table()
+    public function it_re_installs_slub_without_dropping_the_database_nor_the_table(): void
     {
         $this->assertTableExists();
         $this->addOnePr();
@@ -87,7 +87,7 @@ class InstallerCLITest extends KernelTestCase
         return $output = $commandTester->getDisplay();
     }
 
-    private function assertTableExists()
+    private function assertTableExists(): void
     {
         /** @var Connection $sqlConnection */
         $sqlConnection = $this->get('slub.infrastructure.persistence.sql.database_connection');

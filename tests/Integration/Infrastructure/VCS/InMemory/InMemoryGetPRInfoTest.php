@@ -16,7 +16,7 @@ class InMemoryGetPRInfoTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_a_PR_info_for_the_given_identifier_and_some_default_data()
+    public function it_returns_a_PR_info_for_the_given_identifier_and_some_default_data(): void
     {
         $expectedPRIdentifier = 'akeneo/pim-community-dev';
 

@@ -120,14 +120,10 @@ class GetCIStatusTest extends WebTestCase
         string $buildLink
     ): void {
         $prIdentifierArgument = Argument::that(
-            function (PRIdentifier $PRIdentifier) {
-                return $PRIdentifier->equals($PRIdentifier::fromString(self::PR_IDENTIFIER));
-            }
+            fn (PRIdentifier $PRIdentifier) => $PRIdentifier->equals($PRIdentifier::fromString(self::PR_IDENTIFIER))
         );
         $commitRefArgument = Argument::that(
-            function (string $commitRef) {
-                return self::COMMIT_REF === $commitRef;
-            }
+            fn (string $commitRef) => self::COMMIT_REF === $commitRef
         );
         $this->getCheckRunStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
             new CheckStatus($checkRunStatus, $buildLink)
@@ -139,8 +135,6 @@ class GetCIStatusTest extends WebTestCase
 
     private function getCIStatus(): CheckStatus
     {
-        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
-
-        return $actualCIStatus;
+        return $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
     }
 }

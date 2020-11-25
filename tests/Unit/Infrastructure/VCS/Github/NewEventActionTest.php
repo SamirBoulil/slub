@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
@@ -29,16 +30,16 @@ class NewEventActionTest extends TestCase
      */
     private $newEventAction;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|EventHandlerRegistry */
+    /** @var ObjectProphecy|EventHandlerRegistry */
     private $eventHandlerRegistry;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|SqlDeliveredEventRepository */
+    /** @var ObjectProphecy|SqlDeliveredEventRepository */
     private $deliveredEventRepository;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|SqlHasEventAlreadyBeenDelivered */
+    /** @var ObjectProphecy|SqlHasEventAlreadyBeenDelivered */
     private $hasEventAlreadyBeenDelivered;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->eventHandlerRegistry = $this->prophesize(EventHandlerRegistry::class);
         $this->hasEventAlreadyBeenDelivered = $this->prophesize(SqlHasEventAlreadyBeenDelivered::class);
@@ -55,7 +56,7 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_successfully_processes_supported_events()
+    public function it_successfully_processes_supported_events(): void
     {
         $eventType = 'EVENT_TYPE';
         $eventPayload = ['payload'];
@@ -73,7 +74,7 @@ class NewEventActionTest extends TestCase
      * @test
      * @dataProvider wrongRequests
      */
-    public function it_throws(Request $wrongRequest)
+    public function it_throws(Request $wrongRequest): void
     {
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
         $this->eventHandlerRegistry->get(Argument::any())->willReturn(null);
@@ -85,7 +86,7 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_event_type_is_unsupported()
+    public function it_throws_if_the_event_type_is_unsupported(): void
     {
         $alreadyDeliveredRequest = $this->supportedRequest('UNKNOWN', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
 
@@ -96,7 +97,7 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_event_has_already_been_delivered()
+    public function it_throws_if_the_event_has_already_been_delivered(): void
     {
         $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(true);
@@ -108,7 +109,7 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_event_identifier_is_not_set()
+    public function it_throws_if_the_event_identifier_is_not_set(): void
     {
         $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], null);
 
@@ -116,7 +117,7 @@ class NewEventActionTest extends TestCase
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
     }
 
-    public function wrongRequests()
+    public function wrongRequests(): array
     {
         return [
             'if the signature is missing'      => [$this->requestWithNoSignature('EVENT_TYPE', ['payload'])],
@@ -140,7 +141,7 @@ class NewEventActionTest extends TestCase
         return $request;
     }
 
-    private function requestWithNoSignature(string $eventType, array $payload)
+    private function requestWithNoSignature(string $eventType, array $payload): Request
     {
         $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);

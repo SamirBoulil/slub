@@ -19,6 +19,7 @@ use Tests\Integration\Infrastructure\KernelTestCase;
 class DebugCIStatusCLITest extends KernelTestCase
 {
     private const COMMAND_NAME = 'slub:debug:ci-status';
+    const PR_IDENTIFIER = 'samirboulil/slub/123';
 
     /** @var CommandTester */
     private $commandTester;
@@ -39,10 +40,10 @@ class DebugCIStatusCLITest extends KernelTestCase
     public function it_executes(): void
     {
         $ciStatus = 'GREEN';
-        $prInfo = new PRInfo();
+        $prInfo = $this->aPRInfo();
         $prInfo->CIStatus = new CheckStatus($ciStatus);
 
-        $this->getPRInfo->fetch(PRIdentifier::fromString('samirboulil/slub/123'))->willReturn($prInfo);
+        $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER))->willReturn($prInfo);
         $this->commandTester->execute(['command' => self::COMMAND_NAME, 'pull_request_link' => 'https://github.com/samirboulil/slub/pull/123']);
 
         $this->assertContains($ciStatus, $this->commandTester->getDisplay());
@@ -56,5 +57,25 @@ class DebugCIStatusCLITest extends KernelTestCase
         $application->add(new DebugCIStatusCLI($getPRInfo));
         $command = $application->find(self::COMMAND_NAME);
         $this->commandTester = new CommandTester($command);
+    }
+
+    /**
+     * @return PRInfo
+     *
+     */
+    protected function aPRInfo(): PRInfo
+    {
+        $prInfo = new PRInfo();
+        $prInfo->PRIdentifier = self::PR_IDENTIFIER;
+        $prInfo->authorIdentifier = 'dummy';
+        $prInfo->title = 'dummy';
+        $prInfo->GTMCount = 1;
+        $prInfo->notGTMCount = 1;
+        $prInfo->comments = 1;
+        $prInfo->CIStatus = new CheckStatus('success');
+        $prInfo->isMerged = false;
+        $prInfo->isClosed = false;
+
+        return $prInfo;
     }
 }

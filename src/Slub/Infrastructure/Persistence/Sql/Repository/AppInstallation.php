@@ -13,5 +13,5 @@ class AppInstallation
 
     public string $installationId;
 
-    public string $accessToken;
+    public ?string $accessToken;
 }

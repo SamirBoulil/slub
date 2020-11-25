@@ -47,6 +47,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
         $expected = new AppInstallation();
         $expected->repositoryIdentifier = $repositoryIdentifier;
         $expected->installationId = Uuid::uuid4()->toString();
+        $expected->accessToken = null;
 
         $this->appInstallationRepository->save($expected);
         $actual = $this->appInstallationRepository->getBy($repositoryIdentifier);

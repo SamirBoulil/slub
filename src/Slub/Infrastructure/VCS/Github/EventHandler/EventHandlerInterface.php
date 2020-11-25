@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
 */

@@ -31,9 +31,8 @@ class GetPRDetails
     private function getUrl(PRIdentifier $PRIdentifier): string
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $url = sprintf('https://api.github.com/repos/%s/%s/pulls/%s', ...$matches);
 
-        return $url;
+        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s', ...$matches);
     }
 
     private function fetchPRdetails(PRIdentifier $PRIdentifier, string $url): array

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Client;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
@@ -28,7 +29,7 @@ class GithubAPIClient
     public function __construct(
         RefreshAccessToken $refreshAccessToken,
         SqlAppInstallationRepository $sqlAppInstallationRepository,
-        Client $client
+        ClientInterface $client
     ) {
         $this->refreshAccessToken = $refreshAccessToken;
         $this->client = $client;

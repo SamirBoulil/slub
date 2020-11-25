@@ -16,7 +16,7 @@ class SqlDeliveredEventRepository
     /** @var Connection */
     private $sqlConnection;
 
-    public function __construct(Connection $sqlConnection)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }

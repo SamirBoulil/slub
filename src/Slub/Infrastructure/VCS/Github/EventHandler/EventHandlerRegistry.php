@@ -22,9 +22,7 @@ class EventHandlerRegistry
     public function get(string $eventType): ?EventHandlerInterface
     {
         $handlers = array_filter($this->eventHandlers,
-            function (EventHandlerInterface $eventHandler) use ($eventType) {
-                return $eventHandler->supports($eventType);
-            }
+            fn (EventHandlerInterface $eventHandler) => $eventHandler->supports($eventType)
         );
 
         if (empty($handlers)) {

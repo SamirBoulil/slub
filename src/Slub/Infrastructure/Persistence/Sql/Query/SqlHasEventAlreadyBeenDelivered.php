@@ -14,7 +14,7 @@ class SqlHasEventAlreadyBeenDelivered
     /** @var Connection */
     private $sqlConnection;
 
-    public function __construct(Connection $sqlConnection)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }
@@ -30,8 +30,7 @@ class SqlHasEventAlreadyBeenDelivered
 SQL;
 
         $statement = $this->sqlConnection->executeQuery($sql, ['deliveredEventIdentifier' => $deliveredEventIdentifier]);
-        $existsDeliveredEvent = (bool) $statement->fetch(\PDO::FETCH_COLUMN);
 
-        return $existsDeliveredEvent;
+        return (bool) $statement->fetch(\PDO::FETCH_COLUMN);
     }
 }

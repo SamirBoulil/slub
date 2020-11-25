@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -17,7 +18,7 @@ class GetBotReactionsForMessageAndUser
     /** @var string */
     private $slackToken;
 
-    public function __construct(Client $client, string $slackToken)
+    public function __construct(ClientInterface $client, string $slackToken)
     {
         $this->client = $client;
         $this->slackToken = $slackToken;
@@ -26,9 +27,8 @@ class GetBotReactionsForMessageAndUser
     public function fetch(string $channel, string $ts, string $userId): array
     {
         $reactions = $this->fetchReactions($channel, $ts);
-        $botReactions = $this->findBotReactions($userId, $reactions);
 
-        return $botReactions;
+        return $this->findBotReactions($userId, $reactions);
     }
 
     private function fetchReactions(string $channel, string $ts): array
@@ -52,14 +52,10 @@ class GetBotReactionsForMessageAndUser
     private function findBotReactions(string $userId, array $reactions): array
     {
         return array_map(
-            function (array $reaction) {
-                return $reaction['name'];
-            },
+            fn (array $reaction) => $reaction['name'],
             array_filter(
                 $reactions,
-                function (array $reaction) use ($userId) {
-                    return in_array($userId, $reaction['users']);
-                }
+                fn (array $reaction) => in_array($userId, $reaction['users'])
             )
         );
     }

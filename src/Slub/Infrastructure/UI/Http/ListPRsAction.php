@@ -28,7 +28,7 @@ class ListPRsAction
         $this->averageTimeToMerge = $averageTimeToMerge;
     }
 
-    public function executeAction(): Response
+    public function executeAction(): JsonResponse
     {
         $result = $this->allPRs();
         $result['AVERAGE_TIME_TO_MERGE'] = $this->averageTimeToMerge->fetch();
@@ -39,9 +39,7 @@ class ListPRsAction
     private function allPRs(): array
     {
         return array_map(
-            function (PR $PR) {
-                return $PR->normalize();
-            },
+            fn (PR $PR) => $PR->normalize(),
             $this->PRRepository->all()
         );
     }

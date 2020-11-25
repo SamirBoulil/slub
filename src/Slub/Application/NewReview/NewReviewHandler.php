@@ -35,7 +35,7 @@ class NewReviewHandler
         $this->logger = $logger;
     }
 
-    public function handle(NewReview $review)
+    public function handle(NewReview $review): void
     {
         if (!$this->isSupported($review)) {
             return;

@@ -71,9 +71,8 @@ class GetCheckSuiteStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $commitRef;
-        $url = sprintf('https://api.github.com/repos/%s/%s/commits/%s/check-suites', ...$matches);
 
-        return $url;
+        return sprintf('https://api.github.com/repos/%s/%s/commits/%s/check-suites', ...$matches);
     }
 
     private function buildLink(array $checkSuites): string

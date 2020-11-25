@@ -64,9 +64,8 @@ class FindReviews
     private function getUrl(PRIdentifier $PRIdentifier): string
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $url = sprintf('https://api.github.com/repos/%s/%s/pulls/%s/reviews', ...$matches);
 
-        return $url;
+        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s/reviews', ...$matches);
     }
 
     private function count(array $reviews, string $status): int
@@ -74,9 +73,7 @@ class FindReviews
         return count(
             array_filter(
                 $reviews,
-                function (array $review) use ($status) {
-                    return $review['state'] === $status;
-                }
+                fn (array $review) => $review['state'] === $status
             )
         );
     }

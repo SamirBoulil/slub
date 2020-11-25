@@ -31,11 +31,11 @@ class PublishRemindersCLI extends Command
              ->setHidden(false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->publishRemindersHandler->handle();
         $output->writeln('<info>Reminders published!</info>');
 
-        return null;
+        return 0;
     }
 }

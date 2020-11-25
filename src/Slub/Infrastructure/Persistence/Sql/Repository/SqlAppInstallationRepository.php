@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -15,7 +16,7 @@ class SqlAppInstallationRepository
     /** @var Connection */
     private $sqlConnection;
 
-    public function __construct(Connection $sqlConnection)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }
@@ -68,7 +69,7 @@ SQL;
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function fetch(string $repositoryIdentifier): array
     {

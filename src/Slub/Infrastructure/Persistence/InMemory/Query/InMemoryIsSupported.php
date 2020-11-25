@@ -31,9 +31,7 @@ class InMemoryIsSupported implements IsSupportedInterface
     {
         $repositoriesFound = array_filter(
             $this->supportedRepositories,
-            static function (RepositoryIdentifier $supportedRepository) use ($repositoryIdentifierToCheck) {
-                return $supportedRepository->equals($repositoryIdentifierToCheck);
-            }
+            static fn (RepositoryIdentifier $supportedRepository) => $supportedRepository->equals($repositoryIdentifierToCheck)
         );
 
         return 1 === \count($repositoriesFound);
@@ -43,9 +41,7 @@ class InMemoryIsSupported implements IsSupportedInterface
     {
         $found = array_filter(
             $this->supportedWorkspace,
-            function (WorkspaceIdentifier $supportedChannel) use ($workspaceIdentifierToCheck) {
-                return $supportedChannel->equals($workspaceIdentifierToCheck);
-            }
+            fn (WorkspaceIdentifier $supportedChannel) => $supportedChannel->equals($workspaceIdentifierToCheck)
         );
 
         return 1 === \count($found);
@@ -57,9 +53,7 @@ class InMemoryIsSupported implements IsSupportedInterface
     private function createIdentifiers(array $normalizedIdentifiers): array
     {
         return array_map(
-            function (string $normalizedIdentifier) {
-                return RepositoryIdentifier::fromString($normalizedIdentifier);
-            },
+            fn (string $normalizedIdentifier) => RepositoryIdentifier::fromString($normalizedIdentifier),
             $normalizedIdentifiers
         );
     }
@@ -70,9 +64,7 @@ class InMemoryIsSupported implements IsSupportedInterface
     private function createWorkspaces(array $normalizedWorkspaceIdentifiers): array
     {
         return array_map(
-            function (string $normalizedIdentifier) {
-                return WorkspaceIdentifier::fromString($normalizedIdentifier);
-            },
+            fn (string $normalizedIdentifier) => WorkspaceIdentifier::fromString($normalizedIdentifier),
             $normalizedWorkspaceIdentifiers
         );
     }

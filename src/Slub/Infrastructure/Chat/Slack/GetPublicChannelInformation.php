@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Slub\Domain\Query\ChannelInformation;
 
 /**
@@ -19,7 +20,7 @@ class GetPublicChannelInformation implements GetChannelInformationInterface
     /** @var string */
     private $slackToken;
 
-    public function __construct(Client $client, string $slackToken)
+    public function __construct(ClientInterface $client, string $slackToken)
     {
         $this->client = $client;
         $this->slackToken = $slackToken;

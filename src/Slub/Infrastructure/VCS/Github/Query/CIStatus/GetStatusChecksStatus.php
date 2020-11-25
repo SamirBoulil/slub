@@ -64,14 +64,12 @@ class GetStatusChecksStatus
 
     private function deductCIStatus(array $statuses): CheckStatus
     {
-        $getStatuses = function (string $statusToFilterOn) {
-            return function ($current, $ciStatus) use ($statusToFilterOn) {
-                if (null !== $current) {
-                    return $current;
-                }
+        $getStatuses = fn (string $statusToFilterOn) => function ($current, $ciStatus) use ($statusToFilterOn) {
+            if (null !== $current) {
+                return $current;
+            }
 
-                return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
-            };
+            return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
         };
 
         $faillingStatus = array_reduce($statuses, $getStatuses('failure'));
@@ -80,9 +78,7 @@ class GetStatusChecksStatus
         }
 
         $supportedStatuses = array_filter($statuses,
-            function (array $status) {
-                return $this->isStatusSupported($status);
-            }
+            fn (array $status) => $this->isStatusSupported($status)
         );
 
         if (empty($supportedStatuses)) {
@@ -101,9 +97,8 @@ class GetStatusChecksStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
-        $url = sprintf('%s/repos/%s/%s/statuses/%s', $this->domainName, ...$matches);
 
-        return $url;
+        return sprintf('%s/repos/%s/%s/statuses/%s', $this->domainName, ...$matches);
     }
 
     private function isStatusSupported(array $status): bool

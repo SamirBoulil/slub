@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -20,7 +21,7 @@ class GetBotUserId
     /** @var ?string */
     private $cachedResult;
 
-    public function __construct(Client $client, string $slackToken)
+    public function __construct(ClientInterface $client, string $slackToken)
     {
         $this->client = $client;
         $this->slackToken = $slackToken;

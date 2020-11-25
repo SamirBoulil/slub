@@ -17,7 +17,7 @@ class PurgeDeliveredEventsCLI extends Command
     /** @var Connection */
     private $connection;
 
-    public function __construct(Connection $sqlConnection)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
     {
         parent::__construct(self::$defaultName);
         $this->connection = $sqlConnection;
@@ -30,7 +30,7 @@ class PurgeDeliveredEventsCLI extends Command
             ->setHidden(false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Starting to purge the delivered events from the database</info>');
 
@@ -40,7 +40,7 @@ class PurgeDeliveredEventsCLI extends Command
         $output->writeln('');
         $output->writeln(sprintf('<info>✅ Purge of %d delivered events done</info>', $numberOfDeliveredEventsToPurge));
 
-        return null;
+        return 0;
     }
 
     private function purgeDeliveredEvents(): void
@@ -54,8 +54,6 @@ class PurgeDeliveredEventsCLI extends Command
             ->executeQuery('SELECT COUNT(*) FROM delivered_event;')
             ->fetch(\PDO::FETCH_COLUMN);
 
-        $count = $this->connection->convertToPHPValue($result, Type::INTEGER);
-
-        return $count;
+        return $this->connection->convertToPHPValue($result, Type::INTEGER);
     }
 }

@@ -18,7 +18,7 @@ class SqlGetMessageIdsForPR implements GetMessageIdsForPR
     /** @var Connection */
     private $sqlConnection;
 
-    public function __construct(Connection $sqlConnection)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection)
     {
         $this->sqlConnection = $sqlConnection;
     }
@@ -26,11 +26,8 @@ class SqlGetMessageIdsForPR implements GetMessageIdsForPR
     public function fetch(PRIdentifier $PRIdentifier): array
     {
         $messageIds = $this->fetchMessageIds($PRIdentifier);
-        $messageIds = array_map(function (string $messageId) {
-            return MessageIdentifier::fromString($messageId);
-        }, $messageIds);
 
-        return $messageIds;
+        return array_map(fn (string $messageId) => MessageIdentifier::fromString($messageId), $messageIds);
     }
 
     private function fetchMessageIds(PRIdentifier $PRIdentifier): array
@@ -45,8 +42,7 @@ SQL;
         if (false === $info) {
             throw  PRNotFoundException::create($PRIdentifier);
         }
-        $result = json_decode($info['MESSAGE_IDS'], true);
 
-        return $result;
+        return json_decode($info['MESSAGE_IDS'], true);
     }
 }

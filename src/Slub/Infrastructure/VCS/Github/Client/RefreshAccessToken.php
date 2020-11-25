@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Client;
 
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
@@ -29,7 +30,7 @@ class RefreshAccessToken
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey)
+    public function __construct(ClientInterface $httpClient, string $githubAppId, string $githubPrivateKey)
     {
         $this->httpClient = $httpClient;
         $this->githubAppId = $githubAppId;
@@ -77,7 +78,8 @@ class RefreshAccessToken
     private function jwt(): string
     {
         $now = new \DateTime('now');
-        $jwt = JWT::encode(
+
+        return JWT::encode(
             [
                 'iat' => $now->getTimestamp(),
                 'exp' => $now->getTimestamp() + (10 * 60),
@@ -86,7 +88,5 @@ class RefreshAccessToken
             $this->githubPrivateKey,
             'RS256'
         );
-
-        return $jwt;
     }
 }

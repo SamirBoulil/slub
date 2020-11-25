@@ -83,34 +83,24 @@ class PublishRemindersHandler
     {
         return array_filter(
             $PRsInReview,
-            function (PR $PR) use ($expectedChannelIdentifier) {
-                return array_filter(
-                    $PR->channelIdentifiers(),
-                    function (ChannelIdentifier $actualChannelIdentifier) use ($expectedChannelIdentifier) {
-                        return $expectedChannelIdentifier->equals($actualChannelIdentifier);
-                    }
-                );
-            }
+            fn (PR $PR) => array_filter(
+                $PR->channelIdentifiers(),
+                fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
+            )
         );
     }
 
     private function formatReminders(array $prs): string
     {
-        usort($prs, function (PR $pr1, PR $pr2) {
-            return $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview();
-        });
+        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview());
 
-        $PRReminders = array_map(function (PR $PR) {
-            return $this->formatReminder($PR);
-        }, $prs);
+        $PRReminders = array_map(fn (PR $PR) => $this->formatReminder($PR), $prs);
         $reminder = <<<CHAT
 Yop, these PRs need reviews!
 %s
 CHAT;
 
-        $result = sprintf($reminder, implode("\n", $PRReminders));
-
-        return $result;
+        return sprintf($reminder, implode("\n", $PRReminders));
     }
 
     private function formatReminder(PR $PR): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -36,7 +37,7 @@ class SlackClient implements ChatClient
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
-        Client $client,
+        ClientInterface $client,
         LoggerInterface $logger,
         string $slackToken,
         string $slackBotUserId

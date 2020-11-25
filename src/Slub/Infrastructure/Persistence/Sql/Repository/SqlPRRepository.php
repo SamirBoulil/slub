@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -20,7 +21,7 @@ class SqlPRRepository implements PRRepositoryInterface
     /** @var Connection */
     private $sqlConnection;
 
-    public function __construct(Connection $sqlConnection, EventDispatcherInterface $eventDispatcher)
+    public function __construct(\Doctrine\DBAL\Driver\Connection $sqlConnection, EventDispatcherInterface $eventDispatcher)
     {
         $this->sqlConnection = $sqlConnection;
         $this->eventDispatcher = $eventDispatcher;
@@ -74,7 +75,7 @@ SQL;
 
     /**
      * @throws PRNotFoundException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function fetch(PRIdentifier $PRidentifier): array
     {
@@ -100,13 +101,12 @@ FROM pr
 ORDER BY IS_MERGED ASC;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql);
-        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $result;
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function hydrate(array $result): PR
     {
@@ -160,7 +160,7 @@ SQL;
     /**
      * @param PR $PR
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function updatePR(PR $PR): void
     {
@@ -210,9 +210,8 @@ WHERE
 ;
 SQL;
         $statement = $this->sqlConnection->executeQuery($sql);
-        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        return $result;
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -224,9 +223,7 @@ SQL;
     private function hydrateAll(array $PRsInReviewNotGtmed): array
     {
         return array_map(
-            function (array $normalizedPR) {
-                return $this->hydrate($normalizedPR);
-            },
+            fn (array $normalizedPR) => $this->hydrate($normalizedPR),
             $PRsInReviewNotGtmed
         );
     }

@@ -39,9 +39,8 @@ class GetPRInfo implements GetPRInfoInterface
         $isClosed = $this->isClosed($PRDetails);
         $authorIdentifier = $this->authorIdentifier($PRDetails);
         $title = $this->title($PRDetails);
-        $result = $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
 
-        return $result;
+        return $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
     }
 
     private function getPRCommitRef(array $PRDetails): string

@@ -49,9 +49,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
         $isMerged = $this->isMerged($PRDetails);
         $this->logger->critical('Fetched is merged');
 
-        $result = $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
-
-        return $result;
+        return $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
     }
 
     private function getPRCommitRef(array $PRDetails): string

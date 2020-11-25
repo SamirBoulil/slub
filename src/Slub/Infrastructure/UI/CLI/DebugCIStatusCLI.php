@@ -31,7 +31,7 @@ class DebugCIStatusCLI extends Command
             ->setHidden(false);
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $PRLink = $input->getArgument('pull_request_link');
         if (!is_string($PRLink)) {
@@ -46,6 +46,7 @@ class DebugCIStatusCLI extends Command
         $output->writeln(sprintf('<info>CI status: %s</info>', $PRInfo->CIStatus->status));
         $output->writeln(sprintf('<info>CI closed: %s</info>', $PRInfo->isClosed ? 'yes' : 'no'));
         $output->writeln(sprintf('<info>CI isMerged: %s</info>', $PRInfo->isClosed ? 'yes' : 'no'));
+        return 0;
     }
 
     private function PRIdentifier($matches): PRIdentifier

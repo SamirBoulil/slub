@@ -98,7 +98,7 @@ class SlubBot
 
     private function listensToNewPR(BotMan $bot): void
     {
-        $createNewPr = function (Botman $bot, string $repositoryIdentifier, string $PRNumber) {
+        $createNewPr = function (\BotMan\BotMan\BotMan $bot, string $repositoryIdentifier, string $PRNumber) {
             $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
@@ -119,7 +119,7 @@ class SlubBot
 
     private function listenToPRToUnpublish(BotMan $bot): void
     {
-        $unpublishPR = function (Botman $bot, string $repository, $PRNumber) {
+        $unpublishPR = function (\BotMan\BotMan\BotMan $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
             $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
             $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
@@ -175,7 +175,7 @@ class SlubBot
     {
         $bot->hears(
             'alive',
-            function (Botman $bot) {
+            function (\BotMan\BotMan\BotMan $bot) {
                 $bot->reply('yes :+1:');
             }
         );
@@ -199,7 +199,7 @@ class SlubBot
         return $channelInformation->channelName;
     }
 
-    private function getMessageIdentifier(Botman $bot): string
+    private function getMessageIdentifier(\BotMan\BotMan\BotMan $bot): string
     {
         $channel = $bot->getMessage()->getPayload()['channel'];
         $ts = $bot->getMessage()->getPayload()['ts'];
@@ -226,7 +226,7 @@ class SlubBot
 
     private function providesToHelp(BotMan $bot): void
     {
-        $userHelp = function (Botman $bot) {
+        $userHelp = function (\BotMan\BotMan\BotMan $bot) {
             $message = <<<MESSAGE
 *Hello I'm Yeee!*
 I'm here to improve the feedback loop between you and your PR statuses.
@@ -259,8 +259,7 @@ MESSAGE;
     {
         $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
-        $result = $payload['team'];
 
-        return $result;
+        return $payload['team'];
     }
 }

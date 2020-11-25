@@ -89,9 +89,6 @@
             "src/Repository/.gitignore"
         ]
     },
-    "doctrine/doctrine-cache-bundle": {
-        "version": "1.4.0"
-    },
     "doctrine/doctrine-migrations-bundle": {
         "version": "2.2",
         "recipe": {
@@ -123,8 +120,8 @@
     "doctrine/persistence": {
         "version": "1.3.8"
     },
-    "doctrine/reflection": {
-        "version": "1.2.2"
+    "doctrine/sql-formatter": {
+        "version": "1.1.1"
     },
     "donatj/mock-webserver": {
         "version": "v2.1.1"
@@ -177,8 +174,8 @@
     "jangregor/phpstan-prophecy": {
         "version": "0.8.1"
     },
-    "jdorn/sql-formatter": {
-        "version": "v1.2.17"
+    "jean85/pretty-package-versions": {
+        "version": "1.5.1"
     },
     "johnkary/phpunit-speedtrap": {
         "version": "v3.2.0"
@@ -198,8 +195,17 @@
     "laravel/framework": {
         "version": "v5.6.40"
     },
+    "laravel/nexmo-notification-channel": {
+        "version": "v1.0.1"
+    },
+    "laravel/slack-notification-channel": {
+        "version": "v1.0.3"
+    },
     "laravel/tinker": {
         "version": "v1.0.10"
+    },
+    "lcobucci/jwt": {
+        "version": "3.4.0"
     },
     "league/flysystem": {
         "version": "1.1.3"
@@ -209,6 +215,12 @@
     },
     "matthiasnoback/convenient-immutability": {
         "version": "v0.2.1"
+    },
+    "migrify/migrify-kernel": {
+        "version": "0.4.2"
+    },
+    "migrify/php-config-printer": {
+        "version": "0.4.2"
     },
     "monolog/monolog": {
         "version": "1.25.5"
@@ -228,11 +240,29 @@
     "nesbot/carbon": {
         "version": "1.26.6"
     },
+    "nette/finder": {
+        "version": "v2.5.2"
+    },
+    "nette/robot-loader": {
+        "version": "v3.3.1"
+    },
+    "nette/utils": {
+        "version": "v3.1.3"
+    },
+    "nexmo/client": {
+        "version": "1.9.1"
+    },
+    "nexmo/client-core": {
+        "version": "1.8.1"
+    },
     "nikic/php-parser": {
         "version": "v4.10.2"
     },
     "ocramius/proxy-manager": {
         "version": "2.10.0"
+    },
+    "ondram/ci-detector": {
+        "version": "3.5.1"
     },
     "opis/closure": {
         "version": "3.6.1"
@@ -246,6 +276,15 @@
     "php-cs-fixer/diff": {
         "version": "v1.3.1"
     },
+    "php-http/guzzle6-adapter": {
+        "version": "v1.1.1"
+    },
+    "php-http/httplug": {
+        "version": "v1.1.0"
+    },
+    "php-http/promise": {
+        "version": "1.1.0"
+    },
     "phpdocumentor/reflection-common": {
         "version": "2.2.0"
     },
@@ -258,8 +297,14 @@
     "phpspec/prophecy": {
         "version": "1.12.1"
     },
+    "phpstan/phpdoc-parser": {
+        "version": "0.4.9"
+    },
     "phpstan/phpstan": {
         "version": "0.12.57"
+    },
+    "phpstan/phpstan-phpunit": {
+        "version": "0.12.16"
     },
     "phpunit/php-code-coverage": {
         "version": "6.1.4"
@@ -295,6 +340,9 @@
     },
     "psr/container": {
         "version": "1.0.0"
+    },
+    "psr/http-factory": {
+        "version": "1.0.1"
     },
     "psr/http-message": {
         "version": "1.0.1"
@@ -334,6 +382,9 @@
     },
     "react/stream": {
         "version": "v1.1.1"
+    },
+    "rector/rector": {
+        "version": "0.8.56"
     },
     "sebastian/code-unit-reverse-lookup": {
         "version": "1.0.1"
@@ -389,6 +440,9 @@
     "symfony/cache": {
         "version": "v4.2.12"
     },
+    "symfony/cache-contracts": {
+        "version": "v2.2.0"
+    },
     "symfony/config": {
         "version": "v4.2.12"
     },
@@ -404,9 +458,6 @@
             "bin/console",
             "config/bootstrap.php"
         ]
-    },
-    "symfony/contracts": {
-        "version": "v1.1.10"
     },
     "symfony/css-selector": {
         "version": "v4.2.12"
@@ -426,8 +477,14 @@
     "symfony/dotenv": {
         "version": "v4.2.12"
     },
+    "symfony/error-handler": {
+        "version": "v4.4.16"
+    },
     "symfony/event-dispatcher": {
         "version": "v4.2.12"
+    },
+    "symfony/event-dispatcher-contracts": {
+        "version": "v1.1.9"
     },
     "symfony/filesystem": {
         "version": "v4.2.12"
@@ -466,6 +523,9 @@
             "src/Kernel.php"
         ]
     },
+    "symfony/http-client-contracts": {
+        "version": "v2.3.1"
+    },
     "symfony/http-foundation": {
         "version": "v4.2.12"
     },
@@ -474,6 +534,9 @@
     },
     "symfony/lock": {
         "version": "v4.2.12"
+    },
+    "symfony/mime": {
+        "version": "v4.4.16"
     },
     "symfony/monolog-bridge": {
         "version": "v4.2.12"
@@ -508,6 +571,12 @@
     "symfony/polyfill-php72": {
         "version": "v1.20.0"
     },
+    "symfony/polyfill-php73": {
+        "version": "v1.20.0"
+    },
+    "symfony/polyfill-php80": {
+        "version": "v1.20.0"
+    },
     "symfony/process": {
         "version": "v4.0.15"
     },
@@ -525,6 +594,9 @@
             "config/routes.yaml"
         ]
     },
+    "symfony/service-contracts": {
+        "version": "v2.2.0"
+    },
     "symfony/stopwatch": {
         "version": "v4.2.12"
     },
@@ -541,6 +613,9 @@
             "translations/.gitignore"
         ]
     },
+    "symfony/translation-contracts": {
+        "version": "v2.3.0"
+    },
     "symfony/var-dumper": {
         "version": "v4.2.12"
     },
@@ -549,6 +624,30 @@
     },
     "symfony/yaml": {
         "version": "v4.2.12"
+    },
+    "symplify/autowire-array-parameter": {
+        "version": "8.3.48"
+    },
+    "symplify/composer-json-manipulator": {
+        "version": "8.3.48"
+    },
+    "symplify/console-color-diff": {
+        "version": "8.3.48"
+    },
+    "symplify/easy-testing": {
+        "version": "8.3.48"
+    },
+    "symplify/package-builder": {
+        "version": "8.3.48"
+    },
+    "symplify/set-config-resolver": {
+        "version": "8.3.48"
+    },
+    "symplify/smart-file-system": {
+        "version": "8.3.48"
+    },
+    "symplify/symplify-kernel": {
+        "version": "8.3.48"
     },
     "thecodingmachine/discovery": {
         "version": "v1.3.0"
@@ -570,6 +669,9 @@
     },
     "webmozart/assert": {
         "version": "1.9.1"
+    },
+    "zendframework/zend-diactoros": {
+        "version": "2.2.1"
     },
     "zendframework/zend-escaper": {
         "version": "2.6.1"

@@ -17,8 +17,7 @@ class ConnectionFactory
     {
         $config = new Configuration();
         $connectionParams = ['url' => $databaseUrl];
-        $sqlConnection = DriverManager::getConnection($connectionParams, $config);
 
-        return $sqlConnection;
+        return DriverManager::getConnection($connectionParams, $config);
     }
 }

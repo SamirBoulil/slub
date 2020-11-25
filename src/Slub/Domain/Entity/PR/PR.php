@@ -170,21 +170,15 @@ class PR
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(
-            static function (string $messageId) {
-                return MessageIdentifier::fromString($messageId);
-            },
+            static fn (string $messageId) => MessageIdentifier::fromString($messageId),
             $normalizedPR[self::MESSAGE_IDS]
         );
         $channelIdentifiers = array_map(
-            static function (string $channelIdentifier) {
-                return ChannelIdentifier::fromString($channelIdentifier);
-            },
+            static fn (string $channelIdentifier) => ChannelIdentifier::fromString($channelIdentifier),
             $normalizedPR[self::CHANNEL_IDS]
         );
         $workspaceIdentifiers = array_map(
-            static function (string $workspaceIdentifier) {
-                return WorkspaceIdentifier::fromString($workspaceIdentifier);
-            },
+            static fn (string $workspaceIdentifier) => WorkspaceIdentifier::fromString($workspaceIdentifier),
             $normalizedPR[self::WORKSPACE_IDS]
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
@@ -219,21 +213,15 @@ class PR
             self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
             self::CHANNEL_IDS => array_map(
-                static function (ChannelIdentifier $channelIdentifier) {
-                    return $channelIdentifier->stringValue();
-                },
+                static fn (ChannelIdentifier $channelIdentifier) => $channelIdentifier->stringValue(),
                 $this->channelIdentifiers
             ),
             self::WORKSPACE_IDS => array_map(
-                static function (WorkspaceIdentifier $workspaceIdentifier) {
-                    return $workspaceIdentifier->stringValue();
-                },
+                static fn (WorkspaceIdentifier $workspaceIdentifier) => $workspaceIdentifier->stringValue(),
                 $this->workspaceIdentifiers
             ),
             self::MESSAGE_IDS => array_map(
-                function (MessageIdentifier $messageIdentifier) {
-                    return $messageIdentifier->stringValue();
-                },
+                fn (MessageIdentifier $messageIdentifier) => $messageIdentifier->stringValue(),
                 $this->messageIdentifiers
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
@@ -401,9 +389,7 @@ class PR
         return in_array(
             $newMessageIdentifier->stringValue(),
             array_map(
-                function (MessageIdentifier $messageIdentifier) {
-                    return $messageIdentifier->stringValue();
-                },
+                fn (MessageIdentifier $messageIdentifier) => $messageIdentifier->stringValue(),
                 $this->messageIdentifiers
             ),
             true
@@ -415,9 +401,7 @@ class PR
         return in_array(
             $newChannelIdentifier->stringValue(),
             array_map(
-                function (ChannelIdentifier $channelIdentifier) {
-                    return $channelIdentifier->stringValue();
-                },
+                fn (ChannelIdentifier $channelIdentifier) => $channelIdentifier->stringValue(),
                 $this->channelIdentifiers
             ),
             true

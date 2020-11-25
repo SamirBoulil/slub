@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\DBALException;
-
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Entity\PR\PR;
@@ -152,7 +151,7 @@ SQL;
     private function dispatchEvents(PR $PR): void
     {
         foreach ($PR->getEvents() as $event) {
-            $this->eventDispatcher->dispatch(get_class($event), $event);
+            $this->eventDispatcher->dispatch($event);
         }
     }
 

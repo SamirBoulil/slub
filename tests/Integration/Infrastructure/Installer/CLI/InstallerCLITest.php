@@ -54,7 +54,7 @@ class InstallerCLITest extends KernelTestCase
         $output = $this->installSlub();
         $this->assertTableExists();
         self::assertTrue($this->existsDatabase());
-        self::assertContains('Slub installed', $output);
+        self::assertStringContainsString('Slub installed', $output);
     }
 
     /**
@@ -65,7 +65,7 @@ class InstallerCLITest extends KernelTestCase
         $this->assertTableExists();
         $this->addOnePr();
         $output = $this->installSlub();
-        $this->assertContains('Slub installed', $output);
+        $this->assertStringContainsString('Slub installed', $output);
         $this->assertHasPR();
     }
 

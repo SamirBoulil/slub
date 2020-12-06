@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\UI\CLI;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Infrastructure\UI\CLI\PurgeDeliveredEventsCLI;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -40,8 +41,8 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
         $this->commandTester->execute(['command' => self::COMMAND_NAME]);
 
         self::assertEquals(0, $this->countDeliveredEvents());
-        $this->assertContains('Starting to purge the delivered events from the database', $this->commandTester->getDisplay());
-        $this->assertContains('✅ Purge of 10 delivered events done', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting to purge the delivered events from the database', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('✅ Purge of 10 delivered events done', $this->commandTester->getDisplay());
     }
 
     private function setUpCommand(): void

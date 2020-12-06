@@ -79,7 +79,7 @@ class CIStatusUpdatedTest extends WebTestCase
 
     private function callAPI(string $data): KernelBrowser
     {
-        $client = static::createClient();
+        $client = self::getClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $data, $this->get('GITHUB_WEBHOOK_SECRET')));
         $client->request(
             'POST',

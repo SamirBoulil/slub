@@ -115,7 +115,7 @@ class NewReviewTest extends WebTestCase
 
     private function CallAPI(string $review): KernelBrowser
     {
-        $client = static::createClient();
+        $client = self::getClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $review, $this->get('GITHUB_WEBHOOK_SECRET')));
         $client->request(
             'POST',

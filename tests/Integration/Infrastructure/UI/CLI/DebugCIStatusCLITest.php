@@ -46,7 +46,7 @@ class DebugCIStatusCLITest extends KernelTestCase
         $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER))->willReturn($prInfo);
         $this->commandTester->execute(['command' => self::COMMAND_NAME, 'pull_request_link' => 'https://github.com/samirboulil/slub/pull/123']);
 
-        $this->assertContains($ciStatus, $this->commandTester->getDisplay());
+        $this->assertStringContainsString($ciStatus, $this->commandTester->getDisplay());
     }
 
     private function setUpCommand(): void

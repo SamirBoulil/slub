@@ -74,7 +74,7 @@ class ListPRsActionTest extends WebTestCase
             )
         );
 
-        $client = static::createClient();
+        $client = self::getClient();
         $client->request('GET', '/');
         $response = $client->getResponse();
 

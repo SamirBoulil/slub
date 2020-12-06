@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -16,7 +17,6 @@ class WebTestCase extends SymfonyWebTestCase
     public function setUp(): void
     {
         self::bootKernel();
-
         parent::setUp();
 
         $this->resetDatabase();
@@ -34,6 +34,12 @@ class WebTestCase extends SymfonyWebTestCase
         } catch (ServiceNotFoundException $e) {
             return self::$kernel->getContainer()->getParameter($serviceOrParameterId);
         }
+    }
+    protected static function getClient(): KernelBrowser
+    {
+        self::ensureKernelShutdown();
+
+        return self::createClient();
     }
 
     private function resetDatabase(): void

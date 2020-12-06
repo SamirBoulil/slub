@@ -319,7 +319,7 @@
         "version": "2.1.2"
     },
     "phpunit/php-token-stream": {
-        "version": "3.1.1"
+        "version": "4.0.4"
     },
     "phpunit/phpunit": {
         "version": "4.7",
@@ -415,6 +415,9 @@
     },
     "sebastian/resource-operations": {
         "version": "2.0.1"
+    },
+    "sebastian/type": {
+        "version": "2.3.1"
     },
     "sebastian/version": {
         "version": "2.0.1"
@@ -558,6 +561,21 @@
     },
     "symfony/options-resolver": {
         "version": "v4.2.12"
+    },
+    "symfony/phpunit-bridge": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "6d0e35f749d5f4bfe1f011762875275cd3f9874f"
+        },
+        "files": [
+            ".env.test",
+            "bin/phpunit",
+            "phpunit.xml.dist",
+            "tests/bootstrap.php"
+        ]
     },
     "symfony/polyfill-intl-idn": {
         "version": "v1.20.0"

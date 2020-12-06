@@ -30,9 +30,7 @@ class SlubBot
 
     private UnpublishPRHandler $unpublishPRHandler;
 
-    private GetChannelInformationInterface $getPublicChannelInformation;
-
-    private GetChannelInformationInterface $getPrivateChannelInformation;
+    private GetChannelInformationInterface $getChannelInformation;
 
     private LoggerInterface $logger;
 
@@ -50,8 +48,7 @@ class SlubBot
         PutPRToReviewHandler $putPRToReviewHandler,
         UnpublishPRHandler $unpublishPRHandler,
         ChatClient $chatClient,
-        GetChannelInformationInterface $getPublicChannelInformation,
-        GetChannelInformationInterface $getPrivateChannelInformation,
+        GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
         LoggerInterface $logger,
         string $slackToken,
@@ -59,8 +56,7 @@ class SlubBot
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->unpublishPRHandler = $unpublishPRHandler;
-        $this->getPublicChannelInformation = $getPublicChannelInformation;
-        $this->getPrivateChannelInformation = $getPrivateChannelInformation;
+        $this->getChannelInformation = $getChannelInformation;
         $this->getPRInfo = $getPRInfo;
         $this->logger = $logger;
         $this->botUserId = $botUserId;
@@ -177,15 +173,8 @@ class SlubBot
         $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
         $channel = $payload['channel'];
-        $channelType = $payload['channel_type'];
 
-        if ($this->isPublicChannel($channelType)) {
-            $channelInformation = $this->getPublicChannelInformation->fetch($channel);
-        } else {
-            $channelInformation = $this->getPrivateChannelInformation->fetch($channel);
-        }
-
-        return $channelInformation->channelName;
+        return $this->getChannelInformation->fetch($channel)->channelName;
     }
 
     private function getMessageIdentifier(BotMan $bot): string
@@ -194,11 +183,6 @@ class SlubBot
         $ts = $bot->getMessage()->getPayload()['ts'];
 
         return MessageIdentifierHelper::from($channel, $ts);
-    }
-
-    private function isPublicChannel(string $channelType): bool
-    {
-        return 'channel' === $channelType;
     }
 
     private function PRInfo(string $PRNumber, string $repositoryIdentifier): PRInfo

@@ -42,7 +42,7 @@ class GetPublicChannelInformationTest extends TestCase
 
         $generatedRequest = $this->mock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/api/channels.info', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('/api/conversations.info', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             'token=xobxob-slack-token&channel=1231461',
             $this->getBodyContent($generatedRequest)

@@ -179,7 +179,6 @@ class SlubBot
         $channel = $payload['channel'];
         $channelType = $payload['channel_type'];
 
-        // Extract into one class GetChannelInformation no ?
         if ($this->isPublicChannel($channelType)) {
             $channelInformation = $this->getPublicChannelInformation->fetch($channel);
         } else {

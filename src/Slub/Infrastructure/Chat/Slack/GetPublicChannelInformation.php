@@ -25,7 +25,7 @@ class GetPublicChannelInformation implements GetChannelInformationInterface
     public function fetch(string $channelIdentifier): ChannelInformation
     {
         $response = $this->client->post(
-            'https://slack.com/api/channels.info',
+            'https://slack.com/api/conversations.info',
             [
                 'form_params' => [
                     'token' => $this->slackToken,

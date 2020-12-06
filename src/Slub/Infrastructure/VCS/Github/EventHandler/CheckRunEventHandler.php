@@ -9,6 +9,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Webmozart\Assert\Assert;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -49,11 +50,14 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
+        $pullRequests = $CIStatusUpdate['check_run']['check_suite']['pull_requests'];
+        Assert::notEmpty($pullRequests, 'Expected to have at least one pull request, didn\'t find any.');
+
         return PRIdentifier::fromString(
             sprintf(
                 '%s/%s',
                 $CIStatusUpdate['repository']['full_name'],
-                $CIStatusUpdate['check_run']['check_suite']['pull_requests'][0]['number']
+                $pullRequests[0]['number']
             )
         );
     }

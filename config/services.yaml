@@ -138,8 +138,7 @@ services:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.application.unpublish_pr.unpublish_pr_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
-            - '@slub.infrastructure.query.get_public_channel_information'
-            - '@slub.infrastructure.query.get_private_channel_information'
+            - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@logger'
             - '%env(SLACK_TOKEN)%'
@@ -150,14 +149,8 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
-    slub.infrastructure.query.get_public_channel_information:
-        class: Slub\Infrastructure\Chat\Slack\GetPublicChannelInformation
-        arguments:
-            - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
-
-    slub.infrastructure.query.get_private_channel_information:
-        class: Slub\Infrastructure\Chat\Slack\GetPrivateChannelInformation
+    slub.infrastructure.query.get_channel_information:
+        class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'

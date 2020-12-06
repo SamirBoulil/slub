@@ -10,7 +10,7 @@ use Slub\Domain\Query\ChannelInformation;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class GetPublicChannelInformation implements GetChannelInformationInterface
+class GetChannelInformation implements GetChannelInformationInterface
 {
     private ClientInterface $client;
 

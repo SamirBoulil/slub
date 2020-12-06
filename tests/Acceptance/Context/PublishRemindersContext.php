@@ -49,7 +49,7 @@ class PublishRemindersContext extends FeatureContext
     /**
      * @Given /^some PRs in review and some PRs merged in multiple channels$/
      */
-    public function somePRsInReviewAndSomePRsMergedInMultipleChannels()
+    public function somePRsInReviewAndSomePRsMergedInMultipleChannels(): void
     {
         $this->createMergedPR(self::SQUAD_RACCOONS);
         $this->createClosedPRNotMerged(self::SQUAD_RACCOONS);
@@ -63,7 +63,7 @@ class PublishRemindersContext extends FeatureContext
     /**
      * @When /^the system publishes a reminder$/
      */
-    public function anAuthorPublishesAReminder()
+    public function anAuthorPublishesAReminder(): void
     {
         $this->publishRemindersHandler->handle();
     }
@@ -71,7 +71,7 @@ class PublishRemindersContext extends FeatureContext
     /**
      * @Given /^the reminders should only contain a reference to the PRs in review$/
      */
-    public function theRemindersShouldOnlyContainAReferenceToThePRsInReview()
+    public function theRemindersShouldOnlyContainAReferenceToThePRsInReview(): void
     {
         $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
@@ -94,7 +94,7 @@ CHAT
      * @Given /^a PR in review not GTMed$/
      * @Given /^a PR not GTMed published in a supported channel$/
      */
-    public function aPRInReviewHavingNoGTMs()
+    public function aPRInReviewHavingNoGTMs(): void
     {
         $this->createInReviewPR(self::PR_1, self::SQUAD_RACCOONS, 0, 0);
     }
@@ -102,7 +102,7 @@ CHAT
     /**
      * @Given /^a PR in review having (\d+) GTMs$/
      */
-    public function aPRInReviewHavingGTMs(int $numberOfGTMs)
+    public function aPRInReviewHavingGTMs(int $numberOfGTMs): void
     {
         $this->createInReviewPR(self::PR_2, self::SQUAD_RACCOONS, $numberOfGTMs, 0);
     }
@@ -110,7 +110,7 @@ CHAT
     /**
      * @Given /^a PR merged$/
      */
-    public function aPRMerged()
+    public function aPRMerged(): void
     {
         $this->createMergedPR(self::SQUAD_RACCOONS);
     }
@@ -133,7 +133,7 @@ CHAT
     /**
      * @Given /^a PR not GTMed published in a unsupported channel$/
      */
-    public function aPRNotGTMedPublishedInAUnsupportedChannel()
+    public function aPRNotGTMedPublishedInAUnsupportedChannel(): void
     {
         $this->createInReviewPR('samirboulil/slub/5', self::UNSUPPORTED_CHANNEL, 0, 0);
     }
@@ -197,7 +197,7 @@ CHAT
     /**
      * @Given /^a PR closed$/
      */
-    public function aPRClosed()
+    public function aPRClosed(): void
     {
         $PR = PR::create(
             PRIdentifier::create(Uuid::uuid4()->toString()),
@@ -214,7 +214,7 @@ CHAT
     /**
      * @Given /^we are on a week\-end$/
      */
-    public function weAreOnAWeekEnd()
+    public function weAreOnAWeekEnd(): void
     {
         $this->clock->YesWeAReOneWeekEnd();
     }
@@ -222,7 +222,7 @@ CHAT
     /**
      * @Then /^the reminder should be empty$/
      */
-    public function theReminderShouldBeEmpty()
+    public function theReminderShouldBeEmpty(): void
     {
         $this->chatClientSpy->assertEmpty();
     }

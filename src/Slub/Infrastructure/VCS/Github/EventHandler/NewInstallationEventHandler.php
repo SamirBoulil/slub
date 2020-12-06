@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use GuzzleHttp\Client;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
@@ -17,11 +16,9 @@ class NewInstallationEventHandler implements EventHandlerInterface
     private const EVENT_TYPE = 'installation';
     private const INSTALLATION_TYPE = 'created';
 
-    /** @var SqlAppInstallationRepository */
-    private $sqlAppInstallationRepository;
+    private SqlAppInstallationRepository $sqlAppInstallationRepository;
 
-    /** @var RefreshAccessToken */
-    private $refreshAccessToken;
+    private RefreshAccessToken $refreshAccessToken;
 
     public function __construct(SqlAppInstallationRepository $sqlAppInstallationRepository, RefreshAccessToken $refreshAccessToken)
     {

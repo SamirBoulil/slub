@@ -9,12 +9,10 @@ use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class InMemoryGetChannelInformation implements GetChannelInformationInterface
 {
-    /** @var array */
-    private $supportedChannels;
+    private array $supportedChannels;
 
     public function __construct(string $commaSeparatedChannels)
     {

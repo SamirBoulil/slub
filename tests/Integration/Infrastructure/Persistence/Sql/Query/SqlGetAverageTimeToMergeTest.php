@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Query;
 
-use Doctrine\DBAL\Connection;
 use Ramsey\Uuid\Uuid;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
@@ -33,7 +32,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_returns_null_if_there_is_no_pr()
+    public function it_returns_null_if_there_is_no_pr(): void
     {
         self::assertNull($this->getAverageTimeToMerge->fetch());
     }
@@ -41,7 +40,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_returns_the_average_time_to_merge()
+    public function it_returns_the_average_time_to_merge(): void
     {
         $this->addPRMergedInDay(2);
         $this->addPRMergedInDay(4);
@@ -52,7 +51,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_does_not_take_into_account_prs_created_prior_to_migration_Version20190609163730()
+    public function it_does_not_take_into_account_prs_created_prior_to_migration_Version20190609163730(): void
     {
         $this->createPRPriorToMigrationVersion20190609163730();
         self::assertNull($this->getAverageTimeToMerge->fetch());
@@ -61,7 +60,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_does_not_take_into_account_prs_not_merged()
+    public function it_does_not_take_into_account_prs_not_merged(): void
     {
         $this->createPRNotMerged();
         self::assertNull($this->getAverageTimeToMerge->fetch());

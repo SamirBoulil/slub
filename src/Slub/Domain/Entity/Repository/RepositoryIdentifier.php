@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class RepositoryIdentifier
 {
-    /** @var string */
-    private $repositoryIdentifier;
+    private string $repositoryIdentifier;
 
     private function __construct(string $repositoryIdentifier)
     {

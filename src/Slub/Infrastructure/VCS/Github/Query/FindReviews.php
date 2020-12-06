@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query;
 
-use GuzzleHttp\Client;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 
@@ -23,8 +22,7 @@ class FindReviews
     private const REFUSED = 'REFUSED';
     private const COMMENTED = 'COMMENTED';
 
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function __construct(GithubAPIClient $githubAPIClient)
     {
@@ -48,11 +46,15 @@ class FindReviews
         $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
         $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
 
-        // TODO: Check status code
-
         $content = json_decode($response->getBody()->getContents(), true);
         if (null === $content) {
-            throw new \RuntimeException(sprintf('There was a problem when fetching the reviews for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
+            throw new \RuntimeException(
+                sprintf(
+                    'There was a problem when fetching the reviews for PR "%s" at %s',
+                    $PRIdentifier->stringValue(),
+                    $url
+                )
+            );
         }
 
         return $content;
@@ -61,9 +63,8 @@ class FindReviews
     private function getUrl(PRIdentifier $PRIdentifier): string
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $url = sprintf('https://api.github.com/repos/%s/%s/pulls/%s/reviews', ...$matches);
 
-        return $url;
+        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s/reviews', ...$matches);
     }
 
     private function count(array $reviews, string $status): int
@@ -71,9 +72,7 @@ class FindReviews
         return count(
             array_filter(
                 $reviews,
-                function (array $review) use ($status) {
-                    return $review['state'] === $status;
-                }
+                fn (array $review) => $review['state'] === $status
             )
         );
     }

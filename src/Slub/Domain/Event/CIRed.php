@@ -13,11 +13,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CIRed extends Event
 {
-    /** @var PRIdentifier */
-    private $PRIdentifier;
+    private PRIdentifier $PRIdentifier;
 
-    /** @var BuildLink */
-    private $buildLink;
+    private BuildLink $buildLink;
 
     private function __construct(PRIdentifier $PRIdentifier, BuildLink $buildLink)
     {

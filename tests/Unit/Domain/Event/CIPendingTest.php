@@ -6,7 +6,6 @@ namespace Tests\Unit\Domain\Event;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Event\CIGreen;
 use Slub\Domain\Event\CIPending;
 
 /**
@@ -17,7 +16,7 @@ class CIPendingTest extends TestCase
     /**
      * @test
      */
-    public function it_is_created_with_a_pr_identifier_and_returns_it()
+    public function it_is_created_with_a_pr_identifier_and_returns_it(): void
     {
         $expectedIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $event = CIPending::forPR($expectedIdentifier);

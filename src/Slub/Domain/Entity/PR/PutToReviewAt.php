@@ -9,8 +9,7 @@ namespace Slub\Domain\Entity\PR;
  */
 class PutToReviewAt
 {
-    /** @var \DateTime */
-    private $putToReviewAt;
+    private \DateTime $putToReviewAt;
 
     public function __construct(\DateTime $putToReviewAt)
     {

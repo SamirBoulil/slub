@@ -14,8 +14,7 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class InMemoryGetPRInfo implements GetPRInfoInterface
 {
-    /** @var PRInfo */
-    private $PRInfo;
+    private PRInfo $PRInfo;
 
     public function __construct()
     {
@@ -27,6 +26,7 @@ class InMemoryGetPRInfo implements GetPRInfoInterface
         $this->PRInfo->GTMCount = 0;
         $this->PRInfo->notGTMCount = 0;
         $this->PRInfo->isMerged = false;
+        $this->PRInfo->isClosed = false;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): PRInfo

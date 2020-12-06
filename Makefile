@@ -23,6 +23,10 @@ check:
 # 	vendor/bin/phpstan analyse --level max src tests
 	vendor/bin/php-cs-fixer fix --diff --dry-run --config=.php_cs.php --using-cache=no
 
+.PHONY: fixcs
+fixcs:
+	vendor/bin/php-cs-fixer fix --diff --config=.php_cs.php --using-cache=no
+
 .PHONY: tunnel
 tunnel:
 	ngrok http slub.test:80

@@ -12,7 +12,7 @@ class MessageIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_an_message_id()
+    public function it_creates_an_message_id(): void
     {
         $identifier = MessageIdentifier::create('1');
         $this->assertEquals('1', $identifier->stringValue());
@@ -21,7 +21,7 @@ class MessageIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_message_id_from_string()
+    public function it_creates_a_message_id_from_string(): void
     {
         $identifier = MessageIdentifier::fromString('1');
         $this->assertEquals('1', $identifier->stringValue());
@@ -30,7 +30,7 @@ class MessageIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_message_id_from_its_string_value()
+    public function it_creates_a_message_id_from_its_string_value(): void
     {
         $identifier = MessageIdentifier::fromString('1');
         $this->assertEquals('1', $identifier->stringValue());
@@ -39,7 +39,7 @@ class MessageIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_tells_if_it_is_equal_to_another_message_id()
+    public function it_tells_if_it_is_equal_to_another_message_id(): void
     {
         $identifier = MessageIdentifier::fromString('1');
         $anotherIdentifier = MessageIdentifier::fromString('19');
@@ -50,7 +50,7 @@ class MessageIdentifierTest extends TestCase
     /**
      * @test
      */
-    public function it_cannot_be_created_out_of_an_empty_string()
+    public function it_cannot_be_created_out_of_an_empty_string(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         MessageIdentifier::fromString('');

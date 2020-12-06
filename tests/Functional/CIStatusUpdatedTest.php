@@ -16,7 +16,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Tests\WebTestCase;
 
 /**
@@ -41,7 +41,7 @@ class CIStatusUpdatedTest extends WebTestCase
         $this->githubServer->start();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->githubServer->stop();
     }
@@ -49,7 +49,7 @@ class CIStatusUpdatedTest extends WebTestCase
     /**
      * @test
      */
-    public function it_listens_to_green_ci_for_supported_statuses()
+    public function it_listens_to_green_ci_for_supported_statuses(): void
     {
         $this->Given_a_PR_is_to_review();
         $this->When_a_PR_status_is_green();
@@ -71,15 +71,15 @@ class CIStatusUpdatedTest extends WebTestCase
         $this->githubServer->setResponseOfPath('/repos/', new Response('yolo'));
     }
 
-    private function Then_the_PR_should_be_green()
+    private function Then_the_PR_should_be_green(): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER));
         $this->assertEquals('GREEN', $PR->normalize()['CI_STATUS']['BUILD_RESULT']);
     }
 
-    private function callAPI(string $data): Client
+    private function callAPI(string $data): KernelBrowser
     {
-        $client = static::createClient();
+        $client = self::getClient();
         $signature = sprintf('sha1=%s', hash_hmac('sha1', $data, $this->get('GITHUB_WEBHOOK_SECRET')));
         $client->request(
             'POST',
@@ -124,7 +124,7 @@ class CIStatusUpdatedTest extends WebTestCase
 
     private function supportedGreenCI(): string
     {
-        $json = <<<JSON
+        return <<<JSON
 {
   "sha": "commit-ref",
   "name": "travis",
@@ -135,7 +135,5 @@ class CIStatusUpdatedTest extends WebTestCase
   }
 }
 JSON;
-
-        return $json;
     }
 }

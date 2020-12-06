@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SqlHasEventAlreadyBeenDelivered
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
     public function __construct(Connection $sqlConnection)
     {
@@ -30,8 +29,7 @@ class SqlHasEventAlreadyBeenDelivered
 SQL;
 
         $statement = $this->sqlConnection->executeQuery($sql, ['deliveredEventIdentifier' => $deliveredEventIdentifier]);
-        $existsDeliveredEvent = (bool) $statement->fetch(\PDO::FETCH_COLUMN);
 
-        return $existsDeliveredEvent;
+        return (bool) $statement->fetch(\PDO::FETCH_COLUMN);
     }
 }

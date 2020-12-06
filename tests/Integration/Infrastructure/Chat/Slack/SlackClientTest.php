@@ -189,9 +189,8 @@ class SlackClientTest extends KernelTestCase
     {
         $this->httpClientMock = new MockHandler([]);
         $handler = HandlerStack::create($this->httpClientMock);
-        $client = new Client(['handler' => $handler]);
 
-        return $client;
+        return new Client(['handler' => $handler]);
     }
 
     private function getBodyContent($generatedRequest): array

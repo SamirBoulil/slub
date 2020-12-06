@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
-use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -17,17 +16,13 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class PublishRemindersHandler
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var ChatClient */
-    private $chatClient;
+    private ChatClient $chatClient;
 
-    /** @var ClockInterface */
-    private $clock;
+    private ClockInterface $clock;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
@@ -83,34 +78,24 @@ class PublishRemindersHandler
     {
         return array_filter(
             $PRsInReview,
-            function (PR $PR) use ($expectedChannelIdentifier) {
-                return array_filter(
-                    $PR->channelIdentifiers(),
-                    function (ChannelIdentifier $actualChannelIdentifier) use ($expectedChannelIdentifier) {
-                        return $expectedChannelIdentifier->equals($actualChannelIdentifier);
-                    }
-                );
-            }
+            fn (PR $PR) => array_filter(
+                $PR->channelIdentifiers(),
+                fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
+            )
         );
     }
 
     private function formatReminders(array $prs): string
     {
-        usort($prs, function (PR $pr1, PR $pr2) {
-            return $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview();
-        });
+        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview());
 
-        $PRReminders = array_map(function (PR $PR) {
-            return $this->formatReminder($PR);
-        }, $prs);
+        $PRReminders = array_map(fn (PR $PR) => $this->formatReminder($PR), $prs);
         $reminder = <<<CHAT
 Yop, these PRs need reviews!
 %s
 CHAT;
 
-        $result = sprintf($reminder, implode("\n", $PRReminders));
-
-        return $result;
+        return sprintf($reminder, implode("\n", $PRReminders));
     }
 
     private function formatReminder(PR $PR): string

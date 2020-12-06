@@ -37,46 +37,36 @@ class PR
     private const CLOSED_AT = 'CLOSED_AT';
 
     /** @var Event[] */
-    private $events = [];
+    private array $events = [];
 
-    /** @var PRIdentifier */
-    private $PRIdentifier;
+    private PRIdentifier $PRIdentifier;
 
     /** @var ChannelIdentifier[] */
-    private $channelIdentifiers;
+    private array $channelIdentifiers;
 
     /** @var WorkspaceIdentifier[] */
-    private $workspaceIdentifiers;
+    private array $workspaceIdentifiers;
 
     /** @var MessageIdentifier[] */
-    private $messageIdentifiers;
+    private array $messageIdentifiers;
 
-    /** @var AuthorIdentifier */
-    private $authorIdentifier;
+    private AuthorIdentifier $authorIdentifier;
 
-    /** @var Title */
-    private $title;
+    private Title $title;
 
-    /** @var int */
-    private $GTMCount;
+    private int $GTMCount;
 
-    /** @var int */
-    private $comments;
+    private int $comments;
 
-    /** @var int */
-    private $notGTMCount;
+    private int $notGTMCount;
 
-    /** @var CIStatus */
-    private $CIStatus;
+    private CIStatus $CIStatus;
 
-    /** @var bool */
-    private $isMerged;
+    private bool $isMerged;
 
-    /** @var PutToReviewAt */
-    private $putToReviewAt;
+    private PutToReviewAt $putToReviewAt;
 
-    /** @var ClosedAt */
-    private $closedAt;
+    private ClosedAt $closedAt;
 
     private function __construct(
         PRIdentifier $PRIdentifier,
@@ -170,21 +160,15 @@ class PR
         $comments = $normalizedPR[self::COMMENTS_KEY];
         $isMerged = $normalizedPR[self::IS_MERGED_KEY];
         $messageIds = array_map(
-            static function (string $messageId) {
-                return MessageIdentifier::fromString($messageId);
-            },
+            static fn (string $messageId) => MessageIdentifier::fromString($messageId),
             $normalizedPR[self::MESSAGE_IDS]
         );
         $channelIdentifiers = array_map(
-            static function (string $channelIdentifier) {
-                return ChannelIdentifier::fromString($channelIdentifier);
-            },
+            static fn (string $channelIdentifier) => ChannelIdentifier::fromString($channelIdentifier),
             $normalizedPR[self::CHANNEL_IDS]
         );
         $workspaceIdentifiers = array_map(
-            static function (string $workspaceIdentifier) {
-                return WorkspaceIdentifier::fromString($workspaceIdentifier);
-            },
+            static fn (string $workspaceIdentifier) => WorkspaceIdentifier::fromString($workspaceIdentifier),
             $normalizedPR[self::WORKSPACE_IDS]
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
@@ -219,21 +203,15 @@ class PR
             self::CI_STATUS_KEY => $this->CIStatus->normalize(),
             self::IS_MERGED_KEY => $this->isMerged,
             self::CHANNEL_IDS => array_map(
-                static function (ChannelIdentifier $channelIdentifier) {
-                    return $channelIdentifier->stringValue();
-                },
+                static fn (ChannelIdentifier $channelIdentifier) => $channelIdentifier->stringValue(),
                 $this->channelIdentifiers
             ),
             self::WORKSPACE_IDS => array_map(
-                static function (WorkspaceIdentifier $workspaceIdentifier) {
-                    return $workspaceIdentifier->stringValue();
-                },
+                static fn (WorkspaceIdentifier $workspaceIdentifier) => $workspaceIdentifier->stringValue(),
                 $this->workspaceIdentifiers
             ),
             self::MESSAGE_IDS => array_map(
-                function (MessageIdentifier $messageIdentifier) {
-                    return $messageIdentifier->stringValue();
-                },
+                fn (MessageIdentifier $messageIdentifier) => $messageIdentifier->stringValue(),
                 $this->messageIdentifiers
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
@@ -401,9 +379,7 @@ class PR
         return in_array(
             $newMessageIdentifier->stringValue(),
             array_map(
-                function (MessageIdentifier $messageIdentifier) {
-                    return $messageIdentifier->stringValue();
-                },
+                fn (MessageIdentifier $messageIdentifier) => $messageIdentifier->stringValue(),
                 $this->messageIdentifiers
             ),
             true
@@ -415,9 +391,7 @@ class PR
         return in_array(
             $newChannelIdentifier->stringValue(),
             array_map(
-                function (ChannelIdentifier $channelIdentifier) {
-                    return $channelIdentifier->stringValue();
-                },
+                fn (ChannelIdentifier $channelIdentifier) => $channelIdentifier->stringValue(),
                 $this->channelIdentifiers
             ),
             true

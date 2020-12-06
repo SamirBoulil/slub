@@ -14,14 +14,11 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetPRInfo implements GetPRInfoInterface
 {
-    /** @var GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails $getPRDetails;
 
-    /** @var FindReviews */
-    private $findReviews;
+    private FindReviews $findReviews;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
     public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus)
     {
@@ -39,9 +36,8 @@ class GetPRInfo implements GetPRInfoInterface
         $isClosed = $this->isClosed($PRDetails);
         $authorIdentifier = $this->authorIdentifier($PRDetails);
         $title = $this->title($PRDetails);
-        $result = $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
 
-        return $result;
+        return $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
     }
 
     private function getPRCommitRef(array $PRDetails): string

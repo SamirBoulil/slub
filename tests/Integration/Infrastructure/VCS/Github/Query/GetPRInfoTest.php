@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
@@ -20,13 +21,13 @@ class GetPRInfoTest extends TestCase
     /** @var GetPRInfo */
     private $getPRInfo;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GetPRDetails */
+    /** @var ObjectProphecy|GetPRDetails */
     private $getPRDetails;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GetCIStatus */
+    /** @var ObjectProphecy|GetCIStatus */
     private $getCIStatus;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|FindReviews */
+    /** @var ObjectProphecy|FindReviews */
     private $findReviews;
 
     public function setUp(): void

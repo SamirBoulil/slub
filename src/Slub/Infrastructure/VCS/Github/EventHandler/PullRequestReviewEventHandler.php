@@ -6,7 +6,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
@@ -16,8 +15,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     private const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
     const EDITED_ACTION_TYPE = 'edited';
 
-    /** @var NewReviewHandler */
-    private $newReviewHandler;
+    private NewReviewHandler $newReviewHandler;
 
     public function __construct(NewReviewHandler $newReviewHandler)
     {

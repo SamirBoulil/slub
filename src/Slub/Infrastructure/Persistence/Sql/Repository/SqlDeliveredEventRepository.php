@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
 
 /**
  * Repository only used for the infrastructure layer, to make sure we only treat a delivered event once.
@@ -13,8 +13,7 @@ use Doctrine\DBAL\Connection;
  */
 class SqlDeliveredEventRepository
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
     public function __construct(Connection $sqlConnection)
     {

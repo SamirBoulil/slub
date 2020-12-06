@@ -12,8 +12,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CIGreen extends Event
 {
-    /** @var PRIdentifier */
-    private $PRIdentifier;
+    private PRIdentifier $PRIdentifier;
 
     private function __construct(PRIdentifier $PRIdentifier)
     {

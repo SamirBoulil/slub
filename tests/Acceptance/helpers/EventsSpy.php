@@ -100,7 +100,7 @@ class EventsSpy implements EventSubscriberInterface
         return $this->events[CIRed::class] ?? false;
     }
 
-    public function notifyCIPending(CIPending $CIPending)
+    public function notifyCIPending(CIPending $CIPending): void
     {
         $this->events[get_class($CIPending)] = true;
     }

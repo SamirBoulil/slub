@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Slub\Domain\Query\ChannelInformation;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetPublicChannelInformation implements GetChannelInformationInterface
 {
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
-    public function __construct(Client $client, string $slackToken)
+    public function __construct(ClientInterface $client, string $slackToken)
     {
         $this->client = $client;
         $this->slackToken = $slackToken;
@@ -28,7 +25,7 @@ class GetPublicChannelInformation implements GetChannelInformationInterface
     public function fetch(string $channelIdentifier): ChannelInformation
     {
         $response = $this->client->post(
-            'https://slack.com/api/channels.info',
+            'https://slack.com/api/conversations.info',
             [
                 'form_params' => [
                     'token' => $this->slackToken,

@@ -8,19 +8,15 @@ use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class ListPRsAction
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var GetAverageTimeToMergeInterface */
-    private $averageTimeToMerge;
+    private GetAverageTimeToMergeInterface $averageTimeToMerge;
 
     public function __construct(PRRepositoryInterface $PRRepository, GetAverageTimeToMergeInterface $averageTimeToMerge)
     {
@@ -28,7 +24,7 @@ class ListPRsAction
         $this->averageTimeToMerge = $averageTimeToMerge;
     }
 
-    public function executeAction(): Response
+    public function executeAction(): JsonResponse
     {
         $result = $this->allPRs();
         $result['AVERAGE_TIME_TO_MERGE'] = $this->averageTimeToMerge->fetch();
@@ -39,9 +35,7 @@ class ListPRsAction
     private function allPRs(): array
     {
         return array_map(
-            function (PR $PR) {
-                return $PR->normalize();
-            },
+            fn (PR $PR) => $PR->normalize(),
             $this->PRRepository->all()
         );
     }

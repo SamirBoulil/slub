@@ -13,9 +13,7 @@ class ChannelInformation
 {
     use Immutable;
 
-    /** @var string */
-    public $channelIdentifier;
+    public string $channelIdentifier;
 
-    /** @var string */
-    public $channelName;
+    public string $channelName;
 }

@@ -6,6 +6,7 @@ namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
@@ -22,7 +23,7 @@ class GetPRDetailsTest extends WebTestCase
     /** @var GetPRDetails */
     private $getPRDetails;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    /** @var ObjectProphecy|GithubAPIClient */
     private $githubAPIClient;
 
     public function setUp(): void

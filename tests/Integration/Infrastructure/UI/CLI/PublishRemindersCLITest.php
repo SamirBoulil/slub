@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\UI\CLI;
 
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Infrastructure\UI\CLI\PublishRemindersCLI;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -17,7 +18,7 @@ class PublishRemindersCLITest extends KernelTestCase
 {
     private const COMMAND_NAME = 'slub:send-reminders';
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy */
+    /** @var ObjectProphecy */
     private $publishRemindersHandlerMock;
 
     /** @var CommandTester */
@@ -33,11 +34,11 @@ class PublishRemindersCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_executes()
+    public function it_executes(): void
     {
         $this->publishRemindersHandlerMock->handle()->shouldBeCalled();
         $this->commandTester->execute(['command' => self::COMMAND_NAME]);
-        $this->assertContains('Reminders published!', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Reminders published!', $this->commandTester->getDisplay());
     }
 
     private function setUpCommand(): void

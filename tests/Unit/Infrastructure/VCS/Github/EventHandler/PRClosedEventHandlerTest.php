@@ -38,7 +38,7 @@ class PRClosedEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_only_listens_to_check_run_events()
+    public function it_only_listens_to_check_run_events(): void
     {
         self::assertTrue($this->PRCloseEventHandler->supports('pull_request'));
         self::assertFalse($this->PRCloseEventHandler->supports('unsupported_event'));
@@ -47,7 +47,7 @@ class PRClosedEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_listens_to_close_PR_that_are_merged()
+    public function it_listens_to_close_PR_that_are_merged(): void
     {
         $closePREvent = [
             'pull_request' => [
@@ -59,22 +59,19 @@ class PRClosedEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                function (ClosePR $mergedPR) {
-                    return self::PR_IDENTIFIER === $mergedPR->PRIdentifier
-                        && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier
-                        && true === $mergedPR->isMerged;
-                }
+                fn (ClosePR $mergedPR) => self::PR_IDENTIFIER === $mergedPR->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier
+                    && $mergedPR->isMerged
             )
         )->shouldBeCalled();
 
         $this->PRCloseEventHandler->handle($closePREvent);
     }
 
-
     /**
      * @test
      */
-    public function it_listens_to_close_PR_that_are_not_merged()
+    public function it_listens_to_close_PR_that_are_not_merged(): void
     {
         $closePREvent = [
             'pull_request' => [
@@ -86,11 +83,9 @@ class PRClosedEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                function (ClosePR $mergedPR) {
-                    return self::PR_IDENTIFIER === $mergedPR->PRIdentifier
-                        && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier
-                        && false === $mergedPR->isMerged;
-                }
+                fn (ClosePR $mergedPR) => self::PR_IDENTIFIER === $mergedPR->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $mergedPR->repositoryIdentifier
+                    && !$mergedPR->isMerged
             )
         )->shouldBeCalled();
 
@@ -100,7 +95,7 @@ class PRClosedEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_does_nothing_if_the_pr_is_not_merged()
+    public function it_does_nothing_if_the_pr_is_not_merged(): void
     {
         $unsupportedEvent = ['dummy_event'];
 

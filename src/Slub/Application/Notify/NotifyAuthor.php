@@ -14,7 +14,6 @@ use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Query\GetMessageIdsForPR;
-use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -32,14 +31,11 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
 
-    /** @var GetMessageIdsForPR */
-    private $getMessageIdsForPR;
+    private GetMessageIdsForPR $getMessageIdsForPR;
 
-    /** @var ChatClient */
-    private $chatClient;
+    private ChatClient $chatClient;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         GetMessageIdsForPR $getMessageIdsForPR,

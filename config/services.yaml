@@ -155,7 +155,7 @@ services:
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '%env(SLACK_TOKEN)%'
-            -
+
     slub.infrastructure.query.get_private_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetPrivateChannelInformation
         arguments:

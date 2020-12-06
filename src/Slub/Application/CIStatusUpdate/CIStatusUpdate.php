@@ -13,15 +13,11 @@ class CIStatusUpdate
 {
     use Immutable;
 
-    /** @var string */
-    public $repositoryIdentifier;
+    public string $repositoryIdentifier;
 
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var string */
-    public $status;
+    public string $status;
 
-    /** @var string|null */
-    public $buildLink;
+    public ?string $buildLink = null;
 }

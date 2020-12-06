@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\UI\CLI;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
+
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,8 +15,7 @@ class PurgeDeliveredEventsCLI extends Command
 {
     protected static $defaultName = 'slub:maintenance:purge-delivered-events';
 
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $sqlConnection)
     {
@@ -23,14 +23,13 @@ class PurgeDeliveredEventsCLI extends Command
         $this->connection = $sqlConnection;
     }
 
-
     protected function configure(): void
     {
         $this->setDescription('Maintenance of operation consisting in purging the delivered events from the databases to keep its size minimal')
             ->setHidden(false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Starting to purge the delivered events from the database</info>');
 
@@ -40,7 +39,7 @@ class PurgeDeliveredEventsCLI extends Command
         $output->writeln('');
         $output->writeln(sprintf('<info>✅ Purge of %d delivered events done</info>', $numberOfDeliveredEventsToPurge));
 
-        return null;
+        return 0;
     }
 
     private function purgeDeliveredEvents(): void
@@ -54,8 +53,6 @@ class PurgeDeliveredEventsCLI extends Command
             ->executeQuery('SELECT COUNT(*) FROM delivered_event;')
             ->fetch(\PDO::FETCH_COLUMN);
 
-        $count = $this->connection->convertToPHPValue($result, Type::INTEGER);
-
-        return $count;
+        return $this->connection->convertToPHPValue($result, Type::INTEGER);
     }
 }

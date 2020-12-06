@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
@@ -15,28 +15,22 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class SlackClient implements ChatClient
 {
-    /** @var GetBotUserId */
-    private $getBotUserId;
+    private GetBotUserId $getBotUserId;
 
-    /** @var GetBotReactionsForMessageAndUser */
-    private $getBotReactionsForMessageAndUser;
+    private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
 
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var string */
-    private $slackToken;
+    private string $slackToken;
 
-    /** @var string */
-    private $slackBotUserId;  // TODO: remove,  call slack API
+    private string $slackBotUserId;  // TODO: remove,  call slack API
 
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
-        Client $client,
+        ClientInterface $client,
         LoggerInterface $logger,
         string $slackToken,
         string $slackBotUserId

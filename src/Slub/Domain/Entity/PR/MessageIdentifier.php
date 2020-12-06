@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class MessageIdentifier
 {
-    /** @var string */
-    private $messageId;
+    private string $messageId;
 
     private function __construct(string $messageId)
     {

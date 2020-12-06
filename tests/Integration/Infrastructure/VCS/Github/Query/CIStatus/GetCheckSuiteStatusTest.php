@@ -6,6 +6,7 @@ namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckSuiteStatus;
@@ -23,7 +24,7 @@ class GetCheckSuiteStatusTest extends WebTestCase
     /** @var GetCheckSuiteStatus */
     private $getCheckSuiteStatus;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    /** @var ObjectProphecy|GithubAPIClient */
     private $githubAPIClient;
 
     public function setUp(): void
@@ -60,7 +61,7 @@ class GetCheckSuiteStatusTest extends WebTestCase
         self::assertEquals($expectedBuildLink, $actualCheckStatus->buildLink);
     }
 
-    public function checkSuiteExample()
+    public function checkSuiteExample(): array
     {
         return [
             'Check suite is failed' => [

@@ -37,7 +37,7 @@ class UnpublishPRContext extends FeatureContext
     /**
      * @Given /^a PR has been put to review by mistake$/
      */
-    public function aPRHasBeenPutToReviewByMistake()
+    public function aPRHasBeenPutToReviewByMistake(): void
     {
         $this->PRRepository->save(
             PR::create(
@@ -54,7 +54,7 @@ class UnpublishPRContext extends FeatureContext
     /**
      * @When /^an author unpublishes a PR$/
      */
-    public function anAuthorUnpublishesAPR()
+    public function anAuthorUnpublishesAPR(): void
     {
         $unpublishPRCommand = new UnpublishPR();
         $unpublishPRCommand->PRIdentifier = self::PR_IDENTIFIER_MISTAKENLY_TO_REVIEW;
@@ -64,7 +64,7 @@ class UnpublishPRContext extends FeatureContext
     /**
      * @Then /^the PR is is unpublished$/
      */
-    public function thePRIsIsRemoved()
+    public function thePRIsIsRemoved(): void
     {
         $isFound = true;
         try {

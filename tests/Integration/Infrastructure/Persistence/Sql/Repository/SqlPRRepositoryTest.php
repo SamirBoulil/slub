@@ -32,7 +32,7 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_saves_a_pr_and_returns_it()
+    public function it_saves_a_pr_and_returns_it(): void
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
@@ -54,7 +54,7 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_updates_a_pr()
+    public function it_updates_a_pr(): void
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
@@ -87,7 +87,7 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_puts_a_pr_to_review_that_has_been_closed()
+    public function it_puts_a_pr_to_review_that_has_been_closed(): void
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $savedPR = PR::create(
@@ -119,7 +119,7 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_returns_all_PR_ordered_by_is_merged()
+    public function it_returns_all_PR_ordered_by_is_merged(): void
     {
         $this->sqlPRRepository->save(
             PR::fromNormalized(
@@ -236,7 +236,7 @@ class SqlPRRepositoryTest extends KernelTestCase
      *
      * @throws PRNotFoundException
      */
-    public function it_throws_if_it_does_not_find_the_pr()
+    public function it_throws_if_it_does_not_find_the_pr(): void
     {
         $this->expectException(PRNotFoundException::class);
         $this->sqlPRRepository->getBy(PRIdentifier::fromString('unknown/unknown/unknown'));
@@ -247,7 +247,7 @@ class SqlPRRepositoryTest extends KernelTestCase
      *
      * @throws PRNotFoundException
      */
-    public function it_resets_itself()
+    public function it_resets_itself(): void
     {
         $identifier = PRIdentifier::create('akeneo/pim-community-dev/1111');
         $this->sqlPRRepository->save(
@@ -271,7 +271,7 @@ class SqlPRRepositoryTest extends KernelTestCase
      *
      * @throws PRNotFoundException
      */
-    public function it_finds_every__open_prs_not_gtmed_twice()
+    public function it_finds_every__open_prs_not_gtmed_twice(): void
     {
         $PRInReviewNotGTMedIdentifier = 'akeneo/pim-community-dev/1';
         $this->createPRInReview($PRInReviewNotGTMedIdentifier, 0, false);
@@ -290,7 +290,7 @@ class SqlPRRepositoryTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_deletes_a_PR_that_has_been_published()
+    public function it_deletes_a_PR_that_has_been_published(): void
     {
         $PRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev/1');
         $this->createPRInReview($PRIdentifier->stringValue(), 0, false);
@@ -301,7 +301,6 @@ class SqlPRRepositoryTest extends KernelTestCase
     }
 
     /**
-     * @param array $expectedPRs
      * @param PR[]  $actualPRs
      */
     private function assertPRs(array $expectedPRs, array $actualPRs): void

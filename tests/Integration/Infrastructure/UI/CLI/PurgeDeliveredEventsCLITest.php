@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\UI\CLI;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Infrastructure\UI\CLI\PurgeDeliveredEventsCLI;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,15 +34,15 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_purges_the_delivered_events_from_the_database()
+    public function it_purges_the_delivered_events_from_the_database(): void
     {
         $this->assertThereAreSomeDeliveredEventsInDatabase();
 
         $this->commandTester->execute(['command' => self::COMMAND_NAME]);
 
         self::assertEquals(0, $this->countDeliveredEvents());
-        $this->assertContains('Starting to purge the delivered events from the database', $this->commandTester->getDisplay());
-        $this->assertContains('✅ Purge of 10 delivered events done', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('Starting to purge the delivered events from the database', $this->commandTester->getDisplay());
+        $this->assertStringContainsString('✅ Purge of 10 delivered events done', $this->commandTester->getDisplay());
     }
 
     private function setUpCommand(): void
@@ -53,7 +53,7 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
         $this->commandTester = new CommandTester($command);
     }
 
-    private function assertThereAreSomeDeliveredEventsInDatabase()
+    private function assertThereAreSomeDeliveredEventsInDatabase(): void
     {
         $insertDeliveredEvents = <<<SQL
 DELETE FROM delivered_event;
@@ -81,8 +81,6 @@ SQL;
             ->executeQuery('SELECT COUNT(*) FROM delivered_event;')
             ->fetch(\PDO::FETCH_COLUMN);
 
-        $count = $this->connection->convertToPHPValue($result, Type::INTEGER);
-
-        return $count;
+        return $this->connection->convertToPHPValue($result, Type::INTEGER);
     }
 }

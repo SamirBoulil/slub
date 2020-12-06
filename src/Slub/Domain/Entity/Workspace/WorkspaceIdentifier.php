@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class WorkspaceIdentifier
 {
-    /** @var string */
-    private $workspaceIdentifier;
+    private string $workspaceIdentifier;
 
     private function __construct(string $workspaceIdentifier)
     {

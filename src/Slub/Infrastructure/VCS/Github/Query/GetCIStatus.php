@@ -15,14 +15,11 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
  */
 class GetCIStatus
 {
-    /** @var GetCheckRunStatus */
-    private $getCheckRunStatus;
+    private GetCheckRunStatus $getCheckRunStatus;
 
-    /** @var GetStatusChecksStatus */
-    private $getStatusChecksStatus;
+    private GetStatusChecksStatus $getStatusChecksStatus;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         GetCheckRunStatus $getCheckRunStatus,

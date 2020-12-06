@@ -11,8 +11,7 @@ use Webmozart\Assert\Assert;
  */
 class Title
 {
-    /** @var string */
-    private $title;
+    private string $title;
 
     private function __construct(string $title)
     {

@@ -13,12 +13,9 @@ class ClosePR
 {
     use Immutable;
 
-    /** @var string */
-    public $repositoryIdentifier;
+    public string $repositoryIdentifier;
 
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var bool */
-    public $isMerged;
+    public bool $isMerged;
 }

@@ -15,7 +15,6 @@ use Slub\Infrastructure\Chat\Slack\GetPublicChannelInformation;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
-
  */
 class GetPublicChannelInformationTest extends TestCase
 {
@@ -35,7 +34,7 @@ class GetPublicChannelInformationTest extends TestCase
     /**
      * @test
      */
-    public function it_calls_the_slack_api_to_retrieve_the_channel_information()
+    public function it_calls_the_slack_api_to_retrieve_the_channel_information(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "channel": {"name": "general"}}'));
 
@@ -43,7 +42,7 @@ class GetPublicChannelInformationTest extends TestCase
 
         $generatedRequest = $this->mock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
-        $this->assertEquals('/api/channels.info', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('/api/conversations.info', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             'token=xobxob-slack-token&channel=1231461',
             $this->getBodyContent($generatedRequest)
@@ -55,7 +54,7 @@ class GetPublicChannelInformationTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_http_status_is_not_200()
+    public function it_throws_if_the_http_status_is_not_200(): void
     {
         $this->mockGuzzleWith(new Response(400, [], ''));
 
@@ -66,7 +65,7 @@ class GetPublicChannelInformationTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_ok_flag_is_false()
+    public function it_throws_if_the_ok_flag_is_false(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
@@ -78,9 +77,8 @@ class GetPublicChannelInformationTest extends TestCase
     {
         $this->mock = new MockHandler([]);
         $handler = HandlerStack::create($this->mock);
-        $client = new Client(['handler' => $handler]);
 
-        return $client;
+        return new Client(['handler' => $handler]);
     }
 
     private function mockGuzzleWith(Response $response): void

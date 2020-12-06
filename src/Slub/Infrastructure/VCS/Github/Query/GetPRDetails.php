@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query;
 
-use GuzzleHttp\Client;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 
@@ -13,8 +12,7 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
  */
 class GetPRDetails
 {
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function __construct(GithubAPIClient $githubAPIClient)
     {
@@ -31,9 +29,8 @@ class GetPRDetails
     private function getUrl(PRIdentifier $PRIdentifier): string
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $url = sprintf('https://api.github.com/repos/%s/%s/pulls/%s', ...$matches);
 
-        return $url;
+        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s', ...$matches);
     }
 
     private function fetchPRdetails(PRIdentifier $PRIdentifier, string $url): array

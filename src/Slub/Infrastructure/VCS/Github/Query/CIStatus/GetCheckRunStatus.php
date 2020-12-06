@@ -11,17 +11,14 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetCheckRunStatus
 {
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     /** @var string[] */
-    private $supportedCIChecks;
+    private array $supportedCIChecks;
 
-    /** @var string */
-    private $domainName;
+    private string $domainName;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         GithubAPIClient $githubAPIClient,
@@ -64,14 +61,12 @@ class GetCheckRunStatus
 
     private function deductCIStatus(array $checkRuns): CheckStatus
     {
-        $getCheckRuns = function (string $statusToFilterOn) {
-            return function ($current, $checkRun) use ($statusToFilterOn) {
-                if (null !== $current) {
-                    return $current;
-                }
+        $getCheckRuns = fn (string $statusToFilterOn) => function ($current, $checkRun) use ($statusToFilterOn) {
+            if (null !== $current) {
+                return $current;
+            }
 
-                return $statusToFilterOn === $checkRun['conclusion'] ? $checkRun : $current;
-            };
+            return $statusToFilterOn === $checkRun['conclusion'] ? $checkRun : $current;
         };
 
         $CICheckAFailure = array_reduce($checkRuns, $getCheckRuns('failure'), null);
@@ -81,9 +76,7 @@ class GetCheckRunStatus
 
         $supportedCheckRuns = array_filter(
             $checkRuns,
-            function (array $checkRun) {
-                return $this->isCheckRunSupported($checkRun);
-            }
+            fn (array $checkRun) => $this->isCheckRunSupported($checkRun)
         );
 
         if (empty($supportedCheckRuns)) {
@@ -102,13 +95,12 @@ class GetCheckRunStatus
     {
         $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
         $matches[2] = $ref;
-        $url = sprintf(
+
+        return sprintf(
             '%s/repos/%s/%s/commits/%s/check-runs',
             $this->domainName,
             ...$matches
         );
-
-        return $url;
     }
 
     private function isCheckRunSupported(array $checkRun): bool

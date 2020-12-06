@@ -11,8 +11,7 @@ class ClosedAt
 {
     private const EMPTY_DATE = null;
 
-    /** @var ?\DateTime */
-    private $closedAt;
+    private ?\DateTime $closedAt = null;
 
     public function __construct(?\DateTime $closedAt)
     {

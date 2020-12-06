@@ -15,17 +15,13 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetVCSStatusFromGithub implements GetVCSStatus
 {
-    /** @var GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails $getPRDetails;
 
-    /** @var FindReviews */
-    private $findReviews;
+    private FindReviews $findReviews;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus, LoggerInterface $logger)
     {
@@ -49,9 +45,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
         $isMerged = $this->isMerged($PRDetails);
         $this->logger->critical('Fetched is merged');
 
-        $result = $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
-
-        return $result;
+        return $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
     }
 
     private function getPRCommitRef(array $PRDetails): string

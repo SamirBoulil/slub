@@ -43,14 +43,14 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_only_listens_to_new_installation_events()
+    public function it_only_listens_to_new_installation_events(): void
     {
         self::assertTrue($this->newInstallationEventHandler->supports('installation_repositories'));
         self::assertFalse($this->newInstallationEventHandler->supports('unsupported_event'));
     }
 
     /** @test */
-    public function it_gather_app_installations_and_saves_them()
+    public function it_gather_app_installations_and_saves_them(): void
     {
         $installationId = 12202825;
         $repository1 = 'SamirBoulil/slub';
@@ -68,20 +68,16 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
 
         $this->appInformationRepository->save(
             Argument::that(
-                function (AppInstallation $appInstallation) use ($installationId, $repository1) {
-                    return $appInstallation->installationId === (string) $installationId
-                        && self::ACCESS_TOKEN === $appInstallation->accessToken
-                        && $appInstallation->repositoryIdentifier === $repository1;
-                }
+                fn (AppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
+                    && self::ACCESS_TOKEN === $appInstallation->accessToken
+                    && $appInstallation->repositoryIdentifier === $repository1
             )
         )->shouldBeCalled();
         $this->appInformationRepository->save(
             Argument::that(
-                function (AppInstallation $appInstallation) use ($installationId, $repository2) {
-                    return $appInstallation->installationId === (string) $installationId
-                        && self::ACCESS_TOKEN === $appInstallation->accessToken
-                        && $appInstallation->repositoryIdentifier === $repository2;
-                }
+                fn (AppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
+                    && self::ACCESS_TOKEN === $appInstallation->accessToken
+                    && $appInstallation->repositoryIdentifier === $repository2
             )
         )->shouldBeCalled();
 
@@ -89,7 +85,7 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_support_actions_different_that_installation_creation()
+    public function it_does_not_support_actions_different_that_installation_creation(): void
     {
         $installationEventWithUnsupportedAction = ['action' => 'unsupported_action'];
 

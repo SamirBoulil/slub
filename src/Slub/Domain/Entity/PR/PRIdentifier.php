@@ -8,8 +8,7 @@ use Webmozart\Assert\Assert;
 
 class PRIdentifier
 {
-    /** @var string */
-    private $PRIdentifier;
+    private string $PRIdentifier;
 
     private function __construct(string $PRIdentifier)
     {

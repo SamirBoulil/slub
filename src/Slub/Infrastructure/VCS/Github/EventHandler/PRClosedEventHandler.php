@@ -14,8 +14,7 @@ class PRClosedEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
 
-    /** @var ClosePRHandler */
-    private $closePRHandler;
+    private ClosePRHandler $closePRHandler;
 
     public function __construct(ClosePRHandler $closePRHandler)
     {

@@ -31,7 +31,7 @@ class SqlHasEventAlreadyBeenDeliveredTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_tells_if_an_event_has_already_been_delivered()
+    public function it_tells_if_an_event_has_already_been_delivered(): void
     {
         $deliveredEvent = Uuid::uuid4()->toString();
         $this->deliveredEventRepository->save($deliveredEvent);
@@ -44,7 +44,7 @@ class SqlHasEventAlreadyBeenDeliveredTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_tells_if_an_event_has_not_already_been_delivered()
+    public function it_tells_if_an_event_has_not_already_been_delivered(): void
     {
         $deliveredEvent = Uuid::uuid4()->toString();
 
@@ -52,7 +52,6 @@ class SqlHasEventAlreadyBeenDeliveredTest extends KernelTestCase
 
         self::assertFalse($result);
     }
-
 
     private function resetDB(): void
     {

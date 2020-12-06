@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Client;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
@@ -15,20 +15,17 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
  */
 class GithubAPIClient
 {
-    const UNAUTHORIZED_STATUS_CODE = 401;
-    /** @var RefreshAccessToken */
-    private $refreshAccessToken;
+    private const UNAUTHORIZED_STATUS_CODE = 401;
+    private RefreshAccessToken $refreshAccessToken;
 
-    /** @var Client */
-    private $client;
+    private ClientInterface $client;
 
-    /** @var SqlAppInstallationRepository */
-    private $sqlAppInstallationRepository;
+    private SqlAppInstallationRepository $sqlAppInstallationRepository;
 
     public function __construct(
         RefreshAccessToken $refreshAccessToken,
         SqlAppInstallationRepository $sqlAppInstallationRepository,
-        Client $client
+        ClientInterface $client
     ) {
         $this->refreshAccessToken = $refreshAccessToken;
         $this->client = $client;

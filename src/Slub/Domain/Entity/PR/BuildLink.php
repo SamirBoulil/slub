@@ -13,8 +13,7 @@ use Webmozart\Assert\Assert;
  */
 class BuildLink
 {
-    /** @var string */
-    private $buildLink;
+    private string $buildLink;
 
     private function __construct(string $buildLink)
     {

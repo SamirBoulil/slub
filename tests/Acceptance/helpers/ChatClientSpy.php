@@ -28,7 +28,7 @@ class ChatClientSpy implements ChatClient
             $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
-    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text)
+    public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
         $this->recordedMessages[$channelIdentifier->stringValue()][] = $text;
     }
@@ -53,7 +53,7 @@ class ChatClientSpy implements ChatClient
         Assert::assertEquals([$expectedText], $reactions);
     }
 
-    public function assertRepliedWithOneOf(array $expectedMessages)
+    public function assertRepliedWithOneOf(array $expectedMessages): void
     {
         $isFound = false;
         foreach ($this->recordedMessages as $actualMessages) {

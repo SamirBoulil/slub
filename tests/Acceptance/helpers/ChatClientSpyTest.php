@@ -17,7 +17,7 @@ class ChatClientSpyTest extends TestCase
     /** @var ChatClientSpy */
     private $slackClientSpy;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -27,7 +27,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_asserts_that_it_has_been_called_with_the_expected_arguments()
+    public function it_asserts_that_it_has_been_called_with_the_expected_arguments(): void
     {
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
         $text = 'hello';
@@ -52,7 +52,7 @@ class ChatClientSpyTest extends TestCase
      * @test
      * @expectedException \RuntimeException
      */
-    public function it_throws_if_a_reply_in_a_thread_was_made_and_it_asserts_empty()
+    public function it_throws_if_a_reply_in_a_thread_was_made_and_it_asserts_empty(): void
     {
         $slackClientSpy = new ChatClientSpy();
         $slackClientSpy->replyInThread(MessageIdentifier::fromString('general@12345'), 'hello');
@@ -64,7 +64,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_a_reaction_to_a_message_was_made_and_it_asserts_empty()
+    public function it_throws_if_a_reaction_to_a_message_was_made_and_it_asserts_empty(): void
     {
         $slackClientSpy = new ChatClientSpy();
         $slackClientSpy->setReactionsToMessageWith(MessageIdentifier::fromString('general@12345'), ['reaction']);
@@ -76,7 +76,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_message_was_published_in_a_channel_and_it_asserts_empty()
+    public function it_throws_if_message_was_published_in_a_channel_and_it_asserts_empty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $slackClientSpy = new ChatClientSpy();
@@ -89,7 +89,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_it_has_not_been_called_with_the_expected_message_identifier()
+    public function it_throws_if_it_has_not_been_called_with_the_expected_message_identifier(): void
     {
         $text = 'hello';
         $this->slackClientSpy->replyInThread(MessageIdentifier::fromString('general@12345'), $text);
@@ -101,7 +101,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_it_has_not_been_called_with_the_expected_text()
+    public function it_throws_if_it_has_not_been_called_with_the_expected_text(): void
     {
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
         $this->slackClientSpy->replyInThread($messageIdentifier, 'hello');
@@ -113,7 +113,7 @@ class ChatClientSpyTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_it_has_not_been_called_prior_to_asserting()
+    public function it_throws_if_it_has_not_been_called_prior_to_asserting(): void
     {
         $this->expectException(AssertionFailedError::class);
         $this->slackClientSpy->assertReaction(

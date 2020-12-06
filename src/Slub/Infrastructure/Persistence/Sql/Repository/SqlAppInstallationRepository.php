@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -12,8 +13,7 @@ use Doctrine\DBAL\Types\Type;
  */
 class SqlAppInstallationRepository
 {
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
     public function __construct(Connection $sqlConnection)
     {
@@ -31,7 +31,7 @@ ON DUPLICATE KEY UPDATE
     ACCESS_TOKEN = :access_token
 ;
 SQL;
-        $this->sqlConnection->executeUpdate(
+        $this->sqlConnection->executeStatement(
             $saveAccessToken,
             [
                 'repository_identifier' => $appInstallation->repositoryIdentifier,
@@ -68,7 +68,7 @@ SQL;
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function fetch(string $repositoryIdentifier): array
     {
@@ -84,9 +84,7 @@ SQL;
         );
         $result = $statement->fetch(\PDO::FETCH_ASSOC);
         if (false === $result) {
-            throw new \RuntimeException(
-                sprintf('There was no app installation found for repository %s', $repositoryIdentifier)
-            );
+            throw new \RuntimeException(sprintf('There was no app installation found for repository %s', $repositoryIdentifier));
         }
 
         return $result;

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Installer\CLI;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection;
+
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,8 +18,7 @@ class InstallerCLI extends Command
 {
     protected static $defaultName = 'slub:install';
 
-    /** @var Connection */
-    private $sqlConnection;
+    private Connection $sqlConnection;
 
     public function __construct(Connection $sqlConnection)
     {
@@ -26,19 +26,20 @@ class InstallerCLI extends Command
         $this->sqlConnection = $sqlConnection;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Installs the application')
             ->setHidden(false);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->createDatabaseIfNotExists();
         $this->createPRTableIfNotExists();
         $this->createDeliveredEventTableIfNotExists();
         $this->createAppInstallationTableIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
+        return 0;
     }
 
     private function createDatabaseIfNotExists(): void
@@ -83,7 +84,7 @@ SQL;
         $this->sqlConnection->executeUpdate($createTable);
     }
 
-    private function createDeliveredEventTableIfNotExists()
+    private function createDeliveredEventTableIfNotExists(): void
     {
         $createTable = <<<SQL
 CREATE TABLE IF NOT EXISTS delivered_event (IDENTIFIER VARCHAR(255) PRIMARY KEY);
@@ -91,7 +92,7 @@ SQL;
         $this->sqlConnection->executeUpdate($createTable);
     }
 
-    private function createAppInstallationTableIfNotExists()
+    private function createAppInstallationTableIfNotExists(): void
     {
         $createTable = <<<SQL
 CREATE TABLE IF NOT EXISTS app_installation (

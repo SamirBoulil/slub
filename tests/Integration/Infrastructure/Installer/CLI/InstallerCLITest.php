@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Installer\CLI;
 
-use Doctrine\DBAL\Connection;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
@@ -48,25 +47,25 @@ class InstallerCLITest extends KernelTestCase
     /**
      * @test
      */
-    public function it_installs_slub_for_the_first_time()
+    public function it_installs_slub_for_the_first_time(): void
     {
         $this->dropDatabase();
         self::assertFalse($this->existsDatabase());
         $output = $this->installSlub();
         $this->assertTableExists();
         self::assertTrue($this->existsDatabase());
-        self::assertContains('Slub installed', $output);
+        self::assertStringContainsString('Slub installed', $output);
     }
 
     /**
      * @test
      */
-    public function it_re_installs_slub_without_dropping_the_database_nor_the_table()
+    public function it_re_installs_slub_without_dropping_the_database_nor_the_table(): void
     {
         $this->assertTableExists();
         $this->addOnePr();
         $output = $this->installSlub();
-        $this->assertContains('Slub installed', $output);
+        $this->assertStringContainsString('Slub installed', $output);
         $this->assertHasPR();
     }
 
@@ -87,7 +86,7 @@ class InstallerCLITest extends KernelTestCase
         return $output = $commandTester->getDisplay();
     }
 
-    private function assertTableExists()
+    private function assertTableExists(): void
     {
         /** @var Connection $sqlConnection */
         $sqlConnection = $this->get('slub.infrastructure.persistence.sql.database_connection');

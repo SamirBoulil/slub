@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Tests\WebTestCase;
@@ -21,7 +22,7 @@ class FindPRNumberTest extends WebTestCase
     /** @var FindPRNumber */
     private $findPRNumber;
 
-    /** @var \Prophecy\Prophecy\ObjectProphecy|GithubAPIClient */
+    /** @var ObjectProphecy|GithubAPIClient */
     private $githubAPIClient;
 
     public function setUp(): void
@@ -34,7 +35,7 @@ class FindPRNumberTest extends WebTestCase
     /**
      * @test
      */
-    public function it_finds_a_pr_number_given_a_repository_and_a_commit_sha()
+    public function it_finds_a_pr_number_given_a_repository_and_a_commit_sha(): void
     {
         $expectedPRNumber = self::PR_NUMBER;
         $this->githubAPIClient->get(
@@ -51,7 +52,7 @@ class FindPRNumberTest extends WebTestCase
     /**
      * @test
      */
-    public function it_does_not_find_a_pr_number_given_a_repository_and_a_commit_sha()
+    public function it_does_not_find_a_pr_number_given_a_repository_and_a_commit_sha(): void
     {
         $this->githubAPIClient->get(
             sprintf('https://api.github.com/search/issues?q=%s+%s', self::REPOSITORY_NAME, self::COMMIT_SHA),
@@ -67,7 +68,7 @@ class FindPRNumberTest extends WebTestCase
     /**
      * @test
      */
-    public function it_cannot_find_the_pr_number_in_the_search_result()
+    public function it_cannot_find_the_pr_number_in_the_search_result(): void
     {
         $this->githubAPIClient->get(
             sprintf('https://api.github.com/search/issues?q=%s+%s', self::REPOSITORY_NAME, self::COMMIT_SHA),

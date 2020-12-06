@@ -54,7 +54,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Given /^a PR in review$/
      */
-    public function aPullRequestInReview()
+    public function aPullRequestInReview(): void
     {
         $this->currentPRIdentifier = PRIdentifier::create('akeneo/pim-community-dev/1010');
         $this->currentMessageIdentifier = MessageIdentifier::fromString('CHANNEL_ID@1');
@@ -72,7 +72,7 @@ class ReviewContext extends FeatureContext
     /**
      * @When /^the PR is GTMed$/
      */
-    public function thePullRequestIsGTMed()
+    public function thePullRequestIsGTMed(): void
     {
         $gtm = new NewReview();
         $gtm->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -85,7 +85,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Then /^the PR should be GTMed$/
      */
-    public function thePullRequestShouldBeGTMed()
+    public function thePullRequestShouldBeGTMed(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals(1, $PR->normalize()['GTMS']);
@@ -94,7 +94,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Then /^the squad should be notified that the PR has one more GTM$/
      */
-    public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreGTM()
+    public function theSquadShouldBeNotifiedThatThePullRequestHasOneMoreGTM(): void
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
@@ -110,7 +110,7 @@ class ReviewContext extends FeatureContext
     /**
      * @When /^the PR is NOT GTMED$/
      */
-    public function thePullRequestIsNOTGTMED()
+    public function thePullRequestIsNOTGTMED(): void
     {
         $notGTM = new NewReview();
         $notGTM->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -123,7 +123,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Then /^the PR should be NOT GTMed$/
      */
-    public function thePullRequestShouldBeNOTGTMed()
+    public function thePullRequestShouldBeNOTGTMed(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals(1, $PR->normalize()['NOT_GTMS']);
@@ -132,7 +132,7 @@ class ReviewContext extends FeatureContext
     /**
      * @When /^a PR is reviewed on an unsupported repository$/
      */
-    public function aPullRequestIsReviewedOnAnUnsupportedRepository()
+    public function aPullRequestIsReviewedOnAnUnsupportedRepository(): void
     {
         $this->currentPRIdentifier = PRIdentifier::fromString('1010');
 
@@ -147,7 +147,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Then /^it does not notify the squad$/
      */
-    public function itDoesNotNotifyTheSquad()
+    public function itDoesNotNotifyTheSquad(): void
     {
         Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
         Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
@@ -169,7 +169,7 @@ class ReviewContext extends FeatureContext
     /**
      * @When /^the PR is commented$/
      */
-    public function thePRIsCommented()
+    public function thePRIsCommented(): void
     {
         $comment = new NewReview();
         $comment->repositoryIdentifier = 'akeneo/pim-community-dev';
@@ -182,7 +182,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Then /^the PR should have one comment$/
      */
-    public function thePRShouldHaveOneComment()
+    public function thePRShouldHaveOneComment(): void
     {
         $PR = $this->PRRepository->getBy($this->currentPRIdentifier);
         Assert::assertEquals(1, $PR->normalize()['COMMENTS']);
@@ -191,7 +191,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Given /^the author should be notified that the PR has one more comment$/
      */
-    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreComment()
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreComment(): void
     {
         Assert::assertTrue($this->eventSpy->PRCommentedDispatched());
         $commentMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_COMMENTED);
@@ -201,7 +201,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Given /^the author should be notified that the PR has one more GTM$/
      */
-    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM()
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreGTM(): void
     {
         Assert::assertTrue($this->eventSpy->PRGMTedDispatched());
         $gtmedMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_GTMED);
@@ -211,7 +211,7 @@ class ReviewContext extends FeatureContext
     /**
      * @Given /^the author should be notified that the PR has one more NOT GTM$/
      */
-    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM()
+    public function theAuthorShouldBeNotifiedThatThePRHasOneMoreNOTGTM(): void
     {
         Assert::assertTrue($this->eventSpy->PRNotGMTedDispatched());
         $notGtmedMessage = str_replace(NotifyAuthor::PLACEHOLDER_REVIEWER_NAME, self::REVIEWER_NAME, NotifyAuthor::MESSAGE_PR_NOT_GTMED);

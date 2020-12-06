@@ -11,21 +11,15 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class VCSStatus
 {
-    /** @var string */
-    public $PRIdentifier;
+    public string $PRIdentifier;
 
-    /** @var int */
-    public $GTMCount;
+    public int $GTMCount;
 
-    /** @var int */
-    public $comments;
+    public int $comments;
 
-    /** @var int */
-    public $notGTMCount;
+    public int $notGTMCount;
 
-    /** @var CheckStatus */
-    public $checkStatus;
+    public CheckStatus $checkStatus;
 
-    /** @var bool */
-    public $isMerged;
+    public bool $isMerged;
 }

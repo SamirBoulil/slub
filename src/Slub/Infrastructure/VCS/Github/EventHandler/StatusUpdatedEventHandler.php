@@ -18,14 +18,11 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 {
     private const STATUS_UPDATE_EVENT_TYPE = 'status';
 
-    /** @var CIStatusUpdateHandler */
-    private $CIStatusUpdateHandler;
+    private CIStatusUpdateHandler $CIStatusUpdateHandler;
 
-    /** @var FindPRNumberInterface */
-    private $findPRNumber;
+    private FindPRNumberInterface $findPRNumber;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
     public function __construct(
         CIStatusUpdateHandler $CIStatusUpdateHandler,

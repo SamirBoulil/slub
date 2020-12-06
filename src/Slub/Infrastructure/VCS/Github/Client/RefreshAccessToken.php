@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Client;
 
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
@@ -17,19 +17,15 @@ class RefreshAccessToken
 {
     private const ACCESS_TOKEN_URL_TEMPLATE = 'https://api.github.com/app/installations/%s/access_tokens';
 
-    /** @var Client */
-    private $httpClient;
+    private ClientInterface $httpClient;
 
-    /** @var string */
-    private $githubAppId;
+    private string $githubAppId;
 
-    /** @var string */
-    private $githubPrivateKey;
+    private string $githubPrivateKey;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    public function __construct(Client $httpClient, string $githubAppId, string $githubPrivateKey)
+    public function __construct(ClientInterface $httpClient, string $githubAppId, string $githubPrivateKey)
     {
         $this->httpClient = $httpClient;
         $this->githubAppId = $githubAppId;
@@ -77,7 +73,8 @@ class RefreshAccessToken
     private function jwt(): string
     {
         $now = new \DateTime('now');
-        $jwt = JWT::encode(
+
+        return JWT::encode(
             [
                 'iat' => $now->getTimestamp(),
                 'exp' => $now->getTimestamp() + (10 * 60),
@@ -86,7 +83,5 @@ class RefreshAccessToken
             $this->githubPrivateKey,
             'RS256'
         );
-
-        return $jwt;
     }
 }

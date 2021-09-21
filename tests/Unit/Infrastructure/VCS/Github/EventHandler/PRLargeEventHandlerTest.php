@@ -7,8 +7,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Slub\Application\CIStatusUpdate\WarnLargePR;
-use Slub\Application\NewReview\NewReview;
+use Slub\Application\WarnLargePR\WarnLargePR;
 use Slub\Application\WarnLargePR\WarnLargePRHandler;
 use Slub\Infrastructure\VCS\Github\EventHandler\PRLargeEventHandler;
 
@@ -72,15 +71,22 @@ class PRLargeEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_warn_large_pr_from_small_pr(): void
+    public function it_listens_to_small_PR(): void
     {
         $smallPR = [
             'action' => 'submitted',
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie'], 'additions' => 500, 'deletions' => 500],
+            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie'], 'additions' => 400, 'deletions' => 400],
             'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
         ];
 
-        $this->handler->handle(Argument::any())->shouldNotBeCalled();
+        $this->handler->handle(
+            Argument::that(
+                fn (WarnLargePR $warnLargePR) => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
+                    && self::REPOSITORY_IDENTIFIER === $warnLargePR->repositoryIdentifier
+                    && 400 === $warnLargePR->additions
+                    && 400 === $warnLargePR->deletions
+            )
+        )->shouldBeCalled();
 
         $this->prLargeEventHandler->handle($smallPR);
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Application\CIStatusUpdate\WarnLargePR;
+use Slub\Application\WarnLargePR\WarnLargePR;
 use Slub\Application\WarnLargePR\WarnLargePRHandler;
 
 /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\CIStatusUpdate;
+namespace Slub\Application\WarnLargePR;
 
 use ConvenientImmutability\Immutable;
 

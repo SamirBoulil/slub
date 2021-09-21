@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Application\WarnLargePR;
 
 use Psr\Log\LoggerInterface;
-use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Query\IsSupportedInterface;
@@ -67,14 +66,7 @@ class WarnLargePRHandler
     {
         if ($WarnLargePR->additions > 500 || $WarnLargePR->deletions > 500) {
             $logMessage = sprintf('Author has been notified PR "%s" is too large', $WarnLargePR->PRIdentifier);
+            $this->logger->info($logMessage);
         }
-        $this->logger->info($logMessage);
-    }
-
-    private function buildLink(WarnLargePR $WarnLargePR): BuildLink
-    {
-        $buildLink = $WarnLargePR->buildLink;
-
-        return empty($buildLink) ? BuildLink::none() : BuildLink::fromURL($WarnLargePR->buildLink ?? '');
     }
 }

@@ -13,6 +13,7 @@ use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\PRTooLarge;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,6 +31,7 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
+    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is too large (more than 500 lines).';
 
     private GetMessageIdsForPR $getMessageIdsForPR;
 
@@ -55,7 +57,8 @@ class NotifyAuthor implements EventSubscriberInterface
             PRCommented::class => 'whenPRComment',
             CIGreen::class     => 'whenCIIsGreen',
             CIRed::class       => 'whenCIIsRed',
-            GoodToMerge::class => 'whenGoodToMerge'
+            GoodToMerge::class => 'whenGoodToMerge',
+            PRTooLarge::class  => 'whenPRTooLarge'
         ];
     }
 
@@ -125,6 +128,14 @@ class NotifyAuthor implements EventSubscriberInterface
         $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
         $goodToMergeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, self::MESSAGE_GOOD_TO_MERGE);
         $this->replyInThread($event->PRIdentifier(), $goodToMergeMessage);
+    }
+
+    public function whenPRTooLarge(PRTooLarge $event): void
+    {
+        preg_match('#(.+)\/(.+)\/(.+)#', $event->PRIdentifier()->stringValue(), $matches);
+        $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
+        $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, self::MESSAGE_PR_TOO_LARGE);
+        $this->replyInThread($event->PRIdentifier(), $prTooLargeMessage);
     }
 
     private function replyInThread(PRIdentifier $PRIdentifier, string $message): void

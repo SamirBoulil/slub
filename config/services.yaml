@@ -88,6 +88,7 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
+            - '%env(WARN_LOC_LIMIT)%'
 
     # Infrastructure
     ## Common

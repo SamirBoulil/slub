@@ -21,6 +21,7 @@ use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
+use Slub\Domain\Event\PRTooLarge;
 
 class PRTest extends TestCase
 {
@@ -67,6 +68,7 @@ class PRTest extends TestCase
         self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         self::assertEmpty($normalizedPR['CLOSED_AT']);
+        self::assertEquals(false, $normalizedPR['IS_LARGE']);
         self::assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
@@ -92,6 +94,7 @@ class PRTest extends TestCase
             'MESSAGE_IDS' => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
             'CLOSED_AT' => self::A_TIMESTAMP,
+            'IS_LARGE' => true
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -624,6 +627,35 @@ class PRTest extends TestCase
         self::assertEmpty($pr->getEvents());
     }
 
+    /**
+     * @test
+     */
+    public function it_can_become_large(): void
+    {
+        $pr = $this->pendingPR();
+
+        $pr->large();
+
+        self::assertTrue($pr->normalize()['IS_LARGE']);
+        self::assertCount(1, $pr->getEvents());
+        $event = current($pr->getEvents());
+        self::assertInstanceOf(PRTooLarge::class, $event);
+        self::assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_become_small(): void
+    {
+        $pr = $this->largePR();
+
+        $pr->small();
+
+        self::assertFalse($pr->normalize()['IS_LARGE']);
+        self::assertCount(0, $pr->getEvents());
+    }
+
     public function normalizedWithMissingInformation(): array
     {
         return [
@@ -701,6 +733,31 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_LARGE' => false,
+            ]
+        );
+    }
+
+    private function largePR(): PR
+    {
+        return PR::fromNormalized([
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
+                    'BUILD_RESULT' => 'PENDING',
+                    'BUILD_LINK' => '',
+                ],
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'WORKSPACE_IDS' => ['akeneo'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
+                'IS_LARGE' => true,
             ]
         );
     }

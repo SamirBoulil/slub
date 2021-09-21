@@ -45,6 +45,7 @@ Slub improves the feedback loop of your PRs in multiple ways:
 - ot notifies the author of a PR when the continuous integration (CI) status changes.
 - it keeps the team up to date regarding the number of approvals a PR has, it's CI status, and the PR status.
 - it sends daily reminders to your team regarding the PRs missing reviews.
+- it notifies the author of a pull request when a PR is too large (500 Loc by default, you can change this value in the `.env` with `WARN_LOC_LIMIT`).
 
 ## How to use
 Slub listens to any PR sent to review in a slack channel which slub is configured to listen to.

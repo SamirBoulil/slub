@@ -48,12 +48,12 @@ class PRLargeEventHandler implements EventHandlerInterface
         $this->largePRHandler->handle($command);
     }
 
-    private function getPRIdentifier(array $CIStatusUpdate): string
+    private function getPRIdentifier(array $PRLargeEvent): string
     {
         return sprintf(
             '%s/%s',
-            $CIStatusUpdate['repository']['full_name'],
-            $CIStatusUpdate['pull_request']['number']
+            $PRLargeEvent['repository']['full_name'],
+            $PRLargeEvent['pull_request']['number']
         );
     }
 }

@@ -82,6 +82,13 @@ services:
             - '@logger'
             - '@slub.infrastructure.common.query.clock'
 
+    slub.application.warn_large_pr.warn_large_pr_handler:
+        class: Slub\Application\WarnLargePR\WarnLargePRHandler
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.query.is_supported'
+            - '@logger'
+
     # Infrastructure
     ## Common
     slub.infrastructure.common.query.clock:

@@ -17,6 +17,7 @@ use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
+use Slub\Domain\Event\PRTooLarge;
 use Symfony\Component\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
@@ -35,6 +36,7 @@ class PR
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
     private const CLOSED_AT = 'CLOSED_AT';
+    private const IS_LARGE_KEY = 'IS_LARGE';
 
     /** @var Event[] */
     private array $events = [];
@@ -68,6 +70,8 @@ class PR
 
     private ClosedAt $closedAt;
 
+    private bool $isLarge;
+
     private function __construct(
         PRIdentifier $PRIdentifier,
         array $channelIdentifiers,
@@ -81,7 +85,8 @@ class PR
         CIStatus $CIStatus,
         bool $isMerged,
         PutToReviewAt $putToReviewAt,
-        ClosedAt $closedAt
+        ClosedAt $closedAt,
+        bool $isLarge
     ) {
         $this->PRIdentifier = $PRIdentifier;
         $this->authorIdentifier = $authorIdentifier;
@@ -96,6 +101,7 @@ class PR
         $this->putToReviewAt = $putToReviewAt;
         $this->closedAt = $closedAt;
         $this->isMerged = $isMerged;
+        $this->isLarge = $isLarge;
     }
 
     public static function create(
@@ -109,7 +115,8 @@ class PR
         int $notGTMs = 0,
         int $comments = 0,
         string $CIStatus = 'PENDING',
-        bool $isMerged = false
+        bool $isMerged = false,
+        bool $isLarge = false
     ): self {
         $pr = new self(
             $PRIdentifier,
@@ -127,7 +134,8 @@ class PR
             ),
             $isMerged,
             PutToReviewAt::create(),
-            ClosedAt::none()
+            ClosedAt::none(),
+            $isLarge
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
 
@@ -174,6 +182,12 @@ class PR
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
         $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::CLOSED_AT]);
 
+        // Protect from BC break
+        $isLarge = false;
+        if (Assert::keyExists($normalizedPR, self::IS_LARGE_KEY)) {
+            $isLarge = $normalizedPR[self::IS_LARGE_KEY];
+        }
+
         return new self(
             $identifier,
             $channelIdentifiers,
@@ -187,7 +201,8 @@ class PR
             CIStatus::fromNormalized($CIStatus),
             $isMerged,
             $putToReviewAt,
-            $closedAt
+            $closedAt,
+            $isLarge
         );
     }
 
@@ -216,6 +231,7 @@ class PR
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
             self::CLOSED_AT => $this->closedAt->toTimestamp(),
+            self::IS_LARGE_KEY => $this->isLarge,
         ];
     }
 
@@ -320,6 +336,33 @@ class PR
         }
         $this->closedAt = ClosedAt::create();
         $this->events[] = PRClosed::ForPR($this->PRIdentifier);
+    }
+
+    public function large(): void
+    {
+        if ($this->isMerged) {
+            return;
+        }
+
+        if ($this->isLarge) {
+            return;
+        }
+
+        $this->isLarge = true;
+        $this->events[] = PRTooLarge::forPR($this->PRIdentifier);
+    }
+
+    public function small(): void
+    {
+        if ($this->isMerged) {
+            return;
+        }
+
+        if (!$this->isLarge) {
+            return;
+        }
+
+        $this->isLarge = false;
     }
 
     /**

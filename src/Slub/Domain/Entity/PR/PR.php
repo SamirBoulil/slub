@@ -30,13 +30,13 @@ class PR
     private const NOT_GTM_KEY = 'NOT_GTMS';
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
+    private const IS_LARGE_KEY = 'IS_LARGE';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
     private const CHANNEL_IDS = 'CHANNEL_IDS';
     private const WORKSPACE_IDS = 'WORKSPACE_IDS';
     private const COMMENTS_KEY = 'COMMENTS';
     private const PUT_TO_REVIEW_AT = 'PUT_TO_REVIEW_AT';
     private const CLOSED_AT = 'CLOSED_AT';
-    private const IS_LARGE_KEY = 'IS_LARGE';
 
     /** @var Event[] */
     private array $events = [];
@@ -184,7 +184,7 @@ class PR
 
         // Protect from BC break
         $isLarge = false;
-        if (Assert::keyExists($normalizedPR, self::IS_LARGE_KEY)) {
+        if (isset($normalizedPR[self::IS_LARGE_KEY])) {
             $isLarge = $normalizedPR[self::IS_LARGE_KEY];
         }
 

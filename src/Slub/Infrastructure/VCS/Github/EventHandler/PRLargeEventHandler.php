@@ -13,6 +13,7 @@ use Slub\Application\WarnLargePR\WarnLargePRHandler;
 class PRLargeEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
+    private const SUPPORTED_ACTION_TYPES = ['opened', 'synchronize'];
 
     private WarnLargePRHandler $largePRHandler;
 
@@ -35,7 +36,8 @@ class PRLargeEventHandler implements EventHandlerInterface
 
     private function isPullRequestEventSupported(array $PRLargeEvent): bool
     {
-        return isset($PRLargeEvent['pull_request']['additions']) && isset($PRLargeEvent['pull_request']['deletions']);
+        return isset($PRLargeEvent['pull_request']['additions']) && isset($PRLargeEvent['pull_request']['deletions']) 
+            && isset($PRLargeEvent['action']) && in_array($PRLargeEvent['action'], self::SUPPORTED_ACTION_TYPES);
     }
 
     private function updatePR(array $PRLargeEvent): void

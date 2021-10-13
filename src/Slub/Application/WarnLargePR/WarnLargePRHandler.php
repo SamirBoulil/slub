@@ -22,18 +22,18 @@ class WarnLargePRHandler
 
     private LoggerInterface $logger;
 
-    private int $warnLocLimit;
+    private int $prSizeLimit;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
         IsSupportedInterface $isSupported,
         LoggerInterface $logger,
-        int $warnLocLimit = 500
+        int $prSizeLimit = 500
     ) {
         $this->PRRepository = $PRRepository;
         $this->isSupported = $isSupported;
         $this->logger = $logger;
-        $this->warnLocLimit = $warnLocLimit;
+        $this->prSizeLimit = $prSizeLimit;
     }
 
     public function handle(WarnLargePR $WarnLargePR): void
@@ -57,9 +57,9 @@ class WarnLargePRHandler
     private function warnLargePR(WarnLargePR $WarnLargePR): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($WarnLargePR->PRIdentifier));
-        if ($WarnLargePR->additions > $this->warnLocLimit || $WarnLargePR->deletions > $this->warnLocLimit) {
+        if ($WarnLargePR->additions > $this->prSizeLimit || $WarnLargePR->deletions > $this->prSizeLimit) {
             $PR->large();
-        } else if ($WarnLargePR->additions <= $this->warnLocLimit && $WarnLargePR <= $this->warnLocLimit) {
+        } else if ($WarnLargePR->additions <= $this->prSizeLimit && $WarnLargePR <= $this->prSizeLimit) {
             $PR->small();
         }
 
@@ -68,7 +68,7 @@ class WarnLargePRHandler
 
     private function logIt(WarnLargePR $WarnLargePR): void
     {
-        if ($WarnLargePR->additions > $this->warnLocLimit || $WarnLargePR->deletions > $this->warnLocLimit) {
+        if ($WarnLargePR->additions > $this->prSizeLimit || $WarnLargePR->deletions > $this->prSizeLimit) {
             $logMessage = sprintf('Author has been notified PR "%s" is too large', $WarnLargePR->PRIdentifier);
             $this->logger->info($logMessage);
         }

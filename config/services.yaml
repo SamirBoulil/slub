@@ -67,6 +67,7 @@ services:
             - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
+            - '%env(PR_SIZE_LIMIT)%'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -93,7 +94,7 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.query.is_supported'
             - '@logger'
-            - '%env(WARN_LOC_LIMIT)%'
+            - '%env(PR_SIZE_LIMIT)%'
 
     # Infrastructure
     ## Common

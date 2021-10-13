@@ -137,6 +137,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => false,
                 ]
             )
         );
@@ -156,6 +157,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => true,
                 ]
             )
         );
@@ -175,6 +177,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => false,
                 ]
             )
         );
@@ -195,6 +198,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => false,
                 ],
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/3333',
@@ -210,6 +214,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => false,
                 ],
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
@@ -225,6 +230,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_LARGE' => true,
                 ],
             ],
             $actualPRs

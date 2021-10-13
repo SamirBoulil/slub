@@ -48,8 +48,6 @@ class WarnLargePRHandler
     private function isSupported(WarnLargePR $WarnLargePR): bool
     {
         $repositoryIdentifier = RepositoryIdentifier::fromString($WarnLargePR->repositoryIdentifier);
-        Assert::integer($WarnLargePR->additions);
-        Assert::integer($WarnLargePR->deletions);
 
         return $this->isSupported->repository($repositoryIdentifier);
     }

@@ -31,7 +31,7 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
-    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is too large (more than 500 lines).';
+    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is too large (more than %s lines).';
 
     private GetMessageIdsForPR $getMessageIdsForPR;
 
@@ -39,14 +39,18 @@ class NotifyAuthor implements EventSubscriberInterface
 
     private LoggerInterface $logger;
 
+    private int $prSizeLimit;
+
     public function __construct(
         GetMessageIdsForPR $getMessageIdsForPR,
         ChatClient $chatClient,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        int $prSizeLimit = 500
     ) {
         $this->chatClient = $chatClient;
         $this->getMessageIdsForPR = $getMessageIdsForPR;
         $this->logger = $logger;
+        $this->prSizeLimit = $prSizeLimit;
     }
 
     public static function getSubscribedEvents(): array
@@ -134,7 +138,7 @@ class NotifyAuthor implements EventSubscriberInterface
     {
         preg_match('#(.+)\/(.+)\/(.+)#', $event->PRIdentifier()->stringValue(), $matches);
         $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
-        $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, self::MESSAGE_PR_TOO_LARGE);
+        $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, sprintf(self::MESSAGE_PR_TOO_LARGE, $this->prSizeLimit));
         $this->replyInThread($event->PRIdentifier(), $prTooLargeMessage);
     }
 

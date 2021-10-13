@@ -1,5 +1,5 @@
 Feature: Enhance the author's confidence in merging the PR
-  In order to make improve the aurthor's confidence in merging the PR
+  In order to make improve the author's confidence in merging the PR
   As an author
   I want to be notified when the PR is good to merge
 

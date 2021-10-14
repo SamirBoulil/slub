@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -23,7 +24,7 @@ class SlackClient implements ChatClient
 
     private LoggerInterface $logger;
 
-    private string $slackToken;
+    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
 
     private string $slackBotUserId;  // TODO: remove,  call slack API
 
@@ -32,13 +33,13 @@ class SlackClient implements ChatClient
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
         ClientInterface $client,
         LoggerInterface $logger,
-        string $slackToken,
+        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
         string $slackBotUserId
     ) {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
-        $this->slackToken = $slackToken;
+        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
         $this->slackBotUserId = $slackBotUserId;
         $this->logger = $logger;
     }
@@ -51,7 +52,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer ' . $this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -75,16 +76,17 @@ class SlackClient implements ChatClient
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
+        $channel = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
         APIHelper::checkResponse(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer ' . $this->slackToken($channel['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
-                        'channel' => $channelIdentifier->stringValue(),
+                        'channel' => $channel['channel'],
                         'text' => $text,
                     ],
                 ]
@@ -97,7 +99,12 @@ class SlackClient implements ChatClient
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         $botUserId = $this->slackBotUserId;
 
-        return $this->getBotReactionsForMessageAndUser->fetch($messageId['channel'], $messageId['ts'], $botUserId);
+        return $this->getBotReactionsForMessageAndUser->fetch(
+            $messageId['workspace'],
+            $messageId['channel'],
+            $messageId['ts'],
+            $botUserId
+        );
     }
 
     private function addReactions(MessageIdentifier $messageIdentifier, array $reactionsToAdd): void
@@ -108,7 +115,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.add',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer '. $this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -136,7 +143,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.remove',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -154,5 +161,10 @@ class SlackClient implements ChatClient
                 implode(',', $reactionsToRemove)
             )
         );
+    }
+
+    private function slackToken(string $workspaceId): string
+    {
+        return $this->slackAppInstallationRepository->getBy($workspaceId)->accessToken;
     }
 }

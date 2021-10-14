@@ -34,7 +34,11 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_gtm_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->PRGMTedDispatched());
-        $this->eventSpy->notifyPRGTMed(PRGTMed::forPR(PRIdentifier::fromString('1010'), ReviewerName::fromString('samir')));
+        $this->eventSpy->notifyPRGTMed(PRGTMed::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString(''),
+            ReviewerName::fromString('samir')
+        ));
         $this->assertTrue($this->eventSpy->PRGMTedDispatched());
     }
 
@@ -44,7 +48,11 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_not_gtm_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->PRNotGMTedDispatched());
-        $this->eventSpy->notifyPRNotGTMed(PRNotGTMed::forPR(PRIdentifier::fromString('1010'), ReviewerName::fromString('samir')));
+        $this->eventSpy->notifyPRNotGTMed(PRNotGTMed::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString(''),
+            ReviewerName::fromString('samir')
+        ));
         $this->assertTrue($this->eventSpy->PRNotGMTedDispatched());
     }
 
@@ -54,7 +62,11 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_commented_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->PRCommentedDispatched());
-        $this->eventSpy->notifyPRCommented(PRCommented::forPR(PRIdentifier::fromString('1010'), ReviewerName::fromString('samir')));
+        $this->eventSpy->notifyPRCommented(PRCommented::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString(''),
+            ReviewerName::fromString('samir')
+        ));
         $this->assertTrue($this->eventSpy->PRCommentedDispatched());
     }
 
@@ -64,7 +76,10 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_ci_green_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->CIGreenEventDispatched());
-        $this->eventSpy->notifyCIGreen(CIGreen::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyCIGreen(CIGreen::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString('')
+        ));
         $this->assertTrue($this->eventSpy->CIGreenEventDispatched());
     }
 
@@ -74,7 +89,11 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_ci_red_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->CIRedEventDispatched());
-        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010'), BuildLink::none()));
+        $this->eventSpy->notifyCIRed(CIRed::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString(''),
+            BuildLink::none()
+        ));
         $this->assertTrue($this->eventSpy->CIRedEventDispatched());
     }
 
@@ -94,7 +113,10 @@ class EventsSpyTest extends TestCase
     public function it_tells_wether_the_good_to_merge_event_has_been_thrown(): void
     {
         $this->assertFalse($this->eventSpy->PRGoodToMergeDispatched());
-        $this->eventSpy->notifyPRGoodToMerge(GoodToMerge::forPR(PRIdentifier::fromString('1010')));
+        $this->eventSpy->notifyPRGoodToMerge(GoodToMerge::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString('')
+        ));
         $this->assertTrue($this->eventSpy->PRGoodToMergeDispatched());
     }
 
@@ -104,7 +126,11 @@ class EventsSpyTest extends TestCase
     public function it_tells_if_it_has_events(): void
     {
         $this->assertFalse($this->eventSpy->hasEvents());
-        $this->eventSpy->notifyCIRed(CIRed::forPR(PRIdentifier::fromString('1010'), BuildLink::none()));
+        $this->eventSpy->notifyCIRed(CIRed::forPR(
+            PRIdentifier::fromString('1010'),
+            WorkspaceIdentifier::fromString(''),
+            BuildLink::none()
+        ));
         $this->assertTrue($this->eventSpy->hasEvents());
     }
 

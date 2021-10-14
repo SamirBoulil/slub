@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Ramsey\Uuid\Uuid;
-use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**

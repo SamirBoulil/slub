@@ -14,7 +14,9 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\GetBotUserId;
+use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
 use Slub\Infrastructure\Chat\Slack\SlackClient;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**
@@ -43,8 +45,16 @@ class SlackClientTest extends KernelTestCase
         $this->getBotUserId = $this->prophesize(GetBotUserId::class);
         $this->getBotReactionsForMessageAndUser = $this->prophesize(GetBotReactionsForMessageAndUser::class);
 
+        $slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
+        $this->mockSlackAppInstallation($slackAppInstallationRepository);
+
         $this->slackClient = new SlackClient(
-            $this->getBotUserId->reveal(), $this->getBotReactionsForMessageAndUser->reveal(), $client, $this->prophesize(LoggerInterface::class)->reveal(), 'xobxob-slack-token', 'USER_ID' // TODO: to remove
+            $this->getBotUserId->reveal(),
+            $this->getBotReactionsForMessageAndUser->reveal(),
+            $client,
+            $this->prophesize(LoggerInterface::class)->reveal(),
+            $slackAppInstallationRepository->reveal(),
+            'USER_ID' // TODO: to remove
         );
     }
 
@@ -55,7 +65,7 @@ class SlackClientTest extends KernelTestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 
-        $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
+        $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
 
         $generatedRequest = $this->httpClientMock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
@@ -77,11 +87,12 @@ class SlackClientTest extends KernelTestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 //        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
-        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+
+        $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
             ->willReturn(['ok_hand']);
 
-        $this->slackClient->setReactionsToMessageWith(MessageIdentifier::fromString('channel@message'), ['ok_hand', 'rocket']);
+        $this->slackClient->setReactionsToMessageWith(MessageIdentifier::fromString('workspace@channel@message'), ['ok_hand', 'rocket']);
 
         $generatedRequest = $this->httpClientMock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
@@ -103,12 +114,12 @@ class SlackClientTest extends KernelTestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 //        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
-        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+        $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
             ->willReturn(['ok_hand', 'one', 'red_ci']);
 
         $this->slackClient->setReactionsToMessageWith(
-            MessageIdentifier::fromString('channel@message'),
+            MessageIdentifier::fromString('workspace@channel@message'),
             ['ok_hand', 'one']
         );
 
@@ -132,12 +143,12 @@ class SlackClientTest extends KernelTestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 //        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
-        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message', 'USER_ID')
+        $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
             ->willReturn(['ok_hand', 'one', 'red_ci']);
 
         $this->slackClient->setReactionsToMessageWith(
-            MessageIdentifier::fromString('channel@message'),
+            MessageIdentifier::fromString('workspace@channel@message'),
             ['ok_hand', 'one', 'red_ci']
         );
         $this->assertNull($this->httpClientMock->getLastRequest());
@@ -149,7 +160,7 @@ class SlackClientTest extends KernelTestCase
     public function it_publishes_a_message_in_a_channel(): void
     {
         $message = 'a message';
-        $channel = 'channel';
+        $channel = 'workspace@channel';
 
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
         $this->slackClient->publishInChannel(ChannelIdentifier::fromString($channel), $message);
@@ -157,9 +168,10 @@ class SlackClientTest extends KernelTestCase
         $generatedRequest = $this->httpClientMock->getLastRequest();
         self::assertEquals('POST', $generatedRequest->getMethod());
         self::assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
         self::assertEquals(
-            ['channel' => $channel, 'text' => $message],
-            $this->getBodyContent($generatedRequest)
+            ['channel' => 'channel', 'text' => $message],
+            $bodyContent
         );
     }
 
@@ -171,7 +183,7 @@ class SlackClientTest extends KernelTestCase
         $this->mockGuzzleWith(new Response(400, [], ''));
 
         $this->expectException(\RuntimeException::class);
-        $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
+        $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
     }
 
     /**
@@ -182,7 +194,7 @@ class SlackClientTest extends KernelTestCase
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
         $this->expectException(\RuntimeException::class);
-        $this->slackClient->replyInThread(MessageIdentifier::fromString('channel@message'), 'hello world');
+        $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
     }
 
     private function setUpGuzzleMock(): Client
@@ -201,5 +213,16 @@ class SlackClientTest extends KernelTestCase
     private function mockGuzzleWith(Response $response): void
     {
         $this->httpClientMock->append($response);
+    }
+
+    /**
+     *
+     */
+    private function mockSlackAppInstallation(ObjectProphecy $slackAppInstallationRepository): void
+    {
+        $slackAppInstallation = new SlackAppInstallation();
+        $slackAppInstallation->accessToken = 'access_token';
+        $slackAppInstallation->workspaceId = 'workspace';
+        $slackAppInstallationRepository->getBy('workspace')->willReturn($slackAppInstallation);
     }
 }

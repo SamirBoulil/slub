@@ -25,7 +25,7 @@ class PRNotGTMedTest extends TestCase
         $event = PRNotGTMed::forPR($expectedIdentifier, $expectedReviewerName);
 
         $this->assertTrue($event->PRIdentifier()->equals($expectedIdentifier),
-            'Expected PR identifier to be the same than the one the event was created with, found different.');
+                          'Expected PR identifier to be the same than the one the event was created with, found different.');
         $this->assertEquals(
             $event->reviewerName()->stringValue(),
             $expectedReviewerName->stringValue(),

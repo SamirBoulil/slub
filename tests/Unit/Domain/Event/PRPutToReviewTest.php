@@ -25,8 +25,8 @@ class PRPutToReviewTest extends TestCase
         $event = PRPutToReview::forPR($expectedIdentifier, $expectedMessageIdentifier);
 
         $this->assertTrue($event->PRIdentifier()->equals($expectedIdentifier),
-            'Expected identifier to be the same than the one the event was created with, found different.');
+                          'Expected identifier to be the same than the one the event was created with, found different.');
         $this->assertTrue($event->messageIdentifier()->equals($expectedMessageIdentifier),
-            'Expected message identifier to be the same than the one the event was created with, found different.');
+                          'Expected message identifier to be the same than the one the event was created with, found different.');
     }
 }

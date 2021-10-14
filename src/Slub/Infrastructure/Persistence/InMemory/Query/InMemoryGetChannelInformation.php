@@ -19,7 +19,7 @@ class InMemoryGetChannelInformation implements GetChannelInformationInterface
         $this->supportedChannels = explode(',', $commaSeparatedChannels);
     }
 
-    public function fetch(string $channelIdentifier): ChannelInformation
+    public function fetch(string $workspaceId, string $channelIdentifier): ChannelInformation
     {
         $channelInformation = new ChannelInformation();
         $channelInformation->channelName = current($this->supportedChannels);

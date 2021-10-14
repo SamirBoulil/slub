@@ -11,17 +11,18 @@ class MessageIdentifierHelper
 {
     private const SEPARATOR = '@';
 
-    public static function from(string $channel, string $ts): string
+    public static function from(string $workspace, string $channel, string $ts): string
     {
-        return sprintf('%s%s%s', $channel, self::SEPARATOR, $ts);
+        return sprintf('%s%s%s%s%s', $workspace, self::SEPARATOR, $channel, self::SEPARATOR, $ts);
     }
 
     public static function split(string $messageIdentifier): array
     {
         $message = explode(self::SEPARATOR, $messageIdentifier);
-        $channel = $message[0];
-        $ts = $message[1];
+        $workspace = $message[0];
+        $channel = $message[1];
+        $ts = $message[2];
 
-        return ['channel' => $channel, 'ts' => $ts];
+        return ['workspace' => $workspace, 'channel' => $channel, 'ts' => $ts];
     }
 }

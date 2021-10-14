@@ -108,7 +108,10 @@ class SlubBot
         $unpublishPR = function (BotMan $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
             $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
-            $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
+            $this->chatClient->replyInThread(
+                MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)),
+                $message
+            );
         };
         $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);
         $bot->hears($unpublishMessage, $unpublishPR);
@@ -172,17 +175,20 @@ class SlubBot
     {
         $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
+        $workspace = $this->getWorkspaceIdentifier($bot);
         $channel = $payload['channel'];
 
-        return $this->getChannelInformation->fetch($channel)->channelName;
+        return $this->getChannelInformation->fetch($workspace, $channel)->channelName;
     }
 
     private function getMessageIdentifier(BotMan $bot): string
     {
-        $channel = $bot->getMessage()->getPayload()['channel'];
-        $ts = $bot->getMessage()->getPayload()['ts'];
+        $messageBody = $bot->getMessage()->getPayload();
+        $workspace = $this->getWorkspaceIdentifier($bot);
+        $channel = $messageBody['channel'];
+        $ts = $messageBody['ts'];
 
-        return MessageIdentifierHelper::from($channel, $ts);
+        return MessageIdentifierHelper::from($workspace, $channel, $ts);
     }
 
     private function PRInfo(string $PRNumber, string $repositoryIdentifier): PRInfo
@@ -230,7 +236,6 @@ MESSAGE;
 
     private function getWorkspaceIdentifier(BotMan $bot): string
     {
-        $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
 
         return $payload['team'];

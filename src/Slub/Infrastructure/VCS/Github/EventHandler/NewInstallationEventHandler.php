@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 
 /**

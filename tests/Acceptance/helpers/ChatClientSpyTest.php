@@ -32,7 +32,7 @@ class ChatClientSpyTest extends TestCase
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
         $text = 'hello';
 
-        $this->slackClientSpy->replyInThread($messageIdentifier, $text);
+        $this->slackClientSpy->replyInThread(WorkspaceIdentifier::fromString('workspace_id'), $messageIdentifier, $text);
 
         $this->slackClientSpy->assertReaction($messageIdentifier, $text);
         $this->assertTrue(true, 'No exception was thrown');
@@ -55,7 +55,11 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_a_reply_in_a_thread_was_made_and_it_asserts_empty(): void
     {
         $slackClientSpy = new ChatClientSpy();
-        $slackClientSpy->replyInThread(MessageIdentifier::fromString('general@12345'), 'hello');
+        $slackClientSpy->replyInThread(
+            WorkspaceIdentifier::fromString('workspace_id'),
+            MessageIdentifier::fromString('general@12345'),
+            'hello'
+        );
 
         $this->expectException(AssertionFailedError::class);
         $slackClientSpy->assertEmpty();
@@ -67,7 +71,10 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_a_reaction_to_a_message_was_made_and_it_asserts_empty(): void
     {
         $slackClientSpy = new ChatClientSpy();
-        $slackClientSpy->setReactionsToMessageWith(MessageIdentifier::fromString('general@12345'), ['reaction']);
+        $slackClientSpy->setReactionsToMessageWith(WorkspaceIdentifier::fromString(''),
+                                                   MessageIdentifier::fromString('general@12345'),
+                                                   ['reaction']
+        );
 
         $this->expectException(AssertionFailedError::class);
         $slackClientSpy->assertEmpty();
@@ -80,7 +87,11 @@ class ChatClientSpyTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $slackClientSpy = new ChatClientSpy();
-        $slackClientSpy->publishInChannel(ChannelIdentifier::fromString('general@12345'), 'text');
+        $slackClientSpy->publishInChannel(
+            WorkspaceIdentifier::fromString('workspace_id'),
+            ChannelIdentifier::fromString('general@12345'),
+            'text'
+        );
 
         $this->expectException(AssertionFailedError::class);
         $slackClientSpy->assertEmpty();
@@ -92,7 +103,11 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_it_has_not_been_called_with_the_expected_message_identifier(): void
     {
         $text = 'hello';
-        $this->slackClientSpy->replyInThread(MessageIdentifier::fromString('general@12345'), $text);
+        $this->slackClientSpy->replyInThread(
+            WorkspaceIdentifier::fromString('workspace_id'),
+            MessageIdentifier::fromString('general@12345'),
+            $text
+        );
 
         $this->expectException(AssertionFailedError::class);
         $this->slackClientSpy->assertReaction(MessageIdentifier::fromString('another_one'), $text);
@@ -104,7 +119,11 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_it_has_not_been_called_with_the_expected_text(): void
     {
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
-        $this->slackClientSpy->replyInThread($messageIdentifier, 'hello');
+        $this->slackClientSpy->replyInThread(
+            WorkspaceIdentifier::fromString('workspace_id'),
+            $messageIdentifier,
+            'hello'
+        );
 
         $this->expectException(AssertionFailedError::class);
         $this->slackClientSpy->assertReaction($messageIdentifier, 'another_text');

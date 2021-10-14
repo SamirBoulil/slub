@@ -63,7 +63,7 @@ class SlubBotTest extends KernelTestCase
     public function it_answers_to_new_PR_messages_in_public_channels(string $message): void
     {
         $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'channel', 'team' => 'akeneo'])->assertReplyNothing();
-        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'akeneo@channelId@1234');
     }
 
     /**
@@ -72,7 +72,7 @@ class SlubBotTest extends KernelTestCase
     public function it_answers_to_new_PR_messages_in_private_channels(): void
     {
         $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo'])->assertReplyNothing();
-        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'channelId@1234');
+        $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'akeneo@channelId@1234');
     }
 
     /**

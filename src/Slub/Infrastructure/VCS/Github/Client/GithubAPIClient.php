@@ -6,7 +6,6 @@ namespace Slub\Infrastructure\VCS\Github\Client;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 

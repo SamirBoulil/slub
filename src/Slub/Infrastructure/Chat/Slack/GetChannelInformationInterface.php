@@ -7,5 +7,5 @@ use Slub\Domain\Query\ChannelInformation;
 
 interface GetChannelInformationInterface
 {
-    public function fetch(string $channelIdentifier): ChannelInformation;
+    public function fetch(string $workspaceId, string $channelIdentifier): ChannelInformation;
 }

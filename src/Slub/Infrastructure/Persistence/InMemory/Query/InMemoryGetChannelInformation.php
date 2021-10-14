@@ -12,17 +12,10 @@ use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
  */
 class InMemoryGetChannelInformation implements GetChannelInformationInterface
 {
-    private array $supportedChannels;
-
-    public function __construct(string $commaSeparatedChannels)
-    {
-        $this->supportedChannels = explode(',', $commaSeparatedChannels);
-    }
-
     public function fetch(string $workspaceId, string $channelIdentifier): ChannelInformation
     {
         $channelInformation = new ChannelInformation();
-        $channelInformation->channelName = current($this->supportedChannels);
+        $channelInformation->channelName = 'akeneo';
         $channelInformation->channelIdentifier = $channelIdentifier;
 
         return $channelInformation;

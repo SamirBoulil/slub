@@ -7,6 +7,7 @@ namespace Slub\Infrastructure\Chat\Slack;
 use GuzzleHttp\ClientInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * In the OAuth Slack installation flow (https://api.slack.com/authentication/oauth-v2).
@@ -19,38 +20,46 @@ class OAuthInstallationAction
 {
     private ClientInterface $httpClient;
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
+    private string $slackClientId;
+    private string $slackClientSecret;
 
     public function __construct(
         ClientInterface $httpClient,
-        SqlSlackAppInstallationRepository $slackAppInstallationRepository
+        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
+        string $slackClientId,
+        string $slackClientSecret
     ) {
         $this->httpClient = $httpClient;
         $this->slackAppInstallationRepository = $slackAppInstallationRepository;
+        $this->slackClientId = $slackClientId;
+        $this->slackClientSecret = $slackClientSecret;
     }
 
-    public function executeAction(Request $request): void
+    public function executeAction(Request $request): Response
     {
         $temporaryCode = $this->temporaryCode($request);
         $slackAppInstallation = $this->exchangeTemporaryCode($temporaryCode);
         $this->slackAppInstallationRepository->save($slackAppInstallation);
+
+        return new Response();
     }
 
     private function temporaryCode(Request $request): string
     {
-        $content = json_decode((string)$request->getContent(), true);
-        if (!isset($content['code'])) {
+        $code = $request->query->get('code');
+        if (null === $code) {
             throw new \RuntimeException('Expected to have a "code" field in the request, none found.');
         }
 
-        return $content['code'];
+        return $code;
     }
 
     private function exchangeTemporaryCode(string $temporaryCode): SlackAppInstallation
     {
         $response = $this->httpClient->post('https://slack.com/api/oauth.v2.access', [
             'form_params' => [
-                'client_id' => '',
-                'client_secret' => '',
+                'client_id' => $this->slackClientId,
+                'client_secret' => $this->slackClientSecret,
                 'code' => $temporaryCode,
             ],
         ]);

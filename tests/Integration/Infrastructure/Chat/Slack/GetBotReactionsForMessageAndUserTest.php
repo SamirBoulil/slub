@@ -10,6 +10,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
@@ -34,7 +35,8 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
 
         $this->getBotReactionsForMessageAndUser = new GetBotReactionsForMessageAndUser(
             $client,
-            $this->slackAppInstallationRepository->reveal()
+            $this->slackAppInstallationRepository->reveal(),
+            new NullLogger()
         );
     }
 
@@ -55,7 +57,8 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
         $generatedRequest = $this->httpMock->getLastRequest();
         $this->assertEquals('GET', $generatedRequest->getMethod());
         $this->assertEquals('/api/reactions.get', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=access_token&channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals(['white_check_mark', 'rocket'], $reactions);
     }
 
@@ -76,7 +79,8 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
         $generatedRequest = $this->httpMock->getLastRequest();
         $this->assertEquals('GET', $generatedRequest->getMethod());
         $this->assertEquals('/api/reactions.get', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=access_token&channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals([], $reactions);
     }
 

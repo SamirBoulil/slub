@@ -6,8 +6,6 @@ namespace Slub\Application\ClosePR;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Entity\Repository\RepositoryIdentifier;
-use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -16,35 +14,20 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 class ClosePRHandler
 {
     private PRRepositoryInterface $PRRepository;
-
-    private IsSupportedInterface $isSupported;
-
     private LoggerInterface $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        IsSupportedInterface $isSupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->isSupported = $isSupported;
         $this->logger = $logger;
     }
 
     public function handle(ClosePR $command): void
     {
-        if (!$this->isSupported($command)) {
-            return;
-        }
         $this->closePR($command);
         $this->logIt($command);
-    }
-
-    private function isSupported(ClosePR $closePR): bool
-    {
-        $repositoryIdentifier = RepositoryIdentifier::fromString($closePR->repositoryIdentifier);
-
-        return $this->isSupported->repository($repositoryIdentifier);
     }
 
     private function closePR(ClosePR $closePR): void

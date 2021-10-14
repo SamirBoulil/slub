@@ -6,7 +6,7 @@ chat_slack_messages:
 chat_slack_oauth_installation:
     path: /chat/slack/oauth
     controller: slub.infrastructure.chat.slack.oauth_installation_action::executeAction
-    methods: [POST]
+    methods: [POST, GET]
 
 vcs_github_new_event:
     path: /vcs/github

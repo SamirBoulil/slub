@@ -36,7 +36,7 @@ class SlubBot
 
     private BotMan $bot;
 
-    private string $botUserId;
+    private GetBotUserIdInterface $getBotUserId;
 
     private ChatClient $chatClient;
 
@@ -46,25 +46,25 @@ class SlubBot
         PutPRToReviewHandler $putPRToReviewHandler,
         UnpublishPRHandler $unpublishPRHandler,
         ChatClient $chatClient,
+        GetBotUserIdInterface $getBotUserId,
         GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
-        LoggerInterface $logger,
-        string $botUserId
+        LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->unpublishPRHandler = $unpublishPRHandler;
         $this->getChannelInformation = $getChannelInformation;
         $this->getPRInfo = $getPRInfo;
         $this->logger = $logger;
-        $this->botUserId = $botUserId;
         $this->chatClient = $chatClient;
+        $this->getBotUserId = $getBotUserId;
 
         DriverManager::loadDriver(SlackDriver::class);
         $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
         $this->listensToNewPR($this->bot);
         $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);
-        $this->providesToHelp($this->bot);
+//        $this->providesToHelp($this->bot);
         $this->bot->listen();
     }
 
@@ -109,7 +109,7 @@ class SlubBot
                 $message
             );
         };
-        $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);
+        $unpublishMessage = '.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*';
         $bot->hears($unpublishMessage, $unpublishPR);
     }
 
@@ -169,12 +169,12 @@ class SlubBot
 
     private function getChannelIdentifier(BotMan $bot): string
     {
-        $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
         $workspace = $this->getWorkspaceIdentifier($bot);
         $channel = $payload['channel'];
+        $this->logger->info(sprintf('Now fetching channel information for workspace "%s" and channel "%s"', $workspace, $channel));
 
-        return $this->getChannelInformation->fetch($workspace, $channel)->channelName;
+        return ChannelIdentifierHelper::from($workspace, $this->getChannelInformation->fetch($workspace, $channel)->channelName);
     }
 
     private function getMessageIdentifier(BotMan $bot): string
@@ -199,36 +199,38 @@ class SlubBot
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
     }
 
-    private function providesToHelp(BotMan $bot): void
-    {
-        $userHelp = function (BotMan $bot) {
-            $message = <<<MESSAGE
-*Hello I'm Yeee!*
-I'm here to improve the feedback loop between you and your PR statuses.
-
-Ever wonder how to work with me ? Here are some advices ;)
-
-*1. I track the PRs you put to review directly in slack. Make sure they have the following structure:*
-```
-... TR ... {PR link} ...
-... PR ... {PR link} ...
-... review ... {PR link} ...
-```
-
-*2. I post daily reminders for you and your teams to review PRs. To unpublish a PR from it, just let me know like this:*
-```@Yeee Unpublish {PR link}```
-
-*3. If you found a bug, <https://github.com/SamirBoulil/slub/issues/new|you can open a new issue>!*
-
-That's it! Have a wonderful day :yee:
-MESSAGE;
-            $bot->reply($message);
-        };
-        $yeeeHelp = sprintf('<@%s>.*help.*', $this->botUserId);
-        $helpYeee = sprintf('.*help.*<@%s>.*', $this->botUserId);
-        $bot->hears($yeeeHelp, $userHelp);
-        $bot->hears($helpYeee, $userHelp);
-    }
+    // Impossible to listen to bot user id
+//    private function providesToHelp(BotMan $bot): void
+//    {
+//        $userHelp = function (BotMan $bot) {
+//            $message = <<<MESSAGE
+    //*Hello I'm Yeee!*
+    //I'm here to improve the feedback loop between you and your PR statuses.
+//
+    //Ever wonder how to work with me ? Here are some advices ;)
+//
+    //*1. I track the PRs you put to review directly in slack. Make sure they have the following structure:*
+    //```
+    //... TR ... {PR link} ...
+    //... PR ... {PR link} ...
+    //... review ... {PR link} ...
+    //```
+//
+    //*2. I post daily reminders for you and your teams to review PRs. To unpublish a PR from it, just let me know like this:*
+    //```@Yeee Unpublish {PR link}```
+//
+    //*3. If you found a bug, <https://github.com/SamirBoulil/slub/issues/new|you can open a new issue>!*
+//
+    //That's it! Have a wonderful day :yee:
+    //MESSAGE;
+//            $bot->reply($message);
+//        };
+//        $botUserId = $this->getBotUserId->fetch($this->getWorkspaceIdentifier($this->bot));
+//        $yeeeHelp = sprintf('.*help.*', $botUserId);
+//        $helpYeee = sprintf('.*help.*<@%s>.*', $botUserId);
+//        $bot->hears($yeeeHelp, $userHelp);
+//        $bot->hears($helpYeee, $userHelp);
+//    }
 
     private function getWorkspaceIdentifier(BotMan $bot): string
     {

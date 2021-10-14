@@ -26,21 +26,17 @@ class SlackClient implements ChatClient
 
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
 
-    private string $slackBotUserId;  // TODO: remove,  call slack API
-
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
         ClientInterface $client,
         LoggerInterface $logger,
-        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
-        string $slackBotUserId
+        SqlSlackAppInstallationRepository $slackAppInstallationRepository
     ) {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
         $this->slackAppInstallationRepository = $slackAppInstallationRepository;
-        $this->slackBotUserId = $slackBotUserId;
         $this->logger = $logger;
     }
 
@@ -68,6 +64,7 @@ class SlackClient implements ChatClient
     public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void
     {
         $currentReactions = $this->getCurrentReactions($messageIdentifier);
+        $this->logger->critical(implode(',', $currentReactions));
         $reactionsToRemove = array_diff($currentReactions, $reactionsToSet);
         $reactionsToAdd = array_diff($reactionsToSet, $currentReactions);
         $this->removeReactions($messageIdentifier, $reactionsToRemove);
@@ -97,14 +94,21 @@ class SlackClient implements ChatClient
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $botUserId = $this->slackBotUserId;
+        $botUserId = $this->getBotUserId->fetch($messageId['workspace']);
 
-        return $this->getBotReactionsForMessageAndUser->fetch(
+        $this->logger->critical(sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId)));
+        $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
+
+        $result = $this->getBotReactionsForMessageAndUser->fetch(
             $messageId['workspace'],
             $messageId['channel'],
             $messageId['ts'],
             $botUserId
         );
+
+        $this->logger->critical(sprintf('Reactions: %s', implode(',', $result)));
+
+        return $result;
     }
 
     private function addReactions(MessageIdentifier $messageIdentifier, array $reactionsToAdd): void

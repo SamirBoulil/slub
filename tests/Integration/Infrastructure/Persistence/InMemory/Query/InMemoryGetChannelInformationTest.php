@@ -16,7 +16,7 @@ class InMemoryGetChannelInformationTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->getChannelInformation = new InMemoryGetChannelInformation('akeneo,squad-chipmunks');
+        $this->getChannelInformation = new InMemoryGetChannelInformation();
     }
 
     /**

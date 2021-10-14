@@ -16,8 +16,3 @@ Feature: Improve the signal VS noise of the list of pull requests that needs a r
     When the author closes the PR by merging it
     Then the PR is closed and merged
     And the squad should be notified that the PR has been closed and merged
-
-  @secondary
-  Scenario: It does not notify when a PR of an unsupported repository is closed
-    When the a PR belonging to an unsupported repository is closed
-    Then the squad should not be not notified

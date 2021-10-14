@@ -1,6 +1,4 @@
 parameters:
-    SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
-    SUPPORTED_WORKSPACES: 'akeneo,general'
     GITHUB_WEBHOOK_SECRET: 'my_secret'
     GITHUB_URI: '127.0.0.1:8081'
     GITHUB_PORT: '8081'
@@ -19,18 +17,14 @@ services:
     slub.infrastructure.chat.slack.slack_client:
         class: Tests\Acceptance\helpers\ChatClientSpy
 
-    slub.infrastructure.query.get_public_channel_information:
-        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
-        arguments:
-            - '%env(SUPPORTED_WORKSPACES)%'
-
     slub.infrastructure.common.query.clock:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation
-        arguments:
-            - '%env(SUPPORTED_WORKSPACES)%'
+
+    slub.infrastructure.query.get_bot_user_id:
+        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetBotUserId
 
     slub.infrastructure.vcs.github.query.get_vcs_status_from_github:
         class: Tests\Acceptance\helpers\GetVCSStatusDummy

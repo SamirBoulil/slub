@@ -10,6 +10,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Chat\Slack\GetBotUserId;
 use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
@@ -34,7 +35,7 @@ class GetBotUserIdTest extends TestCase
         $this->slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
         $this->mockSlackAppInstallation();
 
-        $this->getBotUserId = new GetBotUserId($client, $this->slackAppInstallationRepository->reveal());
+        $this->getBotUserId = new GetBotUserId($client, $this->slackAppInstallationRepository->reveal(), new NullLogger());
     }
 
     /**
@@ -42,14 +43,14 @@ class GetBotUserIdTest extends TestCase
      */
     public function it_fetches_the_slack_user_id(): void
     {
-        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "bot": {"id": "USER_ID"}}'));
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "user_id": "USER_ID"}'));
 
         $userId = $this->getBotUserId->fetch('workspace_id');
 
         $generatedRequest = $this->httpMock->getLastRequest();
-        $this->assertEquals('GET', $generatedRequest->getMethod());
-        $this->assertEquals('/api/bots.info', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=access_token', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('/api/auth.test', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals('USER_ID', $userId);
     }
 

@@ -53,7 +53,7 @@ class SlubBotTest extends KernelTestCase
         $this->chatClientSpy = $this->get('slub.infrastructure.chat.slack.slack_client');
         $this->botTester = $this->startBot();
         $this->botTester->setUser(['id' => 'DUMMY_NAME']);
-        $this->botUserId = $this->get('BOT_USER_ID');
+        $this->botUserId = 'bot_user_id';
     }
 
     /**

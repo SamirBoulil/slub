@@ -7,10 +7,7 @@ namespace Slub\Application\CIStatusUpdate;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Entity\Repository\RepositoryIdentifier;
-use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Webmozart\Assert\Assert;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -19,35 +16,20 @@ class CIStatusUpdateHandler
 {
     private PRRepositoryInterface $PRRepository;
 
-    private IsSupportedInterface $isSupported;
-
     private LoggerInterface $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        IsSupportedInterface $isSupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->isSupported = $isSupported;
         $this->logger = $logger;
     }
 
     public function handle(CIStatusUpdate $CIStatusUpdate): void
     {
-        if (!$this->isSupported($CIStatusUpdate)) {
-            return;
-        }
         $this->updateCIStatus($CIStatusUpdate);
         $this->logIt($CIStatusUpdate);
-    }
-
-    private function isSupported(CIStatusUpdate $CIStatusUpdate): bool
-    {
-        $repositoryIdentifier = RepositoryIdentifier::fromString($CIStatusUpdate->repositoryIdentifier);
-        Assert::string($CIStatusUpdate->status);
-
-        return $this->isSupported->repository($repositoryIdentifier);
     }
 
     private function updateCIStatus(CIStatusUpdate $CIStatusUpdate): void

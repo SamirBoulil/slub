@@ -25,8 +25,3 @@ Feature: Improve the feedback delay between the squad and the continuous integra
     When the CI is being running for the PR
     Then the PR should be pending
     And the squad should be notified that the ci is pending for the PR
-
-  @secondary
-  Scenario: It does not notify CI status changes for unsupported repositories
-    When the CI status changes for a PR belonging to an unsupported repository
-    Then the squad should not be not notified

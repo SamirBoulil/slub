@@ -86,7 +86,7 @@ class SlackClientTest extends KernelTestCase
     public function it_adds_reactions_to_messages(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
-//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotUserId->fetch('workspace')->shouldBeCalled()->willReturn('USER_ID');
 
         $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
@@ -113,7 +113,7 @@ class SlackClientTest extends KernelTestCase
     public function it_removes_reactions_from_the_messages(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
-//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotUserId->fetch('workspace')->shouldBeCalled()->willReturn('USER_ID');
         $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
             ->willReturn(['ok_hand', 'one', 'red_ci']);
@@ -142,7 +142,7 @@ class SlackClientTest extends KernelTestCase
     public function it_does_not_update_the_reactions(): void
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
-//        $this->getBotUserId->fetch()->shouldBeCalled()->willReturn('USER_ID');
+        $this->getBotUserId->fetch('workspace')->shouldBeCalled()->willReturn('USER_ID');
         $this->getBotReactionsForMessageAndUser->fetch('workspace', 'channel', 'message', 'USER_ID')
             ->shouldBeCalled()
             ->willReturn(['ok_hand', 'one', 'red_ci']);

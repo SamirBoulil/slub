@@ -11,59 +11,27 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
-use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
-use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 class PutPRToReviewHandler
 {
     private PRRepositoryInterface $PRRepository;
-
-    private IsSupportedInterface $isSupported;
-
     private LoggerInterface $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        IsSupportedInterface $isRepositorySupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->isSupported = $isRepositorySupported;
         $this->logger = $logger;
     }
 
     public function handle(PutPRToReview $command): void
     {
-        if (!$this->isSupported($command)) {
-            return;
-        }
         $this->createOrUpdatePR($command);
         $this->logIt($command);
-    }
-
-    private function isSupported(PutPRToReview $putPRToReview): bool
-    {
-        $repositoryIdentifier = RepositoryIdentifier::fromString($putPRToReview->repositoryIdentifier);
-        $workspaceIdentifier = WorkspaceIdentifier::fromString($putPRToReview->workspaceIdentifier);
-
-        $isSupported = $this->isSupported->repository($repositoryIdentifier)
-            && $this->isSupported->workspace($workspaceIdentifier);
-
-        if (!$isSupported) {
-            $this->logger->info(
-                sprintf(
-                    'PR "%s" was not put to review because it is not supported for workspace "%s", and repository "%s"',
-                    $putPRToReview->PRIdentifier,
-                    $putPRToReview->workspaceIdentifier,
-                    $putPRToReview->repositoryIdentifier
-                )
-            );
-        }
-
-        return $isSupported;
     }
 
     private function createOrUpdatePR(PutPRToReview $command): void

@@ -108,42 +108,6 @@ class PutPRToReviewContext extends FeatureContext
     }
 
     /**
-     * @When /^an author puts a PR belonging to an unsupported repository to review$/
-     */
-    public function anAuthorPutsAPRBelongingToAnUnsupportedRepositoryToReview(): void
-    {
-        $putPRToReview = $this->createPutPRToReviewCommand(
-            'unknown/unknown',
-            'unknown/unknown/1111',
-            'squad-raccoons',
-            'akeneo',
-            '1',
-            'sam',
-            'Add new feature',
-            false
-        );
-        $this->putPRToReviewHandler->handle($putPRToReview);
-    }
-
-    /**
-     * @When /^an author puts a PR to review on an unsupported workspace/
-     */
-    public function anAuthorPutsAPRToReviewOnAnUnsupportedChannel(): void
-    {
-        $putPRToReview = $this->createPutPRToReviewCommand(
-            'akeneo/pim-community-dev',
-            'akeneo/pim-community-dev/1111',
-            'general',
-            'unsupported-workspace',
-            '1',
-            'sam',
-            'Add new feature',
-            false
-        );
-        $this->putPRToReviewHandler->handle($putPRToReview);
-    }
-
-    /**
      * @Then /^the PR is added to the list of followed PRs$/
      */
     public function thePRIsAddedToTheListOfFollowedPRs(): void
@@ -174,14 +138,6 @@ class PutPRToReviewContext extends FeatureContext
         }
 
         return $found;
-    }
-
-    /**
-     * @Then /^the PR is not added to the list of followed PRs$/
-     */
-    public function thePRIsNotAddedToTheListOfFollowedPRs(): void
-    {
-        Assert::assertFalse($this->PRExists($this->currentPRIdentifier));
     }
 
     /**

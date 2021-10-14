@@ -129,31 +129,6 @@ class ReviewContext extends FeatureContext
         Assert::assertEquals(1, $PR->normalize()['NOT_GTMS']);
     }
 
-    /**
-     * @When /^a PR is reviewed on an unsupported repository$/
-     */
-    public function aPullRequestIsReviewedOnAnUnsupportedRepository(): void
-    {
-        $this->currentPRIdentifier = PRIdentifier::fromString('1010');
-
-        $notGTM = new NewReview();
-        $notGTM->repositoryIdentifier = 'unsupported_repository';
-        $notGTM->PRIdentifier = '1010';
-        $notGTM->reviewStatus = 'approved';
-
-        $this->reviewHandler->handle($notGTM);
-    }
-
-    /**
-     * @Then /^it does not notify the squad$/
-     */
-    public function itDoesNotNotifyTheSquad(): void
-    {
-        Assert::assertNotNull($this->currentPRIdentifier, 'The PR identifier was not created');
-        Assert::assertFalse($this->PRExists($this->currentPRIdentifier), 'PR should not exist but was found.');
-        Assert::assertFalse($this->eventSpy->PRNotGMTedDispatched(), 'Event has been thrown, while none was expected.');
-    }
-
     private function PRExists(PRIdentifier $PRIdentifier): bool
     {
         $found = true;

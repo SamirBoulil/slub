@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 
@@ -58,7 +58,7 @@ class NewInstallationEventHandler implements EventHandlerInterface
     }
 
     /**
-     * @return AppInstallation[]
+     * @return \Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation[]
      */
     private function createAppInstallations(array $request, $accessToken): array
     {
@@ -66,7 +66,7 @@ class NewInstallationEventHandler implements EventHandlerInterface
 
         return array_map(
             static function (array $repository) use ($installationId, $accessToken) {
-                $appInstallation = new AppInstallation();
+                $appInstallation = new GithubAppInstallation();
                 $appInstallation->repositoryIdentifier = $repository['full_name'];
                 $appInstallation->installationId = (string) $installationId;
                 $appInstallation->accessToken = $accessToken;
@@ -81,7 +81,7 @@ class NewInstallationEventHandler implements EventHandlerInterface
     {
         array_walk(
             $appInstallations,
-            function (AppInstallation $appInstallation) {
+            function (GithubAppInstallation $appInstallation) {
                 $this->sqlAppInstallationRepository->save($appInstallation);
             }
         );

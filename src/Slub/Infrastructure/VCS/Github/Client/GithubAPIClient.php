@@ -6,7 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Client;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
@@ -44,21 +44,21 @@ class GithubAPIClient
         return $response;
     }
 
-    private function optionsWithAuthorizationHeaders(array $options, AppInstallation $appInstallation): array
+    private function optionsWithAuthorizationHeaders(array $options, GithubAppInstallation $appInstallation): array
     {
         $options['headers'] = array_merge($options['headers'] ?? [], GithubAPIHelper::authorizationHeader($appInstallation->accessToken));
 
         return $options;
     }
 
-    private function fetch(string $url, array $options, AppInstallation $appInstallation): ResponseInterface
+    private function fetch(string $url, array $options, GithubAppInstallation $appInstallation): ResponseInterface
     {
         $options = $this->optionsWithAuthorizationHeaders($options, $appInstallation);
 
         return $this->client->get($url, $options);
     }
 
-    private function refreshAndSaveAccessToken(AppInstallation $appInstallation): AppInstallation
+    private function refreshAndSaveAccessToken(GithubAppInstallation $appInstallation): GithubAppInstallation
     {
         $newAccessToken = $this->refreshAccessToken->fetch($appInstallation->installationId);
         $appInstallation->accessToken = $newAccessToken;

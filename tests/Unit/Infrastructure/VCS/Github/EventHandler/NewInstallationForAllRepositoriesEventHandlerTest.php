@@ -7,7 +7,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationForAllRepositoriesEventHandler;
@@ -68,14 +68,14 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
 
         $this->appInformationRepository->save(
             Argument::that(
-                fn (AppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
+                fn (GithubAppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
                     && self::ACCESS_TOKEN === $appInstallation->accessToken
                     && $appInstallation->repositoryIdentifier === $repository1
             )
         )->shouldBeCalled();
         $this->appInformationRepository->save(
             Argument::that(
-                fn (AppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
+                fn (GithubAppInstallation $appInstallation) => $appInstallation->installationId === (string) $installationId
                     && self::ACCESS_TOKEN === $appInstallation->accessToken
                     && $appInstallation->repositoryIdentifier === $repository2
             )

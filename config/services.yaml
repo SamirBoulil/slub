@@ -149,6 +149,11 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
+    slub.infrastructure.chat.slack.oauth_installation_action:
+        class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction
+        arguments:
+            - '@slub.infrastructure.chat.slack.slub_bot'
+
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
@@ -199,6 +204,11 @@ services:
 
     slub.infrastructure.vcs.github.client.app_installation_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
+    slub.infrastructure.chat.slack.slack_app_installation_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 

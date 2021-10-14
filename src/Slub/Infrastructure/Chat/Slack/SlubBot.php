@@ -36,8 +36,6 @@ class SlubBot
 
     private BotMan $bot;
 
-    private string $slackToken;
-
     private string $botUserId;
 
     private ChatClient $chatClient;
@@ -51,7 +49,6 @@ class SlubBot
         GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
         LoggerInterface $logger,
-        string $slackToken,
         string $botUserId
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
@@ -60,11 +57,10 @@ class SlubBot
         $this->getPRInfo = $getPRInfo;
         $this->logger = $logger;
         $this->botUserId = $botUserId;
-        $this->slackToken = $slackToken;
         $this->chatClient = $chatClient;
 
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create(['slack' => ['token' => $this->slackToken]]);
+        $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
         $this->listensToNewPR($this->bot);
         $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);

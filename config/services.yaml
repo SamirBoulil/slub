@@ -141,7 +141,6 @@ services:
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@logger'
-            - '%env(SLACK_TOKEN)%'
             - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.slub_bot_action:
@@ -158,19 +157,19 @@ services:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.query.get_bot_reactions_for_message_and_user:
         class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.query.get_bot_user_id:
         class: Slub\Infrastructure\Chat\Slack\GetBotUserId
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
@@ -179,7 +178,7 @@ services:
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
             - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
             - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.http.guzzle_client:

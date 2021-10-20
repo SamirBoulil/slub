@@ -9,7 +9,11 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Chat\Slack\GetBotUserId;
+use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -22,11 +26,16 @@ class GetBotUserIdTest extends TestCase
     /** @var GetBotUserId */
     private $getBotUserId;
 
+    private ObjectProphecy $slackAppInstallationRepository;
+
     public function setUp(): void
     {
         parent::setUp();
         $client = $this->setUpGuzzleMock();
-        $this->getBotUserId = new GetBotUserId($client, 'xobxob-slack-token');
+        $this->slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
+        $this->mockSlackAppInstallation();
+
+        $this->getBotUserId = new GetBotUserId($client, $this->slackAppInstallationRepository->reveal(), new NullLogger());
     }
 
     /**
@@ -34,14 +43,14 @@ class GetBotUserIdTest extends TestCase
      */
     public function it_fetches_the_slack_user_id(): void
     {
-        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "bot": {"id": "USER_ID"}}'));
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "user_id": "USER_ID"}'));
 
-        $userId = $this->getBotUserId->fetch();
+        $userId = $this->getBotUserId->fetch('workspace_id');
 
         $generatedRequest = $this->httpMock->getLastRequest();
-        $this->assertEquals('GET', $generatedRequest->getMethod());
-        $this->assertEquals('/api/bots.info', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=xobxob-slack-token', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('POST', $generatedRequest->getMethod());
+        $this->assertEquals('/api/auth.test', $generatedRequest->getUri()->getPath());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals('USER_ID', $userId);
     }
 
@@ -53,7 +62,7 @@ class GetBotUserIdTest extends TestCase
         $this->mockGuzzleWith(new Response(400, [], ''));
 
         $this->expectException(\RuntimeException::class);
-        $this->getBotUserId->fetch();
+        $this->getBotUserId->fetch('workspace_id');
     }
 
     /**
@@ -64,7 +73,7 @@ class GetBotUserIdTest extends TestCase
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
         $this->expectException(\RuntimeException::class);
-        $this->getBotUserId->fetch();
+        $this->getBotUserId->fetch('workspace_id');
     }
 
     private function setUpGuzzleMock(): Client
@@ -78,5 +87,12 @@ class GetBotUserIdTest extends TestCase
     private function mockGuzzleWith(Response $response): void
     {
         $this->httpMock->append($response);
+    }
+
+    private function mockSlackAppInstallation(): void
+    {
+        $slackAppInstallation = new SlackAppInstallation();
+        $slackAppInstallation->accessToken = 'access_token';
+        $this->slackAppInstallationRepository->getBy('workspace_id')->willReturn($slackAppInstallation);
     }
 }

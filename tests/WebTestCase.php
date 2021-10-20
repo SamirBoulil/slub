@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -51,7 +51,7 @@ class WebTestCase extends SymfonyWebTestCase
     private function addDefaultGithubAppInstallation(): void
     {
         $appInstallationRepository = $this->get('slub.infrastructure.vcs.github.client.app_installation_repository');
-        $appInstallation = new AppInstallation();
+        $appInstallation = new GithubAppInstallation();
         $appInstallation->repositoryIdentifier = 'Samirboulil/slub';
         $appInstallation->installationId = 'installation_id';
         $appInstallation->accessToken = 'access_token';

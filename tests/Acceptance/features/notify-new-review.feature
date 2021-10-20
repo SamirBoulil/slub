@@ -24,9 +24,3 @@ Feature: Improve the communication between the author of the pull request (PR) a
     When the PR is commented
     Then the PR should have one comment
     And the author should be notified that the PR has one more comment
-
-  @secondary
-  Scenario: It does not notify the new reviews on unsupported repositories
-    When a PR is reviewed on an unsupported repository
-    Then it does not notify the squad
-

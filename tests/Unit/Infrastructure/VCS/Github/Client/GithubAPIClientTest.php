@@ -7,9 +7,9 @@ namespace Tests\Unit\Infrastructure\VCS\Github\Client;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Tests\Integration\Infrastructure\KernelTestCase;
 use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
@@ -85,7 +85,7 @@ class GithubAPIClientTest extends KernelTestCase
         $this->refreshAccessToken->fetch(self::INSTALLATION_ID)->willReturn($newAccessToken);
         $this->sqlAppInstallationRepository->save(
             Argument::that(
-                fn (AppInstallation $appInstallation) => $appInstallation->accessToken === $newAccessToken
+                fn (GithubAppInstallation $appInstallation) => $appInstallation->accessToken === $newAccessToken
                     && self::INSTALLATION_ID === $appInstallation->installationId
                     && self::REPOSITORY_IDENTIFIER === $appInstallation->repositoryIdentifier
             )
@@ -101,9 +101,9 @@ class GithubAPIClientTest extends KernelTestCase
         $this->requestSpy->assertAuthToken($newAccessToken, $request);
     }
 
-    private function appInstallation(): AppInstallation
+    private function appInstallation(): GithubAppInstallation
     {
-        $appInstallation = new AppInstallation();
+        $appInstallation = new GithubAppInstallation();
         $appInstallation->repositoryIdentifier = self::REPOSITORY_IDENTIFIER;
         $appInstallation->installationId = self::INSTALLATION_ID;
         $appInstallation->accessToken = self::ACCESS_TOKEN;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Ramsey\Uuid\Uuid;
-use Slub\Infrastructure\Persistence\Sql\Repository\AppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**
@@ -27,7 +27,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     public function it_saves_an_app_installation_and_returns_it(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
-        $expected = new AppInstallation();
+        $expected = new GithubAppInstallation();
         $expected->repositoryIdentifier = $repositoryIdentifier;
         $expected->installationId = Uuid::uuid4()->toString();
         $expected->accessToken = Uuid::uuid4()->toString();
@@ -44,7 +44,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     public function it_saves_an_app_installation_without_access_token_and_returns_it(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
-        $expected = new AppInstallation();
+        $expected = new GithubAppInstallation();
         $expected->repositoryIdentifier = $repositoryIdentifier;
         $expected->installationId = Uuid::uuid4()->toString();
         $expected->accessToken = null;
@@ -61,7 +61,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     public function it_updates_the_app_installation(): void
     {
         $repositoryIdentifier = 'akeneo/pim-community-dev';
-        $expected = new AppInstallation();
+        $expected = new GithubAppInstallation();
         $expected->repositoryIdentifier = $repositoryIdentifier;
         $expected->installationId = Uuid::uuid4()->toString();
         $expected->accessToken = Uuid::uuid4()->toString();

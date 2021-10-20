@@ -9,26 +9,34 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class GetBotReactionsForMessageAndUserTest extends TestCase
 {
-    /** @var MockHandler */
-    private $httpMock;
+    private MockHandler $httpMock;
 
-    /** @var GetBotReactionsForMessageAndUser */
-    private $getBotReactionsForMessageAndUser;
+    private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
+
+    private ObjectProphecy $slackAppInstallationRepository;
 
     public function setUp(): void
     {
         parent::setUp();
         $client = $this->setUpGuzzleMock();
+        $this->slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
+        $this->mockSlackAppInstallation();
+
         $this->getBotReactionsForMessageAndUser = new GetBotReactionsForMessageAndUser(
             $client,
-            'xobxob-slack-token'
+            $this->slackAppInstallationRepository->reveal(),
+            new NullLogger()
         );
     }
 
@@ -39,12 +47,18 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     {
         $this->mockGuzzleWith(new Response(200, [], $this->reactions()));
 
-        $reactions = $this->getBotReactionsForMessageAndUser->fetch('channel', 'message_id', 'BOT_USER_ID');
+        $reactions = $this->getBotReactionsForMessageAndUser->fetch(
+            'workspace_id',
+            'channel',
+            'message_id',
+            'BOT_USER_ID'
+        );
 
         $generatedRequest = $this->httpMock->getLastRequest();
         $this->assertEquals('GET', $generatedRequest->getMethod());
         $this->assertEquals('/api/reactions.get', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=xobxob-slack-token&channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals(['white_check_mark', 'rocket'], $reactions);
     }
 
@@ -55,12 +69,18 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "message": {}}'));
 
-        $reactions = $this->getBotReactionsForMessageAndUser->fetch('channel', 'message_id', 'BOT_USER_ID');
+        $reactions = $this->getBotReactionsForMessageAndUser->fetch(
+            'workspace_id',
+            'channel',
+            'message_id',
+            'BOT_USER_ID'
+        );
 
         $generatedRequest = $this->httpMock->getLastRequest();
         $this->assertEquals('GET', $generatedRequest->getMethod());
         $this->assertEquals('/api/reactions.get', $generatedRequest->getUri()->getPath());
-        $this->assertEquals('token=xobxob-slack-token&channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('channel=channel&timestamp=message_id', $generatedRequest->getUri()->getQuery());
+        $this->assertEquals('Bearer access_token', $generatedRequest->getHeader('Authorization')[0]);
         $this->assertEquals([], $reactions);
     }
 
@@ -70,9 +90,10 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     public function it_throws_if_the_http_status_is_not_200(): void
     {
         $this->mockGuzzleWith(new Response(400, [], ''));
+        $this->mockSlackAppInstallation();
 
         $this->expectException(\RuntimeException::class);
-        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message_id', 'BOT_USER_ID');
+        $this->getBotReactionsForMessageAndUser->fetch('workspace_id', 'channel', 'message_id', 'BOT_USER_ID');
     }
 
     /**
@@ -83,7 +104,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
         $this->expectException(\RuntimeException::class);
-        $this->getBotReactionsForMessageAndUser->fetch('channel', 'message_id', 'BOT_USER_ID');
+        $this->getBotReactionsForMessageAndUser->fetch('workspace_id', 'channel', 'message_id', 'BOT_USER_ID');
     }
 
     private function setUpGuzzleMock(): Client
@@ -133,5 +154,12 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
     "ok": true
 }
 json;
+    }
+
+    private function mockSlackAppInstallation(): void
+    {
+        $slackAppInstallation = new SlackAppInstallation();
+        $slackAppInstallation->accessToken = 'access_token';
+        $this->slackAppInstallationRepository->getBy('workspace_id')->willReturn($slackAppInstallation);
     }
 }

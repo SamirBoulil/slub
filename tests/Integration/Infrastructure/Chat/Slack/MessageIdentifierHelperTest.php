@@ -15,9 +15,9 @@ class MessageIdentifierHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_creates_a_string_out_of_a_channel_and_ts(): void
+    public function it_creates_a_string_out_of_a_workspace_and_channel_and_ts(): void
     {
-        $this->assertEquals('general@12345', MessageIdentifierHelper::from('general', '12345'));
+        $this->assertEquals('akeneo@general@12345', MessageIdentifierHelper::from('akeneo', 'general', '12345'));
     }
 
     /**
@@ -25,6 +25,6 @@ class MessageIdentifierHelperTest extends TestCase
      */
     public function it_returns_the_channel_and_ts_out_of_a_normalized_channel_identifier(): void
     {
-        $this->assertEquals(['channel' => 'general', 'ts' => '12345'], MessageIdentifierHelper::split('general@12345'));
+        $this->assertEquals(['workspace' => 'akeneo', 'channel' => 'general', 'ts' => '12345'], MessageIdentifierHelper::split('akeneo@general@12345'));
     }
 }

@@ -147,26 +147,6 @@ class CIStatusUpdateContext extends FeatureContext
     }
 
     /**
-     * @When /^the CI status changes for a PR belonging to an unsupported repository$/
-     */
-    public function theCIStatusChangesForAPRBelongingToAnUnsupportedRepository(): void
-    {
-        $CIStatusUpdate = new CIStatusUpdate();
-        $CIStatusUpdate->repositoryIdentifier = 'unsupported_repository';
-        $CIStatusUpdate->PRIdentifier = 'unsupported_repository/1010';
-        $CIStatusUpdate->status = 'GREEN';
-        $this->CIStatusUpdateHandler->handle($CIStatusUpdate);
-    }
-
-    /**
-     * @Then /^the squad should not be not notified$/
-     */
-    public function theSquadShouldNotBeNotNotified(): void
-    {
-        Assert::assertFalse($this->eventSpy->hasEvents(), 'Expected to have no events, but some were found');
-    }
-
-    /**
      * @Given /^the author should be notified that the ci is green for the PR$/
      */
     public function theAuthorShouldBeNotifiedThatTheCiIsGreenForThePR(): void

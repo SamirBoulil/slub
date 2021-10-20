@@ -5,46 +5,63 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\ClientInterface;
+use Psr\Log\LoggerInterface;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class GetBotUserId
+class GetBotUserId implements GetBotUserIdInterface
 {
     private ClientInterface $client;
 
-    private string $slackToken;
+    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
+
+    private LoggerInterface $logger;
 
     private ?string $cachedResult = null;
 
-    public function __construct(ClientInterface $client, string $slackToken)
-    {
+    public function __construct(
+        ClientInterface $client,
+        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
+        LoggerInterface $logger
+    ) {
         $this->client = $client;
-        $this->slackToken = $slackToken;
+        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
+        $this->logger = $logger;
     }
 
-    public function fetch(): string
+    public function fetch(string $workspaceId): string
     {
         if (null === $this->cachedResult) {
-            $this->cachedResult = $this->fetchBotUserId();
+            $this->cachedResult = $this->fetchBotUserId($workspaceId);
         }
+
+        $this->logger->critical(sprintf('Bot user id is "%s"', $this->cachedResult));
 
         return $this->cachedResult;
     }
 
-    private function fetchBotUserId(): string
+    private function fetchBotUserId(string $workspaceId): string
     {
         $response = APIHelper::checkResponse(
-            $this->client->get(
-                'https://slack.com/api/bots.info',
+            $this->client->post(
+                'https://slack.com/api/auth.test',
                 [
-                    'query' => [
-                        'token' => $this->slackToken,
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->slackToken($workspaceId),
                     ],
                 ]
             )
         );
 
-        return $response['bot']['id'];
+        $this->logger->critical(json_encode($response));
+
+        return $response['user_id'];
+    }
+
+    private function slackToken(string $workspaceId): string
+    {
+        return $this->slackAppInstallationRepository->getBy($workspaceId)->accessToken;
     }
 }

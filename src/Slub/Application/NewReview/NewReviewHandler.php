@@ -6,9 +6,7 @@ namespace Slub\Application\NewReview;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Entity\Repository\RepositoryIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
-use Slub\Domain\Query\IsSupportedInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -17,35 +15,20 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 class NewReviewHandler
 {
     private PRRepositoryInterface $PRRepository;
-
-    private IsSupportedInterface $isSupported;
-
     private LoggerInterface $logger;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        IsSupportedInterface $isSupported,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
-        $this->isSupported = $isSupported;
         $this->logger = $logger;
     }
 
     public function handle(NewReview $review): void
     {
-        if (!$this->isSupported($review)) {
-            return;
-        }
         $this->updatePRWithReview($review);
         $this->logIt($review);
-    }
-
-    private function isSupported(NewReview $review): bool
-    {
-        $repositoryIdentifier = RepositoryIdentifier::fromString($review->repositoryIdentifier);
-
-        return $this->isSupported->repository($repositoryIdentifier);
     }
 
     private function updatePRWithReview(NewReview $review): void

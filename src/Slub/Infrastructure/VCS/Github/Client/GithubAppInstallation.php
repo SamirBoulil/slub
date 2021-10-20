@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Persistence\Sql\Repository;
+namespace Slub\Infrastructure\VCS\Github\Client;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
  */
-class AppInstallation
+class GithubAppInstallation
 {
     public string $repositoryIdentifier;
 

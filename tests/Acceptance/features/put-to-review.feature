@@ -22,13 +22,3 @@ Feature: Collect the pull requests put to review
     When an author reopens the PR and puts it to review
     Then the PR is reopened with the new channel id and message id
     And the squad should be notified that the PR has been successfully put to review
-
-  @secondary
-  Scenario: Put a PR belonging to an unsupported repository to review
-    When an author puts a PR belonging to an unsupported repository to review
-    Then the PR is not added to the list of followed PRs
-
-  @secondary
-  Scenario: Put a PR to review on an unsupported workspace
-    When an author puts a PR to review on an unsupported workspace
-    Then the PR is not added to the list of followed PRs

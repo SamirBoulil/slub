@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -23,23 +24,19 @@ class SlackClient implements ChatClient
 
     private LoggerInterface $logger;
 
-    private string $slackToken;
-
-    private string $slackBotUserId;  // TODO: remove,  call slack API
+    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
 
     public function __construct(
         GetBotUserId $getBotUserId,
         GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
         ClientInterface $client,
         LoggerInterface $logger,
-        string $slackToken,
-        string $slackBotUserId
+        SqlSlackAppInstallationRepository $slackAppInstallationRepository
     ) {
         $this->getBotUserId = $getBotUserId;
         $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
         $this->client = $client;
-        $this->slackToken = $slackToken;
-        $this->slackBotUserId = $slackBotUserId;
+        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
         $this->logger = $logger;
     }
 
@@ -51,7 +48,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer ' . $this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -67,6 +64,7 @@ class SlackClient implements ChatClient
     public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void
     {
         $currentReactions = $this->getCurrentReactions($messageIdentifier);
+        $this->logger->critical(implode(',', $currentReactions));
         $reactionsToRemove = array_diff($currentReactions, $reactionsToSet);
         $reactionsToAdd = array_diff($reactionsToSet, $currentReactions);
         $this->removeReactions($messageIdentifier, $reactionsToRemove);
@@ -75,16 +73,17 @@ class SlackClient implements ChatClient
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
+        $channel = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
         APIHelper::checkResponse(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer ' . $this->slackToken($channel['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
-                        'channel' => $channelIdentifier->stringValue(),
+                        'channel' => $channel['channel'],
                         'text' => $text,
                     ],
                 ]
@@ -95,9 +94,21 @@ class SlackClient implements ChatClient
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        $botUserId = $this->slackBotUserId;
+        $botUserId = $this->getBotUserId->fetch($messageId['workspace']);
 
-        return $this->getBotReactionsForMessageAndUser->fetch($messageId['channel'], $messageId['ts'], $botUserId);
+        $this->logger->critical(sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId)));
+        $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
+
+        $result = $this->getBotReactionsForMessageAndUser->fetch(
+            $messageId['workspace'],
+            $messageId['channel'],
+            $messageId['ts'],
+            $botUserId
+        );
+
+        $this->logger->critical(sprintf('Reactions: %s', implode(',', $result)));
+
+        return $result;
     }
 
     private function addReactions(MessageIdentifier $messageIdentifier, array $reactionsToAdd): void
@@ -108,7 +119,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.add',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer '. $this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -136,7 +147,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.remove',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken,
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -154,5 +165,10 @@ class SlackClient implements ChatClient
                 implode(',', $reactionsToRemove)
             )
         );
+    }
+
+    private function slackToken(string $workspaceId): string
+    {
+        return $this->slackAppInstallationRepository->getBy($workspaceId)->accessToken;
     }
 }

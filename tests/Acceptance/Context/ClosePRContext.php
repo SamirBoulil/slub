@@ -145,19 +145,6 @@ class ClosePRContext extends FeatureContext
     }
 
     /**
-     * @When /^the a PR belonging to an unsupported repository is closed$/
-     */
-    public function theAPRBelongingToAnUnsupportedRepositoryIsClosed(): void
-    {
-        $closePR = new ClosePR();
-        $closePR->repositoryIdentifier = 'unsupported_repository';
-        $closePR->PRIdentifier = '1010';
-        $closePR->isMerged = true;
-        $this->currentPRIdentifier = PRIdentifier::fromString($closePR->PRIdentifier);
-        $this->closePRHandler->handle($closePR);
-    }
-
-    /**
      * @Then /^the PR is closed and merged$/
      */
     public function thePRIsClosedAndMerged(): void

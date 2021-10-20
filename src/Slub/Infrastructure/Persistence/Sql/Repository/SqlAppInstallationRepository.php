@@ -7,6 +7,7 @@ namespace Slub\Infrastructure\Persistence\Sql\Repository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
+use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
@@ -20,7 +21,7 @@ class SqlAppInstallationRepository
         $this->sqlConnection = $sqlConnection;
     }
 
-    public function save(AppInstallation $appInstallation): void
+    public function save(GithubAppInstallation $appInstallation): void
     {
         $saveAccessToken = <<<SQL
 INSERT INTO app_installation (REPOSITORY_IDENTIFIER, INSTALLATION_ID, ACCESS_TOKEN)
@@ -41,16 +42,16 @@ SQL;
         );
     }
 
-    public function getBy(string $repositoryIdentifier): AppInstallation
+    public function getBy(string $repositoryIdentifier): GithubAppInstallation
     {
         $result = $this->fetch($repositoryIdentifier);
 
         return $this->hydrate($result);
     }
 
-    private function hydrate(array $result): AppInstallation
+    private function hydrate(array $result): GithubAppInstallation
     {
-        $appInstallation = new AppInstallation();
+        $appInstallation = new GithubAppInstallation();
         $appInstallation->repositoryIdentifier = Type::getType(Type::STRING)->convertToPHPValue(
             $result['REPOSITORY_IDENTIFIER'],
             $this->sqlConnection->getDatabasePlatform()
@@ -84,7 +85,9 @@ SQL;
         );
         $result = $statement->fetch(\PDO::FETCH_ASSOC);
         if (false === $result) {
-            throw new \RuntimeException(sprintf('There was no app installation found for repository %s', $repositoryIdentifier));
+            throw new \RuntimeException(
+                sprintf('There was no app installation found for repository %s', $repositoryIdentifier)
+            );
         }
 
         return $result;

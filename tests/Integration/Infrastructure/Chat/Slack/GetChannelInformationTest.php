@@ -9,9 +9,12 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\RequestInterface;
 use Slub\Infrastructure\Chat\Slack\GetChannelInformation;
 use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
+use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -24,11 +27,15 @@ class GetChannelInformationTest extends TestCase
     /** @var GetChannelInformationInterface */
     private $getChannelInformation;
 
+    private ObjectProphecy $slackAppInstallationRepository;
+
     public function setUp(): void
     {
         parent::setUp();
         $client = $this->setUpGuzzleMock();
-        $this->getChannelInformation = new GetChannelInformation($client, 'xobxob-slack-token');
+        $this->slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
+        $this->mockSlackAppInstallation();
+        $this->getChannelInformation = new GetChannelInformation($client, $this->slackAppInstallationRepository->reveal());
     }
 
     /**
@@ -38,13 +45,13 @@ class GetChannelInformationTest extends TestCase
     {
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true, "channel": {"name": "general"}}'));
 
-        $channelInformation = $this->getChannelInformation->fetch('1231461');
+        $channelInformation = $this->getChannelInformation->fetch('workspace_id', '1231461');
 
         $generatedRequest = $this->mock->getLastRequest();
         $this->assertEquals('POST', $generatedRequest->getMethod());
         $this->assertEquals('/api/conversations.info', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
-            'token=xobxob-slack-token&channel=1231461',
+            'token=access_token&channel=1231461',
             $this->getBodyContent($generatedRequest)
         );
         $this->assertEquals('1231461', $channelInformation->channelIdentifier);
@@ -59,7 +66,7 @@ class GetChannelInformationTest extends TestCase
         $this->mockGuzzleWith(new Response(400, [], ''));
 
         $this->expectException(\RuntimeException::class);
-        $this->getChannelInformation->fetch('1231461');
+        $this->getChannelInformation->fetch('workspace_id', '1231461');
     }
 
     /**
@@ -70,7 +77,7 @@ class GetChannelInformationTest extends TestCase
         $this->mockGuzzleWith(new Response(200, [], '{"ok": false}'));
 
         $this->expectException(\RuntimeException::class);
-        $this->getChannelInformation->fetch('1231461');
+        $this->getChannelInformation->fetch('workspace_id', '1231461');
     }
 
     private function setUpGuzzleMock(): Client
@@ -84,6 +91,13 @@ class GetChannelInformationTest extends TestCase
     private function mockGuzzleWith(Response $response): void
     {
         $this->mock->append($response);
+    }
+
+    private function mockSlackAppInstallation(): void
+    {
+        $slackAppInstallation = new SlackAppInstallation();
+        $slackAppInstallation->accessToken = 'access_token';
+        $this->slackAppInstallationRepository->getBy('workspace_id')->willReturn($slackAppInstallation);
     }
 
     private function getBodyContent(RequestInterface $generatedRequest): string

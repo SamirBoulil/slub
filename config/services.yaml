@@ -4,11 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    SUPPORTED_REPOSITORIES: 'akeneo/pim-community-dev,SamirBoulil/slub'
-    SUPPORTED_WORKSPACES: 'akeneo,general'
     SUPPORTED_CI_CHECKS: 'Travis CI - Pull Request,ci/circleci: back_behat_legacy'
     GITHUB_URI: 'https://api.github.com'
-    BOT_USER_ID: 'my_bot_user_id'
+    SLACK_CLIENT_ID: 'slack_client_id'
+    SLACK_CLIENT_SECRET: 'slack_client_secret'
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
@@ -31,28 +30,24 @@ services:
         class: Slub\Application\PutPRToReview\PutPRToReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
     slub.application.new_review.new_review_handler:
         class: Slub\Application\NewReview\NewReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
     slub.application.ci_status_update.ci_status_update_handler:
         class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
     slub.application.close_pr.close_pr_handler:
         class: Slub\Application\ClosePR\ClosePRHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.query.is_supported'
             - '@logger'
 
     slub.application.unpublish_pr.unpublish_pr_handler:
@@ -115,12 +110,6 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
-    slub.infrastructure.query.is_supported:
-        class: Slub\Infrastructure\Persistence\InMemory\Query\InMemoryIsSupported
-        arguments:
-            - '%env(SUPPORTED_REPOSITORIES)%'
-            - '%env(SUPPORTED_WORKSPACES)%'
-
     slub.infrastructure.persistence.delivered_event_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository
         arguments:
@@ -138,34 +127,43 @@ services:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.application.unpublish_pr.unpublish_pr_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
+            - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@logger'
-            - '%env(SLACK_TOKEN)%'
-            - '%env(BOT_USER_ID)%'
 
     slub.infrastructure.chat.slack.slub_bot_action:
         class: Slub\Infrastructure\Chat\Slack\SlubBotAction
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
+    slub.infrastructure.chat.slack.oauth_installation_action:
+        class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+            - '%env(SLACK_CLIENT_ID)%'
+            - '%env(SLACK_CLIENT_SECRET)%'
+
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.query.get_bot_reactions_for_message_and_user:
         class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+            - '@logger'
 
     slub.infrastructure.query.get_bot_user_id:
         class: Slub\Infrastructure\Chat\Slack\GetBotUserId
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
-            - '%env(SLACK_TOKEN)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+            - '@logger'
 
     slub.infrastructure.chat.slack.slack_client:
         class: Slub\Infrastructure\Chat\Slack\SlackClient
@@ -174,8 +172,7 @@ services:
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
             - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
-            - '%env(SLACK_TOKEN)%'
-            - '%env(BOT_USER_ID)%'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.http.guzzle_client:
         class: GuzzleHttp\Client
@@ -199,6 +196,11 @@ services:
 
     slub.infrastructure.vcs.github.client.app_installation_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
+    slub.infrastructure.chat.slack.slack_app_installation_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 

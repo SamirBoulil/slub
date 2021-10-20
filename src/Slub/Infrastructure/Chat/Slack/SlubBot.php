@@ -36,9 +36,7 @@ class SlubBot
 
     private BotMan $bot;
 
-    private string $slackToken;
-
-    private string $botUserId;
+    private GetBotUserIdInterface $getBotUserId;
 
     private ChatClient $chatClient;
 
@@ -48,27 +46,25 @@ class SlubBot
         PutPRToReviewHandler $putPRToReviewHandler,
         UnpublishPRHandler $unpublishPRHandler,
         ChatClient $chatClient,
+        GetBotUserIdInterface $getBotUserId,
         GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
-        LoggerInterface $logger,
-        string $slackToken,
-        string $botUserId
+        LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->unpublishPRHandler = $unpublishPRHandler;
         $this->getChannelInformation = $getChannelInformation;
         $this->getPRInfo = $getPRInfo;
         $this->logger = $logger;
-        $this->botUserId = $botUserId;
-        $this->slackToken = $slackToken;
         $this->chatClient = $chatClient;
+        $this->getBotUserId = $getBotUserId;
 
         DriverManager::loadDriver(SlackDriver::class);
-        $this->bot = BotManFactory::create(['slack' => ['token' => $this->slackToken]]);
+        $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
         $this->listensToNewPR($this->bot);
         $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);
-        $this->providesToHelp($this->bot);
+//        $this->providesToHelp($this->bot);
         $this->bot->listen();
     }
 
@@ -108,9 +104,12 @@ class SlubBot
         $unpublishPR = function (BotMan $bot, string $repository, $PRNumber) {
             $this->unpublishPR($PRNumber, $repository);
             $message = self::UNPUBLISH_CONFIRMATION_MESSAGES[array_rand(self::UNPUBLISH_CONFIRMATION_MESSAGES)];
-            $this->chatClient->replyInThread(MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)), $message);
+            $this->chatClient->replyInThread(
+                MessageIdentifier::fromString($this->getMessageIdentifier($this->bot)),
+                $message
+            );
         };
-        $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId);
+        $unpublishMessage = sprintf('<@%s>.*unpublish.*<https://github.com/(.*)/pull/(\d+).*>.*', $this->botUserId ?? 'FIX ME');
         $bot->hears($unpublishMessage, $unpublishPR);
     }
 
@@ -170,19 +169,22 @@ class SlubBot
 
     private function getChannelIdentifier(BotMan $bot): string
     {
-        $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
+        $workspace = $this->getWorkspaceIdentifier($bot);
         $channel = $payload['channel'];
+        $this->logger->info(sprintf('Now fetching channel information for workspace "%s" and channel "%s"', $workspace, $channel));
 
-        return $this->getChannelInformation->fetch($channel)->channelName;
+        return ChannelIdentifierHelper::from($workspace, $this->getChannelInformation->fetch($workspace, $channel)->channelName);
     }
 
     private function getMessageIdentifier(BotMan $bot): string
     {
-        $channel = $bot->getMessage()->getPayload()['channel'];
-        $ts = $bot->getMessage()->getPayload()['ts'];
+        $messageBody = $bot->getMessage()->getPayload();
+        $workspace = $this->getWorkspaceIdentifier($bot);
+        $channel = $messageBody['channel'];
+        $ts = $messageBody['ts'];
 
-        return MessageIdentifierHelper::from($channel, $ts);
+        return MessageIdentifierHelper::from($workspace, $channel, $ts);
     }
 
     private function PRInfo(string $PRNumber, string $repositoryIdentifier): PRInfo
@@ -197,40 +199,43 @@ class SlubBot
         return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
     }
 
+    /**
+     * TODO: To rework once the whole @botname works
+     */
     private function providesToHelp(BotMan $bot): void
     {
         $userHelp = function (BotMan $bot) {
             $message = <<<MESSAGE
-*Hello I'm Yeee!*
-I'm here to improve the feedback loop between you and your PR statuses.
+    *Hello I'm Yeee!*
+    I'm here to improve the feedback loop between you and your PR statuses.
 
-Ever wonder how to work with me ? Here are some advices ;)
+    Ever wonder how to work with me ? Here are some advices ;)
 
-*1. I track the PRs you put to review directly in slack. Make sure they have the following structure:*
-```
-... TR ... {PR link} ...
-... PR ... {PR link} ...
-... review ... {PR link} ...
-```
+    *1. I track the PRs you put to review directly in slack. Make sure they have the following structure:*
+    ```
+    ... TR ... {PR link} ...
+    ... PR ... {PR link} ...
+    ... review ... {PR link} ...
+    ```
 
-*2. I post daily reminders for you and your teams to review PRs. To unpublish a PR from it, just let me know like this:*
-```@Yeee Unpublish {PR link}```
+    *2. I post daily reminders for you and your teams to review PRs. To unpublish a PR from it, just let me know like this:*
+    ```@Yeee Unpublish {PR link}```
 
-*3. If you found a bug, <https://github.com/SamirBoulil/slub/issues/new|you can open a new issue>!*
+    *3. If you found a bug, <https://github.com/SamirBoulil/slub/issues/new|you can open a new issue>!*
 
-That's it! Have a wonderful day :yee:
-MESSAGE;
+    That's it! Have a wonderful day :yee:
+    MESSAGE;
             $bot->reply($message);
         };
-        $yeeeHelp = sprintf('<@%s>.*help.*', $this->botUserId);
-        $helpYeee = sprintf('.*help.*<@%s>.*', $this->botUserId);
+        $botUserId = $this->getBotUserId->fetch($this->getWorkspaceIdentifier($this->bot));
+        $yeeeHelp = sprintf('.*help.*', $botUserId);
+        $helpYeee = sprintf('.*help.*<@%s>.*', $botUserId);
         $bot->hears($yeeeHelp, $userHelp);
         $bot->hears($helpYeee, $userHelp);
     }
 
     private function getWorkspaceIdentifier(BotMan $bot): string
     {
-        $this->logger->info('Now fetching channel information for channel');
         $payload = $bot->getMessage()->getPayload();
 
         return $payload['team'];

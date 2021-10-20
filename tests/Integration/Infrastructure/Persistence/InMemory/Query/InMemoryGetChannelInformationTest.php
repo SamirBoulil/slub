@@ -16,7 +16,7 @@ class InMemoryGetChannelInformationTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->getChannelInformation = new InMemoryGetChannelInformation('akeneo,squad-chipmunks');
+        $this->getChannelInformation = new InMemoryGetChannelInformation();
     }
 
     /**
@@ -24,7 +24,7 @@ class InMemoryGetChannelInformationTest extends TestCase
      */
     public function it_retrieves_the_name_of_the_channel_for_an_id(): void
     {
-        $channelInformation = $this->getChannelInformation->fetch('11111');
+        $channelInformation = $this->getChannelInformation->fetch('workspace_id', '11111');
         $this->assertEquals('akeneo', $channelInformation->channelName);
         $this->assertEquals('11111', $channelInformation->channelIdentifier);
     }

@@ -38,6 +38,7 @@ class InstallerCLI extends Command
         $this->createPRTableIfNotExists();
         $this->createDeliveredEventTableIfNotExists();
         $this->createAppInstallationTableIfNotExists();
+        $this->createSlackAppInstallationTableIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
         return 0;
     }
@@ -98,6 +99,17 @@ SQL;
 CREATE TABLE IF NOT EXISTS app_installation (
     REPOSITORY_IDENTIFIER VARCHAR(255) PRIMARY KEY,
     INSTALLATION_ID VARCHAR(255),
+    ACCESS_TOKEN VARCHAR(255)
+);
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createSlackAppInstallationTableIfNotExists(): void
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS slack_app_installation (
+    WORKSPACE_ID VARCHAR(255) PRIMARY KEY,
     ACCESS_TOKEN VARCHAR(255)
 );
 SQL;

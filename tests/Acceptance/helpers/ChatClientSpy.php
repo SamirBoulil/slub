@@ -22,10 +22,10 @@ class ChatClientSpy implements ChatClient
         $this->recordedMessages[$messageIdentifier->stringValue()][] = $text;
     }
 
-    public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactions): void
+    public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void
     {
-        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactions,
-            $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
+        $this->recordedMessages[$messageIdentifier->stringValue()] = array_merge($reactionsToSet,
+                                                                                 $this->recordedMessages[$messageIdentifier->stringValue()] ?? []);
     }
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void

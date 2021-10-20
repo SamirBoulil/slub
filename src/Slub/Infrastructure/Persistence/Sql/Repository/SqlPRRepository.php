@@ -194,8 +194,8 @@ SQL;
                 'MESSAGE_IDS' => 'json',
                 'CHANNEL_IDS' => 'json',
                 'WORKSPACE_IDS' => 'json',
-                'CI_STATUS' => 'json'
-                'IS_LARGE'   => 'boolean',
+                'CI_STATUS' => 'json',
+                'IS_LARGE' => 'boolean',
             ]
         );
     }

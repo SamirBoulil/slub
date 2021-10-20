@@ -87,7 +87,6 @@ services:
         class: Slub\Application\WarnLargePR\WarnLargePRHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.query.is_supported'
             - '@logger'
             - '%env(PR_SIZE_LIMIT)%'
 

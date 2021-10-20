@@ -53,8 +53,7 @@ class SlackClientTest extends KernelTestCase
             $this->getBotReactionsForMessageAndUser->reveal(),
             $client,
             $this->prophesize(LoggerInterface::class)->reveal(),
-            $slackAppInstallationRepository->reveal(),
-            'USER_ID' // TODO: to remove
+            $slackAppInstallationRepository->reveal()
         );
     }
 
@@ -215,9 +214,6 @@ class SlackClientTest extends KernelTestCase
         $this->httpClientMock->append($response);
     }
 
-    /**
-     *
-     */
     private function mockSlackAppInstallation(ObjectProphecy $slackAppInstallationRepository): void
     {
         $slackAppInstallation = new SlackAppInstallation();

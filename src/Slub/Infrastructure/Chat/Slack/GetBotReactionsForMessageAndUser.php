@@ -32,13 +32,8 @@ class GetBotReactionsForMessageAndUser
     public function fetch(string $workspaceId, string $channel, string $ts, string $botId): array
     {
         $reactions = $this->fetchReactions($workspaceId, $channel, $ts);
-        $this->logger->critical(sprintf('here is all the reactions I found: "%s"', json_encode($reactions)));
-        $result = $this->findBotReactions($botId, $reactions);
-        $this->logger->critical(sprintf('here is all the reactions I filtered: "%s"', json_encode($result)));
 
-        $this->logger->critical(sprintf('Reactions are: %s', implode(',', $result)));
-
-        return $result;
+        return $this->findBotReactions($botId, $reactions);
     }
 
     private function fetchReactions(string $workspaceId, string $channel, string $ts): array

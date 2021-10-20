@@ -58,7 +58,7 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
     }
 
     /**
-     * @return \Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation[]
+     * @return GithubAppInstallation[]
      */
     private function createAppInstallations(array $request, $accessToken): array
     {

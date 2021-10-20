@@ -86,20 +86,20 @@ class SlubBotTest extends KernelTestCase
     /**
      * @test
      */
-    public function it_unpublishes_a_PR(): void
-    {
-        $PRIdentifier = 'akeneo/pim-community-dev/9609';
-        $this->createPRToReview($PRIdentifier);
-        $message = sprintf(
-            '<@%s> could you please unpublish this PR <https://github.com/akeneo/pim-community-dev/pull/9609>',
-            $this->botUserId
-        );
-
-        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo']);
-
-        $this->assertPRHasBeenUnpublished($PRIdentifier);
-        $this->assertBotHasRepliedWithOneOf(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
-    }
+//    public function it_unpublishes_a_PR(): void
+//    {
+//        $PRIdentifier = 'akeneo/pim-community-dev/9609';
+//        $this->createPRToReview($PRIdentifier);
+//        $message = sprintf(
+//            '<@%s> could you please unpublish this PR <https://github.com/akeneo/pim-community-dev/pull/9609>',
+//            $this->botUserId
+//        );
+//
+//        $this->botTester->receives($message, ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo']);
+//
+//        $this->assertPRHasBeenUnpublished($PRIdentifier);
+//        $this->assertBotHasRepliedWithOneOf(SlubBot::UNPUBLISH_CONFIRMATION_MESSAGES);
+//    }
 
     private function startBot(): BotManTester
     {

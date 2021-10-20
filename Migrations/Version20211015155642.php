@@ -25,7 +25,7 @@ SQL;
         $statement = $this->connection->executeQuery($allPRs);
         $result = $statement->fetchAll();
         foreach ($result as $pr) {
-            if (null === $pr['WORKSPACE_IDS'] || null === $pr['CHANNEL_IDS'] || null === $pr['WORKSPACE_IDS']) {
+            if ($this->isPRdirty($pr)) {
                 continue;
             }
             $pr = $this->migrateMessageIdentifiers($pr);
@@ -80,4 +80,15 @@ SQL;
 
         return $pr;
     }
+
+    /**
+     * @param $pr
+     *
+     * @return bool
+     *
+     */
+    private function isPRdirty($pr): bool
+    {
+        return null === $pr['WORKSPACE_IDS'] || null === $pr['CHANNEL_IDS'] || null === $pr['WORKSPACE_IDS'];
+}
 }

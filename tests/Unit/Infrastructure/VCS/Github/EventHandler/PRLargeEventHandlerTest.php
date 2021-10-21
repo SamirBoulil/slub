@@ -7,9 +7,9 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Slub\Application\WarnLargePR\WarnLargePR;
-use Slub\Application\WarnLargePR\WarnLargePRHandler;
-use Slub\Infrastructure\VCS\Github\EventHandler\PRLargeEventHandler;
+use Slub\Application\ChangePRSize\ChangePRSize;
+use Slub\Application\ChangePRSize\ChangePRSizeHandler;
+use Slub\Infrastructure\VCS\Github\EventHandler\PRSizeChangedEventHandler;
 
 /**
  * @author    Pierrick Martos <pierrick.martos@gmail.com>
@@ -21,18 +21,18 @@ class PRLargeEventHandlerTest extends TestCase
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
     /**
-     * @var PRLargeEventHandler
+     * @var PRSizeChangedEventHandler
      * @sut
      */
     private $prLargeEventHandler;
 
-    /** @var ObjectProphecy|WarnLargePRHandler */
+    /** @var ObjectProphecy|ChangePRSizeHandler */
     private $handler;
 
     public function setUp(): void
     {
-        $this->handler = $this->prophesize(WarnLargePRHandler::class);
-        $this->prLargeEventHandler = new PRLargeEventHandler($this->handler->reveal());
+        $this->handler = $this->prophesize(ChangePRSizeHandler::class);
+        $this->prLargeEventHandler = new PRSizeChangedEventHandler($this->handler->reveal());
     }
 
     /**
@@ -47,18 +47,19 @@ class PRLargeEventHandlerTest extends TestCase
 
     /**
      * @test
+     * @dataProvider PRActions
      */
-    public function it_listens_to_large_PR(): void
+    public function it_listens_to_large_PR(string $prAction): void
     {
         $largePR = [
-            'action' => 'submitted',
+            'action' => $prAction,
             'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie'], 'additions' => 501, 'deletions' => 0],
             'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
         ];
 
         $this->handler->handle(
             Argument::that(
-                fn (WarnLargePR $warnLargePR) => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
+                static fn(ChangePRSize $warnLargePR): bool => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
                     && self::REPOSITORY_IDENTIFIER === $warnLargePR->repositoryIdentifier
                     && 501 === $warnLargePR->additions
                     && 0 === $warnLargePR->deletions
@@ -70,6 +71,7 @@ class PRLargeEventHandlerTest extends TestCase
 
     /**
      * @test
+     * @dataProvider PRActions
      */
     public function it_listens_to_small_PR(): void
     {
@@ -81,7 +83,7 @@ class PRLargeEventHandlerTest extends TestCase
 
         $this->handler->handle(
             Argument::that(
-                fn (WarnLargePR $warnLargePR) => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
+                fn (ChangePRSize $warnLargePR) => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
                     && self::REPOSITORY_IDENTIFIER === $warnLargePR->repositoryIdentifier
                     && 400 === $warnLargePR->additions
                     && 400 === $warnLargePR->deletions
@@ -101,5 +103,14 @@ class PRLargeEventHandlerTest extends TestCase
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
 
         $this->prLargeEventHandler->handle($unsupportedEvent);
+    }
+
+    public function PRActions()
+    {
+        return [
+            'synchronize' => ['synchronize'],
+            'submitted' => ['submitted'],
+            'opened' => ['opened']
+        ];
     }
 }

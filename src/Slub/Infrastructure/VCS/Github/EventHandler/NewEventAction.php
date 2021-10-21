@@ -105,11 +105,16 @@ class NewEventAction
 
     private function handle(array $event, string $eventType): void
     {
-        $eventHandler = $this->eventHandlerRegistry->get($eventType);
-        if (null === $eventHandler) {
+        $eventHandlers = $this->eventHandlerRegistry->get($eventType);
+        if (empty($eventHandlers)) {
             throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
         }
-        $eventHandler->handle($event);
+        array_map(
+            static function (EventHandlerInterface $eventHandler) use ($event) {
+                $eventHandler->handle($event);
+            },
+            $eventHandlers
+        );
     }
 
     private function event(Request $request): array

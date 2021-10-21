@@ -68,7 +68,7 @@ class PRTest extends TestCase
         self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         self::assertEmpty($normalizedPR['CLOSED_AT']);
-        self::assertEquals(false, $normalizedPR['IS_LARGE']);
+        self::assertEquals(false, $normalizedPR['IS_TOO_LARGE']);
         self::assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
     }
 
@@ -94,7 +94,7 @@ class PRTest extends TestCase
             'MESSAGE_IDS' => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
             'CLOSED_AT' => self::A_TIMESTAMP,
-            'IS_LARGE' => true
+            'IS_TOO_LARGE' => true
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -429,6 +429,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
 
@@ -462,6 +463,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
 
@@ -636,7 +638,7 @@ class PRTest extends TestCase
 
         $pr->large();
 
-        self::assertTrue($pr->normalize()['IS_LARGE']);
+        self::assertTrue($pr->normalize()['IS_TOO_LARGE']);
         self::assertCount(1, $pr->getEvents());
         $event = current($pr->getEvents());
         self::assertInstanceOf(PRTooLarge::class, $event);
@@ -652,7 +654,7 @@ class PRTest extends TestCase
 
         $pr->small();
 
-        self::assertFalse($pr->normalize()['IS_LARGE']);
+        self::assertFalse($pr->normalize()['IS_TOO_LARGE']);
         self::assertCount(0, $pr->getEvents());
     }
 
@@ -733,7 +735,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
-                'IS_LARGE' => false,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }
@@ -757,7 +759,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
-                'IS_LARGE' => true,
+                'IS_TOO_LARGE' => true,
             ]
         );
     }
@@ -782,6 +784,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }
@@ -806,6 +809,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }
@@ -830,6 +834,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => self::A_TIMESTAMP,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }

@@ -83,8 +83,8 @@ services:
             - '@logger'
             - '@slub.infrastructure.common.query.clock'
 
-    slub.application.warn_large_pr.warn_large_pr_handler:
-        class: Slub\Application\WarnLargePR\WarnLargePRHandler
+    slub.application.warn_large_pr.change_pr_size_handler:
+        class: Slub\Application\ChangePRSize\ChangePRSizeHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@logger'
@@ -251,6 +251,12 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler
         arguments:
             - '@slub.application.close_pr.close_pr_handler'
+        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.pr_size_changed:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\PRSizeChangedEventHandler
+        arguments:
+            - '@slub.application.warn_large_pr.change_pr_size_handler'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation:

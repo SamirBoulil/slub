@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\WarnLargePR;
+namespace Slub\Application\ChangePRSize;
 
 use ConvenientImmutability\Immutable;
 
 /**
  * @author    Pierrick Martos <pierrick.martos@gmail.com>
  */
-class WarnLargePR
+class ChangePRSize
 {
     use Immutable;
 

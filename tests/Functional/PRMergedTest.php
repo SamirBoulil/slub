@@ -40,7 +40,6 @@ class PRMergedTest extends WebTestCase
     public function when_a_pr_is_merged_on_github_it_is_set_to_merged(): void
     {
         $client = $this->WhenAPRIsMerged();
-
         $this->assertIsMerged(true);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         // Check Slack calls

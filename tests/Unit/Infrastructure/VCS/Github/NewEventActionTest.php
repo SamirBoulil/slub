@@ -63,7 +63,7 @@ class NewEventActionTest extends TestCase
         $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $eventHandler = $this->prophesize(EventHandlerInterface::class);
         $eventHandler->handle($eventPayload)->shouldBeCalled();
-        $this->eventHandlerRegistry->get($eventType)->willReturn($eventHandler->reveal());
+        $this->eventHandlerRegistry->get($eventType)->willReturn([$eventHandler->reveal()]);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
         $this->deliveredEventRepository->save(self::DELIVERY_EVENT_IDENTIFIER)->shouldBeCalled();
 
@@ -77,7 +77,7 @@ class NewEventActionTest extends TestCase
     public function it_throws(Request $wrongRequest): void
     {
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
-        $this->eventHandlerRegistry->get(Argument::any())->willReturn(null);
+        $this->eventHandlerRegistry->get(Argument::any())->willReturn([]);
 
         $this->expectException(\Exception::class);
         $this->newEventAction->executeAction($wrongRequest);

@@ -41,23 +41,30 @@ class PRTooLargeTest extends WebTestCase
     {
         $client = $this->WhenALargePRIsOpened();
 
-        $this->assertIsLarge(true);
+        $this->assertPRIsLarge(true);
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 
     private function WhenALargePRIsOpened(): KernelBrowser
     {
         $client = self::getClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->LargePR(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->largePR(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request(
+            'POST',
+            '/vcs/github',
+            [],
+            [],
+            ['HTTP_X-GitHub-Event' => 'pull_request', 'HTTP_X-Hub-Signature' => $signature, 'HTTP_X-Github-Delivery' => Uuid::uuid4()->toString()],
+            $this->largePR()
+        );
 
         return $client;
     }
 
-    private function assertIsLarge(bool $isLarge): void
+    private function assertPRIsLarge(bool $isLarge): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER));
-        $this->assertEquals($isLarge, $PR->normalize()['IS_LARGE']);
+        $this->assertEquals($isLarge, $PR->normalize()['IS_TOO_LARGE']);
     }
 
     private function GivenALargePRToReview(): void
@@ -74,10 +81,11 @@ class PRTooLargeTest extends WebTestCase
         );
     }
 
-    private function LargePR(): string
+    private function largePR(): string
     {
         return <<<JSON
 {
+    "action": "submitted",
     "pull_request": {
         "number": 10,
         "additions": 1271,

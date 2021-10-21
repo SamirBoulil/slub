@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Application\WarnLargePR;
+namespace Slub\Application\ChangePRSize;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -11,7 +11,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 /**
  * @author    Pierrick Martos <pierrick.martos@gmail.com>
  */
-class WarnLargePRHandler
+class ChangePRSizeHandler
 {
     private PRRepositoryInterface $PRRepository;
 
@@ -29,13 +29,13 @@ class WarnLargePRHandler
         $this->prSizeLimit = $prSizeLimit;
     }
 
-    public function handle(WarnLargePR $warnLargePR): void
+    public function handle(ChangePRSize $warnLargePR): void
     {
         $this->warnLargePR($warnLargePR);
         $this->logIt($warnLargePR);
     }
 
-    private function warnLargePR(WarnLargePR $warnLargePR): void
+    private function warnLargePR(ChangePRSize $warnLargePR): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($warnLargePR->PRIdentifier));
         if ($this->isPRTooLarge($warnLargePR)) {
@@ -47,7 +47,7 @@ class WarnLargePRHandler
         $this->PRRepository->save($PR);
     }
 
-    private function logIt(WarnLargePR $warnLargePR): void
+    private function logIt(ChangePRSize $warnLargePR): void
     {
         if ($this->isPRTooLarge($warnLargePR)) {
             $logMessage = sprintf('Author has been notified PR "%s" is too large', $warnLargePR->PRIdentifier);
@@ -55,7 +55,7 @@ class WarnLargePRHandler
         }
     }
 
-    private function isPRTooLarge(WarnLargePR $warnLargePR)
+    private function isPRTooLarge(ChangePRSize $warnLargePR)
     {
         if ($warnLargePR->additions > $this->prSizeLimit || $warnLargePR->deletions > $this->prSizeLimit) {
             return true;

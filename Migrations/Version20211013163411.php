@@ -19,11 +19,11 @@ final class Version20211013163411 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE pr ADD IS_LARGE BOOLEAN DEFAULT false;');
+        $this->addSql('ALTER TABLE pr ADD IS_TOO_LARGE BOOLEAN DEFAULT false;');
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE pr DROP IS_LARGE;');
+        $this->addSql('ALTER TABLE pr DROP IS_TOO_LARGE;');
     }
 }

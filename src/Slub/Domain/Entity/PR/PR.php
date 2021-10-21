@@ -30,7 +30,7 @@ class PR
     private const NOT_GTM_KEY = 'NOT_GTMS';
     private const CI_STATUS_KEY = 'CI_STATUS';
     private const IS_MERGED_KEY = 'IS_MERGED';
-    private const IS_LARGE_KEY = 'IS_LARGE';
+    private const IS_TOO_LARGE_KEY = 'IS_TOO_LARGE';
     private const MESSAGE_IDS = 'MESSAGE_IDS';
     private const CHANNEL_IDS = 'CHANNEL_IDS';
     private const WORKSPACE_IDS = 'WORKSPACE_IDS';
@@ -181,12 +181,7 @@ class PR
         );
         $putToReviewAt = PutToReviewAt::fromTimestamp($normalizedPR[self::PUT_TO_REVIEW_AT]);
         $closedAt = ClosedAt::fromTimestampIfAny($normalizedPR[self::CLOSED_AT]);
-
-        // Protect from BC break
-        $isLarge = false;
-        if (isset($normalizedPR[self::IS_LARGE_KEY])) {
-            $isLarge = $normalizedPR[self::IS_LARGE_KEY];
-        }
+        $isLarge = $normalizedPR[self::IS_TOO_LARGE_KEY];
 
         return new self(
             $identifier,
@@ -231,7 +226,7 @@ class PR
             ),
             self::PUT_TO_REVIEW_AT => $this->putToReviewAt->toTimestamp(),
             self::CLOSED_AT => $this->closedAt->toTimestamp(),
-            self::IS_LARGE_KEY => $this->isLarge,
+            self::IS_TOO_LARGE_KEY => $this->isLarge,
         ];
     }
 

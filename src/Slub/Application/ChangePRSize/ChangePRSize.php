@@ -17,7 +17,7 @@ class ChangePRSize
 
     public string $PRIdentifier;
 
-    public int $additions = 0;
+    public int $additions;
 
-    public int $deletions = 0;
+    public int $deletions;
 }

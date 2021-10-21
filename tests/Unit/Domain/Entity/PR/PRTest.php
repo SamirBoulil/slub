@@ -50,7 +50,13 @@ class PRTest extends TestCase
             $expectedWorkspaceIdentifier,
             $expectedMessageIdentifier,
             AuthorIdentifier::fromString($author),
-            Title::fromString($title)
+            Title::fromString($title),
+            0,
+            0,
+            0,
+            'PENDING',
+            false,
+            true // Too large
         );
 
         $normalizedPR = $pr->normalize();
@@ -68,8 +74,11 @@ class PRTest extends TestCase
         self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         self::assertEmpty($normalizedPR['CLOSED_AT']);
-        self::assertEquals(false, $normalizedPR['IS_TOO_LARGE']);
-        self::assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
+        self::assertEquals(true, $normalizedPR['IS_TOO_LARGE']);
+        $events = $pr->getEvents();
+        self::assertCount(2, $events);
+        $this->assertPRPutToReviewEvent($events, $expectedPRIdentifier, $expectedMessageIdentifier);
+        $this->assertPRTooLargeEvent($events, $expectedPRIdentifier);
     }
 
     /**
@@ -709,11 +718,18 @@ class PRTest extends TestCase
         PRIdentifier $expectedPRIdentifier,
         MessageIdentifier $expectedMessageId
     ): void {
-        self::assertCount(1, $events);
         $PRPutToReviewEvent = current($events);
         self::assertInstanceOf(PRPutToReview::class, $PRPutToReviewEvent);
         self::assertTrue($PRPutToReviewEvent->PRIdentifier()->equals($expectedPRIdentifier));
         self::assertTrue($PRPutToReviewEvent->messageIdentifier()->equals($expectedMessageId));
+    }
+
+    private function assertPRTooLargeEvent(
+        array $events,
+        PRIdentifier $expectedPRIdentifier
+    ): void {
+        self::assertInstanceOf(PRTooLarge::class, last($events));
+        self::assertTrue(current($events)->PRIdentifier()->equals($expectedPRIdentifier));
     }
 
     private function pendingPR(): PR

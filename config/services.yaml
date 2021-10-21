@@ -30,6 +30,7 @@ services:
         class: Slub\Application\PutPRToReview\PutPRToReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.application.change_pr_size.is_large'
             - '@logger'
 
     slub.application.new_review.new_review_handler:
@@ -83,11 +84,16 @@ services:
             - '@logger'
             - '@slub.infrastructure.common.query.clock'
 
-    slub.application.warn_large_pr.change_pr_size_handler:
+    slub.application.change_pr_size.change_pr_size_handler:
         class: Slub\Application\ChangePRSize\ChangePRSizeHandler
         arguments:
-            - '@slub.infrastructure.persistence.pr_repository'
-            - '@logger'
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.change_pr_size.is_large'
+        - '@logger'
+
+    slub.application.change_pr_size.is_large:
+        class: Slub\Application\ChangePRSize\IsLarge
+        arguments:
             - '%env(PR_SIZE_LIMIT)%'
 
     # Infrastructure
@@ -256,7 +262,7 @@ services:
     slub.infrastructure.vcs.github.event_handler.pr_size_changed:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRSizeChangedEventHandler
         arguments:
-            - '@slub.application.warn_large_pr.change_pr_size_handler'
+            - '@slub.application.change_pr_size.change_pr_size_handler'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation:

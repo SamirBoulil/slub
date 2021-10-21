@@ -14,6 +14,7 @@ use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
+use Slub\Domain\Event\PRTooLarge;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -37,12 +38,23 @@ class EventsSpy implements EventSubscriberInterface
             PRMerged::class => 'notifyPRMerged',
             PRClosed::class => 'notifyPRClosed',
             GoodToMerge::class => 'notifyPRGoodToMerge',
+            PRTooLarge::class => 'notifyPRTooLarge',
         ];
     }
 
     public function notifyPRPutToReview(PRPutToReview $PRPutToReview): void
     {
         $this->events[PRPutToReview::class] = true;
+    }
+
+    public function notifyPRTooLarge(PRTooLarge $event): void
+    {
+        $this->events[PRTooLarge::class] = true;
+    }
+
+    public function PRTooLargeDispatched(): bool
+    {
+        return $this->events[PRTooLarge::class] ?? false;
     }
 
     public function PRPutToReviewDispatched(): bool

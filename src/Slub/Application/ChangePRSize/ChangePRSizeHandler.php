@@ -17,28 +17,28 @@ class ChangePRSizeHandler
 
     private LoggerInterface $logger;
 
-    private int $prSizeLimit;
+    private IsLarge $isLarge;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        LoggerInterface $logger,
-        int $prSizeLimit = 500
+        IsLarge $isLarge,
+        LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
         $this->logger = $logger;
-        $this->prSizeLimit = $prSizeLimit;
+        $this->isLarge = $isLarge;
     }
 
-    public function handle(ChangePRSize $warnLargePR): void
+    public function handle(ChangePRSize $changePRSize): void
     {
-        $this->warnLargePR($warnLargePR);
-        $this->logIt($warnLargePR);
+        $this->warnLargePR($changePRSize);
+        $this->logIt($changePRSize);
     }
 
-    private function warnLargePR(ChangePRSize $warnLargePR): void
+    private function warnLargePR(ChangePRSize $changePRSize): void
     {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString($warnLargePR->PRIdentifier));
-        if ($this->isPRTooLarge($warnLargePR)) {
+        $PR = $this->PRRepository->getBy(PRIdentifier::fromString($changePRSize->PRIdentifier));
+        if ($this->isLarge->execute($changePRSize->additions, $changePRSize->deletions)) {
             $PR->large();
         } else {
             $PR->small();
@@ -47,24 +47,11 @@ class ChangePRSizeHandler
         $this->PRRepository->save($PR);
     }
 
-    private function logIt(ChangePRSize $warnLargePR): void
+    private function logIt(ChangePRSize $changePRSize): void
     {
-        if ($this->isPRTooLarge($warnLargePR)) {
-            $logMessage = sprintf('Author has been notified PR "%s" is too large', $warnLargePR->PRIdentifier);
+        if ($this->isLarge->execute($changePRSize->additions, $changePRSize->deletions)) {
+            $logMessage = sprintf('Author has been notified PR "%s" is too large', $changePRSize->PRIdentifier);
             $this->logger->info($logMessage);
         }
-    }
-
-    private function isPRTooLarge(ChangePRSize $warnLargePR)
-    {
-        if ($warnLargePR->additions > $this->prSizeLimit || $warnLargePR->deletions > $this->prSizeLimit) {
-            return true;
-        }
-
-        if ($warnLargePR->additions <= $this->prSizeLimit && $warnLargePR <= $this->prSizeLimit) {
-            return false;
-        }
-
-        return false;
     }
 }

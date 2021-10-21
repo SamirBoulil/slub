@@ -116,7 +116,7 @@ class PR
         int $comments = 0,
         string $CIStatus = 'PENDING',
         bool $isMerged = false,
-        bool $isLarge = false
+        bool $isTooLarge = false
     ): self {
         $pr = new self(
             $PRIdentifier,
@@ -135,9 +135,12 @@ class PR
             $isMerged,
             PutToReviewAt::create(),
             ClosedAt::none(),
-            $isLarge
+            $isTooLarge
         );
         $pr->events[] = PRPutToReview::forPR($PRIdentifier, $messageIdentifier);
+        if ($isTooLarge) {
+            $pr->events[] = PRTooLarge::forPR($PRIdentifier);
+        }
 
         return $pr;
     }

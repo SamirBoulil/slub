@@ -290,7 +290,7 @@ class PutPRToReviewContext extends FeatureContext
     {
         Assert::assertTrue($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
         $warningMessage = sprintf(
-            ':warning: <https://github.com/akeneo/pim-community-dev/pull/1111|Your PR> is too large (> %s lines).',
+            ':warning: <https://github.com/akeneo/pim-community-dev/pull/1111|Your PR> might be hard to review (> %s lines).',
             $this->prSizeLimit
         );
         $this->chatClientSpy->assertRepliedWithOneOf([$warningMessage]);

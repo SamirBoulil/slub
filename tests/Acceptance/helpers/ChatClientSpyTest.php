@@ -50,7 +50,6 @@ class ChatClientSpyTest extends TestCase
 
     /**
      * @test
-     * @expectedException \RuntimeException
      */
     public function it_throws_if_a_reply_in_a_thread_was_made_and_it_asserts_empty(): void
     {

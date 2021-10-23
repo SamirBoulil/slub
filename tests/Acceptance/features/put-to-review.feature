@@ -22,3 +22,9 @@ Feature: Collect the pull requests put to review
     When an author reopens the PR and puts it to review
     Then the PR is reopened with the new channel id and message id
     And the squad should be notified that the PR has been successfully put to review
+
+  @nominal
+  Scenario: Notify the author when the PR is too large when the PR is put to review
+    Given an author puts a PR to review that is too large
+    Then the PR is added to the list of followed PRs
+    And the author should be notified that the PR is too large

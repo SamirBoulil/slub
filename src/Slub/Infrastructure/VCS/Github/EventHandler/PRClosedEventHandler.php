@@ -13,6 +13,7 @@ use Slub\Application\ClosePR\ClosePRHandler;
 class PRClosedEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
+    const PR_CLOSED_ACTION = 'closed';
 
     private ClosePRHandler $closePRHandler;
 
@@ -28,17 +29,17 @@ class PRClosedEventHandler implements EventHandlerInterface
 
     public function handle(array $PRClosedEvent): void
     {
-        if ($this->isPullRequestEventSupported($PRClosedEvent)) {
-            $this->updatePR($PRClosedEvent);
+        if ($this->isPRClosed($PRClosedEvent)) {
+            $this->closePR($PRClosedEvent);
         }
     }
 
-    private function isPullRequestEventSupported(array $PRClosedEvent): bool
+    private function isPRClosed(array $PRClosedEvent): bool
     {
-        return isset($PRClosedEvent['pull_request']['merged']);
+        return isset($PRClosedEvent['pull_request']['merged'], $PRClosedEvent['action']) && 'closed' === $PRClosedEvent['action'];
     }
 
-    private function updatePR(array $PRClosedEvent): void
+    private function closePR(array $PRClosedEvent): void
     {
         $command = new ClosePR();
         $command->PRIdentifier = $this->getPRIdentifier($PRClosedEvent);

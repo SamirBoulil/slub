@@ -17,9 +17,9 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Tests\WebTestCase;
 
 /**
- * @author    Samir Boulil <samir.boulil@gmail.com>
+ * @author    Pierrick Martos <pierrick.martos@gmail.com>
  */
-class PRMergedTest extends WebTestCase
+class PRTooLargeTest extends WebTestCase
 {
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
@@ -31,27 +31,43 @@ class PRMergedTest extends WebTestCase
         parent::setUp();
 
         $this->PRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
-        $this->GivenAPRToReview();
+        $this->GivenAPRToReviewThatIsNotLarge();
     }
 
     /**
      * @test
      */
-    public function when_a_pr_is_merged_on_github_it_is_set_to_merged(): void
+    public function when_a_large_pr_is_opened_on_github_it_is_set_to_large(): void
     {
-        $client = $this->WhenAPRIsMerged();
-        $this->assertIsMerged(true);
+        $client = $this->WhenALargePRIsOpened();
+
+        $this->assertPRIsLarge();
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        // Check Slack calls
     }
 
-    private function assertIsMerged(bool $isMerged): void
+    private function WhenALargePRIsOpened(): KernelBrowser
+    {
+        $client = self::getClient();
+        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->largePREvent(), $this->get('GITHUB_WEBHOOK_SECRET')));
+        $client->request(
+            'POST',
+            '/vcs/github',
+            [],
+            [],
+            ['HTTP_X-GitHub-Event' => 'pull_request', 'HTTP_X-Hub-Signature' => $signature, 'HTTP_X-Github-Delivery' => Uuid::uuid4()->toString()],
+            $this->largePREvent()
+        );
+
+        return $client;
+    }
+
+    private function assertPRIsLarge(): void
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER));
-        $this->assertEquals($isMerged, $PR->normalize()['IS_MERGED']);
+        $this->assertTrue($PR->normalize()['IS_TOO_LARGE']);
     }
 
-    private function GivenAPRToReview(): void
+    private function GivenAPRToReviewThatIsNotLarge(): void
     {
         $this->PRRepository->save(
             PR::create(
@@ -65,30 +81,15 @@ class PRMergedTest extends WebTestCase
         );
     }
 
-    private function WhenAPRIsMerged(): KernelBrowser
-    {
-        $client = self::getClient();
-        $signature = sprintf('sha1=%s', hash_hmac('sha1', $this->PRMerged(), $this->get('GITHUB_WEBHOOK_SECRET')));
-        $client->request(
-            'POST',
-            '/vcs/github',
-            [],
-            [],
-            ['HTTP_X-GitHub-Event' => 'pull_request', 'HTTP_X-Hub-Signature' => $signature, 'HTTP_X-Github-Delivery' => Uuid::uuid4()->toString()],
-            $this->PRMerged()
-        );
-
-        return $client;
-    }
-
-    private function PRMerged(): string
+    private function largePREvent(): string
     {
         return <<<JSON
 {
-    "action": "closed",
+    "action": "synchronize",
     "pull_request": {
         "number": 10,
-        "merged": true
+        "additions": 1271,
+        "deletions": 43
     },
     "repository": {
         "full_name": "SamirBoulil/slub"

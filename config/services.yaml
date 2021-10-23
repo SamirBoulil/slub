@@ -30,6 +30,7 @@ services:
         class: Slub\Application\PutPRToReview\PutPRToReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.application.change_pr_size.is_large'
             - '@logger'
 
     slub.application.new_review.new_review_handler:
@@ -62,6 +63,7 @@ services:
             - '@slub.infrastructure.persistence.get_message_ids_for_pr'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
+            - '%env(PR_SIZE_LIMIT)%'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -81,6 +83,18 @@ services:
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
             - '@slub.infrastructure.common.query.clock'
+
+    slub.application.change_pr_size.change_pr_size_handler:
+        class: Slub\Application\ChangePRSize\ChangePRSizeHandler
+        arguments:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.change_pr_size.is_large'
+        - '@logger'
+
+    slub.application.change_pr_size.is_large:
+        class: Slub\Application\ChangePRSize\IsLarge
+        arguments:
+            - '%env(PR_SIZE_LIMIT)%'
 
     # Infrastructure
     ## Common
@@ -243,6 +257,12 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRClosedEventHandler
         arguments:
             - '@slub.application.close_pr.close_pr_handler'
+        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.pr_size_changed:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\PRSizeChangedEventHandler
+        arguments:
+            - '@slub.application.change_pr_size.change_pr_size_handler'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation:

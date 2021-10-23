@@ -74,6 +74,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR->comment($reviewerName);
         $updatedPR->green();
         $updatedPR->close(true);
+        $updatedPR->hasBecomeToolarge();
         $updatedPR->putToReviewAgainViaMessage(
             ChannelIdentifier::fromString('brazil-team'),
             MessageIdentifier::fromString('5151')
@@ -137,6 +138,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false,
                 ]
             )
         );
@@ -156,6 +158,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => true,
                 ]
             )
         );
@@ -175,6 +178,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false,
                 ]
             )
         );
@@ -195,6 +199,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false,
                 ],
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/3333',
@@ -210,6 +215,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false,
                 ],
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/2222',
@@ -225,6 +231,7 @@ class SqlPRRepositoryTest extends KernelTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560175073',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => true,
                 ],
             ],
             $actualPRs

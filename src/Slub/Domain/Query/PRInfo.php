@@ -28,4 +28,8 @@ class PRInfo
     public bool $isMerged;
 
     public bool $isClosed;
+
+    public int $additions;
+
+    public int $deletions;
 }

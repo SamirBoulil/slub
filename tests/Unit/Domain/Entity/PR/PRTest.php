@@ -21,6 +21,7 @@ use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRClosed;
 use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRPutToReview;
+use Slub\Domain\Event\PRTooLarge;
 
 class PRTest extends TestCase
 {
@@ -49,7 +50,13 @@ class PRTest extends TestCase
             $expectedWorkspaceIdentifier,
             $expectedMessageIdentifier,
             AuthorIdentifier::fromString($author),
-            Title::fromString($title)
+            Title::fromString($title),
+            0,
+            0,
+            0,
+            'PENDING',
+            false,
+            true // Too large
         );
 
         $normalizedPR = $pr->normalize();
@@ -67,7 +74,11 @@ class PRTest extends TestCase
         self::assertEquals([$messageId], $normalizedPR['MESSAGE_IDS']);
         self::assertNotEmpty($normalizedPR['PUT_TO_REVIEW_AT']);
         self::assertEmpty($normalizedPR['CLOSED_AT']);
-        self::assertPRPutToReviewEvent($pr->getEvents(), $expectedPRIdentifier, $expectedMessageIdentifier);
+        self::assertEquals(true, $normalizedPR['IS_TOO_LARGE']);
+        $events = $pr->getEvents();
+        self::assertCount(2, $events);
+        $this->assertPRPutToReviewEvent($events, $expectedPRIdentifier, $expectedMessageIdentifier);
+        $this->assertPRTooLargeEvent($events, $expectedPRIdentifier);
     }
 
     /**
@@ -92,6 +103,7 @@ class PRTest extends TestCase
             'MESSAGE_IDS' => ['1', '2'],
             'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
             'CLOSED_AT' => self::A_TIMESTAMP,
+            'IS_TOO_LARGE' => true
         ];
 
         $pr = PR::fromNormalized($normalizedPR);
@@ -426,6 +438,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
 
@@ -459,6 +472,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
 
@@ -624,6 +638,60 @@ class PRTest extends TestCase
         self::assertEmpty($pr->getEvents());
     }
 
+    /**
+     * @test
+     */
+    public function it_can_become_large(): void
+    {
+        $pr = $this->pendingPR();
+
+        $pr->hasBecomeToolarge();
+
+        self::assertTrue($pr->normalize()['IS_TOO_LARGE']);
+        self::assertCount(1, $pr->getEvents());
+        $event = current($pr->getEvents());
+        self::assertInstanceOf(PRTooLarge::class, $event);
+        self::assertEquals(self::PR_IDENTIFIER, $event->PRIdentifier()->stringValue());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_tell_it_is_too_large_again_if_it_was_already_too_large(): void
+    {
+        $pr = $this->largePR();
+
+        $pr->hasBecomeToolarge();
+
+        self::assertTrue($pr->normalize()['IS_TOO_LARGE']);
+        self::assertEmpty($pr->getEvents());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_tell_it_is_too_large_if_it_was_already_closed(): void
+    {
+        $pr = $this->closedPR();
+
+        $pr->hasBecomeToolarge();
+
+        self::assertEmpty($pr->getEvents());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_become_small(): void
+    {
+        $pr = $this->largePR();
+
+        $pr->hasBecomeSmall();
+
+        self::assertFalse($pr->normalize()['IS_TOO_LARGE']);
+        self::assertCount(0, $pr->getEvents());
+    }
+
     public function normalizedWithMissingInformation(): array
     {
         return [
@@ -675,11 +743,18 @@ class PRTest extends TestCase
         PRIdentifier $expectedPRIdentifier,
         MessageIdentifier $expectedMessageId
     ): void {
-        self::assertCount(1, $events);
         $PRPutToReviewEvent = current($events);
         self::assertInstanceOf(PRPutToReview::class, $PRPutToReviewEvent);
         self::assertTrue($PRPutToReviewEvent->PRIdentifier()->equals($expectedPRIdentifier));
         self::assertTrue($PRPutToReviewEvent->messageIdentifier()->equals($expectedMessageId));
+    }
+
+    private function assertPRTooLargeEvent(
+        array $events,
+        PRIdentifier $expectedPRIdentifier
+    ): void {
+        self::assertInstanceOf(PRTooLarge::class, last($events));
+        self::assertTrue(current($events)->PRIdentifier()->equals($expectedPRIdentifier));
     }
 
     private function pendingPR(): PR
@@ -701,6 +776,31 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
+            ]
+        );
+    }
+
+    private function largePR(): PR
+    {
+        return PR::fromNormalized([
+                'IDENTIFIER' => self::PR_IDENTIFIER,
+                'TITLE' => 'Add new feature',
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'GTMS' => 0,
+                'NOT_GTMS' => 0,
+                'COMMENTS' => 0,
+                'CI_STATUS' => [
+                    'BUILD_RESULT' => 'PENDING',
+                    'BUILD_LINK' => '',
+                ],
+                'IS_MERGED' => false,
+                'CHANNEL_IDS' => ['squad-raccoons'],
+                'WORKSPACE_IDS' => ['akeneo'],
+                'MESSAGE_IDS' => ['1'],
+                'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
+                'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => true,
             ]
         );
     }
@@ -725,6 +825,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }
@@ -749,6 +850,7 @@ class PRTest extends TestCase
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => null,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }
@@ -767,12 +869,13 @@ class PRTest extends TestCase
                     'BUILD_RESULT' => 'RED',
                     'BUILD_LINK' => '',
                 ],
-                'IS_MERGED' => false,
+                'IS_MERGED' => true,
                 'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],
                 'PUT_TO_REVIEW_AT' => self::A_TIMESTAMP,
                 'CLOSED_AT' => self::A_TIMESTAMP,
+                'IS_TOO_LARGE' => false,
             ]
         );
     }

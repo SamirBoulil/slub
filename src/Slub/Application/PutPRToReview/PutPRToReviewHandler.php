@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\PutPRToReview;
 
 use Psr\Log\LoggerInterface;
+use Slub\Application\ChangePRSize\IsLarge;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
@@ -19,12 +20,15 @@ class PutPRToReviewHandler
 {
     private PRRepositoryInterface $PRRepository;
     private LoggerInterface $logger;
+    private IsLarge $isLarge;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
+        IsLarge $isLarge,
         LoggerInterface $logger
     ) {
         $this->PRRepository = $PRRepository;
+        $this->isLarge = $isLarge;
         $this->logger = $logger;
     }
 
@@ -77,6 +81,7 @@ class PutPRToReviewHandler
         $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
 
         $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
+        $isLarge = $this->isLarge->execute($putPRToReview->additions, $putPRToReview->deletions);
         $PR = PR::create(
             $PRIdentifier,
             $channelIdentifier,
@@ -88,7 +93,8 @@ class PutPRToReviewHandler
             $putPRToReview->notGTMCount,
             $putPRToReview->comments,
             $putPRToReview->CIStatus,
-            $putPRToReview->isMerged
+            $putPRToReview->isMerged,
+            $isLarge
         );
         $this->PRRepository->save($PR);
     }

@@ -40,11 +40,14 @@ class PutPRToReviewContext extends FeatureContext
     /** @var array */
     private $currentWorkspaceIds = [];
 
+    private string $prSizeLimit;
+
     public function __construct(
         PRRepositoryInterface $PRRepository,
         PutPRToReviewHandler $putPRToReviewHandler,
         EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        ChatClientSpy $chatClientSpy,
+        string $prSizeLimit
     ) {
         parent::__construct($PRRepository);
 
@@ -53,6 +56,7 @@ class PutPRToReviewContext extends FeatureContext
         $this->currentPRIdentifier = '';
         $this->eventSpy = $eventSpy;
         $this->chatClientSpy = $chatClientSpy;
+        $this->prSizeLimit = $prSizeLimit;
     }
 
     /**
@@ -66,45 +70,13 @@ class PutPRToReviewContext extends FeatureContext
             'squad-raccoons',
             'akeneo',
             '1234',
-            'sam',
             'Add new feature',
-            false
+            'sam',
+            false,
+            100,
+            100
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
-    }
-
-    private function createPutPRToReviewCommand(
-        string $repositoryIdentifier,
-        string $PRIdentifier,
-        string $channelIdentifier,
-        string $workspaceIdentifier,
-        string $messageId,
-        string $authorIdentifier,
-        string $title,
-        bool $isClosed
-    ): PutPRToReview {
-        $this->currentRepositoryIdentifier = $repositoryIdentifier;
-        $this->currentPRIdentifier = $PRIdentifier;
-        $this->currentMessageIds[] = $messageId;
-        $this->currentChannelIds[] = $channelIdentifier;
-        $this->currentWorkspaceIds[] = $workspaceIdentifier;
-
-        $putPRToReview = new PutPRToReview();
-        $putPRToReview->channelIdentifier = $channelIdentifier;
-        $putPRToReview->workspaceIdentifier = $workspaceIdentifier;
-        $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
-        $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
-        $putPRToReview->messageIdentifier = $messageId;
-        $putPRToReview->authorIdentifier = $authorIdentifier;
-        $putPRToReview->title = $title;
-        $putPRToReview->CIStatus = 'PENDING';
-        $putPRToReview->GTMCount = 0;
-        $putPRToReview->notGTMCount = 0;
-        $putPRToReview->comments = 0;
-        $putPRToReview->isMerged = false;
-        $putPRToReview->isClosed = $isClosed;
-
-        return $putPRToReview;
     }
 
     /**
@@ -151,9 +123,11 @@ class PutPRToReviewContext extends FeatureContext
             'general',
             'akeneo',
             '6666',
-            'sam',
             'Add new feature',
-            false
+            'sam',
+            false,
+            100,
+            100
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -243,6 +217,7 @@ class PutPRToReviewContext extends FeatureContext
                 'WORKSPACE_IDS' => ['akeneo'],
                 'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
                 'CLOSED_AT' => $closedAtTimestamp,
+                 'IS_TOO_LARGE' => false,
             ]
         );
         $this->PRRepository->save($PR);
@@ -259,9 +234,11 @@ class PutPRToReviewContext extends FeatureContext
             'squad-raccoons',
             'akeneo',
             '1234',
-            'sam',
             'Add new feature',
-            false
+            'sam',
+            false,
+            100,
+            100
         );
         $this->putPRToReviewHandler->handle($putPRToReview);
     }
@@ -284,5 +261,76 @@ class PutPRToReviewContext extends FeatureContext
             $this->currentChannelIds,
             $this->currentWorkspaceIds
         );
+    }
+
+    /**
+     * @Given /^an author puts a PR to review that is too large$/
+     */
+    public function aPRInReviewThatIsAlreadyTooLarge()
+    {
+        $putPRToReview = $this->createPutPRToReviewCommand(
+            'akeneo/pim-community-dev',
+            'akeneo/pim-community-dev/1111',
+            'squad-raccoons',
+            'akeneo',
+            '1234',
+            'Add new feature',
+            'sam',
+            false,
+            10000,
+            10000
+        );
+        $this->putPRToReviewHandler->handle($putPRToReview);
+    }
+
+    /**
+     * @Then /^the author should be notified that the PR is too large$/
+     */
+    public function theAuthorShouldBeNotifiedThatThePRIsTooLarge()
+    {
+        Assert::assertTrue($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
+        $warningMessage = sprintf(
+            ':warning: <https://github.com/akeneo/pim-community-dev/pull/1111|Your PR> might be hard to review (> %s lines).',
+            $this->prSizeLimit
+        );
+        $this->chatClientSpy->assertRepliedWithOneOf([$warningMessage]);
+    }
+
+    private function createPutPRToReviewCommand(
+        string $repositoryIdentifier,
+        string $PRIdentifier,
+        string $channelIdentifier,
+        string $workspaceIdentifier,
+        string $messageId,
+        string $title,
+        string $authorIdentifier,
+        bool $isClosed,
+        int $additions,
+        int $deletions
+    ): PutPRToReview {
+        $this->currentRepositoryIdentifier = $repositoryIdentifier;
+        $this->currentPRIdentifier = $PRIdentifier;
+        $this->currentMessageIds[] = $messageId;
+        $this->currentChannelIds[] = $channelIdentifier;
+        $this->currentWorkspaceIds[] = $workspaceIdentifier;
+
+        $putPRToReview = new PutPRToReview();
+        $putPRToReview->channelIdentifier = $channelIdentifier;
+        $putPRToReview->workspaceIdentifier = $workspaceIdentifier;
+        $putPRToReview->repositoryIdentifier = $this->currentRepositoryIdentifier;
+        $putPRToReview->PRIdentifier = $this->currentPRIdentifier;
+        $putPRToReview->messageIdentifier = $messageId;
+        $putPRToReview->authorIdentifier = $authorIdentifier;
+        $putPRToReview->title = $title;
+        $putPRToReview->CIStatus = 'PENDING';
+        $putPRToReview->GTMCount = 0;
+        $putPRToReview->notGTMCount = 0;
+        $putPRToReview->comments = 0;
+        $putPRToReview->isMerged = false;
+        $putPRToReview->isClosed = $isClosed;
+        $putPRToReview->additions = $additions;
+        $putPRToReview->deletions = $deletions;
+
+        return $putPRToReview;
     }
 }

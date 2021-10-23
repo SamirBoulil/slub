@@ -92,7 +92,7 @@ class NewEventAction
     private function checkSecret(Request $request): void
     {
         $secretHeader = $request->headers->get(self::SECRET_HEADER);
-        if (null === $secretHeader || empty($secretHeader) || !is_string($secretHeader)) {
+        if (empty($secretHeader) || !is_string($secretHeader)) {
             throw new BadRequestHttpException();
         }
         $actualSHA1 = last(explode('=', $secretHeader));
@@ -105,11 +105,22 @@ class NewEventAction
 
     private function handle(array $event, string $eventType): void
     {
-        $eventHandler = $this->eventHandlerRegistry->get($eventType);
-        if (null === $eventHandler) {
+        $eventHandlers = $this->eventHandlerRegistry->get($eventType);
+        if (empty($eventHandlers)) {
             throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
         }
-        $eventHandler->handle($event);
+        $logger = $this->logger;
+        array_map(
+            static function (EventHandlerInterface $eventHandler) use ($event, $logger) {
+                try {
+                    $logger->critical('Processing logger with: '.get_class($eventHandler));
+                    $eventHandler->handle($event);
+                } catch (\Exception $e) {
+                    $logger->error($e->getMessage());
+                }
+            },
+            $eventHandlers
+        );
     }
 
     private function event(Request $request): array

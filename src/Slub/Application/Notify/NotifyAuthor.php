@@ -13,6 +13,7 @@ use Slub\Domain\Event\GoodToMerge;
 use Slub\Domain\Event\PRCommented;
 use Slub\Domain\Event\PRGTMed;
 use Slub\Domain\Event\PRNotGTMed;
+use Slub\Domain\Event\PRTooLarge;
 use Slub\Domain\Query\GetMessageIdsForPR;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -27,9 +28,10 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_PR_GTMED = ':+1: ' . self::PLACEHOLDER_REVIEWER_NAME . ' GTMed';
     public const MESSAGE_PR_NOT_GTMED = ':woman-gesturing-no: ' . self::PLACEHOLDER_REVIEWER_NAME . ' refused';
     public const MESSAGE_PR_COMMENTED = ':lower_left_fountain_pen: ' . self::PLACEHOLDER_REVIEWER_NAME . ' commented';
-    public const MESSAGE_CI_GREEN = ':white_check_mark: CI OK';
+    public const MESSAGE_CI_GREEN = ':white_check_mark: CI Passing';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
+    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> might be hard to review (> %s lines).';
 
     private GetMessageIdsForPR $getMessageIdsForPR;
 
@@ -37,14 +39,18 @@ class NotifyAuthor implements EventSubscriberInterface
 
     private LoggerInterface $logger;
 
+    private int $prSizeLimit;
+
     public function __construct(
         GetMessageIdsForPR $getMessageIdsForPR,
         ChatClient $chatClient,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        int $prSizeLimit = 500
     ) {
         $this->chatClient = $chatClient;
         $this->getMessageIdsForPR = $getMessageIdsForPR;
         $this->logger = $logger;
+        $this->prSizeLimit = $prSizeLimit;
     }
 
     public static function getSubscribedEvents(): array
@@ -55,7 +61,8 @@ class NotifyAuthor implements EventSubscriberInterface
             PRCommented::class => 'whenPRComment',
             CIGreen::class     => 'whenCIIsGreen',
             CIRed::class       => 'whenCIIsRed',
-            GoodToMerge::class => 'whenGoodToMerge'
+            GoodToMerge::class => 'whenGoodToMerge',
+            PRTooLarge::class  => 'whenPRTooLarge'
         ];
     }
 
@@ -125,6 +132,16 @@ class NotifyAuthor implements EventSubscriberInterface
         $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
         $goodToMergeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, self::MESSAGE_GOOD_TO_MERGE);
         $this->replyInThread($event->PRIdentifier(), $goodToMergeMessage);
+    }
+
+    public function whenPRTooLarge(PRTooLarge $event): void
+    {
+        preg_match('#(.+)\/(.+)\/(.+)#', $event->PRIdentifier()->stringValue(), $matches);
+        $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
+        $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, sprintf(self::MESSAGE_PR_TOO_LARGE, $this->prSizeLimit));
+        $this->logger->error('Reply in thread'); // TODO: remove me
+        $this->logger->error($prTooLargeMessage);
+        $this->replyInThread($event->PRIdentifier(), $prTooLargeMessage);
     }
 
     private function replyInThread(PRIdentifier $PRIdentifier, string $message): void

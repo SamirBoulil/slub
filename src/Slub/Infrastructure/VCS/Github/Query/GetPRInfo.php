@@ -36,8 +36,20 @@ class GetPRInfo implements GetPRInfoInterface
         $isClosed = $this->isClosed($PRDetails);
         $authorIdentifier = $this->authorIdentifier($PRDetails);
         $title = $this->title($PRDetails);
+        $additions = $this->additions($PRDetails);
+        $deletions = $this->deletions($PRDetails);
 
-        return $this->createPRInfo($PRIdentifier, $authorIdentifier, $title, $reviews, $ciStatus, $isMerged, $isClosed);
+        return $this->createPRInfo(
+            $PRIdentifier,
+            $authorIdentifier,
+            $title,
+            $reviews,
+            $ciStatus,
+            $isMerged,
+            $isClosed,
+            $additions,
+            $deletions
+        );
     }
 
     private function getPRCommitRef(array $PRDetails): string
@@ -62,7 +74,9 @@ class GetPRInfo implements GetPRInfoInterface
         array $reviews,
         CheckStatus $ciStatus,
         bool $isMerged,
-        bool $isClosed
+        bool $isClosed,
+        int $additions,
+        int $deletions
     ): PRInfo {
         $result = new PRInfo();
         $result->PRIdentifier = $PRIdentifier->stringValue();
@@ -74,6 +88,8 @@ class GetPRInfo implements GetPRInfoInterface
         $result->CIStatus = $ciStatus;
         $result->isMerged = $isMerged;
         $result->isClosed = $isClosed;
+        $result->additions = $additions;
+        $result->deletions = $deletions;
 
         return $result;
     }
@@ -86,5 +102,15 @@ class GetPRInfo implements GetPRInfoInterface
     private function authorIdentifier(array $PRDetails): string
     {
         return $PRDetails['user']['login'];
+    }
+
+    private function additions(array $PRDetails): int
+    {
+        return $PRDetails['additions'];
+    }
+
+    private function deletions(array $PRDetails): int
+    {
+        return $PRDetails['deletions'];
     }
 }

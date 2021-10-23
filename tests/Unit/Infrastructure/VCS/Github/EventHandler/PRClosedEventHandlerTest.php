@@ -50,6 +50,7 @@ class PRClosedEventHandlerTest extends TestCase
     public function it_listens_to_close_PR_that_are_merged(): void
     {
         $closePREvent = [
+            'action' => 'closed',
             'pull_request' => [
                 'number' => self::PR_NUMBER,
                 'merged' => true,
@@ -74,6 +75,7 @@ class PRClosedEventHandlerTest extends TestCase
     public function it_listens_to_close_PR_that_are_not_merged(): void
     {
         $closePREvent = [
+            'action' => 'closed',
             'pull_request' => [
                 'number' => self::PR_NUMBER,
                 'merged' => false,

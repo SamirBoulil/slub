@@ -99,6 +99,7 @@ class SqlGetAverageTimeToMergeTest extends KernelTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => (string) $now->getTimestamp(),
                     'CLOSED_AT' => (string) $mergedAt->getTimestamp(),
+                    'IS_TOO_LARGE' => false
                 ]
             )
         );
@@ -121,9 +122,9 @@ SQL;
         /** @var Connection $connection */
         $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
         $sql = <<<SQL
-INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `CLOSED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`)
+INSERT INTO `pr` (`IDENTIFIER`, `GTMS`, `NOT_GTMS`, `COMMENTS`, `CI_STATUS`, `IS_MERGED`, `MESSAGE_IDS`, `rows_before_migration_Version20190609163730`, `PUT_TO_REVIEW_AT`, `CLOSED_AT`, `AUTHOR_IDENTIFIER`, `TITLE`, `IS_TOO_LARGE`)
 VALUES
-	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512', 'sam', 'Add new feature');
+	('pr_identifier', 3, 0, 1, '{"BUILD_RESULT": "PENDING", "BUILD_LINK": ""}', 0, '{}', 0, '251512', '251512', 'sam', 'Add new feature', false);
 SQL;
         $connection->executeUpdate($sql);
     }

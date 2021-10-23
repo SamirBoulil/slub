@@ -48,6 +48,7 @@ class ListPRsActionTest extends WebTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
                     'CLOSED_AT' => '1561363426',
+                    'IS_TOO_LARGE' => false
                 ]
             )
         );
@@ -70,6 +71,7 @@ class ListPRsActionTest extends WebTestCase
                     'MESSAGE_IDS' => ['1', '2'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false
                 ]
             )
         );
@@ -99,6 +101,7 @@ class ListPRsActionTest extends WebTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
                     'CLOSED_AT' => null,
+                    'IS_TOO_LARGE' => false
                 ],
                 [
                     'IDENTIFIER' => 'akeneo/pim-community-dev/1111',
@@ -117,6 +120,7 @@ class ListPRsActionTest extends WebTestCase
                     'WORKSPACE_IDS' => ['akeneo'],
                     'PUT_TO_REVIEW_AT' => '1560177798',
                     'CLOSED_AT' => '1561363426',
+                    'IS_TOO_LARGE' => false
                 ],
             ],
             json_decode($response->getContent(), true)

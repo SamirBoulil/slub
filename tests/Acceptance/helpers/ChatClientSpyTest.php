@@ -32,7 +32,7 @@ class ChatClientSpyTest extends TestCase
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
         $text = 'hello';
 
-        $this->slackClientSpy->replyInThread(WorkspaceIdentifier::fromString('workspace_id'), $messageIdentifier, $text);
+        $this->slackClientSpy->replyInThread($messageIdentifier, $text);
 
         $this->slackClientSpy->assertReaction($messageIdentifier, $text);
         $this->assertTrue(true, 'No exception was thrown');
@@ -56,7 +56,6 @@ class ChatClientSpyTest extends TestCase
     {
         $slackClientSpy = new ChatClientSpy();
         $slackClientSpy->replyInThread(
-            WorkspaceIdentifier::fromString('workspace_id'),
             MessageIdentifier::fromString('general@12345'),
             'hello'
         );
@@ -71,9 +70,9 @@ class ChatClientSpyTest extends TestCase
     public function it_throws_if_a_reaction_to_a_message_was_made_and_it_asserts_empty(): void
     {
         $slackClientSpy = new ChatClientSpy();
-        $slackClientSpy->setReactionsToMessageWith(WorkspaceIdentifier::fromString(''),
-                                                   MessageIdentifier::fromString('general@12345'),
-                                                   ['reaction']
+        $slackClientSpy->setReactionsToMessageWith(
+            MessageIdentifier::fromString('general@12345'),
+            ['reaction']
         );
 
         $this->expectException(AssertionFailedError::class);
@@ -88,7 +87,6 @@ class ChatClientSpyTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $slackClientSpy = new ChatClientSpy();
         $slackClientSpy->publishInChannel(
-            WorkspaceIdentifier::fromString('workspace_id'),
             ChannelIdentifier::fromString('general@12345'),
             'text'
         );
@@ -104,7 +102,6 @@ class ChatClientSpyTest extends TestCase
     {
         $text = 'hello';
         $this->slackClientSpy->replyInThread(
-            WorkspaceIdentifier::fromString('workspace_id'),
             MessageIdentifier::fromString('general@12345'),
             $text
         );
@@ -120,7 +117,6 @@ class ChatClientSpyTest extends TestCase
     {
         $messageIdentifier = MessageIdentifier::fromString('general@12345');
         $this->slackClientSpy->replyInThread(
-            WorkspaceIdentifier::fromString('workspace_id'),
             $messageIdentifier,
             'hello'
         );

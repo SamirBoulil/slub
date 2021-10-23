@@ -156,4 +156,9 @@ class EventsSpy implements EventSubscriberInterface
     {
         return !empty($this->events);
     }
+
+    public function reset(): void
+    {
+        $this->events = [];
+    }
 }

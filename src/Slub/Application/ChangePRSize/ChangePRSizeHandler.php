@@ -41,8 +41,10 @@ class ChangePRSizeHandler
         $PR = $this->PR($changePRSize);
         $isTooLarge = $this->isTooLarge($changePRSize);
         if ($isTooLarge) {
+            $this->logger->error('PR TOO LARGE');
             $PR->hasBecomeToolarge();
         } else {
+            $this->logger->error('it\'s okay, not too large');
             $PR->hasBecomeSmall();
         }
         $this->PRRepository->save($PR);

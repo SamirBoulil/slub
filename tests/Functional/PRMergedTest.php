@@ -85,6 +85,7 @@ class PRMergedTest extends WebTestCase
     {
         return <<<JSON
 {
+    "action": "closed",
     "pull_request": {
         "number": 10,
         "merged": true

@@ -113,8 +113,8 @@ class NewEventAction
         array_map(
             static function (EventHandlerInterface $eventHandler) use ($event, $logger) {
                 try {
-                    $eventHandler->handle($event);
                     $logger->critical('Processing logger with: '.get_class($eventHandler));
+                    $eventHandler->handle($event);
                 } catch (\Exception $e) {
                     $logger->error($e->getMessage());
                 }

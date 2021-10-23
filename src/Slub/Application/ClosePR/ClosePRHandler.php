@@ -39,7 +39,7 @@ class ClosePRHandler
 
     private function logIt(ClosePR $command): void
     {
-        $logMessage = sprintf('Squad has been notified PR "%s" is closed', $command->PRIdentifier);
+        $logMessage = sprintf('Squad has been notified PR "%s" is %s merged and closed', $command->PRIdentifier, $command->isMerged ? '' : 'not');
         $this->logger->info($logMessage);
     }
 }

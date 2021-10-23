@@ -75,7 +75,7 @@ class PRSizeChangedContext extends FeatureContext
     public function theAuthorShouldBeNotifiedThatThePRIsTooLarge()
     {
         Assert::assertTrue($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
-        $warningMessage = ':warning: <https://github.com/akeneo/pim-community-dev/pull/1234|Your PR> is too large (more than 800 lines).';
+        $warningMessage = ':warning: <https://github.com/akeneo/pim-community-dev/pull/1234|Your PR> is too large (> 800 lines).';
         $this->chatClientSpy->assertRepliedWithOneOf([$warningMessage]);
     }
 

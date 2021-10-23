@@ -27,6 +27,8 @@ class InMemoryGetPRInfo implements GetPRInfoInterface
         $this->PRInfo->notGTMCount = 0;
         $this->PRInfo->isMerged = false;
         $this->PRInfo->isClosed = false;
+        $this->PRInfo->additions = 10;
+        $this->PRInfo->deletions = 10;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): PRInfo

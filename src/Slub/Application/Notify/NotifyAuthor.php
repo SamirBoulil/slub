@@ -31,7 +31,7 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_CI_GREEN = ':white_check_mark: CI Passed';
     public const MESSAGE_CI_RED = ':octagonal_sign: CI Failed <' . self::PLACEHOLDER_BUILD_LINK . '|(see build results)>';
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
-    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is too large (more than %s lines).';
+    public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is too large (> %s lines).';
 
     private GetMessageIdsForPR $getMessageIdsForPR;
 
@@ -139,6 +139,8 @@ class NotifyAuthor implements EventSubscriberInterface
         preg_match('#(.+)\/(.+)\/(.+)#', $event->PRIdentifier()->stringValue(), $matches);
         $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
         $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, sprintf(self::MESSAGE_PR_TOO_LARGE, $this->prSizeLimit));
+        $this->logger->error('Reply in thread'); // TODO: remove me
+        $this->logger->error($prTooLargeMessage);
         $this->replyInThread($event->PRIdentifier(), $prTooLargeMessage);
     }
 

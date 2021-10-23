@@ -14,7 +14,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\PRSizeChangedEventHandler;
 /**
  * @author    Pierrick Martos <pierrick.martos@gmail.com>
  */
-class PRLargeEventHandlerTest extends TestCase
+class PRSizeChangedEventHandlerTest extends TestCase
 {
     private const PR_NUMBER = 10;
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
@@ -53,16 +53,20 @@ class PRLargeEventHandlerTest extends TestCase
     {
         $largePR = [
             'action' => $prAction,
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie'], 'additions' => 501, 'deletions' => 0],
+            'pull_request' => [
+                'number' => self::PR_NUMBER,
+                'user' => ['id' => 1, 'login' => 'lucie'],
+                'additions' => 501,
+                'deletions' => 0,
+            ],
             'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
         ];
 
         $this->handler->handle(
             Argument::that(
-                static fn(ChangePRSize $warnLargePR): bool => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
-                    && self::REPOSITORY_IDENTIFIER === $warnLargePR->repositoryIdentifier
-                    && 501 === $warnLargePR->additions
-                    && 0 === $warnLargePR->deletions
+                static fn (ChangePRSize $changePRSize): bool => self::PR_IDENTIFIER === $changePRSize->PRIdentifier
+                    && 501 === $changePRSize->additions
+                    && 0 === $changePRSize->deletions
             )
         )->shouldBeCalled();
 
@@ -77,16 +81,20 @@ class PRLargeEventHandlerTest extends TestCase
     {
         $smallPR = [
             'action' => 'submitted',
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie'], 'additions' => 400, 'deletions' => 400],
+            'pull_request' => [
+                'number' => self::PR_NUMBER,
+                'user' => ['id' => 1, 'login' => 'lucie'],
+                'additions' => 400,
+                'deletions' => 400,
+            ],
             'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
         ];
 
         $this->handler->handle(
             Argument::that(
-                fn (ChangePRSize $warnLargePR) => self::PR_IDENTIFIER === $warnLargePR->PRIdentifier
-                    && self::REPOSITORY_IDENTIFIER === $warnLargePR->repositoryIdentifier
-                    && 400 === $warnLargePR->additions
-                    && 400 === $warnLargePR->deletions
+                fn (ChangePRSize $changePR) => self::PR_IDENTIFIER === $changePR->PRIdentifier
+                    && 400 === $changePR->additions
+                    && 400 === $changePR->deletions
             )
         )->shouldBeCalled();
 
@@ -110,7 +118,7 @@ class PRLargeEventHandlerTest extends TestCase
         return [
             'synchronize' => ['synchronize'],
             'submitted' => ['submitted'],
-            'opened' => ['opened']
+            'opened' => ['opened'],
         ];
     }
 }

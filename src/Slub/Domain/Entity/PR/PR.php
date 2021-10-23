@@ -336,7 +336,7 @@ class PR
         $this->events[] = PRClosed::ForPR($this->PRIdentifier);
     }
 
-    public function large(): void
+    public function hasBecomeToolarge(): void
     {
         if ($this->isMerged) {
             return;

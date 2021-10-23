@@ -645,7 +645,7 @@ class PRTest extends TestCase
     {
         $pr = $this->pendingPR();
 
-        $pr->large();
+        $pr->hasBecomeToolarge();
 
         self::assertTrue($pr->normalize()['IS_TOO_LARGE']);
         self::assertCount(1, $pr->getEvents());

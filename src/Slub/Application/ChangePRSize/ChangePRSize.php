@@ -13,8 +13,6 @@ class ChangePRSize
 {
     use Immutable;
 
-    public string $repositoryIdentifier;
-
     public string $PRIdentifier;
 
     public int $additions;

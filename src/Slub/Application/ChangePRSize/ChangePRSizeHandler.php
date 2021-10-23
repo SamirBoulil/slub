@@ -39,7 +39,7 @@ class ChangePRSizeHandler
     {
         $PR = $this->PRRepository->getBy(PRIdentifier::fromString($changePRSize->PRIdentifier));
         if ($this->isLarge->execute($changePRSize->additions, $changePRSize->deletions)) {
-            $PR->large();
+            $PR->hasBecomeToolarge();
         } else {
             $PR->small();
         }

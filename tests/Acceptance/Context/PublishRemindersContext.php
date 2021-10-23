@@ -175,6 +175,7 @@ CHAT
                 'WORKSPACE_IDS' => [Uuid::uuid4()->toString()],
                 'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
                 'CLOSED_AT' => null,
+                 'IS_TOO_LARGE' => false
             ]
         );
         $this->PRRepository->save($PR);

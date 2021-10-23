@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
+use PHPUnit\Framework\Assert;
 use Slub\Application\ChangePRSize\ChangePRSize;
 use Slub\Application\ChangePRSize\ChangePRSizeHandler;
-use Slub\Application\NewReview\NewReviewHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
-use Slub\Domain\Entity\Reviewer\ReviewerName;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -22,14 +20,11 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class PRSizeChangedContext extends FeatureContext
 {
-    private const PR_IDENTIFIER = 'akeneo/pim-community-dev/1234';
-
     private ChangePRSizeHandler $changePRSizeHandler;
     private EventsSpy $eventSpy;
     private ChatClientSpy $chatClientSpy;
     private PRIdentifier $currentPRIdentifier;
     private MessageIdentifier $currentMessageIdentifier;
-    private PR $currentPR;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
@@ -43,18 +38,14 @@ class PRSizeChangedContext extends FeatureContext
         $this->chatClientSpy = $chatClientSpy;
     }
 
-
     /**
-     * @When /^the author updates the PR too the point that it becomes too large$/
+     * @Given /^a PR in review that has an acceptable size$/
      */
-    public function theAuthorUpdatesThePRTooThePointThatItBecomesTooLarge()
+    public function aPRInReviewThatHasAnAcceptableSize()
     {
-        throw new PendingException();
-    }
-
-    private function PRAlreadyTooLarge(): PR
-    {
-        $PR = PR::create(
+        $this->currentPRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev/1234');
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('message-id');
+        $acceptableSizedPR = PR::create(
             $this->currentPRIdentifier,
             ChannelIdentifier::fromString('squad-raccoons'),
             WorkspaceIdentifier::fromString('akeneo'),
@@ -62,8 +53,37 @@ class PRSizeChangedContext extends FeatureContext
             AuthorIdentifier::fromString('sam'),
             Title::fromString('Add new feature')
         );
-        $PR->large();
+        $this->PRRepository->save($acceptableSizedPR);
+    }
 
-        return $PR;
+    /**
+     * @When /^the author updates the PR with (.*) additions and (.*) deletions$/
+     */
+    public function theAuthorUpdatesThePRTooThePointThatItBecomesTooLargeWithAnd(int $additions, int $deletions)
+    {
+        $changePRSize = new ChangePRSize();
+        $changePRSize->PRIdentifier = $this->currentPRIdentifier->stringValue();
+        $changePRSize->deletions = $additions;
+        $changePRSize->additions = $deletions;
+
+        $this->changePRSizeHandler->handle($changePRSize);
+    }
+
+    /**
+     * @Then /^the author should be notified that the PR has become too large$/
+     */
+    public function theAuthorShouldBeNotifiedThatThePRIsTooLarge()
+    {
+        Assert::assertTrue($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
+        $warningMessage = ':warning: <https://github.com/akeneo/pim-community-dev/pull/1234|Your PR> is too large (more than 800 lines).';
+        $this->chatClientSpy->assertRepliedWithOneOf([$warningMessage]);
+    }
+
+    /**
+     * @Then /^the author should not be notified that the PR size has changed$/
+     */
+    public function theAuthorShouldNotBeNotifiedThatThePRSizeHasChanged()
+    {
+        Assert::assertFalse($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
     }
 }

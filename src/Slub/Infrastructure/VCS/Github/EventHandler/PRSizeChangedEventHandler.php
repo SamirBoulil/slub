@@ -44,7 +44,6 @@ class PRSizeChangedEventHandler implements EventHandlerInterface
     {
         $command = new ChangePRSize();
         $command->PRIdentifier = $this->getPRIdentifier($PRLargeEvent);
-        $command->repositoryIdentifier = $PRLargeEvent['repository']['full_name'];
         $command->additions = $PRLargeEvent['pull_request']['additions'];
         $command->deletions = $PRLargeEvent['pull_request']['deletions'];
         $this->largePRHandler->handle($command);

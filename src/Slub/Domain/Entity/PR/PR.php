@@ -338,11 +338,7 @@ class PR
 
     public function hasBecomeToolarge(): void
     {
-        if ($this->isMerged) {
-            return;
-        }
-
-        if ($this->isLarge) {
+        if ($this->isLarge || $this->isMerged || $this->closedAt->isClosed()) {
             return;
         }
 
@@ -350,13 +346,9 @@ class PR
         $this->events[] = PRTooLarge::forPR($this->PRIdentifier);
     }
 
-    public function small(): void
+    public function hasBecomeSmall(): void
     {
-        if ($this->isMerged) {
-            return;
-        }
-
-        if (!$this->isLarge) {
+        if (!$this->isLarge || $this->isMerged || $this->closedAt->isClosed()) {
             return;
         }
 

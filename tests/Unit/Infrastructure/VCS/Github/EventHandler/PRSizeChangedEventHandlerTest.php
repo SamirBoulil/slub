@@ -47,12 +47,10 @@ class PRSizeChangedEventHandlerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider PRActions
      */
-    public function it_listens_to_large_PR(string $prAction): void
+    public function it_listens_to_large_PR(): void
     {
         $largePR = [
-            'action' => $prAction,
             'pull_request' => [
                 'number' => self::PR_NUMBER,
                 'user' => ['id' => 1, 'login' => 'lucie'],
@@ -75,12 +73,10 @@ class PRSizeChangedEventHandlerTest extends TestCase
 
     /**
      * @test
-     * @dataProvider PRActions
      */
     public function it_listens_to_small_PR(): void
     {
         $smallPR = [
-            'action' => 'submitted',
             'pull_request' => [
                 'number' => self::PR_NUMBER,
                 'user' => ['id' => 1, 'login' => 'lucie'],
@@ -111,14 +107,5 @@ class PRSizeChangedEventHandlerTest extends TestCase
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
 
         $this->prLargeEventHandler->handle($unsupportedEvent);
-    }
-
-    public function PRActions()
-    {
-        return [
-            'synchronize' => ['synchronize'],
-            'submitted' => ['submitted'],
-            'opened' => ['opened'],
-        ];
     }
 }

@@ -13,7 +13,6 @@ use Slub\Application\ChangePRSize\ChangePRSizeHandler;
 class PRSizeChangedEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
-    private const SUPPORTED_ACTION_TYPES = ['opened', 'synchronize', 'submitted'];
 
     private ChangePRSizeHandler $largePRHandler;
 
@@ -36,8 +35,12 @@ class PRSizeChangedEventHandler implements EventHandlerInterface
 
     private function isPullRequestEventSupported(array $PRLargeEvent): bool
     {
-        return isset($PRLargeEvent['pull_request']['additions']) && isset($PRLargeEvent['pull_request']['deletions'])
-            && isset($PRLargeEvent['action']) && in_array($PRLargeEvent['action'], self::SUPPORTED_ACTION_TYPES);
+        return isset(
+            $PRLargeEvent['pull_request']['additions'],
+            $PRLargeEvent['pull_request']['deletions'],
+            $PRLargeEvent['repository']['full_name'],
+            $PRLargeEvent['pull_request']['number']
+        );
     }
 
     private function updatePR(array $PRLargeEvent): void

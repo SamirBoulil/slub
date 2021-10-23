@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Application\ChangePRSize;
 
 use Psr\Log\LoggerInterface;
+use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
@@ -31,27 +32,38 @@ class ChangePRSizeHandler
 
     public function handle(ChangePRSize $changePRSize): void
     {
-        $this->warnLargePR($changePRSize);
-        $this->logIt($changePRSize);
+        $isTooLarge = $this->analyzePRSize($changePRSize);
+        $this->logIt($isTooLarge, $changePRSize);
     }
 
-    private function warnLargePR(ChangePRSize $changePRSize): void
+    private function analyzePRSize(ChangePRSize $changePRSize): bool
     {
-        $PR = $this->PRRepository->getBy(PRIdentifier::fromString($changePRSize->PRIdentifier));
-        if ($this->isLarge->execute($changePRSize->additions, $changePRSize->deletions)) {
+        $PR = $this->PR($changePRSize);
+        $isTooLarge = $this->isTooLarge($changePRSize);
+        if ($isTooLarge) {
             $PR->hasBecomeToolarge();
         } else {
-            $PR->small();
+            $PR->hasBecomeSmall();
         }
-
         $this->PRRepository->save($PR);
+
+        return $isTooLarge;
     }
 
-    private function logIt(ChangePRSize $changePRSize): void
+    private function PR(ChangePRSize $changePRSize): PR
     {
-        if ($this->isLarge->execute($changePRSize->additions, $changePRSize->deletions)) {
-            $logMessage = sprintf('Author has been notified PR "%s" is too large', $changePRSize->PRIdentifier);
-            $this->logger->info($logMessage);
+        return $this->PRRepository->getBy(PRIdentifier::fromString($changePRSize->PRIdentifier));
+    }
+
+    private function isTooLarge(ChangePRSize $changePRSize): bool
+    {
+        return $this->isLarge->execute($changePRSize->additions, $changePRSize->deletions);
+    }
+
+    private function logIt(bool $isTooLarge, ChangePRSize $changePRSize): void
+    {
+        if ($isTooLarge) {
+            $this->logger->info(sprintf('Author has been notified PR "%s" is too large', $changePRSize->PRIdentifier));
         }
     }
 }

@@ -74,6 +74,7 @@ class SqlPRRepositoryTest extends KernelTestCase
         $updatedPR->comment($reviewerName);
         $updatedPR->green();
         $updatedPR->close(true);
+        $updatedPR->hasBecomeToolarge();
         $updatedPR->putToReviewAgainViaMessage(
             ChannelIdentifier::fromString('brazil-team'),
             MessageIdentifier::fromString('5151')

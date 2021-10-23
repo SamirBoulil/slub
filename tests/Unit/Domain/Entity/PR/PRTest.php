@@ -657,11 +657,36 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_tell_it_is_too_large_again_if_it_was_already_too_large(): void
+    {
+        $pr = $this->largePR();
+
+        $pr->hasBecomeToolarge();
+
+        self::assertTrue($pr->normalize()['IS_TOO_LARGE']);
+        self::assertEmpty($pr->getEvents());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_tell_it_is_too_large_if_it_was_already_closed(): void
+    {
+        $pr = $this->closedPR();
+
+        $pr->hasBecomeToolarge();
+
+        self::assertEmpty($pr->getEvents());
+    }
+
+    /**
+     * @test
+     */
     public function it_can_become_small(): void
     {
         $pr = $this->largePR();
 
-        $pr->small();
+        $pr->hasBecomeSmall();
 
         self::assertFalse($pr->normalize()['IS_TOO_LARGE']);
         self::assertCount(0, $pr->getEvents());
@@ -844,7 +869,7 @@ class PRTest extends TestCase
                     'BUILD_RESULT' => 'RED',
                     'BUILD_LINK' => '',
                 ],
-                'IS_MERGED' => false,
+                'IS_MERGED' => true,
                 'CHANNEL_IDS' => ['squad-raccoons'],
                 'WORKSPACE_IDS' => ['akeneo'],
                 'MESSAGE_IDS' => ['1'],

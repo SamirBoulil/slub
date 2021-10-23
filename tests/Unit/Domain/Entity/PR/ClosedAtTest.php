@@ -42,6 +42,18 @@ class ClosedAtTest extends TestCase
         $this->assertEquals($aTimestamp, $ClosedAt->toTimestamp());
     }
 
+    /**
+     * @test
+     */
+    public function it_tells_if_its_closed(): void
+    {
+        $closed = ClosedAt::fromTimestampIfAny($this->aTimestamp());
+        $notClosed = ClosedAt::none();
+
+        $this->assertTrue($closed->isClosed());
+        $this->assertFalse($notClosed->isClosed());
+    }
+
     private function aTimestamp(): string
     {
         $aDate = new \DateTime('now', new \DateTimeZone('UTC'));

@@ -9,7 +9,6 @@ namespace Slub\Application\ChangePRSize;
  */
 class IsLarge
 {
-    // TODO: needs tests
     private int $prSizeLimit;
 
     public function __construct(int $prSizeLimit)

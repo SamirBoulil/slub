@@ -53,13 +53,18 @@ class GetPRInfoTest extends TestCase
         $expectedTitle = 'Add new feature';
         $expectedAuthorIdentifier = 'sam';
         $PRIdentifier = PRIdentifier::fromString($expectedPRIdentifier);
+        $expectedAdditions = 10;
+        $expectedDeletions = 5;
+
         $this->getPRDetails
             ->fetch($PRIdentifier)
             ->willReturn([
                 'head'  => ['sha' => $commitSHA],
                 'state' => 'closed',
                 'title' => $expectedTitle,
-                'user' => ['login' => $expectedAuthorIdentifier]
+                'user' => ['login' => $expectedAuthorIdentifier],
+                'additions' => $expectedAdditions,
+                'deletions' => $expectedDeletions
             ]);
         $this->findReviews
             ->fetch($PRIdentifier)
@@ -81,6 +86,8 @@ class GetPRInfoTest extends TestCase
         self::assertEquals($expectedNotGTMCount, $actualPRInfo->notGTMCount);
         self::assertEquals($expectedCommentsCount, $actualPRInfo->comments);
         self::assertEquals($checkStatus, $actualPRInfo->CIStatus);
+        self::assertEquals($expectedAdditions, $actualPRInfo->additions);
+        self::assertEquals($expectedDeletions, $actualPRInfo->deletions);
         self::assertTrue($actualPRInfo->isMerged);
         self::assertTrue($actualPRInfo->isClosed);
     }

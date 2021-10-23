@@ -46,4 +46,9 @@ class ClosedAt
     {
         return null !== $this->closedAt ? (string)$this->closedAt->getTimestamp() : null;
     }
+
+    public function isClosed(): bool
+    {
+        return $this->closedAt !== self::EMPTY_DATE;
+    }
 }

@@ -84,6 +84,31 @@ class PRSizeChangedContext extends FeatureContext
      */
     public function theAuthorShouldNotBeNotifiedThatThePRSizeHasChanged()
     {
-        Assert::assertFalse($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to be dispatched');
+        Assert::assertFalse($this->eventSpy->PRTooLargeDispatched(), 'Expect a PR Too large event to NOT be dispatched');
+    }
+
+    /**
+     * @Given /^a large PR in review$/
+     */
+    public function aLargePRInReview()
+    {
+        $this->currentPRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev/1234');
+        $this->currentMessageIdentifier = MessageIdentifier::fromString('message-id');
+        $largePR = PR::create(
+            $this->currentPRIdentifier,
+            ChannelIdentifier::fromString('squad-raccoons'),
+            WorkspaceIdentifier::fromString('akeneo'),
+            $this->currentMessageIdentifier,
+            AuthorIdentifier::fromString('sam'),
+            Title::fromString('Add new feature'),
+            0,
+            0,
+            0,
+            'PENDING',
+            false,
+            true
+        );
+        $this->PRRepository->save($largePR);
+        $this->eventSpy->reset();
     }
 }

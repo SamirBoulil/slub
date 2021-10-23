@@ -348,7 +348,7 @@ class PR
 
     public function hasBecomeSmall(): void
     {
-        if (!$this->isLarge || $this->isMerged || $this->closedAt->isClosed()) {
+        if ($this->isMerged || $this->closedAt->isClosed()) {
             return;
         }
 

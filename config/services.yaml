@@ -11,6 +11,7 @@ parameters:
     locale: 'en'
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
+    GITHUB_APP_HOMEPAGE_URL: 'https://github.com/apps/slub-yeee-test'
 
 services:
     # default configuration for services in *this* file
@@ -158,6 +159,7 @@ services:
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
             - '%env(SLACK_CLIENT_ID)%'
             - '%env(SLACK_CLIENT_SECRET)%'
+            - '%env(GITHUB_APP_HOMEPAGE_URL)%'
 
     slub.infrastructure.query.get_channel_information:
         class: Slub\Infrastructure\Chat\Slack\GetChannelInformation

@@ -48,7 +48,7 @@ deploy-staging:
 od-prod: # Open dashboard production
 	open https://dashboard.heroku.com/apps/slub-akeneo
 
-.PHONY: log-staging
+.PHONY: od-staging
 od-staging: # Open dashboard staging
 	open https://dashboard.heroku.com/apps/slub-test
 

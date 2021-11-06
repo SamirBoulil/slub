@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\Chat\Slack;
 
 use GuzzleHttp\ClientInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,17 +23,20 @@ class OAuthInstallationAction
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
     private string $slackClientId;
     private string $slackClientSecret;
+    private string $githubAppHomePageURL;
 
     public function __construct(
         ClientInterface $httpClient,
         SqlSlackAppInstallationRepository $slackAppInstallationRepository,
         string $slackClientId,
-        string $slackClientSecret
+        string $slackClientSecret,
+        string $GithubAppHomePageURL
     ) {
         $this->httpClient = $httpClient;
         $this->slackAppInstallationRepository = $slackAppInstallationRepository;
         $this->slackClientId = $slackClientId;
         $this->slackClientSecret = $slackClientSecret;
+        $this->githubAppHomePageURL = $GithubAppHomePageURL;
     }
 
     public function executeAction(Request $request): Response
@@ -41,7 +45,7 @@ class OAuthInstallationAction
         $slackAppInstallation = $this->exchangeTemporaryCode($temporaryCode);
         $this->slackAppInstallationRepository->save($slackAppInstallation);
 
-        return new Response();
+        return new RedirectResponse($this->githubAppHomePageURL);
     }
 
     private function temporaryCode(Request $request): string

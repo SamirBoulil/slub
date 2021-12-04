@@ -152,6 +152,11 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
+    slub.infrastructure.chat.slack.tr_action:
+        class: Slub\Infrastructure\Chat\Slack\TRAction
+        arguments:
+            - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+
     slub.infrastructure.chat.slack.oauth_installation_action:
         class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction
         arguments:

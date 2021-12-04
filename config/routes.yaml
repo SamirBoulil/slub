@@ -3,6 +3,11 @@ chat_slack_messages:
     controller: slub.infrastructure.chat.slack.slub_bot_action::executeAction
     methods: [POST]
 
+chat_slack_tr:
+    path: /chat/slack/tr
+    controller: slub.infrastructure.chat.slack.tr_action::executeAction
+    methods: [POST]
+
 chat_slack_oauth_installation:
     path: /chat/slack/oauth
     controller: slub.infrastructure.chat.slack.oauth_installation_action::executeAction

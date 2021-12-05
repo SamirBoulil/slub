@@ -80,7 +80,15 @@ class SlubBot
 
     private function listensToNewPR(BotMan $bot): void
     {
-        $createNewPr = function (BotMan $bot, string $repositoryIdentifier, string $PRNumber) {
+        $putToReviewUsageChangeWarning = <<<TEXT
+Hey, did you know I won't be listening to your review requests using classic Slack messages anymore ?
+
+Starting the *january the 1st 2022*, you'll need to use the new `/tr` Slack command ***to .
+
+:yeee:!
+TEXT;
+
+        $createNewPr = function (BotMan $bot, string $repositoryIdentifier, string $PRNumber) use ($putToReviewUsageChangeWarning) {
             $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);
@@ -93,6 +101,7 @@ class SlubBot
                 $messageIdentifier,
                 $PRInfo
             );
+//            $bot->reply($putToReviewUsageChangeWarning);
         };
         $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);

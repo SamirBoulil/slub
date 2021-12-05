@@ -13,6 +13,8 @@ class PRInfo
 {
     public string $PRIdentifier;
 
+    public string $repositoryIdentifier;
+
     public string $authorIdentifier;
 
     public string $title;

@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
+use Psr\Log\LoggerInterface;
+use Slub\Application\Common\ChatClient;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webmozart\Assert\Assert;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
@@ -21,105 +25,117 @@ class TRAction
     private PutPRToReviewHandler $putPRToReviewHandler;
     private GetChannelInformationInterface $getChannelInformation;
     private GetPRInfoInterface $getPRInfo;
+    private ChatClient $chatClient;
+    private LoggerInterface $logger;
 
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
         GetChannelInformationInterface $getChannelInformation,
-        GetPRInfoInterface $getPRInfo
+        GetPRInfoInterface $getPRInfo,
+        ChatClient $chatClient,
+        LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->getChannelInformation = $getChannelInformation;
         $this->getPRInfo = $getPRInfo;
+        $this->chatClient = $chatClient;
+        $this->logger = $logger;
     }
 
     public function executeAction(Request $request): Response
     {
-        $PRInfo = $this->PRInfo($request);
-        $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
-        $channelIdentifier = $this->getChannelIdentifier($request);
-        $messageIdentifier = $this->getMessageIdentifier($request);
-        $this->putPRToReview(
-            $PRInfo,
-            $workspaceIdentifier,
-            $channelIdentifier,
-            $messageIdentifier
-        );
+        return new Response();
 
-        return new JsonResponse($this->PRToReviewAnnouncement($request, $PRInfo));
+        try {
+            $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
+        } catch (ImpossibleToParseGithubURL $exception) {
+            $this->explainAuthorURLCannotBeParsed($request);
+
+            return new Response();
+        }
+        try {
+            $this->logger->critical('New PR has been put to review');
+            $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
+            $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
+            $channelIdentifier = $this->getChannelIdentifier($request);
+            $authorIdentifier = $this->getAuthorIdentifier($request);
+            $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
+            $this->putPRToReview(
+                $PRInfo,
+                $workspaceIdentifier,
+                $channelIdentifier,
+                $authorIdentifier,
+                $messageIdentifier
+            );
+        } catch (\Exception|\Error $e) {
+            $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
+            $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
+        }
+
+        return new Response();
     }
 
-    private function getPRIdentifiers(Request $request): array
+    private function acknowledgeRequest(Request $request): void
     {
-        $text = $request->getContent('text');
-        preg_match('#.*<https://.*/(.*)/pull/(\d+).*>.*$#', $text, $matches);
-
-        return [$matches[1], $matches[2]];
-    }
-
-    private function PRToReviewAnnouncement(Request $request, PRInfo $PRInfo): array
-    {
-        $userId = $request->getContent('user_id');
-
-        return [
-            'response_type' => 'in_channel',
-            'text' => [
-                'type' => 'section',
-                'text' => sprintf('<@%s> needs review for "%s"', $userId, $PRInfo->title),
-            ],
-            'accessory' => [
-                'type' => 'button',
-                'text' => [
-                    'type' => 'plain_text',
-                    'text' => 'Review',
-                    'emoji' => true,
-                    'style' => 'primary',
-                ],
-                'value' => 'show_pr',
-                'url' => 'https://github.akeeo/1212',
-                'action_id' => 'button_action',
-            ],
-        ];
+        $responseUrl = $request->request->get('response_url');
+        $this->chatClient->acknowledgeRequest($responseUrl);
     }
 
     private function getWorkspaceIdentifier(Request $request): string
     {
-        return $request->getContent('team');
+        return $request->request->get('team_id');
+    }
+
+    private function getAuthorIdentifier(Request $request): string
+    {
+        return $request->request->get('user_id');
     }
 
     private function getChannelIdentifier(Request $request): string
     {
         $workspace = $this->getWorkspaceIdentifier($request);
-        $channel = $request->getContent('channel');
+        $channel = $request->request->get('channel_id');
         $channelName = $this->channelName($workspace, $channel);
 
         return ChannelIdentifierHelper::from($workspace, $channelName);
     }
+
     private function channelName(string $workspace, string $channel): string
     {
         return $this->getChannelInformation->fetch($workspace, $channel)->channelName;
     }
 
-    private function getMessageIdentifier(Request $request): string
+    private function publishToReviewAnnouncement(PRInfo $PRInfo, string $channelIdentifier, string $authorIdentifier): string
     {
-        $workspace = $this->getWorkspaceIdentifier($request);
-        $channel = $request->getContent('channel');
-        $ts = $request->getContent('ts');
+        // TODO: Consider putting the url in the PRInfo class instead
+        $PRUrl = GithubAPIHelper::PRPageUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
 
-        return MessageIdentifierHelper::from($workspace, $channel, $ts);
-    }
+        $message = [
+            [
+                'type' => 'section',
+                'text' => [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf(
+                        '<@%s> needs GTMs for <%s|%s>',
+                        $authorIdentifier,
+                        $PRUrl,
+                        $PRInfo->title
+                    ),
+                ],
+            ],
+        ];
 
-    private function PRInfo(Request $request): PRInfo
-    {
-        [$PRNumber, $repositoryIdentifier] = $this->getPRIdentifiers($request);
-        $PRIdentifier = $this->PRIdentifier($PRNumber, $repositoryIdentifier);
-
-        return $this->getPRInfo->fetch(PRIdentifier::fromString($PRIdentifier));
+        return $this->chatClient->publishMessageWithBlocksInChannel(
+            ChannelIdentifier::fromString($channelIdentifier),
+            $message
+        );
     }
 
     private function putPRToReview(
         PRInfo $PRInfo,
-        string $channelIdentifier,
         string $workspaceIdentifier,
+        string $channelIdentifier,
+        string $authorIdentifier,
         string $messageIdentifier
     ): void {
         $PRToReview = new PutPRToReview();
@@ -128,7 +144,7 @@ class TRAction
         $PRToReview->channelIdentifier = $channelIdentifier;
         $PRToReview->workspaceIdentifier = $workspaceIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
-        $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
+        $PRToReview->authorIdentifier = $authorIdentifier;
         $PRToReview->title = $PRInfo->title;
         $PRToReview->GTMCount = $PRInfo->GTMCount;
         $PRToReview->notGTMCount = $PRInfo->notGTMCount;
@@ -139,11 +155,14 @@ class TRAction
         $PRToReview->additions = $PRInfo->additions;
         $PRToReview->deletions = $PRInfo->deletions;
 
-        $this->logger->info(
+        $this->logger->debug(
             sprintf(
-                'New PR to review - channel "%s" - repository "%s" - PR "%s".',
-                $channelIdentifier,
-                $PRInfo->repositoryIdentifier,
+                'New PR to review - workspace "%s" - channel "%s" - repository "%s" - author "%s" - message "%s" - PR "%s".',
+                $PRToReview->workspaceIdentifier,
+                $PRToReview->channelIdentifier,
+                $PRToReview->repositoryIdentifier,
+                $PRToReview->authorIdentifier,
+                $PRToReview->messageIdentifier,
                 $PRToReview->PRIdentifier
             )
         );
@@ -151,8 +170,45 @@ class TRAction
         $this->putPRToReviewHandler->handle($PRToReview);
     }
 
-    private function PRIdentifier(string $PRNumber, string $repositoryIdentifier): string
+    private function extractPRIdentifierFromSlackCommand(string $text): PRIdentifier
     {
-        return sprintf('%s/%s', $repositoryIdentifier, $PRNumber);
+        try {
+            preg_match('#<https://github.com/(.*)/pull/(\d+).*>$#', $text, $matches);
+            [$repositoryIdentifier, $PRNumber] = ([$matches[1], $matches[2]]);
+            Assert::stringNotEmpty($repositoryIdentifier, $PRNumber);
+            Assert::stringNotEmpty($PRNumber, $PRNumber);
+            $PRIdentifier = PRIdentifier::fromString(
+                GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber)
+            );
+        } catch (\Exception $e) {
+            throw new ImpossibleToParseGithubURL($text);
+        }
+
+        return $PRIdentifier;
+    }
+
+    private function explainAuthorURLCannotBeParsed(Request $request): void
+    {
+        $authorInput = $request->request->get('text');
+        $responseUrl = $request->request->get('response_url');
+        $text = <<<SLACK
+:warning: `/tr %s`
+:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
+SLACK;
+        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
+    }
+
+    private function explainAuthorPRCouldNotBeSubmittedToReview(Request $request)
+    {
+        $authorInput = $request->request->get('text');
+        $responseUrl = $request->request->get('response_url');
+        $text = <<<SLACK
+:warning: `/tr %s`
+
+:thinking_face: Something went wrong, I was not able to put your PR to Review.
+
+Can you check the pull request URL ? If this issue keeps coming, Slack @SamirBoulil.
+SLACK;
+        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
     }
 }

@@ -78,9 +78,9 @@ class PublishRemindersHandler
     {
         return array_filter(
             $PRsInReview,
-            fn (PR $PR) => array_filter(
+            static fn (PR $PR) => array_filter(
                 $PR->channelIdentifiers(),
-                fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
+                static fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
             )
         );
     }

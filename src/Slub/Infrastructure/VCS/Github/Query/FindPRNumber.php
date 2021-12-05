@@ -31,7 +31,7 @@ class FindPRNumber implements FindPRNumberInterface
         $response = $this->githubAPIClient->get($url, [], $repository);
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the check runs for repository "%s" (%s) and commit ref %s', $repository, $commitRef, $url));
         }
 

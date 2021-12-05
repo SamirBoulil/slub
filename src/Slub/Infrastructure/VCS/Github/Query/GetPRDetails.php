@@ -21,16 +21,9 @@ class GetPRDetails
 
     public function fetch(PRIdentifier $PRIdentifier): array
     {
-        $url = $this->getUrl($PRIdentifier);
+        $url = GithubAPIHelper::PRAPIUrl($PRIdentifier);
 
         return $this->fetchPRdetails($PRIdentifier, $url);
-    }
-
-    private function getUrl(PRIdentifier $PRIdentifier): string
-    {
-        $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-
-        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s', ...$matches);
     }
 
     private function fetchPRdetails(PRIdentifier $PRIdentifier, string $url): array
@@ -39,7 +32,7 @@ class GetPRDetails
         $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the reviews for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 

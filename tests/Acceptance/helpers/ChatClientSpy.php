@@ -33,6 +33,13 @@ class ChatClientSpy implements ChatClient
         $this->recordedMessages[$channelIdentifier->stringValue()][] = $text;
     }
 
+    public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
+    {
+        $this->recordedMessages[$channelIdentifier->stringValue()][] = $blocks;
+
+        return 'DUMMY_MESSAGE_IDENTIFIER';
+    }
+
     public function assertReaction(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
     {
         $reactions = $this->reactionsForIdentifier($expectedMessageIdentifier->stringValue());

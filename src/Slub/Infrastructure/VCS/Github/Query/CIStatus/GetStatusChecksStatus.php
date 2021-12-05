@@ -35,7 +35,6 @@ class GetStatusChecksStatus
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $ciStatuses = $this->statuses($PRIdentifier, $commitRef);
-        $this->logger->critical((string) json_encode($ciStatuses));
         $uniqueCiStatus = $this->sortAndUniqueStatuses($ciStatuses);
 
         return $this->deductCIStatus($uniqueCiStatus);
@@ -52,7 +51,9 @@ class GetStatusChecksStatus
         );
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+
+        //TODO: Add Test case
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the statuses for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 

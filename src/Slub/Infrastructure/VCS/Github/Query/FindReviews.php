@@ -47,7 +47,9 @@ class FindReviews
         $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+
+        // TODO: Add test case
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(
                 sprintf(
                     'There was a problem when fetching the reviews for PR "%s" at %s',

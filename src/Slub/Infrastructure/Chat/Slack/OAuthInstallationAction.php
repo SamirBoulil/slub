@@ -68,7 +68,7 @@ class OAuthInstallationAction
             ],
         ]);
 
-        $content = APIHelper::checkResponse($response);
+        $content = APIHelper::checkResponseSuccess($response);
 
         return $this->slackAppInstallation($content);
     }

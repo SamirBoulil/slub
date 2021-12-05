@@ -25,6 +25,10 @@ class GithubAPIHelperTest extends TestCase
         );
     }
 
+    // Add test for PRUrl()
+    // Add test for PRAPIUrl()
+    // Add test for PRIdentifierFrom
+
     /**
      * @test
      */

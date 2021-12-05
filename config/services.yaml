@@ -158,6 +158,8 @@ services:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
 
     slub.infrastructure.chat.slack.oauth_installation_action:
         class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Slack;
 
+use Webmozart\Assert\Assert;
+
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
@@ -16,8 +18,10 @@ class ChannelIdentifierHelper
         return sprintf('%s%s%s', $workspace, self::SEPARATOR, $channel);
     }
 
+    // TODO: Consider introducing 2 methods for that like (::slackWorkspace ::slackChannelIdentifier)
     public static function split(string $channelIdentifier): array
     {
+        Assert::contains($channelIdentifier, self::SEPARATOR, 'Impossible to split channel identifier');
         $message = explode(self::SEPARATOR, $channelIdentifier);
         $workspace = $message[0];
         $channel = $message[1];

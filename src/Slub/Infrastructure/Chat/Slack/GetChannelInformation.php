@@ -34,7 +34,7 @@ class GetChannelInformation implements GetChannelInformationInterface
                 ],
             ]
         );
-        $channel = APIHelper::checkResponse($response);
+        $channel = APIHelper::checkResponseSuccess($response);
         $channelInformation = new ChannelInformation();
         $channelInformation->channelIdentifier = $channelIdentifier;
         $channelInformation->channelName = $channel['channel']['name'];

@@ -11,22 +11,35 @@ use Psr\Http\Message\ResponseInterface;
  */
 class APIHelper
 {
-    public static function checkResponse(ResponseInterface $response): array
+    public static function checkResponseSuccess(ResponseInterface $response): array
     {
-        $statusCode = $response->getStatusCode();
+        self::checkStatusCodeSuccess($response);
         $contents = json_decode($response->getBody()->getContents(), true);
-        $hasError = 200 !== $statusCode || false === $contents['ok'];
-
+        $hasError = false === $contents['ok'];
         if ($hasError) {
             throw new \RuntimeException(
                 sprintf(
                     'There was an issue when communicating with the slack API (status %d): "%s"',
-                    $statusCode,
+                    $response->getStatusCode(),
                     json_encode($contents)
                 )
             );
         }
 
         return $contents;
+    }
+
+    public static function checkStatusCodeSuccess(ResponseInterface $response): void
+    {
+        $statusCode = $response->getStatusCode();
+        $hasError = 200 !== $statusCode;
+        if ($hasError) {
+            throw new \RuntimeException(
+                sprintf(
+                    'There was an issue when communicating with the slack API (status %d)',
+                    $statusCode,
+                )
+            );
+        }
     }
 }

@@ -38,9 +38,9 @@ class GetBotReactionsForMessageAndUser
 
     private function fetchReactions(string $workspaceId, string $channel, string $ts): array
     {
-        $this->logger->critical(sprintf('Will get reactions for workspace "%s", channel "%s"', $workspaceId, $channel));
+        $this->logger->critical(sprintf('Will get reactions for workspace "%s", channel "%s", message "%s"', $workspaceId, $channel, $ts));
 
-        $reactions = APIHelper::checkResponse(
+        $reactions = APIHelper::checkResponseSuccess(
             $this->client->get(
                 'https://slack.com/api/reactions.get',
                 [

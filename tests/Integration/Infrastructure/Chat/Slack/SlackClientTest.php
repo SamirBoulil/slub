@@ -196,6 +196,8 @@ class SlackClientTest extends KernelTestCase
         $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
     }
 
+    // It publishes messages in block and returns the message identifier associated
+
     private function setUpGuzzleMock(): Client
     {
         $this->httpClientMock = new MockHandler([]);

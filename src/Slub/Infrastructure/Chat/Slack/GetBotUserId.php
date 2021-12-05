@@ -44,7 +44,7 @@ class GetBotUserId implements GetBotUserIdInterface
 
     private function fetchBotUserId(string $workspaceId): string
     {
-        $response = APIHelper::checkResponse(
+        $response = APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/auth.test',
                 [

@@ -17,14 +17,10 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
 class SlackClient implements ChatClient
 {
     private GetBotUserId $getBotUserId;
-
     private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
-
-    private ClientInterface $client;
-
-    private LoggerInterface $logger;
-
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
+    private ClientInterface $client;
+    private LoggerInterface $logger;
 
     public function __construct(
         GetBotUserId $getBotUserId,
@@ -43,12 +39,12 @@ class SlackClient implements ChatClient
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        APIHelper::checkResponse(
+        APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken($message['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -74,12 +70,12 @@ class SlackClient implements ChatClient
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
         $channel = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
-        APIHelper::checkResponse(
+        APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken($channel['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken($channel['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
@@ -91,12 +87,70 @@ class SlackClient implements ChatClient
         );
     }
 
+    // TODO: Test me
+    public function answerWithEphemeralMessage(string $url, string $text): void
+    {
+        APIHelper::checkStatusCodeSuccess(
+            $this->client->post(
+                $url,
+                [
+                    'headers' => [
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'text' => $text,
+                        'response_type' => 'ephemeral',
+                    ],
+                ]
+            )
+        );
+    }
+
+    // TODO: Test me
+    public function acknowledgeRequest(string $url): void
+    {
+        $this->client->get($url);
+    }
+
+    // TODO: Test me
+    public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
+    {
+        $this->logger->critical('Publishing PR'.$channelIdentifier->stringValue());
+        $channelIdentifierInfo = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
+        $response = APIHelper::checkResponseSuccess(
+            $this->client->post(
+                'https://slack.com/api/chat.postMessage',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->slackToken($channelIdentifierInfo['workspace']),
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'channel' => $channelIdentifierInfo['channel'],
+                        'blocks' => $blocks,
+                        'unfurl_links' => false,
+                    ],
+                ]
+            )
+        );
+
+        $messageIdentifier = MessageIdentifierHelper::from(
+            $response['message']['team'],
+            $response['channel'],
+            $response['ts']
+        );
+
+        return $messageIdentifier;
+    }
+
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         $botUserId = $this->getBotUserId->fetch($messageId['workspace']);
 
-        $this->logger->critical(sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId)));
+        $this->logger->critical(
+            sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId))
+        );
         $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
 
         $result = $this->getBotReactionsForMessageAndUser->fetch(
@@ -119,7 +173,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.add',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '. $this->slackToken($message['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [

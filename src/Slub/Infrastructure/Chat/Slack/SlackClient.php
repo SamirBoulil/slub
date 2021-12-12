@@ -51,6 +51,7 @@ class SlackClient implements ChatClient
                         'thread_ts' => $message['ts'],
                         'channel' => $message['channel'],
                         'text' => $text,
+                        'unfurl_links' => false
                     ],
                 ]
             )
@@ -129,6 +130,7 @@ class SlackClient implements ChatClient
                         'channel' => $channelIdentifierInfo['channel'],
                         'blocks' => $blocks,
                         'unfurl_links' => false,
+                        'link_names' => true
                     ],
                 ]
             )

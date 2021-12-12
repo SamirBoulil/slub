@@ -152,14 +152,20 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
-    slub.infrastructure.chat.slack.tr_action:
+    slub.infrastructure.chat.slack.tr_action: #Consider renaming register TR submission
         class: Slub\Infrastructure\Chat\Slack\TRAction
+
+    slub.infrastructure.chat.slack.process_tr_action:
+        class: Slub\Infrastructure\Chat\Slack\ProcessTRRequestListener
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@slub.infrastructure.chat.slack.slack_client'
+            - '@router'
             - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
 
     slub.infrastructure.chat.slack.oauth_installation_action:
         class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction

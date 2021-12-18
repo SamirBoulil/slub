@@ -22,6 +22,7 @@ use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Query\GetBotUserIdInterface;
 use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
+use Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -32,20 +33,14 @@ class SlubBot
     public const UNPUBLISH_CONFIRMATION_MESSAGES = ['Okaay! :ok_hand:', 'Will do! :+1:', 'Oki doki!', 'Yeeee '];
 
     private PutPRToReviewHandler $putPRToReviewHandler;
-
     private UnpublishPRHandler $unpublishPRHandler;
-
     private GetChannelInformationInterface $getChannelInformation;
-
     private LoggerInterface $logger;
-
     private BotMan $bot;
-
     private GetBotUserIdInterface $getBotUserId;
-
     private ChatClient $chatClient;
-
     private GetPRInfoInterface $getPRInfo;
+    private ShouldCommunicateInApp $shouldCommunicateInApp;
 
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
@@ -54,6 +49,7 @@ class SlubBot
         GetBotUserIdInterface $getBotUserId,
         GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
+        ShouldCommunicateInApp $shouldCommunicateInApp,
         LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
@@ -63,6 +59,7 @@ class SlubBot
         $this->logger = $logger;
         $this->chatClient = $chatClient;
         $this->getBotUserId = $getBotUserId;
+        $this->shouldCommunicateInApp = $shouldCommunicateInApp;
 
         DriverManager::loadDriver(SlackDriver::class);
         $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
@@ -86,9 +83,9 @@ class SlubBot
     private function listensToNewPR(BotMan $bot): void
     {
         $putToReviewUsageChangeWarning = <<<TEXT
-Hey, did you know I won't be listening to your review requests using classic Slack messages anymore ?
+Hey, you can now use the new Slash command `/tr {pr_link}
 
-Starting the *january the 1st 2022*, you'll need to use the new `/tr` Slack command ***to .
+Starting *January the 20th of 2022*, you'll want to use the new `/tr {your PR link}`.
 
 :yeee:!
 TEXT;
@@ -106,7 +103,6 @@ TEXT;
                 $messageIdentifier,
                 $PRInfo
             );
-//            $bot->reply($putToReviewUsageChangeWarning);
         };
         $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
         $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);

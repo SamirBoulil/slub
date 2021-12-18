@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection;
 use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 
 /**
- * @author    Samir Boulil <samir.boulil@akeneo.com>
+ * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class SqlSlackAppInstallationRepository
 {

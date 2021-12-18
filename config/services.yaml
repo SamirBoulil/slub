@@ -125,6 +125,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.should_communicate_in_app:
+        class: Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     slub.infrastructure.persistence.delivered_event_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository
         arguments:
@@ -145,6 +150,7 @@ services:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.persistence.should_communicate_in_app'
             - '@logger'
 
     slub.infrastructure.chat.slack.slub_bot_action:

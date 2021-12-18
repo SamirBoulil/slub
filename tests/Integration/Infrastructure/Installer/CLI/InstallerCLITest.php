@@ -95,6 +95,7 @@ class InstallerCLITest extends KernelTestCase
         self::assertTrue($sm->tablesExist(['delivered_event']));
         self::assertTrue($sm->tablesExist(['app_installation']));
         self::assertTrue($sm->tablesExist(['slack_app_installation']));
+        self::assertTrue($sm->tablesExist(['user_in_app_communication']));
     }
 
     private function dropDatabase(): void

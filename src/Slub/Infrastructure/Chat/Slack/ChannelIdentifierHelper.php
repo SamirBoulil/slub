@@ -23,6 +23,7 @@ class ChannelIdentifierHelper
     {
         Assert::contains($channelIdentifier, self::SEPARATOR, 'Impossible to split channel identifier');
         $message = explode(self::SEPARATOR, $channelIdentifier);
+        Assert::count($message, 2);
         $workspace = $message[0];
         $channel = $message[1];
 

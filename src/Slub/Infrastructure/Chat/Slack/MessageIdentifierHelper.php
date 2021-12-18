@@ -16,6 +16,7 @@ class MessageIdentifierHelper
         return sprintf('%s%s%s%s%s', $workspace, self::SEPARATOR, $channel, self::SEPARATOR, $ts);
     }
 
+    // TODO: Consider introducing ::channelFrom ::workspaceFrom tsFrom::
     public static function split(string $messageIdentifier): array
     {
         $message = explode(self::SEPARATOR, $messageIdentifier);

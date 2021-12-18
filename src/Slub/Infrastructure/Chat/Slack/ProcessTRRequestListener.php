@@ -65,7 +65,7 @@ class ProcessTRRequestListener
             return;
         }
         try {
-            $this->logger->critical('New PR has been put to review');
+            $this->logger->critical('New PR has been put to review : '.$PRIdentifier->stringValue());
             $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
             $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
             $channelIdentifier = $this->getChannelIdentifier($request);
@@ -97,8 +97,7 @@ class ProcessTRRequestListener
     private function getChannelIdentifier(Request $request): string
     {
         $workspace = $this->getWorkspaceIdentifier($request);
-        $channel = $request->request->get('channel_id');
-        $channelName = $this->channelName($workspace, $channel);
+        $channelName = $request->request->get('channel_name'); // TODO: Consider removing #channelName ?
 
         return ChannelIdentifierHelper::from($workspace, $channelName);
     }
@@ -180,9 +179,9 @@ class ProcessTRRequestListener
     {
         try {
             preg_match('#<https://github.com/(.*)/pull/(\d+).*>$#', $text, $matches);
+            Assert::stringNotEmpty($matches[1]);
+            Assert::stringNotEmpty($matches[2]);
             [$repositoryIdentifier, $PRNumber] = ([$matches[1], $matches[2]]);
-            Assert::stringNotEmpty($repositoryIdentifier, $PRNumber);
-            Assert::stringNotEmpty($PRNumber, $PRNumber);
             $PRIdentifier = PRIdentifier::fromString(
                 GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber)
             );

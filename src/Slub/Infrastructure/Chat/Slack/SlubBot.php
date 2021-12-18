@@ -65,7 +65,7 @@ class SlubBot
         $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);
 //        $this->providesToHelp($this->bot);
-        $this->bot->listen();
+//        $this->bot->listen();
     }
 
     public function start(): void

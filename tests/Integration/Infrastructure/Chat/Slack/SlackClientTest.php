@@ -71,9 +71,10 @@ class SlackClientTest extends KernelTestCase
         $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             [
-                'channel'   => 'channel',
+                'channel' => 'channel',
                 'thread_ts' => 'message',
-                'text'      => 'hello world',
+                'text' => 'hello world',
+                'unfurl_links' => false,
             ],
             $this->getBodyContent($generatedRequest)
         );

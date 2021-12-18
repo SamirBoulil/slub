@@ -70,7 +70,7 @@ class SlubBot
         $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);
 //        $this->providesToHelp($this->bot);
-//        $this->bot->listen();
+        $this->bot->listen();
     }
 
     public function start(): void
@@ -108,9 +108,9 @@ TEXT;
             );
 //            $bot->reply($putToReviewUsageChangeWarning);
         };
-//        $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
-//        $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
-//        $bot->hears('.*PR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+        $bot->hears('.*TR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+        $bot->hears('.*review.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
+        $bot->hears('.*PR.*<https://github.com/(.*)/pull/(\d+).*>.*$', $createNewPr);
     }
 
     private function listenToPRToUnpublish(BotMan $bot): void

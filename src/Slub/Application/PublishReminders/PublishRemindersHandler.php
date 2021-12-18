@@ -87,7 +87,7 @@ class PublishRemindersHandler
 
     private function formatReminders(array $prs): string
     {
-        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview());
+        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() <=> $pr2->numberOfDaysInReview());
 
         $PRReminders = array_map(fn (PR $PR) => $this->formatReminder($PR), $prs);
         $reminder = <<<CHAT

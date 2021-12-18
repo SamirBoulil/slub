@@ -113,12 +113,6 @@ class SlackClient implements ChatClient
     }
 
     // TODO: Test me
-    public function acknowledgeRequest(string $url): void
-    {
-        $this->client->get($url);
-    }
-
-    // TODO: Test me
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
     {
         $this->logger->critical('Publishing PR'.$channelIdentifier->stringValue());

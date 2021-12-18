@@ -37,7 +37,24 @@ class ChatClientSpy implements ChatClient
     {
         $this->recordedMessages[$channelIdentifier->stringValue()][] = $blocks;
 
-        return 'DUMMY_MESSAGE_IDENTIFIER';
+        return 'published_message_identifier';
+    }
+
+    public function assertPublishMessageWithBlocksInChannelContains(string $channelIdentifier, string $textMessage): void
+    {
+        Assert::assertIsArray($this->recordedMessages[$channelIdentifier]);
+        Assert::assertContains($this->recordedMessages[$channelIdentifier][0]['text']['text'] ?? 'Block does not exist!', $textMessage);
+    }
+
+    public function answerWithEphemeralMessage(string $url, string $text): void
+    {
+        $this->recordedMessages[$url] = $text;
+    }
+
+    public function assertEphemeralMessageContains(string $url, string $text): void
+    {
+        Assert::assertArrayHasKey($url, $this->recordedMessages);
+        Assert::assertStringContainsString($this->recordedMessages[$url], $text);
     }
 
     public function assertReaction(MessageIdentifier $expectedMessageIdentifier, string $expectedText): void
@@ -46,18 +63,18 @@ class ChatClientSpy implements ChatClient
         Assert::assertContains($expectedText, $reactions);
     }
 
-    public function assertHasBeenCalledWithChannelIdentifierAndMessage(ChannelIdentifier $expectedChannelIdentifier, string $expectedText): void
-    {
-        $actualText = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
-        Assert::assertContains($expectedText, $actualText);
-    }
-
     public function assertOnlyReaction(
         MessageIdentifier $expectedMessageIdentifier,
         string $expectedText
     ): void {
         $reactions = $this->reactionsForIdentifier($expectedMessageIdentifier->stringValue());
         Assert::assertEquals([$expectedText], $reactions);
+    }
+
+    public function assertHasBeenCalledWithChannelIdentifierAndMessage(ChannelIdentifier $expectedChannelIdentifier, string $expectedText): void
+    {
+        $actualText = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
+        Assert::assertContains($expectedText, $actualText);
     }
 
     public function assertRepliedWithOneOf(array $expectedMessages): void

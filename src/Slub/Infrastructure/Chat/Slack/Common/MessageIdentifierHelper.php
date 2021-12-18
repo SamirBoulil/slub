@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\Common;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

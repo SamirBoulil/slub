@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\Query;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserIdInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**

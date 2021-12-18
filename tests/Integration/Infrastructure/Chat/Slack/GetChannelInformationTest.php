@@ -11,9 +11,9 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\RequestInterface;
-use Slub\Infrastructure\Chat\Slack\GetChannelInformation;
-use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformation;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
@@ -95,7 +95,7 @@ class GetChannelInformationTest extends TestCase
 
     private function mockSlackAppInstallation(): void
     {
-        $slackAppInstallation = new SlackAppInstallation();
+        $slackAppInstallation = new \Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation();
         $slackAppInstallation->accessToken = 'access_token';
         $this->slackAppInstallationRepository->getBy('workspace_id')->willReturn($slackAppInstallation);
     }

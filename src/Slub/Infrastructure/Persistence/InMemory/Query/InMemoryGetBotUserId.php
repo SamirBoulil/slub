@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Persistence\InMemory\Query;
 
-use Slub\Infrastructure\Chat\Slack\GetBotUserIdInterface;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserIdInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

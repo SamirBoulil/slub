@@ -11,8 +11,8 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
-use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
@@ -22,7 +22,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
 {
     private MockHandler $httpMock;
 
-    private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
+    private \Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
 
     private ObjectProphecy $slackAppInstallationRepository;
 
@@ -33,7 +33,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
         $this->slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
         $this->mockSlackAppInstallation();
 
-        $this->getBotReactionsForMessageAndUser = new GetBotReactionsForMessageAndUser(
+        $this->getBotReactionsForMessageAndUser = new \Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser(
             $client,
             $this->slackAppInstallationRepository->reveal(),
             new NullLogger()

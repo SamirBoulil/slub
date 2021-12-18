@@ -12,9 +12,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
-use Slub\Infrastructure\Chat\Slack\GetBotUserId;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Chat\Slack\SlackClient;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -42,7 +42,7 @@ class SlackClientTest extends KernelTestCase
 
         // Could have an GuzzleTestCase with mock & client as properties
         $client = $this->setUpGuzzleMock();
-        $this->getBotUserId = $this->prophesize(GetBotUserId::class);
+        $this->getBotUserId = $this->prophesize(\Slub\Infrastructure\Chat\Slack\Query\GetBotUserId::class);
         $this->getBotReactionsForMessageAndUser = $this->prophesize(GetBotReactionsForMessageAndUser::class);
 
         $slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);

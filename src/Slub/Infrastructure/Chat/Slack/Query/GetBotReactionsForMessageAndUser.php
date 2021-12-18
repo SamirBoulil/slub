@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\Query;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
@@ -38,8 +39,6 @@ class GetBotReactionsForMessageAndUser
 
     private function fetchReactions(string $workspaceId, string $channel, string $ts): array
     {
-        $this->logger->critical(sprintf('Will get reactions for workspace "%s", channel "%s", message "%s"', $workspaceId, $channel, $ts));
-
         $reactions = APIHelper::checkResponseSuccess(
             $this->client->get(
                 'https://slack.com/api/reactions.get',
@@ -54,8 +53,6 @@ class GetBotReactionsForMessageAndUser
                 ]
             )
         );
-
-        $this->logger->critical(sprintf('Reactions are: "%s"', json_encode($reactions)));
 
         return $reactions['message']['reactions'] ?? [];
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Ramsey\Uuid\Uuid;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
 

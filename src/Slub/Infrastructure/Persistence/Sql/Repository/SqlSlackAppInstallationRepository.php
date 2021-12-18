@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Repository;
 
 use Doctrine\DBAL\Connection;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\TR;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @author    Samir Boulil <samir.boulil@akeneo.com>
  */
-class TRAction
+class OKAction
 {
     public function executeAction(Request $request): Response
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\TR;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
@@ -12,6 +12,8 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -21,10 +23,9 @@ use Webmozart\Assert\Assert;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class ProcessTRRequestListener
+class ProcessTRAsync
 {
     private PutPRToReviewHandler $putPRToReviewHandler;
-    private GetChannelInformationInterface $getChannelInformation;
     private GetPRInfoInterface $getPRInfo;
     private ChatClient $chatClient;
     private RouterInterface $router;
@@ -32,14 +33,12 @@ class ProcessTRRequestListener
 
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
-        GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
         ChatClient $chatClient,
         RouterInterface $router,
         LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
-        $this->getChannelInformation = $getChannelInformation;
         $this->getPRInfo = $getPRInfo;
         $this->chatClient = $chatClient;
         $this->router = $router;
@@ -59,7 +58,7 @@ class ProcessTRRequestListener
     {
         try {
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
-        } catch (ImpossibleToParseGithubURL $exception) {
+        } catch (ImpossibleToParseRepositoryURL $exception) {
             $this->explainAuthorURLCannotBeParsed($request);
 
             return;
@@ -97,14 +96,9 @@ class ProcessTRRequestListener
     private function getChannelIdentifier(Request $request): string
     {
         $workspace = $this->getWorkspaceIdentifier($request);
-        $channelName = $request->request->get('channel_name'); // TODO: Consider removing #channelName ?
+        $channelName = $request->request->get('channel_name');
 
         return ChannelIdentifierHelper::from($workspace, $channelName);
-    }
-
-    private function channelName(string $workspace, string $channel): string
-    {
-        return $this->getChannelInformation->fetch($workspace, $channel)->channelName;
     }
 
     private function publishToReviewAnnouncement(
@@ -186,7 +180,7 @@ class ProcessTRRequestListener
                 GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber)
             );
         } catch (\Exception $e) {
-            throw new ImpossibleToParseGithubURL($text);
+            throw new ImpossibleToParseRepositoryURL($text);
         }
 
         return $PRIdentifier;

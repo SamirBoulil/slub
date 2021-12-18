@@ -18,6 +18,10 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserIdInterface;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

@@ -9,6 +9,11 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
+use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\Chat\Slack;
+namespace Tests\Integration\Infrastructure\Chat\Slack\Common;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;

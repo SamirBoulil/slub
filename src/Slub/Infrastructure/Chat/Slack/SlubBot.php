@@ -25,6 +25,7 @@ use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ * TODO: Migrate Unpublish in dedicated action. and Remove me.
  */
 class SlubBot
 {

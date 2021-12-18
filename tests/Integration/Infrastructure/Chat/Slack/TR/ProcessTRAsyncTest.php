@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration\Infrastructure\Chat\Slack;
+namespace Tests\Integration\Infrastructure\Chat\Slack\TR;
 
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -11,9 +11,8 @@ use Tests\WebTestCase;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class TRActionTest extends WebTestCase
+class ProcessTRAsyncTest extends WebTestCase
 {
-
     private PRRepositoryInterface $PRRepository;
 
     public function setUp(): void
@@ -38,7 +37,6 @@ class TRActionTest extends WebTestCase
 
     /**
      * @return string[]
-     *
      */
     private function PRToReviewSubmission(): array
     {

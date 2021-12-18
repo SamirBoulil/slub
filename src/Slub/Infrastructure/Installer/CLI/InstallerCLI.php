@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Installer\CLI;
 
 use Doctrine\DBAL\Driver\Connection;
-
 use Slub\Infrastructure\Persistence\Sql\ConnectionFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

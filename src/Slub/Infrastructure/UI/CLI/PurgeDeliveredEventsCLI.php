@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\UI\CLI;
 
 use Doctrine\DBAL\Driver\Connection;
-
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

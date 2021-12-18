@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
 use Doctrine\DBAL\Driver\Connection;
-
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetMessageIdsForPR;

@@ -19,7 +19,6 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Chat\Slack\SlubBot;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Integration\Infrastructure\KernelTestCase;
 

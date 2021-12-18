@@ -26,6 +26,8 @@ class ChannelIdentifierHelper
         Assert::count($message, 2);
         $workspace = $message[0];
         $channel = $message[1];
+        Assert::notEmpty($workspace);
+        Assert::notEmpty($channel);
 
         return ['workspace' => $workspace, 'channel' => $channel];
     }

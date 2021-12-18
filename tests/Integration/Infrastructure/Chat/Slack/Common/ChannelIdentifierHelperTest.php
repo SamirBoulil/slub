@@ -30,10 +30,16 @@ class ChannelIdentifierHelperTest extends TestCase
 
     /**
      * @test
+     * @dataProvider invalidChannelIdentifier
      */
-    public function it_throws_if_the_channel_identifier_is_malformed(): void
+    public function it_throws_if_the_channel_identifier_is_malformed(string $invalidChannelIdentifier): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        ChannelIdentifierHelper::split('channel_identifier_without_separator');
+        ChannelIdentifierHelper::split($invalidChannelIdentifier);
+    }
+
+    public function invalidChannelIdentifier(): array
+    {
+        return [['channel_identifier_without_separator'], ['channel_with_separator_but_missing_info@']];
     }
 }

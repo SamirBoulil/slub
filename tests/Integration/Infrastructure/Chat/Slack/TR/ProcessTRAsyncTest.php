@@ -98,7 +98,7 @@ class ProcessTRAsyncTest extends WebTestCase
             'text' => $userInput,
             'user_id' => self::USER_ID,
             'team_id' => $workspaceIdentifier,
-            'channel_name' => 'channel_name',
+            'channel_id' => 'channel_name',
             'trigger_id' => '123123.123123',
             'response_url' => self::EMPHEMERAL_RESPONSE_URL
         ];

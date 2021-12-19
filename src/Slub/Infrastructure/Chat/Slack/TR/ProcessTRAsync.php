@@ -64,7 +64,7 @@ class ProcessTRAsync
         } catch (\Exception | \Error $e) {
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
-            $this->logger($e->getTraceAsString());
+            $this->logger->critical($e->getTraceAsString());
             throw $e;
         }
     }

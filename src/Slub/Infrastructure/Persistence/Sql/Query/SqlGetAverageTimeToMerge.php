@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\Sql\Query;
 
 use Doctrine\DBAL\Driver\Connection;
-
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Query\GetAverageTimeToMergeInterface;
 

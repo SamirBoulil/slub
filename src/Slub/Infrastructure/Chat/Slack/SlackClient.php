@@ -9,6 +9,11 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
+use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
@@ -17,14 +22,10 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
 class SlackClient implements ChatClient
 {
     private GetBotUserId $getBotUserId;
-
     private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
-
-    private ClientInterface $client;
-
-    private LoggerInterface $logger;
-
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
+    private ClientInterface $client;
+    private LoggerInterface $logger;
 
     public function __construct(
         GetBotUserId $getBotUserId,
@@ -43,18 +44,19 @@ class SlackClient implements ChatClient
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
-        APIHelper::checkResponse(
+        APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken($message['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
                         'thread_ts' => $message['ts'],
                         'channel' => $message['channel'],
                         'text' => $text,
+                        'unfurl_links' => false
                     ],
                 ]
             )
@@ -73,17 +75,16 @@ class SlackClient implements ChatClient
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
-        $channel = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
-        APIHelper::checkResponse(
+        APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer ' . $this->slackToken($channel['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken(ChannelIdentifierHelper::workspaceFrom($channelIdentifier)),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
-                        'channel' => $channel['channel'],
+                        'channel' => ChannelIdentifierHelper::channelFrom($channelIdentifier),
                         'text' => $text,
                     ],
                 ]
@@ -91,12 +92,61 @@ class SlackClient implements ChatClient
         );
     }
 
+    public function answerWithEphemeralMessage(string $url, string $text): void
+    {
+        APIHelper::checkStatusCodeSuccess(
+            $this->client->post(
+                $url,
+                [
+                    'headers' => [
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'text' => $text,
+                        'response_type' => 'ephemeral',
+                    ],
+                ]
+            )
+        );
+    }
+
+    public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
+    {
+        $response = APIHelper::checkResponseSuccess(
+            $this->client->post(
+                'https://slack.com/api/chat.postMessage',
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer '.$this->slackToken(ChannelIdentifierHelper::workspaceFrom($channelIdentifier)),
+                        'Content-type' => 'application/json; charset=utf-8',
+                    ],
+                    'json' => [
+                        'channel' => ChannelIdentifierHelper::channelFrom($channelIdentifier),
+                        'blocks' => $blocks,
+                        'unfurl_links' => false,
+                        'link_names' => true
+                    ],
+                ]
+            )
+        );
+
+        $messageIdentifier = MessageIdentifierHelper::from(
+            $response['message']['team'],
+            $response['channel'],
+            $response['ts']
+        );
+
+        return $messageIdentifier;
+    }
+
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         $botUserId = $this->getBotUserId->fetch($messageId['workspace']);
 
-        $this->logger->critical(sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId)));
+        $this->logger->critical(
+            sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId))
+        );
         $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
 
         $result = $this->getBotReactionsForMessageAndUser->fetch(
@@ -119,7 +169,7 @@ class SlackClient implements ChatClient
                 'https://slack.com/api/reactions.add',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '. $this->slackToken($message['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken($message['workspace']),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [

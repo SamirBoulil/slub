@@ -44,15 +44,14 @@ class GetCheckRunStatus
         $url = $this->checkRunsUrl($PRIdentifier, $ref);
         $this->logger->critical($url);
 
-        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
         $response = $this->githubAPIClient->get(
             $url,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
-            $repositoryIdentifier
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier)
         );
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the check runs for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 
@@ -93,23 +92,16 @@ class GetCheckRunStatus
 
     private function checkRunsUrl(PRIdentifier $PRIdentifier, string $ref): string
     {
-        $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $matches[2] = $ref;
-
         return sprintf(
-            '%s/repos/%s/%s/commits/%s/check-runs',
+            '%s/repos/%s/commits/%s/check-runs',
             $this->domainName,
-            ...$matches
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
+            $ref,
         );
     }
 
     private function isCheckRunSupported(array $checkRun): bool
     {
         return in_array($checkRun['name'], $this->supportedCIChecks);
-    }
-
-    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
-    {
-        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

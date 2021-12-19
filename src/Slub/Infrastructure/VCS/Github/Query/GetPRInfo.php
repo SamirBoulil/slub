@@ -30,6 +30,7 @@ class GetPRInfo implements GetPRInfoInterface
     public function fetch(PRIdentifier $PRIdentifier): PRInfo
     {
         $PRDetails = $this->getPRDetails->fetch($PRIdentifier);
+        $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
         $reviews = $this->findReviews->fetch($PRIdentifier);
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
         $isMerged = $this->isMerged($PRDetails);
@@ -41,6 +42,7 @@ class GetPRInfo implements GetPRInfoInterface
 
         return $this->createPRInfo(
             $PRIdentifier,
+            $repositoryIdentifier,
             $authorIdentifier,
             $title,
             $reviews,
@@ -69,6 +71,7 @@ class GetPRInfo implements GetPRInfoInterface
 
     private function createPRInfo(
         PRIdentifier $PRIdentifier,
+        string $repositoryIdentifier,
         string $authorIdentifier,
         string $title,
         array $reviews,
@@ -79,6 +82,7 @@ class GetPRInfo implements GetPRInfoInterface
         int $deletions
     ): PRInfo {
         $result = new PRInfo();
+        $result->repositoryIdentifier = $repositoryIdentifier;
         $result->PRIdentifier = $PRIdentifier->stringValue();
         $result->authorIdentifier = $authorIdentifier;
         $result->title = $title;

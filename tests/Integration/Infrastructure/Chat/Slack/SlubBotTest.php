@@ -19,7 +19,6 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRNotFoundException;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Slub\Infrastructure\Chat\Slack\SlubBot;
 use Tests\Acceptance\helpers\ChatClientSpy;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
@@ -71,7 +70,7 @@ class SlubBotTest extends KernelTestCase
      */
     public function it_answers_to_new_PR_messages_in_private_channels(): void
     {
-        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel' => 'channelId', 'ts' => '1234', 'channel_type' => 'group', 'team' => 'akeneo'])->assertReplyNothing();
+        $this->botTester->receives('TR please <https://github.com/akeneo/pim-community-dev/pull/9609>', ['channel_type' => 'group', 'channel' => 'channelId', 'ts' => '1234',  'team' => 'akeneo'])->assertReplyNothing();
         $this->assertNewPRRequestReceived('akeneo/pim-community-dev/9609', 'akeneo@channelId@1234');
     }
 

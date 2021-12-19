@@ -125,6 +125,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.should_communicate_in_app:
+        class: Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     slub.infrastructure.persistence.delivered_event_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository
         arguments:
@@ -145,6 +150,7 @@ services:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_channel_information'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.persistence.should_communicate_in_app'
             - '@logger'
 
     slub.infrastructure.chat.slack.slub_bot_action:
@@ -152,8 +158,22 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
+    slub.infrastructure.chat.slack.tr.ok_action:
+        class: Slub\Infrastructure\Chat\Slack\TR\OKAction
+
+    slub.infrastructure.chat.slack.tr.process_tr_async:
+        class: Slub\Infrastructure\Chat\Slack\TR\ProcessTRAsync
+        arguments:
+            - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@router'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
+
     slub.infrastructure.chat.slack.oauth_installation_action:
-        class: Slub\Infrastructure\Chat\Slack\OAuthInstallationAction
+        class: Slub\Infrastructure\Chat\Slack\AppInstallation\OAuthInstallationAction
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
@@ -162,20 +182,20 @@ services:
             - '%env(GITHUB_APP_HOMEPAGE_URL)%'
 
     slub.infrastructure.query.get_channel_information:
-        class: Slub\Infrastructure\Chat\Slack\GetChannelInformation
+        class: Slub\Infrastructure\Chat\Slack\Query\GetChannelInformation
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
 
     slub.infrastructure.query.get_bot_reactions_for_message_and_user:
-        class: Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser
+        class: Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
             - '@logger'
 
     slub.infrastructure.query.get_bot_user_id:
-        class: Slub\Infrastructure\Chat\Slack\GetBotUserId
+        class: Slub\Infrastructure\Chat\Slack\Query\GetBotUserId
         arguments:
             - '@slub.infrastructure.http.guzzle_client'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
@@ -298,6 +318,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\Query\FindReviews
         arguments:
             - '@slub.infrastructure.vcs.github.client.github_api_client'
+            - '%GITHUB_URI%'
 
     slub.infrastructure.vcs.github.query.get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus

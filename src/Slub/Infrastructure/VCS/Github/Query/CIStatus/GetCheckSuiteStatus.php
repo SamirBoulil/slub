@@ -19,12 +19,15 @@ class GetCheckSuiteStatus
 
     /** @var string[] */
     private array $supportedCIChecks;
+    private string $domainName;
 
     public function __construct(
         GithubAPIClient $githubAPIClient,
-        string $supportedCIChecks
+        string $supportedCIChecks,
+        string $domainName
     ) {
         $this->githubAPIClient = $githubAPIClient;
+        $this->domainName = $domainName;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
     }
 
@@ -51,15 +54,14 @@ class GetCheckSuiteStatus
     private function checkSuite(PRIdentifier $PRIdentifier, string $commitRef)
     {
         $url = $this->getCheckSuiteUrl($PRIdentifier, $commitRef);
-        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
         $response = $this->githubAPIClient->get(
             $url,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
-            $repositoryIdentifier
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier)
         );
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the reviews for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
 
@@ -68,10 +70,12 @@ class GetCheckSuiteStatus
 
     private function getCheckSuiteUrl(PRIdentifier $PRIdentifier, string $commitRef): string
     {
-        $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $matches[2] = $commitRef;
-
-        return sprintf('https://api.github.com/repos/%s/%s/commits/%s/check-suites', ...$matches);
+        return sprintf(
+            '%s/repos/%s/commits/%s/check-suites',
+            $this->domainName,
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
+            $commitRef
+        );
     }
 
     private function buildLink(array $checkSuites): string
@@ -79,10 +83,5 @@ class GetCheckSuiteStatus
         $checkSuite = $checkSuites['check_suites'][0];
 
         return $checkSuite['details_url'] ?? '';
-    }
-
-    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
-    {
-        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

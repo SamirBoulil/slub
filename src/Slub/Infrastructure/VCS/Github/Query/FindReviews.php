@@ -23,10 +23,12 @@ class FindReviews
     private const COMMENTED = 'COMMENTED';
 
     private GithubAPIClient $githubAPIClient;
+    private string $githubURI;
 
-    public function __construct(GithubAPIClient $githubAPIClient)
+    public function __construct(GithubAPIClient $githubAPIClient, string $githubURI)
     {
         $this->githubAPIClient = $githubAPIClient;
+        $this->githubURI = $githubURI;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): array
@@ -43,11 +45,12 @@ class FindReviews
     private function reviews(PRIdentifier $PRIdentifier): array
     {
         $url = $this->getUrl($PRIdentifier);
-        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
+        $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
         $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
 
         $content = json_decode($response->getBody()->getContents(), true);
-        if (null === $content) {
+
+        if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(
                 sprintf(
                     'There was a problem when fetching the reviews for PR "%s" at %s',
@@ -62,9 +65,12 @@ class FindReviews
 
     private function getUrl(PRIdentifier $PRIdentifier): string
     {
-        $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-
-        return sprintf('https://api.github.com/repos/%s/%s/pulls/%s/reviews', ...$matches);
+        return sprintf(
+            '%s/repos/%s/pulls/%s/reviews',
+            $this->githubURI,
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
+            GithubAPIHelper::PRNumber($PRIdentifier)
+        );
     }
 
     private function count(array $reviews, string $status): int
@@ -75,10 +81,5 @@ class FindReviews
                 fn (array $review) => $review['state'] === $status
             )
         );
-    }
-
-    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
-    {
-        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

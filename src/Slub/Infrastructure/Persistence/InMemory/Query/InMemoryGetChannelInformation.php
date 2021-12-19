@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Persistence\InMemory\Query;
 
 use Slub\Domain\Query\ChannelInformation;
-use Slub\Infrastructure\Chat\Slack\GetChannelInformationInterface;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\Query;
 
 use Slub\Domain\Query\ChannelInformation;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Slub\Infrastructure\Chat\Slack;
+namespace Slub\Infrastructure\Chat\Slack\Common;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -16,6 +16,7 @@ class MessageIdentifierHelper
         return sprintf('%s%s%s%s%s', $workspace, self::SEPARATOR, $channel, self::SEPARATOR, $ts);
     }
 
+    // TODO: Consider introducing ::channelFrom ::workspaceFrom tsFrom::
     public static function split(string $messageIdentifier): array
     {
         $message = explode(self::SEPARATOR, $messageIdentifier);

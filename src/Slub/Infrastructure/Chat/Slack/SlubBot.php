@@ -18,29 +18,29 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserIdInterface;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
+use Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ * TODO: Migrate Unpublish in dedicated action. and Remove me.
  */
 class SlubBot
 {
     public const UNPUBLISH_CONFIRMATION_MESSAGES = ['Okaay! :ok_hand:', 'Will do! :+1:', 'Oki doki!', 'Yeeee '];
 
     private PutPRToReviewHandler $putPRToReviewHandler;
-
     private UnpublishPRHandler $unpublishPRHandler;
-
     private GetChannelInformationInterface $getChannelInformation;
-
     private LoggerInterface $logger;
-
     private BotMan $bot;
-
     private GetBotUserIdInterface $getBotUserId;
-
     private ChatClient $chatClient;
-
     private GetPRInfoInterface $getPRInfo;
+    private ShouldCommunicateInApp $shouldCommunicateInApp;
 
     public function __construct(
         PutPRToReviewHandler $putPRToReviewHandler,
@@ -49,6 +49,7 @@ class SlubBot
         GetBotUserIdInterface $getBotUserId,
         GetChannelInformationInterface $getChannelInformation,
         GetPRInfoInterface $getPRInfo,
+        ShouldCommunicateInApp $shouldCommunicateInApp,
         LoggerInterface $logger
     ) {
         $this->putPRToReviewHandler = $putPRToReviewHandler;
@@ -58,6 +59,7 @@ class SlubBot
         $this->logger = $logger;
         $this->chatClient = $chatClient;
         $this->getBotUserId = $getBotUserId;
+        $this->shouldCommunicateInApp = $shouldCommunicateInApp;
 
         DriverManager::loadDriver(SlackDriver::class);
         $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
@@ -80,7 +82,15 @@ class SlubBot
 
     private function listensToNewPR(BotMan $bot): void
     {
-        $createNewPr = function (BotMan $bot, string $repositoryIdentifier, string $PRNumber) {
+        $putToReviewUsageChangeWarning = <<<TEXT
+Hey, you can now use the new Slash command `/tr {pr_link}
+
+Starting *January the 20th of 2022*, you'll want to use the new `/tr {your PR link}`.
+
+:yeee:!
+TEXT;
+
+        $createNewPr = function (BotMan $bot, string $repositoryIdentifier, string $PRNumber) use ($putToReviewUsageChangeWarning) {
             $workspaceIdentifier = $this->getWorkspaceIdentifier($bot);
             $channelIdentifier = $this->getChannelIdentifier($bot);
             $messageIdentifier = $this->getMessageIdentifier($bot);

@@ -35,6 +35,7 @@ class WebTestCase extends SymfonyWebTestCase
             return self::$kernel->getContainer()->getParameter($serviceOrParameterId);
         }
     }
+
     protected static function getClient(): KernelBrowser
     {
         self::ensureKernelShutdown();

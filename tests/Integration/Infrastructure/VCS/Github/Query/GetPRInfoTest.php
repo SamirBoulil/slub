@@ -44,7 +44,8 @@ class GetPRInfoTest extends TestCase
      */
     public function it_creates_a_PR_info(): void
     {
-        $expectedPRIdentifier = 'akeneo/pim-community-dev';
+        $expectedPRIdentifier = 'akeneo/pim-community-dev/1212';
+        $expectedRepositoryIdentifier = 'akeneo/pim-community-dev';
         $commitSHA = 'abc2456';
         $expectedCommentsCount = 1;
         $expectedGTMCount = 2;
@@ -80,6 +81,7 @@ class GetPRInfoTest extends TestCase
         $actualPRInfo = $this->getPRInfo->fetch($PRIdentifier);
 
         self::assertEquals($expectedPRIdentifier, $actualPRInfo->PRIdentifier);
+        self::assertEquals($expectedRepositoryIdentifier, $actualPRInfo->repositoryIdentifier);
         self::assertEquals($expectedAuthorIdentifier, $actualPRInfo->authorIdentifier);
         self::assertEquals($expectedTitle, $actualPRInfo->title);
         self::assertEquals($expectedGTMCount, $actualPRInfo->GTMCount);

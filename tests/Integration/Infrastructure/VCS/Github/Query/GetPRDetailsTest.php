@@ -57,7 +57,19 @@ class GetPRDetailsTest extends WebTestCase
     public function it_throws_if_the_response_is_malformed(): void
     {
         $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(new Response(200, [], (string) '{'));
+            ->willReturn(new Response(200, [], '{'));
+        $this->expectException(\RuntimeException::class);
+
+        $this->getPRDetails->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_is_not_successfull(): void
+    {
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(400, [], '{}'));
         $this->expectException(\RuntimeException::class);
 
         $this->getPRDetails->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));

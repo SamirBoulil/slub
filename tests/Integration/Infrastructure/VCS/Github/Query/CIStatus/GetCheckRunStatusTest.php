@@ -57,7 +57,7 @@ class GetCheckRunStatusTest extends WebTestCase
             $uri,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
             $repositoryIdentifier
-        )->willReturn(new Response(200, [], (string) json_encode($ciCheckRuns)));
+        )->willReturn(new Response(200, [], (string)json_encode($ciCheckRuns)));
 
         $actualCheckStatus = $this->getCheckRunStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
@@ -82,7 +82,7 @@ class GetCheckRunStatusTest extends WebTestCase
                 'PENDING',
                 '',
             ],
-            'Supported CI Checks not run'     => [
+            'Supported CI Checks not run' => [
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
@@ -91,9 +91,9 @@ class GetCheckRunStatusTest extends WebTestCase
                     ],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
-            'Multiple CI checks Green'        => [
+            'Multiple CI checks Green' => [
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
@@ -101,19 +101,29 @@ class GetCheckRunStatusTest extends WebTestCase
                     ],
                 ],
                 'GREEN',
-                ''
+                '',
             ],
-            'Multiple CI checks Red'          => [
+            'Multiple CI checks Red' => [
                 [
                     'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
+                        [
+                            'name' => self::SUPPORTED_CI_CHECK_1,
+                            'conclusion' => 'failure',
+                            'status' => 'completed',
+                            'details_url' => self::BUILD_LINK,
+                        ],
+                        [
+                            'name' => self::SUPPORTED_CI_CHECK_2,
+                            'conclusion' => 'failure',
+                            'status' => 'completed',
+                            'details_url' => self::BUILD_LINK,
+                        ],
                     ],
                 ],
                 'RED',
-                self::BUILD_LINK
+                self::BUILD_LINK,
             ],
-            'Multiple CI checks Pending'      => [
+            'Multiple CI checks Pending' => [
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
@@ -121,18 +131,23 @@ class GetCheckRunStatusTest extends WebTestCase
                     ],
                 ],
                 'PENDING',
-                ''
+                '',
             ],
-            'Mixed CI checks statuses: red'   => [
+            'Mixed CI checks statuses: red' => [
                 [
                     'check_runs' => [
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'failure', 'status' => 'completed', 'details_url' => self::BUILD_LINK],
+                        [
+                            'name' => self::NOT_SUPPORTED_CI_CHECK,
+                            'conclusion' => 'failure',
+                            'status' => 'completed',
+                            'details_url' => self::BUILD_LINK,
+                        ],
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],
                 ],
                 'RED',
-                self::BUILD_LINK
+                self::BUILD_LINK,
             ],
             'Mixed CI checks statuses: green' => [
                 [
@@ -143,7 +158,7 @@ class GetCheckRunStatusTest extends WebTestCase
                     ],
                 ],
                 'GREEN',
-                ''
+                '',
             ],
         ];
     }
@@ -154,7 +169,19 @@ class GetCheckRunStatusTest extends WebTestCase
     public function it_throws_if_the_response_is_malformed(): void
     {
         $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(new Response(200, [], (string) '{'));
+            ->willReturn(new Response(200, [], (string)'{'));
+        $this->expectException(\RuntimeException::class);
+
+        $this->getCheckRunStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_is_not_successfull(): void
+    {
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(400, [], '{}'));
         $this->expectException(\RuntimeException::class);
 
         $this->getCheckRunStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');

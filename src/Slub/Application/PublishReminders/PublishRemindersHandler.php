@@ -78,16 +78,16 @@ class PublishRemindersHandler
     {
         return array_filter(
             $PRsInReview,
-            fn (PR $PR) => array_filter(
+            static fn (PR $PR) => array_filter(
                 $PR->channelIdentifiers(),
-                fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
+                static fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals($actualChannelIdentifier)
             )
         );
     }
 
     private function formatReminders(array $prs): string
     {
-        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() >= $pr2->numberOfDaysInReview());
+        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() <=> $pr2->numberOfDaysInReview());
 
         $PRReminders = array_map(fn (PR $PR) => $this->formatReminder($PR), $prs);
         $reminder = <<<CHAT

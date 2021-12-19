@@ -8,13 +8,15 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Uri;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
-use Slub\Infrastructure\Chat\Slack\GetBotReactionsForMessageAndUser;
-use Slub\Infrastructure\Chat\Slack\GetBotUserId;
-use Slub\Infrastructure\Chat\Slack\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
+use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
+use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
 use Slub\Infrastructure\Chat\Slack\SlackClient;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -71,9 +73,10 @@ class SlackClientTest extends KernelTestCase
         $this->assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
         $this->assertEquals(
             [
-                'channel'   => 'channel',
+                'channel' => 'channel',
                 'thread_ts' => 'message',
-                'text'      => 'hello world',
+                'text' => 'hello world',
+                'unfurl_links' => false,
             ],
             $this->getBodyContent($generatedRequest)
         );
@@ -160,8 +163,8 @@ class SlackClientTest extends KernelTestCase
     {
         $message = 'a message';
         $channel = 'workspace@channel';
-
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
         $this->slackClient->publishInChannel(ChannelIdentifier::fromString($channel), $message);
 
         $generatedRequest = $this->httpClientMock->getLastRequest();
@@ -171,6 +174,94 @@ class SlackClientTest extends KernelTestCase
         self::assertEquals(
             ['channel' => 'channel', 'text' => $message],
             $bodyContent
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_publishes_an_ephemeral_message(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $message = 'a message';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->answerWithEphemeralMessage($url, $message);
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        self::assertEquals(
+            [
+                'text' => $message,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_status_code_is_not_success(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->mockGuzzleWith(new Response(400));
+
+        $this->slackClient->answerWithEphemeralMessage('https://slack.ephemeral.url/', 'a message');
+    }
+
+    /**
+     * @test
+     */
+    public function it_publishes_a_message_with_blocks(): void
+    {
+        $workspace = 'workspace';
+        $channel = 'channel';
+        $channelIdentifier = $workspace .'@'.$channel;
+        $messageWithBlocks = ['Ta message containing blocks'];
+
+        $slackTS = 'slack_ts';
+        $slackChannel = 'slack_channel';
+        $slackWorkspace = 'slack_workspace';
+        $apiResponse = [
+            'ok' => true,
+            'message' => ['team' => $slackWorkspace],
+            'channel' => $slackChannel,
+            'ts' => $slackTS
+        ];
+        $this->mockGuzzleWith(new Response(200, $apiResponse, json_encode($apiResponse)));
+
+        $actualMessageIdentifier = $this->slackClient->publishMessageWithBlocksInChannel(ChannelIdentifier::fromString($channelIdentifier), $messageWithBlocks);
+
+        self::assertEquals(MessageIdentifierHelper::from($slackWorkspace, $slackChannel, $slackTS), $actualMessageIdentifier);
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals('/api/chat.postMessage', $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        self::assertEquals(
+            [
+                'channel' => $channel,
+                'blocks' => $messageWithBlocks,
+                'unfurl_links' => false,
+                'link_names' => true
+            ],
+            $bodyContent
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_is_response_is_not_success_when_it_publishes_a_message_with_blocks(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->mockGuzzleWith(new Response(400, [], json_encode(['ok' => true])));
+
+        $this->slackClient->publishMessageWithBlocksInChannel(
+            ChannelIdentifier::fromString('workspace@channel'),
+            ['Ta message containing blocks']
         );
     }
 
@@ -195,6 +286,8 @@ class SlackClientTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
     }
+
+    // It publishes messages in block and returns the message identifier associated
 
     private function setUpGuzzleMock(): Client
     {

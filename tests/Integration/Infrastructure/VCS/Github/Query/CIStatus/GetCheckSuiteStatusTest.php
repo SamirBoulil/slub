@@ -34,7 +34,8 @@ class GetCheckSuiteStatusTest extends WebTestCase
 
         $this->getCheckSuiteStatus = new GetCheckSuiteStatus(
             $this->githubAPIClient->reveal(),
-            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3])
+            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
+            'https://api.github.com'
         );
     }
 
@@ -89,6 +90,18 @@ class GetCheckSuiteStatusTest extends WebTestCase
     {
         $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
             ->willReturn(new Response(200, [], (string) '{'));
+        $this->expectException(\RuntimeException::class);
+
+        $this->getCheckSuiteStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_is_not_successfull(): void
+    {
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(400, [], '{}'));
         $this->expectException(\RuntimeException::class);
 
         $this->getCheckSuiteStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), 'pr_ref');

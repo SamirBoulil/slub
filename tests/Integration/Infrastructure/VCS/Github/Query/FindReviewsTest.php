@@ -17,6 +17,7 @@ use Tests\WebTestCase;
  */
 class FindReviewsTest extends WebTestCase
 {
+    private const GITHUB_URI = 'https://api.github.com';
     private const REPOSITORY_NAME = 'SamirBoulil/slub';
     private const PR_NUMBER = '36';
 
@@ -30,7 +31,7 @@ class FindReviewsTest extends WebTestCase
     {
         parent::setUp();
         $this->githubAPIClient = $this->prophesize(GithubAPIClient::class);
-        $this->findReviews = new FindReviews($this->githubAPIClient->reveal());
+        $this->findReviews = new FindReviews($this->githubAPIClient->reveal(), self::GITHUB_URI);
     }
 
     /**
@@ -40,7 +41,7 @@ class FindReviewsTest extends WebTestCase
     public function it_successfully_fetches_the_reviews(array $someReviews, array $expectedCounts): void
     {
         $this->githubAPIClient->get(
-            sprintf('https://api.github.com/repos/%s/pulls/%s/reviews', self::REPOSITORY_NAME, self::PR_NUMBER),
+            sprintf('%s/repos/%s/pulls/%s/reviews', self::GITHUB_URI, self::REPOSITORY_NAME, self::PR_NUMBER),
             [],
             self::REPOSITORY_NAME
         )->willReturn(new Response(200, [], (string) json_encode($someReviews)));
@@ -68,6 +69,18 @@ class FindReviewsTest extends WebTestCase
     {
         $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
             ->willReturn(new Response(200, [], (string) '{'));
+        $this->expectException(\RuntimeException::class);
+
+        $this->findReviews->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_is_not_successfull(): void
+    {
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(400, [], '{}'));
         $this->expectException(\RuntimeException::class);
 
         $this->findReviews->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'));

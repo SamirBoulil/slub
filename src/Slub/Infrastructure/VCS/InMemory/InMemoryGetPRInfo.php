@@ -11,6 +11,7 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ * // TODO: Should be a stub for sure.
  */
 class InMemoryGetPRInfo implements GetPRInfoInterface
 {
@@ -19,6 +20,7 @@ class InMemoryGetPRInfo implements GetPRInfoInterface
     public function __construct()
     {
         $this->PRInfo = new PRInfo();
+        $this->PRInfo->repositoryIdentifier = 'slub';
         $this->PRInfo->authorIdentifier = 'sam';
         $this->PRInfo->title = 'Add new feature';
         $this->PRInfo->CIStatus = new CheckStatus('GREEN');

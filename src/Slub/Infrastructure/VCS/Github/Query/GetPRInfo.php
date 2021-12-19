@@ -95,7 +95,7 @@ class GetPRInfo implements GetPRInfoInterface
 
     private function description(array $PRDetails): string
     {
-        return $PRDetails['body'];
+        return $PRDetails['body'] ?? '';
     }
 
     private function authorImageUrl(array $PRDetails)

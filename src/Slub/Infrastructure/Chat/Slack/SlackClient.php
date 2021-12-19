@@ -75,17 +75,16 @@ class SlackClient implements ChatClient
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
-        $channel = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
         APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken($channel['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken(ChannelIdentifierHelper::workspaceFrom($channelIdentifier)),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
-                        'channel' => $channel['channel'],
+                        'channel' => ChannelIdentifierHelper::channelFrom($channelIdentifier),
                         'text' => $text,
                     ],
                 ]
@@ -113,17 +112,16 @@ class SlackClient implements ChatClient
 
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
     {
-        $channelIdentifierInfo = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
         $response = APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$this->slackToken($channelIdentifierInfo['workspace']),
+                        'Authorization' => 'Bearer '.$this->slackToken(ChannelIdentifierHelper::workspaceFrom($channelIdentifier)),
                         'Content-type' => 'application/json; charset=utf-8',
                     ],
                     'json' => [
-                        'channel' => $channelIdentifierInfo['channel'],
+                        'channel' => ChannelIdentifierHelper::channelFrom($channelIdentifier),
                         'blocks' => $blocks,
                         'unfurl_links' => false,
                         'link_names' => true

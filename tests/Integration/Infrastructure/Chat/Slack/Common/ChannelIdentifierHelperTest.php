@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Chat\Slack\Common;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 
 /**
@@ -23,9 +24,10 @@ class ChannelIdentifierHelperTest extends TestCase
     /**
      * @test
      */
-    public function it_returns_the_channel_and_ts_out_of_a_normalized_channel_identifier(): void
+    public function it_returns_the_workspace_and_channel_from_a_channel_identifier(): void
     {
-        $this->assertEquals(['workspace' => 'akeneo', 'channel' => 'general'], ChannelIdentifierHelper::split('akeneo@general'));
+        $this->assertEquals('akeneo', ChannelIdentifierHelper::workspaceFrom(ChannelIdentifier::fromString('akeneo@general')));
+        $this->assertEquals('general', ChannelIdentifierHelper::channelFrom(ChannelIdentifier::fromString('akeneo@general')));
     }
 
     /**
@@ -35,7 +37,7 @@ class ChannelIdentifierHelperTest extends TestCase
     public function it_throws_if_the_channel_identifier_is_malformed(string $invalidChannelIdentifier): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        ChannelIdentifierHelper::split($invalidChannelIdentifier);
+        ChannelIdentifierHelper::workspaceFrom(ChannelIdentifier::fromString($invalidChannelIdentifier));
     }
 
     public function invalidChannelIdentifier(): array

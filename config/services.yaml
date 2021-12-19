@@ -158,7 +158,7 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
-    slub.infrastructure.chat.slack.tr.ok_action: #Consider renaming register TR submission
+    slub.infrastructure.chat.slack.tr.ok_action:
         class: Slub\Infrastructure\Chat\Slack\TR\OKAction
 
     slub.infrastructure.chat.slack.tr.process_tr_async:

@@ -58,25 +58,9 @@ class ProcessTRAsync
     {
         try {
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
+            $this->putPRToReview($PRIdentifier, $request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
             $this->explainAuthorURLCannotBeParsed($request);
-
-            return;
-        }
-        try {
-            $this->logger->critical('New PR has been put to review : '.$PRIdentifier->stringValue());
-            $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
-            $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
-            $channelIdentifier = $this->getChannelIdentifier($request);
-            $authorIdentifier = $this->getAuthorIdentifier($request);
-            $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
-            $this->putPRToReview(
-                $PRInfo,
-                $workspaceIdentifier,
-                $channelIdentifier,
-                $authorIdentifier,
-                $messageIdentifier
-            );
         } catch (\Exception | \Error $e) {
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
@@ -106,7 +90,7 @@ class ProcessTRAsync
         string $channelIdentifier,
         string $authorIdentifier
     ): string {
-        // TODO: Consider putting the url in the PRInfo class instead
+        // TODO: Consider putting the url in the PRInfo class instead of recalculating it here
         $PRUrl = GithubAPIHelper::PRUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
 
         $message = [
@@ -131,12 +115,15 @@ class ProcessTRAsync
     }
 
     private function putPRToReview(
-        PRInfo $PRInfo,
-        string $workspaceIdentifier,
-        string $channelIdentifier,
-        string $authorIdentifier,
-        string $messageIdentifier
+        PRIdentifier $PRIdentifier,
+        Request $request
     ): void {
+        $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
+        $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
+        $channelIdentifier = $this->getChannelIdentifier($request);
+        $authorIdentifier = $this->getAuthorIdentifier($request);
+        $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
+
         $PRToReview = new PutPRToReview();
         $PRToReview->PRIdentifier = $PRInfo->PRIdentifier;
         $PRToReview->repositoryIdentifier = $PRInfo->repositoryIdentifier;

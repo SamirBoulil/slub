@@ -10,6 +10,8 @@ use Tests\WebTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ *
+ * TODO: Transform as a functional test instead of an integration test.
  */
 class ProcessTRAsyncTest extends WebTestCase
 {

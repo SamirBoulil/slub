@@ -82,7 +82,7 @@ class ProcessTRAsync
     private function getChannelIdentifier(Request $request): string
     {
         $workspace = $this->getWorkspaceIdentifier($request);
-        $channelName = $request->request->get('channel_name');
+        $channelName = $request->request->get('channel_id');
 
         return ChannelIdentifierHelper::from($workspace, $channelName);
     }

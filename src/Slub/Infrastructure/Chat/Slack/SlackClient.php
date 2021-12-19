@@ -114,9 +114,8 @@ class SlackClient implements ChatClient
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
     {
         $this->logger->critical('CHANNEL IDENTIFIER:' . $channelIdentifier->stringValue());
-        $this->logger->critical('workspaceFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
+        $this->logger->critical('workspaceFrom:' . ChannelIdentifierHelper::workspaceFrom($channelIdentifier));
         $this->logger->critical('channelFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
-
 
         $response = APIHelper::checkResponseSuccess(
             $this->client->post(

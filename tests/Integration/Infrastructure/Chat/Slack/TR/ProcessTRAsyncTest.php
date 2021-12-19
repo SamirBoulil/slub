@@ -50,6 +50,7 @@ class ProcessTRAsyncTest extends WebTestCase
 
     public function test_it_tells_the_author_an_issue_arised_when_its_the_case(): void
     {
+        $this->expectException(\Exception::class);
         $client = self::getClient();
         $client->request('POST', '/chat/slack/tr', $this->payloadIsInvalid());
         $this->assertEquals(200, $client->getResponse()->getStatusCode());

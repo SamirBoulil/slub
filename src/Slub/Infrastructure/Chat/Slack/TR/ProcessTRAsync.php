@@ -107,7 +107,7 @@ class ProcessTRAsync
         string $authorIdentifier
     ): string {
         // TODO: Consider putting the url in the PRInfo class instead
-        $PRUrl = GithubAPIHelper::PRPageUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
+        $PRUrl = GithubAPIHelper::PRUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
 
         $message = [
             [
@@ -176,9 +176,7 @@ class ProcessTRAsync
             Assert::stringNotEmpty($matches[1]);
             Assert::stringNotEmpty($matches[2]);
             [$repositoryIdentifier, $PRNumber] = ([$matches[1], $matches[2]]);
-            $PRIdentifier = PRIdentifier::fromString(
-                GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber)
-            );
+            $PRIdentifier = GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber);
         } catch (\Exception $e) {
             throw new ImpossibleToParseRepositoryURL($text);
         }

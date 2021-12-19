@@ -318,6 +318,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\Query\FindReviews
         arguments:
             - '@slub.infrastructure.vcs.github.client.github_api_client'
+            - '%GITHUB_URI%'
 
     slub.infrastructure.vcs.github.query.get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\GetCIStatus

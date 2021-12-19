@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use GuzzleHttp\Psr7\Response;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
@@ -79,6 +80,18 @@ class FindPRNumberTest extends WebTestCase
         $actualPRNumber = $this->findPRNumber->fetch(self::REPOSITORY_NAME, self::COMMIT_SHA);
 
         $this->assertNull($actualPRNumber);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_if_the_response_is_not_successfull(): void
+    {
+        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(new Response(400, [], '{}'));
+        $this->expectException(\RuntimeException::class);
+
+        $this->findPRNumber->fetch(self::REPOSITORY_NAME, self::COMMIT_SHA);
     }
 
     private function successfullyFindsAPR(): string

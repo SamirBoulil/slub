@@ -93,7 +93,6 @@ class SlackClient implements ChatClient
         );
     }
 
-    // TODO: Test me
     public function answerWithEphemeralMessage(string $url, string $text): void
     {
         APIHelper::checkStatusCodeSuccess(
@@ -112,10 +111,8 @@ class SlackClient implements ChatClient
         );
     }
 
-    // TODO: Test me
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
     {
-        $this->logger->critical('Publishing PR'.$channelIdentifier->stringValue());
         $channelIdentifierInfo = ChannelIdentifierHelper::split($channelIdentifier->stringValue());
         $response = APIHelper::checkResponseSuccess(
             $this->client->post(

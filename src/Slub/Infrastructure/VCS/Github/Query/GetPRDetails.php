@@ -28,7 +28,7 @@ class GetPRDetails
 
     private function fetchPRdetails(PRIdentifier $PRIdentifier, string $url): array
     {
-        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
+        $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
         $response = $this->githubAPIClient->get($url, [], $repositoryIdentifier);
 
         $content = json_decode($response->getBody()->getContents(), true);
@@ -37,10 +37,5 @@ class GetPRDetails
         }
 
         return $content;
-    }
-
-    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
-    {
-        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

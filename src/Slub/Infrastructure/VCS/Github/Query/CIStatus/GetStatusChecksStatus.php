@@ -12,12 +12,9 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 class GetStatusChecksStatus
 {
     private GithubAPIClient $githubAPIClient;
-
     /** @var string[] */
     private array $supportedCIChecks;
-
     private string $domainName;
-
     private LoggerInterface $logger;
 
     public function __construct(
@@ -43,7 +40,7 @@ class GetStatusChecksStatus
     private function statuses(PRIdentifier $PRIdentifier, string $ref): array
     {
         $url = $this->statusesUrl($PRIdentifier, $ref);
-        $repositoryIdentifier = $this->repositoryIdentifier($PRIdentifier);
+        $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
         $response = $this->githubAPIClient->get(
             $url,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
@@ -52,7 +49,6 @@ class GetStatusChecksStatus
 
         $content = json_decode($response->getBody()->getContents(), true);
 
-        //TODO: Add Test case
         if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(sprintf('There was a problem when fetching the statuses for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
         }
@@ -93,10 +89,12 @@ class GetStatusChecksStatus
 
     private function statusesUrl(PRIdentifier $PRIdentifier, string $ref): string
     {
-        $matches = GithubAPIHelper::breakoutPRIdentifier($PRIdentifier);
-        $matches[2] = $ref;
-
-        return sprintf('%s/repos/%s/%s/statuses/%s', $this->domainName, ...$matches);
+        return sprintf(
+            '%s/repos/%s/statuses/%s',
+            $this->domainName,
+            GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
+            $ref
+        );
     }
 
     private function isStatusSupported(array $status): bool
@@ -132,10 +130,5 @@ class GetStatusChecksStatus
         );
 
         return $ciStatuses;
-    }
-
-    private function repositoryIdentifier(PRIdentifier $PRIdentifier): string
-    {
-        return sprintf('%s/%s', ...GithubAPIHelper::breakoutPRIdentifier($PRIdentifier));
     }
 }

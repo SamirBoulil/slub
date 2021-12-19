@@ -14,7 +14,7 @@ use Tests\WebTestCase;
 class ProcessTRAsyncTest extends WebTestCase
 {
     private const USER_ID = 'user_123123';
-    const EMPHEMERAL_RESPONSE_URL = 'https://slack/response_url/';
+    private const EMPHEMERAL_RESPONSE_URL = 'https://slack/response_url/';
 
     private PRRepositoryInterface $PRRepository;
     private ChatClientSpy $chatClientSpy;
@@ -85,8 +85,8 @@ class ProcessTRAsyncTest extends WebTestCase
 
     private function assertToReviewMessageHasBeenPublished()
     {
-//        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', 'https://github.com/SamirBoulil/slub/pull/153');
-//        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', sprintf('<%s>', self::USER_ID));
+        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', 'https://github.com/SamirBoulil/slub/pull/153');
+        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', sprintf('<%s>', self::USER_ID));
     }
 
     private function slashCommandPayload(string $userInput, string $workspaceIdentifier): array

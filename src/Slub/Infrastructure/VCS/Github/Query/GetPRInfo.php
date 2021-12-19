@@ -37,6 +37,8 @@ class GetPRInfo implements GetPRInfoInterface
         $isClosed = $this->isClosed($PRDetails);
         $authorIdentifier = $this->authorIdentifier($PRDetails);
         $title = $this->title($PRDetails);
+        $description = $this->description($PRDetails);
+        $authorImageUrl = $this->authorImageUrl($PRDetails);
         $additions = $this->additions($PRDetails);
         $deletions = $this->deletions($PRDetails);
 
@@ -44,13 +46,15 @@ class GetPRInfo implements GetPRInfoInterface
             $PRIdentifier,
             $repositoryIdentifier,
             $authorIdentifier,
+            $authorImageUrl,
             $title,
+            $description,
             $reviews,
             $ciStatus,
             $isMerged,
             $isClosed,
             $additions,
-            $deletions
+            $deletions,
         );
     }
 
@@ -67,35 +71,6 @@ class GetPRInfo implements GetPRInfoInterface
     private function isClosed(array $PRDetails): bool
     {
         return 'closed' === $PRDetails['state'];
-    }
-
-    private function createPRInfo(
-        PRIdentifier $PRIdentifier,
-        string $repositoryIdentifier,
-        string $authorIdentifier,
-        string $title,
-        array $reviews,
-        CheckStatus $ciStatus,
-        bool $isMerged,
-        bool $isClosed,
-        int $additions,
-        int $deletions
-    ): PRInfo {
-        $result = new PRInfo();
-        $result->repositoryIdentifier = $repositoryIdentifier;
-        $result->PRIdentifier = $PRIdentifier->stringValue();
-        $result->authorIdentifier = $authorIdentifier;
-        $result->title = $title;
-        $result->GTMCount = $reviews[FindReviews::GTMS];
-        $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];
-        $result->comments = $reviews[FindReviews::COMMENTS];
-        $result->CIStatus = $ciStatus;
-        $result->isMerged = $isMerged;
-        $result->isClosed = $isClosed;
-        $result->additions = $additions;
-        $result->deletions = $deletions;
-
-        return $result;
     }
 
     private function title(array $PRDetails): string
@@ -116,5 +91,48 @@ class GetPRInfo implements GetPRInfoInterface
     private function deletions(array $PRDetails): int
     {
         return $PRDetails['deletions'];
+    }
+
+    private function description(array $PRDetails): string
+    {
+        return $PRDetails['body'];
+    }
+
+    private function authorImageUrl(array $PRDetails)
+    {
+        return $PRDetails['user']['avatar_url'];
+    }
+
+    private function createPRInfo(
+        PRIdentifier $PRIdentifier,
+        string $repositoryIdentifier,
+        string $authorIdentifier,
+        string $authorImageUrl,
+        string $title,
+        string $description,
+        array $reviews,
+        CheckStatus $ciStatus,
+        bool $isMerged,
+        bool $isClosed,
+        int $additions,
+        int $deletions
+    ): PRInfo {
+        $result = new PRInfo();
+        $result->repositoryIdentifier = $repositoryIdentifier;
+        $result->PRIdentifier = $PRIdentifier->stringValue();
+        $result->authorIdentifier = $authorIdentifier;
+        $result->authorImageUrl = $authorImageUrl;
+        $result->title = $title;
+        $result->description = $description;
+        $result->GTMCount = $reviews[FindReviews::GTMS];
+        $result->notGTMCount = $reviews[FindReviews::NOT_GTMS];
+        $result->comments = $reviews[FindReviews::COMMENTS];
+        $result->CIStatus = $ciStatus;
+        $result->isMerged = $isMerged;
+        $result->isClosed = $isClosed;
+        $result->additions = $additions;
+        $result->deletions = $deletions;
+
+        return $result;
     }
 }

@@ -52,7 +52,9 @@ class GetPRInfoTest extends TestCase
         $expectedNotGTMCount = 3;
         $checkStatus = new CheckStatus('PENDING');
         $expectedTitle = 'Add new feature';
+        $expectedDescription = 'a nice description';
         $expectedAuthorIdentifier = 'sam';
+        $expectedAuthorImageUrl = 'https://a_nice_url_image';
         $PRIdentifier = PRIdentifier::fromString($expectedPRIdentifier);
         $expectedAdditions = 10;
         $expectedDeletions = 5;
@@ -63,9 +65,10 @@ class GetPRInfoTest extends TestCase
                 'head'  => ['sha' => $commitSHA],
                 'state' => 'closed',
                 'title' => $expectedTitle,
-                'user' => ['login' => $expectedAuthorIdentifier],
+                'user' => ['login' => $expectedAuthorIdentifier, 'avatar_url' => $expectedAuthorImageUrl],
                 'additions' => $expectedAdditions,
-                'deletions' => $expectedDeletions
+                'deletions' => $expectedDeletions,
+                'body' => $expectedDescription
             ]);
         $this->findReviews
             ->fetch($PRIdentifier)
@@ -83,7 +86,9 @@ class GetPRInfoTest extends TestCase
         self::assertEquals($expectedPRIdentifier, $actualPRInfo->PRIdentifier);
         self::assertEquals($expectedRepositoryIdentifier, $actualPRInfo->repositoryIdentifier);
         self::assertEquals($expectedAuthorIdentifier, $actualPRInfo->authorIdentifier);
+        self::assertEquals($expectedAuthorImageUrl, $actualPRInfo->authorImageUrl);
         self::assertEquals($expectedTitle, $actualPRInfo->title);
+        self::assertEquals($expectedDescription, $actualPRInfo->description);
         self::assertEquals($expectedGTMCount, $actualPRInfo->GTMCount);
         self::assertEquals($expectedNotGTMCount, $actualPRInfo->notGTMCount);
         self::assertEquals($expectedCommentsCount, $actualPRInfo->comments);

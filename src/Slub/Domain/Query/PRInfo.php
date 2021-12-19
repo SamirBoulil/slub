@@ -17,7 +17,11 @@ class PRInfo
 
     public string $authorIdentifier;
 
+    public string $authorImageUrl;
+
     public string $title;
+
+    public string $description;
 
     public int $GTMCount;
 
@@ -30,8 +34,6 @@ class PRInfo
     public bool $isMerged;
 
     public bool $isClosed;
-
     public int $additions;
-
     public int $deletions;
 }

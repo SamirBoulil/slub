@@ -95,18 +95,28 @@ class ProcessTRAsync
         // TODO: Consider putting the url in the PRInfo class instead of recalculating it here
         $PRUrl = GithubAPIHelper::PRUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
 
+        // TODO: support CI status
+        // TODO: Consider putting this into directly the SlackClient class (implementation detail of layouting does not belong here)
         $message = [
             [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        '<@%s> needs GTMs for <%s|%s>',
-                        $authorIdentifier,
+                        "<%s|%s>\n*<@%s> _(+%s -%s)_*\n\n%s",
                         $PRUrl,
-                        $PRInfo->title
+                        $PRInfo->title,
+                        $authorIdentifier,
+                        $PRInfo->additions,
+                        $PRInfo->deletions,
+                        sprintf('%s ...', current(explode("\n", wordwrap($PRInfo->description, 100))))
                     ),
                 ],
+                'accessory' => [
+                    'type' => 'image',
+                    'image_url' => $PRInfo->authorImageUrl,
+                    'alt_text' => $PRInfo->title
+                ]
             ],
         ];
 

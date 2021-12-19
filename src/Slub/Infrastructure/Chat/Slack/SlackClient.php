@@ -43,6 +43,7 @@ class SlackClient implements ChatClient
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
+        // TODO: consider making this one private
         $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         APIHelper::checkResponseSuccess(
             $this->client->post(
@@ -75,6 +76,10 @@ class SlackClient implements ChatClient
 
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void
     {
+        $this->logger->critical('CHANNEL IDENTIFIER:' . $channelIdentifier->stringValue());
+        $this->logger->critical('workspaceFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
+        $this->logger->critical('channelFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
+
         APIHelper::checkResponseSuccess(
             $this->client->post(
                 'https://slack.com/api/chat.postMessage',

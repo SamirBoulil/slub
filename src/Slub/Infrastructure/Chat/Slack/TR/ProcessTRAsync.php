@@ -103,12 +103,13 @@ class ProcessTRAsync
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        "<%s|%s>\n*<@%s> _(+%s -%s)_*\n\n%s",
+                        "<%s|%s>\n*<@%s> _(+%s -%s)_* [%s]\n\n%s",
                         $PRUrl,
                         $PRInfo->title,
                         $authorIdentifier,
                         $PRInfo->additions,
                         $PRInfo->deletions,
+                        $PRInfo->repositoryIdentifier,
                         sprintf('%s ...', current(explode("\n", wordwrap($PRInfo->description, 100))))
                     ),
                 ],
@@ -142,7 +143,7 @@ class ProcessTRAsync
         $PRToReview->channelIdentifier = $channelIdentifier;
         $PRToReview->workspaceIdentifier = $workspaceIdentifier;
         $PRToReview->messageIdentifier = $messageIdentifier;
-        $PRToReview->authorIdentifier = $authorIdentifier;
+        $PRToReview->authorIdentifier = $PRInfo->authorIdentifier;
         $PRToReview->title = $PRInfo->title;
         $PRToReview->GTMCount = $PRInfo->GTMCount;
         $PRToReview->notGTMCount = $PRInfo->notGTMCount;

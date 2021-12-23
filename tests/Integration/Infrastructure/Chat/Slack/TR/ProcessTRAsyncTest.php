@@ -83,13 +83,14 @@ class ProcessTRAsyncTest extends WebTestCase
         self::assertEquals('SamirBoulil/slub/153', $PRToReview->PRIdentifier()->stringValue());
         self::assertEquals('published_message_identifier', $PRToReview->messageIdentifiers()[0]->stringValue());
         self::assertEquals('team_123@channel_name', $PRToReview->channelIdentifiers()[0]->stringValue());
-        self::assertEquals(self::USER_ID, $PRToReview->authorIdentifier()->stringValue());
+        self::assertEquals('sam', $PRToReview->authorIdentifier()->stringValue());
     }
 
     private function assertToReviewMessageHasBeenPublished()
     {
         $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', 'https://github.com/SamirBoulil/slub/pull/153');
         $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', sprintf('<%s>', self::USER_ID));
+        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', '[SamirBoulil/slub]');
     }
 
     private function slashCommandPayload(string $userInput, string $workspaceIdentifier): array

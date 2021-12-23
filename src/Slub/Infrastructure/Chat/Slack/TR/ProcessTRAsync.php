@@ -61,7 +61,7 @@ class ProcessTRAsync
             $this->putPRToReview($PRIdentifier, $request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
             $this->explainAuthorURLCannotBeParsed($request);
-        } catch (\Exception | \Error $e) {
+        } catch (\Exception|\Error $e) {
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
             $this->logger->critical($e->getTraceAsString());
@@ -103,20 +103,21 @@ class ProcessTRAsync
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        "<%s|%s>\n*<@%s> _(+%s -%s)_* [%s]",
+                        "<%s|%s>\n%s *(+%s -%s)*\n<@%s>\n\n%s",
                         $PRUrl,
                         $PRInfo->title,
-                        $authorIdentifier,
+                        $PRInfo->repositoryIdentifier,
                         $PRInfo->additions,
                         $PRInfo->deletions,
-                        $PRInfo->repositoryIdentifier,
+                        $authorIdentifier,
+                        $this->shortDescription($PRInfo)
                     ),
                 ],
                 'accessory' => [
                     'type' => 'image',
                     'image_url' => $PRInfo->authorImageUrl,
-                    'alt_text' => $PRInfo->title
-                ]
+                    'alt_text' => $PRInfo->title,
+                ],
             ],
         ];
 
@@ -206,5 +207,12 @@ SLACK;
 Can you check the pull request URL ? If this issue keeps coming, Slack @SamirBoulil.
 SLACK;
         $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
+    }
+
+    private function shortDescription(PRInfo $PRInfo): string
+    {
+        return !empty($PRInfo->description)
+            ? sprintf('%s ...', wordwrap(current(explode("\r\n", $PRInfo->description)), 100))
+            : '';
     }
 }

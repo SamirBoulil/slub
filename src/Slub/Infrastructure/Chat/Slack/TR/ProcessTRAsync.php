@@ -25,6 +25,8 @@ use Webmozart\Assert\Assert;
  */
 class ProcessTRAsync
 {
+    private const MAX_DESCRIPTION = 100;
+
     private PutPRToReviewHandler $putPRToReviewHandler;
     private GetPRInfoInterface $getPRInfo;
     private ChatClient $chatClient;
@@ -212,7 +214,10 @@ SLACK;
     private function shortDescription(PRInfo $PRInfo): string
     {
         $firstLine = current(explode("\r\n", $PRInfo->description));
+        $description = $firstLine > self::MAX_DESCRIPTION ?
+            sprintf("%s ...", current(explode("\r\n", wordwrap($firstLine, self::MAX_DESCRIPTION, "\r\n"))))
+            : $firstLine;
 
-        return strlen($firstLine) > 100 ? wordwrap($firstLine, 100) : $firstLine;
+        return sprintf("\n\n%s", $description);
     }
 }

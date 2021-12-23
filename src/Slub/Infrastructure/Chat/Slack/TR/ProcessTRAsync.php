@@ -103,7 +103,7 @@ class ProcessTRAsync
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        "<%s|%s>\n%s *(+%s -%s)*\n<@%s>\n\n%s",
+                        "<%s|%s>\n%s *(+%s -%s)*\n<@%s>%s",
                         $PRUrl,
                         $PRInfo->title,
                         $PRInfo->repositoryIdentifier,
@@ -211,8 +211,8 @@ SLACK;
 
     private function shortDescription(PRInfo $PRInfo): string
     {
-        return !empty($PRInfo->description)
-            ? sprintf('%s ...', wordwrap(current(explode("\r\n", $PRInfo->description)), 100))
-            : '';
+        $firstLine = current(explode("\r\n", $PRInfo->description));
+
+        return strlen($firstLine) > 100 ? wordwrap($firstLine, 100) : $firstLine;
     }
 }

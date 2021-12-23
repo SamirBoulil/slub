@@ -103,14 +103,13 @@ class ProcessTRAsync
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        "<%s|%s>\n*<@%s> _(+%s -%s)_* [%s]\n\n%s",
+                        "<%s|%s>\n*<@%s> _(+%s -%s)_* [%s]",
                         $PRUrl,
                         $PRInfo->title,
                         $authorIdentifier,
                         $PRInfo->additions,
                         $PRInfo->deletions,
                         $PRInfo->repositoryIdentifier,
-                        sprintf('%s ...', current(explode("\n", wordwrap($PRInfo->description, 100))))
                     ),
                 ],
                 'accessory' => [

@@ -137,6 +137,7 @@ class ProcessTRAsync
         $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
         $channelIdentifier = $this->getChannelIdentifier($request);
         $authorIdentifier = $this->getAuthorIdentifier($request);
+        // TODO: Should be done when PRPutToReview event has been sent
         $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
 
         $PRToReview = new PutPRToReview();
@@ -214,7 +215,7 @@ SLACK;
     private function shortDescription(PRInfo $PRInfo): string
     {
         $firstLine = current(explode("\r\n", $PRInfo->description));
-        $description = $firstLine > self::MAX_DESCRIPTION ?
+        $description = strlen($firstLine) > self::MAX_DESCRIPTION ?
             sprintf("%s ...", current(explode("\r\n", wordwrap($firstLine, self::MAX_DESCRIPTION, "\r\n"))))
             : $firstLine;
 

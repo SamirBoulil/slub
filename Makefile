@@ -59,3 +59,7 @@ status-check-failure: # Create a status check failure for a spectif sha given in
 .PHONY: status-check-success
 status-check-success: # Create a status check failure for a spectif sha given in parameter
 	curl -X POST -H "Authorization: token $(GITHUB_TOKEN)" https://api.github.com/repos/$(REPO)/statuses/$(SHA) -d '{"context": "status-check", "description": "status check success", "state": "success", "target_url": "https://google.com"}'
+
+.PHONY: send-reminders
+send-reminders:
+	heroku run --app slub-test bin/console slub:send-reminders

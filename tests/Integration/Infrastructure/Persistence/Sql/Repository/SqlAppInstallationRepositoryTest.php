@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Persistence\Sql\Repository;
 
 use Ramsey\Uuid\Uuid;
+use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -81,7 +82,7 @@ class SqlAppInstallationRepositoryTest extends KernelTestCase
     /** @test */
     public function it_throws_if_there_is_no_app_installation_for_a_repository(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(AppNotInstalledException::class);
         $this->appInstallationRepository->getBy('unknown_repository');
     }
 }

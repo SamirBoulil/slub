@@ -14,6 +14,7 @@ use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
+use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -63,11 +64,12 @@ class ProcessTRAsync
             $this->putPRToReview($PRIdentifier, $request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
             $this->explainAuthorURLCannotBeParsed($request);
+        } catch (AppNotInstalledException $exception) {
+            $this->explainAuthorAppIsNotInstalled($request);
         } catch (\Exception|\Error $e) {
-            $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
+            $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
             $this->logger->critical($e->getTraceAsString());
-            throw $e;
         }
     }
 
@@ -105,7 +107,7 @@ class ProcessTRAsync
                 'text' => [
                     'type' => 'mrkdwn',
                     'text' => sprintf(
-                        "<%s|%s>\n%s *(+%s -%s)*\n<@%s>%s",
+                        "*<%s|%s>*\n%s *(+%s -%s)*\n<@%s>%s",
                         $PRUrl,
                         $PRInfo->title,
                         $PRInfo->repositoryIdentifier,
@@ -220,5 +222,16 @@ SLACK;
             : $firstLine;
 
         return sprintf("\n\n%s", $description);
+    }
+
+    private function explainAuthorAppIsNotInstalled(Request $request): void
+    {
+        $authorInput = $request->request->get('text');
+        $responseUrl = $request->request->get('response_url');
+        $text = <<<SLACK
+:warning: `/tr %s`
+:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+SLACK;
+        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
     }
 }

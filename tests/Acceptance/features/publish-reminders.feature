@@ -19,6 +19,7 @@ Feature: Publish a reminder of the pull requests to review for every channels
     And the reminders should only contain a reference to the PRs in review
     # And they are ordered by descending time in review
 
+  # TODO: To investigate, this scenario should be failing but it's not for some reason.
   @secondary
   Scenario: Does not publish a reminder of a PR published in unsupported channel
     Given a PR not GTMed published in a supported channel

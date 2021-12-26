@@ -85,9 +85,7 @@ SQL;
         );
         $result = $statement->fetch(\PDO::FETCH_ASSOC);
         if (false === $result) {
-            throw new \RuntimeException(
-                sprintf('There was no app installation found for repository %s', $repositoryIdentifier)
-            );
+            throw new AppNotInstalledException($repositoryIdentifier);
         }
 
         return $result;

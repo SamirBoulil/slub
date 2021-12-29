@@ -10,6 +10,7 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -133,7 +134,7 @@ CHAT;
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
         $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = $PR->title()->stringValue();
+        $title = ChatHelper::elipsisIfTooLong($PR->title()->stringValue(), 100); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);
 

@@ -10,6 +10,7 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Query\ClockInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -127,13 +128,13 @@ CHAT;
 
     private function formatReminderBlock(PR $PR): array
     {
-        $githubLink = function (PR $PR) {
+        $githubLink = static function (PR $PR) {
             $split = explode('/', $PR->PRIdentifier()->stringValue());
 
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
         $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = $PR->title()->stringValue();
+        $title = ChatHelper::elipsisIfTooLong($PR->title()->stringValue(), 95); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);
 

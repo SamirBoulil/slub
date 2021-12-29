@@ -135,7 +135,7 @@ CHAT;
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
         $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = ChatHelper::elipsisIfTooLong($PR->title()->stringValue(), 100); // TODO: Big no no here, Apps -> Infra 😱
+        $title = ChatHelper::elipsisIfTooLong($PR->title()->stringValue(), 95); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);
 

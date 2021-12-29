@@ -110,7 +110,7 @@ class ProcessTRAsync
                     'text' => sprintf(
                         "*<%s|%s>*\n%s *(+%s -%s)*\n<@%s>%s",
                         $PRUrl,
-                        $PRInfo->title,
+                        ChatHelper::elipsisIfTooLong($PRInfo->title, 100),
                         $PRInfo->repositoryIdentifier,
                         $PRInfo->additions,
                         $PRInfo->deletions,

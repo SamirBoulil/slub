@@ -45,8 +45,7 @@ class PublishRemindersHandler
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
-//            if (self::RACCOONS_CHANNEL_ID === $channelIdentifier->stringValue()) {
-            if (true) {
+            if (self::RACCOONS_CHANNEL_ID === $channelIdentifier->stringValue()) {
                 $this->publishNewReminderForChannel($channelIdentifier, $PRsInReview);
             } else {
                 $this->publishReminderForChannel($channelIdentifier, $PRsInReview);
@@ -129,7 +128,7 @@ CHAT;
 
     private function formatReminderBlock(PR $PR): array
     {
-        $githubLink = function (PR $PR) {
+        $githubLink = static function (PR $PR) {
             $split = explode('/', $PR->PRIdentifier()->stringValue());
 
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);

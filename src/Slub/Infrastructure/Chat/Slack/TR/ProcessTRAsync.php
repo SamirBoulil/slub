@@ -12,6 +12,7 @@ use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
@@ -216,12 +217,9 @@ SLACK;
 
     private function shortDescription(PRInfo $PRInfo): string
     {
-        $firstLine = current(explode("\r\n", $PRInfo->description));
-        $description = strlen($firstLine) > self::MAX_DESCRIPTION ?
-            sprintf("%s ...", current(explode("\r\n", wordwrap($firstLine, self::MAX_DESCRIPTION, "\r\n"))))
-            : $firstLine;
+        $shortenDescription = ChatHelper::elipsisIfTooLong($PRInfo->description, self::MAX_DESCRIPTION);
 
-        return sprintf("\n\n%s", $description);
+        return sprintf("\n\n%s", $shortenDescription);
     }
 
     private function explainAuthorAppIsNotInstalled(Request $request): void

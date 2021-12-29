@@ -45,7 +45,8 @@ class PublishRemindersHandler
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
-            if (self::RACCOONS_CHANNEL_ID === $channelIdentifier->stringValue()) {
+//            if (self::RACCOONS_CHANNEL_ID === $channelIdentifier->stringValue()) {
+            if (true) {
                 $this->publishNewReminderForChannel($channelIdentifier, $PRsInReview);
             } else {
                 $this->publishReminderForChannel($channelIdentifier, $PRsInReview);

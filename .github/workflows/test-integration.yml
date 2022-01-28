@@ -1,0 +1,43 @@
+name: Tests
+on: [ pull_request ]
+jobs:
+    builds:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: checkout
+                uses: actions/checkout@master
+
+            -   name: ACLs
+                run: |
+                    sudo setfacl -dR -m u:1000:rwX -m u:1000:rwX .
+                    sudo setfacl -R -m u:1000:rwX -m u:1000:rwX .
+
+            -   name: Cache Composer
+                uses: actions/cache@v2
+                with:
+                    path: |
+                        ~/.composer
+                    key: slub-composer-${{ hashFiles('**/composer.lock') }}-${{ github.head_ref }}
+                    restore-keys: |
+                        slub-composer-
+
+            -   name: ACLs for Composer cache
+                run: |
+                    mkdir -p ~/.composer
+                    sudo setfacl -dR -m u:1000:rwX -m u:1000:rwX ~/.composer
+                    sudo setfacl -R -m u:1000:rwX -m u:1000:rwX ~/.composer
+
+            -   name: Build Docker image
+                run: docker-compose build && docker-compose pull
+
+            -   name: Install dependencies
+                run: docker-compose run --rm php composer install --no-interaction --prefer-dist
+
+            -   name: Tests
+                run: |
+                    APP_ENV=test docker-compose up -d
+                    sleep 10
+                    APP_ENV=dev docker-compose run --rm php vendor/bin/php-cs-fixer fix --diff --dry-run --config=.php_cs.php --using-cache=no
+                    APP_ENV=test docker-compose run --rm php bin/console --env=test slub:install -vvv
+                    APP_ENV=test XDEBUG_MODE=coverage docker-compose run --rm php vendor/bin/simple-phpunit --coverage-text --coverage-clover build/logs/clover.xml
+                    APP_ENV=test docker-compose run --rm php vendor/bin/behat -f progress

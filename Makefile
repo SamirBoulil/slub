@@ -44,7 +44,7 @@ log-staging:
 deploy-staging:
 	git push heroku-staging $(BRANCH):master --force
 
-.PHONY: log-staging
+.PHONY: od-prod
 od-prod: # Open dashboard production
 	open https://dashboard.heroku.com/apps/slub-akeneo
 

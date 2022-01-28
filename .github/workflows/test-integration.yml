@@ -1,0 +1,31 @@
+name: Tests
+on: [ pull_request ]
+jobs:
+    builds:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: checkout
+                uses: actions/checkout@master
+
+            -   name: ACLs
+                run: |
+                    sudo setfacl -dR -m u:1000:rwX -m u:1000:rwX .
+                    sudo setfacl -R -m u:1000:rwX -m u:1000:rwX .
+
+            -   name: Cache Composer
+                uses: actions/cache@v2
+                with:
+                    path: |
+                        ~/.composer
+                    key: slub-composer-${{ hashFiles('**/composer.lock') }}-${{ github.head_ref }}
+                    restore-keys: |
+                        slub-composer-
+
+            -   name: ACLs for Composer cache
+                run: |
+                    mkdir -p ~/.composer
+                    sudo setfacl -dR -m u:1000:rwX -m u:1000:rwX ~/.composer
+                    sudo setfacl -R -m u:1000:rwX -m u:1000:rwX ~/.composer
+
+            -   name: setup
+                run: docker-compose run --rm php composer install --no-interaction

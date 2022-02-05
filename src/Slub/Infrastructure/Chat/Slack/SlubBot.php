@@ -26,7 +26,9 @@ use Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
- * TODO: Migrate Unpublish in dedicated action. and Remove me.
+ * TODO:
+ *  Migrate Unpublish in dedicated action.
+ *  and Remove me.
  */
 class SlubBot
 {
@@ -64,7 +66,7 @@ class SlubBot
         DriverManager::loadDriver(SlackDriver::class);
         $this->bot = BotManFactory::create(['slack' => ['token' => 'dummyToken']]);
         $this->listensToNewPR($this->bot);
-        $this->listenToPRToUnpublish($this->bot);
+//        $this->listenToPRToUnpublish($this->bot);
         $this->answersToHealthChecks($this->bot);
 //        $this->providesToHelp($this->bot);
         $this->bot->listen();

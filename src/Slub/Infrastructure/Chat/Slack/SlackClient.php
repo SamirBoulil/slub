@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
@@ -21,6 +22,8 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class SlackClient implements ChatClient
 {
+    private const MAX_DESCRIPTION = 100;
+
     private GetBotUserId $getBotUserId;
     private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
     private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
@@ -142,6 +145,79 @@ class SlackClient implements ChatClient
         );
 
         return $messageIdentifier;
+    }
+
+    public function explainPRURLCannotBeParsed(string $url, string $usage): void
+    {
+        $text = <<<SLACK
+:warning: `%s`
+:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
+SLACK;
+        $message = sprintf($text, $usage);
+        $this->answerWithEphemeralMessage($url, $message);
+    }
+
+    public function explainAppNotInstalled(string $url, string $usage): void
+    {
+        $text = <<<SLACK
+:warning: `%s`
+:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+SLACK;
+        $this->answerWithEphemeralMessage($url, sprintf($text, $usage));
+    }
+
+    public function explainSomethingWentWrong(string $url, string $usage, string $action): void
+    {
+        $text = <<<SLACK
+:warning: `%s`
+
+:thinking_face: Something went wrong, %s.
+
+Can you check the pull request URL ? If this issue keeps coming, Send an email at samir.boulil(at)gmail.com.
+SLACK;
+        $message = sprintf($text, $usage, $action);
+        $this->answerWithEphemeralMessage($url, $message);
+    }
+
+    public function publishToReviewMessage(
+        string $channelIdentifier,
+        string $PRUrl,
+        string $title,
+        string $repositoryIdentifier,
+        int $additions,
+        int $deletions,
+        string $authorIdentifier,
+        string $authorImageUrl,
+        string $description
+    ): string {
+        $message = [
+            [
+                'type' => 'section',
+                'text' => [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf(
+                        "*<%s|%s>*\n%s *(+%s -%s)*\n<@%s>\n\n%s",
+                        $PRUrl,
+                        ChatHelper::elipsisIfTooLong($title, self::MAX_DESCRIPTION),
+                        $repositoryIdentifier,
+                        $additions,
+                        $deletions,
+                        $authorIdentifier,
+                        ChatHelper::elipsisIfTooLong($description, self::MAX_DESCRIPTION)
+                    ),
+                ],
+                'accessory' => [
+                    'type' => 'image',
+                    'image_url' => $authorImageUrl,
+                    'alt_text' => $title,
+                ],
+            ],
+        ];
+
+        return $this->publishMessageWithBlocksInChannel(
+            ChannelIdentifier::fromString($channelIdentifier),
+            $message
+        );
     }
 
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array

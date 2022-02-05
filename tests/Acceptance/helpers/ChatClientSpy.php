@@ -113,4 +113,33 @@ class ChatClientSpy implements ChatClient
 
         return $reactions;
     }
+
+    public function explainPRURLCannotBeParsed(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function explainAppNotInstalled(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function explainSomethingWentWrong(string $url, string $usage, string $action): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function publishToReviewMessage(
+        string $channelIdentifier,
+        string $PRUrl,
+        string $title,
+        string $repositoryIdentifier,
+        int $additions,
+        int $deletions,
+        string $authorIdentifier,
+        string $authorImageUrl,
+        string $description
+    ): string {
+        return $this->publishMessageWithBlocksInChannel(ChannelIdentifier::fromString($channelIdentifier), ['to review messages']);
+    }
 }

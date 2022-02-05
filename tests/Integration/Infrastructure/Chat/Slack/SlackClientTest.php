@@ -201,6 +201,108 @@ class SlackClientTest extends KernelTestCase
         );
     }
 
+    public function test_it_explains_a_URL_cannot_be_parsed(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->explainPRURLCannotBeParsed($url, 'a message');
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        $expectedMessage = <<<TEXT
+:warning: `a message`
+:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
+TEXT;
+        self::assertEquals(
+            [
+                'text' => $expectedMessage,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
+    public function test_it_explains_a_the_slack_app_is_not_installed(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->explainAppNotInstalled($url, 'a message');
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        $expectedMessage = <<<TEXT
+:warning: `a message`
+:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+TEXT;
+        self::assertEquals(
+            [
+                'text' => $expectedMessage,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
+    public function test_it_explains_something_went_wrong(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->explainSomethingWentWrong($url, 'usage', 'reason');
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        $expectedMessage = <<<TEXT
+:warning: `usage`
+
+:thinking_face: Something went wrong, reason.
+
+Can you check the pull request URL ? If this issue keeps coming, Send an email at samir.boulil(at)gmail.com.
+TEXT;
+        self::assertEquals(
+            [
+                'text' => $expectedMessage,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
+    public function test_it_publish_a_pr_to_review_message(): void
+    {
+        $channelIdentifier = 'workspace@channel';
+        $url = '/api/chat.postMessage';
+        $this->mockGuzzleWith(new Response(200, [], json_encode(['ok' => true, 'message' => ['team' => 'team'], 'channel' => 'channel', 'ts' => 'ts'])));
+
+        $this->slackClient->publishToReviewMessage(
+            $channelIdentifier,
+            'PRUrl',
+            'title',
+            'repositoryIdentifier',
+            1,
+            1,
+            'authorIdentifier',
+            'authorImageUrl',
+            'description'
+        );
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        self::assertJsonStringEqualsJsonString(
+            '{"channel":"channel","blocks":[{"type":"section","text":{"type":"mrkdwn","text":"*<PRUrl|title>*\nrepositoryIdentifier *(+1 -1)*\n<@authorIdentifier>\n\ndescription"},"accessory":{"type":"image","image_url":"authorImageUrl","alt_text":"title"}}],"unfurl_links":false,"link_names":true}',
+            $generatedRequest->getBody()->getContents()
+        );
+    }
+
     /**
      * @test
      */

@@ -5,7 +5,12 @@ chat_slack_messages:
 
 chat_slack_tr:
     path: /chat/slack/tr
-    controller: slub.infrastructure.chat.slack.tr.ok_action::executeAction
+    controller: slub.infrastructure.chat.slack.ok_action::executeAction
+    methods: [POST]
+
+chat_slack_untr:
+    path: /chat/slack/untr
+    controller: slub.infrastructure.chat.slack.ok_action::executeAction
     methods: [POST]
 
 chat_slack_oauth_installation:

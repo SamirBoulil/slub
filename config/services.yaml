@@ -158,14 +158,24 @@ services:
         arguments:
             - '@slub.infrastructure.chat.slack.slub_bot'
 
-    slub.infrastructure.chat.slack.tr.ok_action:
-        class: Slub\Infrastructure\Chat\Slack\TR\OKAction
+    slub.infrastructure.chat.slack.ok_action:
+        class: Slub\Infrastructure\Chat\Slack\OKAction
 
     slub.infrastructure.chat.slack.tr.process_tr_async:
         class: Slub\Infrastructure\Chat\Slack\TR\ProcessTRAsync
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@router'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
+
+    slub.infrastructure.chat.slack.tr.process_untr_async:
+        class: Slub\Infrastructure\Chat\Slack\UnTR\ProcessUnTRAsync
+        arguments:
+            - '@slub.application.unpublish_pr.unpublish_pr_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@router'
             - '@logger'

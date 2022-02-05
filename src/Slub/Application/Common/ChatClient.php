@@ -12,5 +12,8 @@ interface ChatClient
     public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void;
     public function publishInChannel(ChannelIdentifier $channelIdentifier, string $text): void;
     public function answerWithEphemeralMessage(string $url, string $text): void;
+    public function explainPRURLCannotBeParsed(string $url, string $usage): void;
+    public function explainAppNotInstalled(string $url, string $usage): void;
+    public function explainSomethingWentWrong(string $url, string $usage, string $action): void;
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string;
 }

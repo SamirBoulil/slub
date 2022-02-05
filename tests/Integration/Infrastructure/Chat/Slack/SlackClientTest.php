@@ -201,6 +201,54 @@ class SlackClientTest extends KernelTestCase
         );
     }
 
+    public function test_it_explains_a_URL_cannot_be_parsed(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->explainPRURLCannotBeParsed($url, 'a message');
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        $expectedMessage = <<<TEXT
+:warning: `a message`
+:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
+TEXT;
+        self::assertEquals(
+            [
+                'text' => $expectedMessage,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
+    public function test_it_explains_a_the_slack_app_is_not_installed(): void
+    {
+        $url = 'https://slack.ephemeral.url/';
+        $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
+
+        $this->slackClient->explainAppNotInstalled($url, 'a message');
+
+        $generatedRequest = $this->httpClientMock->getLastRequest();
+        self::assertEquals('POST', $generatedRequest->getMethod());
+        self::assertEquals((new Uri($url))->getPath(), $generatedRequest->getUri()->getPath());
+        $bodyContent = $this->getBodyContent($generatedRequest);
+        $expectedMessage = <<<TEXT
+:warning: `a message`
+:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+TEXT;
+        self::assertEquals(
+            [
+                'text' => $expectedMessage,
+                'response_type' => 'ephemeral',
+            ],
+            $bodyContent
+        );
+    }
+
     /**
      * @test
      */

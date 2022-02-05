@@ -55,12 +55,12 @@ class ProcessUnTRAsync
             $this->unTR($PRIdentifier);
             $this->confirmUnTRSuccess($request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
-            $this->explainAuthorURLCannotBeParsed($request);
+            $this->explainPRNotParsable($request);
         } catch (AppNotInstalledException $exception) {
-            $this->explainAuthorAppIsNotInstalled($request);
+            $this->explainAppNotInstalled($request);
         } catch (\Exception|\Error $e) {
-            $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
-            $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
+            $this->explainSomethingWentWrong($request);
+            $this->logger->critical(sprintf('An error occurred during PR unpublish: %s', $e->getMessage()));
             $this->logger->critical($e->getTraceAsString());
         }
     }
@@ -89,48 +89,41 @@ class ProcessUnTRAsync
         return $PRIdentifier;
     }
 
-    // TODO: Move in SlackClient put in command with ProcessTRAsync
-    private function explainAuthorURLCannotBeParsed(Request $request): void
-    {
-        $authorInput = $request->request->get('text');
-        $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
-    }
-
-    // TODO: Move in SlackClient put in command with ProcessTRAsync
-    private function explainAuthorPRCouldNotBeSubmittedToReview(Request $request)
-    {
-        $authorInput = $request->request->get('text');
-        $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-
-:thinking_face: Something went wrong, I was not able to put your PR to Review.
-
-Can you check the pull request URL ? If this issue keeps coming, Slack @SamirBoulil.
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
-    }
-
-    // TODO: Move in SlackClient put in command with ProcessTRAsync
-    private function explainAuthorAppIsNotInstalled(Request $request): void
-    {
-        $authorInput = $request->request->get('text');
-        $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
-    }
-
     private function confirmUnTRSuccess(Request $request): void
     {
         $message = sprintf('Alright, I won\'t be sending reminders for %s', $request->request->get('text'));
         $this->chatClient->answerWithEphemeralMessage($request->request->get('response_url'), $message);
+    }
+
+    private function explainSomethingWentWrong(Request $request): void
+    {
+        $responseUrl = $request->request->get('response_url');
+        $this->chatClient->explainSomethingWentWrong(
+            $responseUrl,
+            $this->usage($request),
+            'I was not able to unpublish your PR'
+        );
+    }
+
+    private function explainAppNotInstalled(Request $request): void
+    {
+        $responseUrl = $request->request->get('response_url');
+        $this->chatClient->explainAppNotInstalled(
+            $responseUrl,
+            sprintf('/untr %s', $request->request->get('text'))
+        );
+    }
+
+    private function explainPRNotParsable(Request $request): void
+    {
+        $this->chatClient->explainPRURLCannotBeParsed(
+            $request->request->get('response_url'),
+            sprintf('/untr %s', $request->request->get('text'))
+        );
+    }
+
+    private function usage(Request $request): string
+    {
+        return sprintf('/untr %s', $request->request->get('text'));
     }
 }

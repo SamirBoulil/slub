@@ -113,4 +113,19 @@ class ChatClientSpy implements ChatClient
 
         return $reactions;
     }
+
+    public function explainPRURLCannotBeParsed(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function explainAppNotInstalled(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function explainSomethingWentWrong(string $url, string $usage, string $action): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
 }

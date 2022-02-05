@@ -64,9 +64,15 @@ class ProcessTRAsync
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
-            $this->explainAuthorURLCannotBeParsed($request);
+            $this->chatClient->explainPRURLCannotBeParsed(
+                $request->request->get('response_url'),
+                sprintf('/tr %s', $request->request->get('text'))
+            );
         } catch (AppNotInstalledException $exception) {
-            $this->explainAuthorAppIsNotInstalled($request);
+            $this->chatClient->explainAppNotInstalled(
+                $request->request->get('response_url'),
+                sprintf('/tr %s', $request->request->get('text'))
+            );
         } catch (\Exception|\Error $e) {
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
@@ -190,29 +196,14 @@ class ProcessTRAsync
         return $PRIdentifier;
     }
 
-    private function explainAuthorURLCannotBeParsed(Request $request): void
-    {
-        $authorInput = $request->request->get('text');
-        $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-:thinking_face: Sorry, I was not able to parse the pull request URL, can you check it and try again ?
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
-    }
-
     private function explainAuthorPRCouldNotBeSubmittedToReview(Request $request)
     {
-        $authorInput = $request->request->get('text');
         $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-
-:thinking_face: Something went wrong, I was not able to put your PR to Review.
-
-Can you check the pull request URL ? If this issue keeps coming, Slack @SamirBoulil.
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
+        $this->chatClient->explainSomethingWentWrong(
+            $responseUrl,
+            $this->usage($request),
+            'I was not able to put your PR to review'
+        );
     }
 
     private function shortDescription(PRInfo $PRInfo): string
@@ -222,14 +213,8 @@ SLACK;
         return sprintf("\n\n%s", $shortenDescription);
     }
 
-    private function explainAuthorAppIsNotInstalled(Request $request): void
+    private function usage(Request $request): string
     {
-        $authorInput = $request->request->get('text');
-        $responseUrl = $request->request->get('response_url');
-        $text = <<<SLACK
-:warning: `/tr %s`
-:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
-SLACK;
-        $this->chatClient->answerWithEphemeralMessage($responseUrl, sprintf($text, $authorInput));
+        return sprintf('/untr %s', $request->request->get('text'));
     }
 }

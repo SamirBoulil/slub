@@ -91,7 +91,7 @@ class ProcessUnTRAsync
 
     private function confirmUnTRSuccess(Request $request): void
     {
-        $message = sprintf('Alright, I won\'t be sending reminders for %s', $request->request->get('text'));
+        $message = sprintf(':ok_hand: Alright, I won\'t be sending reminders for %s', $request->request->get('text'));
         $this->chatClient->answerWithEphemeralMessage($request->request->get('response_url'), $message);
     }
 

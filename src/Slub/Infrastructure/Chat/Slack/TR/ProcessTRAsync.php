@@ -8,11 +8,9 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
-use Slub\Domain\Entity\Channel\ChannelIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
@@ -27,8 +25,6 @@ use Webmozart\Assert\Assert;
  */
 class ProcessTRAsync
 {
-    private const MAX_DESCRIPTION = 100;
-
     private PutPRToReviewHandler $putPRToReviewHandler;
     private GetPRInfoInterface $getPRInfo;
     private ChatClient $chatClient;
@@ -64,15 +60,9 @@ class ProcessTRAsync
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
         } catch (ImpossibleToParseRepositoryURL $exception) {
-            $this->chatClient->explainPRURLCannotBeParsed(
-                $request->request->get('response_url'),
-                sprintf('/tr %s', $request->request->get('text'))
-            );
+            $this->explainPRNotParsable($request);
         } catch (AppNotInstalledException $exception) {
-            $this->chatClient->explainAppNotInstalled(
-                $request->request->get('response_url'),
-                sprintf('/tr %s', $request->request->get('text'))
-            );
+            $this->explainAppNotInstalled($request);
         } catch (\Exception|\Error $e) {
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
@@ -103,38 +93,18 @@ class ProcessTRAsync
         string $channelIdentifier,
         string $authorIdentifier
     ): string {
-        // TODO: Consider putting the url in the PRInfo class instead of recalculating it here
         $PRUrl = GithubAPIHelper::PRUrl(PRIdentifier::fromString($PRInfo->PRIdentifier));
 
-        // TODO: support CI status
-        // TODO: Consider putting this into directly the SlackClient class (implementation detail of layouting does not belong here)
-        $message = [
-            [
-                'type' => 'section',
-                'text' => [
-                    'type' => 'mrkdwn',
-                    'text' => sprintf(
-                        "*<%s|%s>*\n%s *(+%s -%s)*\n<@%s>%s",
-                        $PRUrl,
-                        ChatHelper::elipsisIfTooLong($PRInfo->title, 100),
-                        $PRInfo->repositoryIdentifier,
-                        $PRInfo->additions,
-                        $PRInfo->deletions,
-                        $authorIdentifier,
-                        $this->shortDescription($PRInfo)
-                    ),
-                ],
-                'accessory' => [
-                    'type' => 'image',
-                    'image_url' => $PRInfo->authorImageUrl,
-                    'alt_text' => $PRInfo->title,
-                ],
-            ],
-        ];
-
-        return $this->chatClient->publishMessageWithBlocksInChannel(
-            ChannelIdentifier::fromString($channelIdentifier),
-            $message
+        return $this->chatClient->publishToReviewMessage(
+            $channelIdentifier,
+            $PRUrl,
+            $PRInfo->title,
+            $PRInfo->repositoryIdentifier,
+            $PRInfo->additions,
+            $PRInfo->deletions,
+            $authorIdentifier,
+            $PRInfo->authorImageUrl,
+            $PRInfo->description,
         );
     }
 
@@ -145,8 +115,9 @@ class ProcessTRAsync
         $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
         $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
         $channelIdentifier = $this->getChannelIdentifier($request);
-        $authorIdentifier = $this->getAuthorIdentifier($request);
+
         // TODO: Should be done when PRPutToReview event has been sent
+        $authorIdentifier = $this->getAuthorIdentifier($request);
         $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
 
         $PRToReview = new PutPRToReview();
@@ -196,6 +167,16 @@ class ProcessTRAsync
         return $PRIdentifier;
     }
 
+    private function explainPRNotParsable(Request $request): void
+    {
+        $this->chatClient->explainPRURLCannotBeParsed($request->request->get('response_url'), $this->usage($request));
+    }
+
+    private function explainAppNotInstalled(Request $request): void
+    {
+        $this->chatClient->explainAppNotInstalled($request->request->get('response_url'), $this->usage($request));
+    }
+
     private function explainAuthorPRCouldNotBeSubmittedToReview(Request $request)
     {
         $responseUrl = $request->request->get('response_url');
@@ -206,15 +187,8 @@ class ProcessTRAsync
         );
     }
 
-    private function shortDescription(PRInfo $PRInfo): string
-    {
-        $shortenDescription = ChatHelper::elipsisIfTooLong($PRInfo->description, self::MAX_DESCRIPTION);
-
-        return sprintf("\n\n%s", $shortenDescription);
-    }
-
     private function usage(Request $request): string
     {
-        return sprintf('/untr %s', $request->request->get('text'));
+        return sprintf('/tr %s', $request->request->get('text'));
     }
 }

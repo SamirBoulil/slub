@@ -128,4 +128,18 @@ class ChatClientSpy implements ChatClient
     {
         $this->answerWithEphemeralMessage($url, $usage);
     }
+
+    public function publishToReviewMessage(
+        string $channelIdentifier,
+        string $PRUrl,
+        string $title,
+        string $repositoryIdentifier,
+        int $additions,
+        int $deletions,
+        string $authorIdentifier,
+        string $authorImageUrl,
+        string $description
+    ): string {
+        return $this->publishMessageWithBlocksInChannel(ChannelIdentifier::fromString($channelIdentifier), ['to review messages']);
+    }
 }

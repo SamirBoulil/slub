@@ -45,11 +45,7 @@ class PublishRemindersHandler
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
-            if (self::RACCOONS_CHANNEL_ID === $channelIdentifier->stringValue()) {
-                $this->publishNewReminderForChannel($channelIdentifier, $PRsInReview);
-            } else {
-                $this->publishReminderForChannel($channelIdentifier, $PRsInReview);
-            }
+            $this->publishNewReminderForChannel($channelIdentifier, $PRsInReview);
         }
 
         $this->logger->info('Reminders published');
@@ -98,34 +94,6 @@ class PublishRemindersHandler
         );
     }
 
-    private function formatReminders(array $prs): string
-    {
-        usort($prs, fn (PR $pr1, PR $pr2) => $pr1->numberOfDaysInReview() <=> $pr2->numberOfDaysInReview());
-
-        $PRReminders = array_map(fn (PR $PR) => $this->formatReminder($PR), $prs);
-        $reminder = <<<CHAT
-Yop, these PRs need reviews!
-%s
-CHAT;
-
-        return sprintf($reminder, implode("\n", $PRReminders));
-    }
-
-    private function formatReminder(PR $PR): string
-    {
-        $githubLink = function (PR $PR) {
-            $split = explode('/', $PR->PRIdentifier()->stringValue());
-
-            return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
-        };
-        $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = $PR->title()->stringValue();
-        $githubLink = $githubLink($PR);
-        $numberOfDaysInReview = $this->formatDuration($PR);
-
-        return sprintf(' - *%s*, _<%s|"%s">_ (%s)', $author, $githubLink, $title, $numberOfDaysInReview);
-    }
-
     private function formatReminderBlock(PR $PR): array
     {
         $githubLink = static function (PR $PR) {
@@ -134,7 +102,10 @@ CHAT;
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
         $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = ChatHelper::elipsisIfTooLong($PR->title()->stringValue(), 95); // TODO: Big no no here, Apps -> Infra 😱
+        $title = ChatHelper::elipsisIfTooLong(
+            $PR->title()->stringValue(),
+            95
+        ); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);
 

@@ -29,6 +29,7 @@ class CIStatusTest extends TestCase
             ],
             $normalizedCIStatus
         );
+        self::assertFalse(true);
     }
 
     /**

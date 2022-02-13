@@ -8,8 +8,8 @@ services:
     _defaults:
         public: true
 
-    Tests\Acceptance\Context\:
-        resource: '../tests/Acceptance/Context/*'
+    Tests\Acceptance\:
+        resource: '../tests/Acceptance/*'
 
     helpers.event_spy:
         class: Tests\Acceptance\helpers\EventsSpy
@@ -39,6 +39,12 @@ services:
         class: Slub\Infrastructure\VCS\InMemory\InMemoryGetPRInfo
 
     # contexts
+    Tests\Acceptance\Context\PRSizeChangedContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.change_pr_size.change_pr_size_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+
     Tests\Acceptance\Context\PutPRToReviewContext:
         - '@slub.infrastructure.persistence.pr_repository'
         - '@slub.application.put_pr_to_review.put_pr_to_review_handler'

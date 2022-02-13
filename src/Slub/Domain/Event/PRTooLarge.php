@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Domain\Event;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author    Pierrick Martos <pierrick.martos@gmail.com>

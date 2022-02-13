@@ -18,8 +18,7 @@ class PurgeDeliveredEventsCLITest extends KernelTestCase
 {
     private const COMMAND_NAME = 'slub:maintenance:purge-delivered-events';
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     /** * @var Connection */
     private $connection;

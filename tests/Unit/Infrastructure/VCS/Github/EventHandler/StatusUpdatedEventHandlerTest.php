@@ -28,19 +28,15 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private const COMMIT_REF = 'commit-ref';
 
     /**
-     * @var StatusUpdatedEventHandler
      * @sut
      */
-    private $statusUpdateEventHandler;
+    private StatusUpdatedEventHandler $statusUpdateEventHandler;
 
-    /** @var ObjectProphecy|CIStatusUpdateHandler */
-    private $handler;
+    private CIStatusUpdateHandler|ObjectProphecy $handler;
 
-    /** @var ObjectProphecy|GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus|ObjectProphecy $getCIStatus;
 
-    /** @var ObjectProphecy|FindPRNumber */
-    private $findPRNumber;
+    private FindPRNumber|ObjectProphecy $findPRNumber;
 
     public function setUp(): void
     {

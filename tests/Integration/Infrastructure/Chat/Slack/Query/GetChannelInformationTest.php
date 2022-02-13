@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Chat\Slack\Query;
 
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -20,11 +21,9 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetChannelInformationTest extends TestCase
 {
-    /** @var MockHandler */
-    private $mock;
+    private MockHandler $mock;
 
-    /** @var GetChannelInformationInterface */
-    private $getChannelInformation;
+    private GetChannelInformationInterface $getChannelInformation;
 
     private ObjectProphecy $slackAppInstallationRepository;
 
@@ -94,7 +93,7 @@ class GetChannelInformationTest extends TestCase
 
     private function mockSlackAppInstallation(): void
     {
-        $slackAppInstallation = new \Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation();
+        $slackAppInstallation = new SlackAppInstallation();
         $slackAppInstallation->accessToken = 'access_token';
         $this->slackAppInstallationRepository->getBy('workspace_id')->willReturn($slackAppInstallation);
     }

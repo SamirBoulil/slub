@@ -19,8 +19,7 @@ use Tests\Integration\Infrastructure\KernelTestCase;
 
 class SqlPRRepositoryTest extends KernelTestCase
 {
-    /** @var SqlPRRepository */
-    private $sqlPRRepository;
+    private SqlPRRepository $sqlPRRepository;
 
     public function setUp(): void
     {

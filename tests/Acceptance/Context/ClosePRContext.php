@@ -25,32 +25,18 @@ use Tests\Acceptance\helpers\EventsSpy;
  */
 class ClosePRContext extends FeatureContext
 {
-    /** @var ClosePRHandler */
-    private $closePRHandler;
+    private PRIdentifier $currentPRIdentifier;
 
-    /** @var EventsSpy */
-    private $eventSpy;
-
-    /** @var PRIdentifier */
-    private $currentPRIdentifier;
-
-    /** @var MessageIdentifier */
-    private $currentMessageIdentifier;
-
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
+    private MessageIdentifier $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        ClosePRHandler $closePRHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        private ClosePRHandler $closePRHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
-        $this->eventSpy = $eventSpy;
-        $this->chatClientSpy = $chatClientSpy;
         $this->PRRepository = $PRRepository;
-        $this->closePRHandler = $closePRHandler;
     }
 
     /**

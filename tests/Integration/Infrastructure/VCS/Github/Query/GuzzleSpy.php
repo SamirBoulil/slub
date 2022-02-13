@@ -16,11 +16,9 @@ use Psr\Http\Message\RequestInterface;
  */
 class GuzzleSpy
 {
-    /** @var Client */
-    private $client;
+    private Client $client;
 
-    /** @var MockHandler */
-    private $mockHandler;
+    private MockHandler $mockHandler;
 
     public function __construct()
     {

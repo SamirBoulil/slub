@@ -21,11 +21,9 @@ class GetCheckSuiteStatusTest extends WebTestCase
     private const SUPPORTED_CI_CHECK_3 = 'supported_3';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
-    /** @var GetCheckSuiteStatus */
-    private $getCheckSuiteStatus;
+    private GetCheckSuiteStatus $getCheckSuiteStatus;
 
-    /** @var ObjectProphecy|GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

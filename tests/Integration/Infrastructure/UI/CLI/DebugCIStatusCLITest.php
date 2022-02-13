@@ -19,10 +19,9 @@ use Tests\Integration\Infrastructure\KernelTestCase;
 class DebugCIStatusCLITest extends KernelTestCase
 {
     private const COMMAND_NAME = 'slub:debug:ci-status';
-    const PR_IDENTIFIER = 'samirboulil/slub/123';
+    public const PR_IDENTIFIER = 'samirboulil/slub/123';
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     /** * @var \Prophecy\Prophecy\ObjectProphecy|GetPRInfo */
     private $getPRInfo;

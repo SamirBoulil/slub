@@ -26,17 +26,13 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SlackClientTest extends KernelTestCase
 {
-    /** @var ObjectProphecy */
-    private $getBotUserId;
+    private ObjectProphecy $getBotUserId;
 
-    /** @var ObjectProphecy */
-    private $getBotReactionsForMessageAndUser;
+    private ObjectProphecy $getBotReactionsForMessageAndUser;
 
-    /** @var MockHandler */
-    private $httpClientMock;
+    private MockHandler $httpClientMock;
 
-    /** @var SlackClient */
-    private $slackClient;
+    private SlackClient $slackClient;
 
     public function setUp(): void
     {

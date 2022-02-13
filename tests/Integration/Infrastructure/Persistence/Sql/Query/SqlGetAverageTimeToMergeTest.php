@@ -15,11 +15,9 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SqlGetAverageTimeToMergeTest extends KernelTestCase
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
-    /** @var GetAverageTimeToMergeInterface */
-    private $getAverageTimeToMerge;
+    private GetAverageTimeToMergeInterface $getAverageTimeToMerge;
 
     public function setUp(): void
     {

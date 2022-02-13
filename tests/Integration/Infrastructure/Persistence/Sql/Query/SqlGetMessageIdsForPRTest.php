@@ -23,8 +23,7 @@ class SqlGetMessageIdsForPRTest extends KernelTestCase
 {
     private const PR_IDENTIFIER = 'akeneo/pim-community-dev/1111';
 
-    /** @var GetMessageIdsForPR */
-    private $getMessageIdsForPR;
+    private GetMessageIdsForPR $getMessageIdsForPR;
 
     public function setUp(): void
     {

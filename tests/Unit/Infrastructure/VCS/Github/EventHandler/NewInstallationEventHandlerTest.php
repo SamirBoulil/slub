@@ -21,14 +21,11 @@ class NewInstallationEventHandlerTest extends TestCase
     private const ACCESS_TOKENS_URL = 'https://api.github.com'.self::ACCESS_TOKEN_URI;
     private const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
 
-    /** @var NewInstallationEventHandler */
-    private $newInstallationEventHandler;
+    private NewInstallationEventHandler $newInstallationEventHandler;
 
-    /** @var ObjectProphecy|SqlAppInstallationRepository */
-    private $appInformationRepository;
+    private ObjectProphecy|SqlAppInstallationRepository $appInformationRepository;
 
-    /** @var ObjectProphecy|RefreshAccessToken */
-    private $refreshAccessToken;
+    private ObjectProphecy|RefreshAccessToken $refreshAccessToken;
 
     public function setUp(): void
     {
@@ -52,7 +49,7 @@ class NewInstallationEventHandlerTest extends TestCase
     /** @test */
     public function it_gather_app_installations_and_saves_them(): void
     {
-        $installationId = 12202825;
+        $installationId = 12_202_825;
         $repository1 = 'SamirBoulil/slub';
         $repository2 = 'akeneo/pim-community-dev';
         $newInstallationEvent = [

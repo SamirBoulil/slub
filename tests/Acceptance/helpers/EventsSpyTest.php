@@ -22,8 +22,7 @@ use Slub\Domain\Event\PRTooLarge;
 
 class EventsSpyTest extends TestCase
 {
-    /** @var EventsSpy */
-    private $eventSpy;
+    private EventsSpy $eventSpy;
 
     public function setUp(): void/* The :void return type declaration that should be here would cause a BC issue */
     {

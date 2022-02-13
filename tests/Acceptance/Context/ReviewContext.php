@@ -23,32 +23,17 @@ class ReviewContext extends FeatureContext
 {
     private const REVIEWER_NAME = 'samir';
 
-    /** @var NewReviewHandler */
-    private $reviewHandler;
+    private PRIdentifier $currentPRIdentifier;
 
-    /** @var EventsSpy */
-    private $eventSpy;
-
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
-
-    /** @var PRIdentifier */
-    private $currentPRIdentifier;
-
-    /** @var MessageIdentifier */
-    private $currentMessageIdentifier;
+    private MessageIdentifier $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        NewReviewHandler $reviewHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        private NewReviewHandler $reviewHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
-
-        $this->reviewHandler = $reviewHandler;
-        $this->eventSpy = $eventSpy;
-        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**
@@ -134,7 +119,7 @@ class ReviewContext extends FeatureContext
         $found = true;
         try {
             $this->PRRepository->getBy($PRIdentifier);
-        } catch (PRNotFoundException $notFoundException) {
+        } catch (PRNotFoundException) {
             $found = false;
         }
 

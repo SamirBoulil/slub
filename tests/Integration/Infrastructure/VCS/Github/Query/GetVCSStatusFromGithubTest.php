@@ -30,11 +30,9 @@ class GetVCSStatusFromGithubTest extends WebTestCase
     /** @var ObjectProphecy|GetCIStatus */
     protected $getCIStatusStub;
 
-    /** @var GetVCSStatusFromGithub */
-    private $getVCSStatus;
+    private GetVCSStatusFromGithub $getVCSStatus;
 
-    /** @var ObjectProphecy|GetPRDetails */
-    private $getPRDetailsStub;
+    private GetPRDetails|ObjectProphecy $getPRDetailsStub;
 
     /** @var ObjectProphecy|FindReviews */
     protected $findReviewsStub;

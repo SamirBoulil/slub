@@ -14,8 +14,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class ChatClientSpy implements ChatClient
 {
-    /** @var array */
-    private $recordedMessages = [];
+    private array $recordedMessages = [];
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {

@@ -16,47 +16,27 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class PutPRToReviewContext extends FeatureContext
 {
-    /** @var PutPRToReviewHandler */
-    private $putPRToReviewHandler;
+    private string $currentPRIdentifier;
 
-    /** @var string */
-    private $currentPRIdentifier;
-
-    /** @var string */
-    private $currentRepositoryIdentifier;
-
-    /** @var EventsSpy */
-    private $eventSpy;
-
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
+    private string $currentRepositoryIdentifier;
 
     /** @var string[] */
-    private $currentMessageIds = [];
+    private array $currentMessageIds = [];
 
-    /** @var array */
-    private $currentChannelIds = [];
+    private array $currentChannelIds = [];
 
-    /** @var array */
-    private $currentWorkspaceIds = [];
-
-    private string $prSizeLimit;
+    private array $currentWorkspaceIds = [];
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        PutPRToReviewHandler $putPRToReviewHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy,
-        string $prSizeLimit
+        private PutPRToReviewHandler $putPRToReviewHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy,
+        private string $prSizeLimit
     ) {
         parent::__construct($PRRepository);
-
-        $this->putPRToReviewHandler = $putPRToReviewHandler;
         $this->currentRepositoryIdentifier = '';
         $this->currentPRIdentifier = '';
-        $this->eventSpy = $eventSpy;
-        $this->chatClientSpy = $chatClientSpy;
-        $this->prSizeLimit = $prSizeLimit;
     }
 
     /**
@@ -105,7 +85,7 @@ class PutPRToReviewContext extends FeatureContext
         $found = true;
         try {
             $this->PRRepository->getBy(PRIdentifier::create($PRIdentifier));
-        } catch (PRNotFoundException $notFoundException) {
+        } catch (PRNotFoundException) {
             $found = false;
         }
 

@@ -21,13 +21,11 @@ class PRSizeChangedEventHandlerTest extends TestCase
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
     /**
-     * @var PRSizeChangedEventHandler
      * @sut
      */
-    private $prLargeEventHandler;
+    private PRSizeChangedEventHandler $prLargeEventHandler;
 
-    /** @var ObjectProphecy|ChangePRSizeHandler */
-    private $handler;
+    private ChangePRSizeHandler|ObjectProphecy $handler;
 
     public function setUp(): void
     {

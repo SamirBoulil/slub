@@ -20,11 +20,9 @@ class FindPRNumberTest extends WebTestCase
     private const COMMIT_SHA = 'commit_sha';
     private const PR_NUMBER = '1234';
 
-    /** @var FindPRNumber */
-    private $findPRNumber;
+    private FindPRNumber $findPRNumber;
 
-    /** @var ObjectProphecy|GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

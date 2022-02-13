@@ -29,16 +29,13 @@ class CheckRunEventHandlerTest extends TestCase
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     /**
-     * @var CheckRunEventHandler
      * @sut
      */
-    private $checkRunEventHandler;
+    private CheckRunEventHandler $checkRunEventHandler;
 
-    /** @var ObjectProphecy|CIStatusUpdateHandler */
-    private $handler;
+    private CIStatusUpdateHandler|ObjectProphecy $handler;
 
-    /** @var ObjectProphecy|GetPRInfoInterface */
-    private $getPRInfo;
+    private GetPRInfoInterface|ObjectProphecy $getPRInfo;
 
     public function setUp(): void
     {

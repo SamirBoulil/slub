@@ -17,14 +17,12 @@ use Tests\WebTestCase;
  */
 class GetPRDetailsTest extends WebTestCase
 {
-    const REPOSITORY_NAME = 'SamirBoulil/slub';
-    const PR_NUMBER = '36';
+    public const REPOSITORY_NAME = 'SamirBoulil/slub';
+    public const PR_NUMBER = '36';
 
-    /** @var GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails $getPRDetails;
 
-    /** @var ObjectProphecy|GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

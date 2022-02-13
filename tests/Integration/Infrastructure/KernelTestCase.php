@@ -29,7 +29,7 @@ class KernelTestCase extends SymfonyTestCase
 
         try {
             return self::$kernel->getContainer()->get($serviceOrParameterId);
-        } catch (ServiceNotFoundException $exception) {
+        } catch (ServiceNotFoundException) {
             return self::$kernel->getContainer()->getParameter($serviceOrParameterId);
         }
     }

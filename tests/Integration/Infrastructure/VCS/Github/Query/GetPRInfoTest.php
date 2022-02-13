@@ -18,17 +18,13 @@ use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
  */
 class GetPRInfoTest extends TestCase
 {
-    /** @var GetPRInfo */
-    private $getPRInfo;
+    private GetPRInfo $getPRInfo;
 
-    /** @var ObjectProphecy|GetPRDetails */
-    private $getPRDetails;
+    private GetPRDetails|ObjectProphecy $getPRDetails;
 
-    /** @var ObjectProphecy|GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus|ObjectProphecy $getCIStatus;
 
-    /** @var ObjectProphecy|FindReviews */
-    private $findReviews;
+    private FindReviews|ObjectProphecy $findReviews;
 
     public function setUp(): void
     {

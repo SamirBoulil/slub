@@ -20,22 +20,16 @@ use Tests\Acceptance\helpers\EventsSpy;
 
 class PRSizeChangedContext extends FeatureContext
 {
-    private ChangePRSizeHandler $changePRSizeHandler;
-    private EventsSpy $eventSpy;
-    private ChatClientSpy $chatClientSpy;
     private PRIdentifier $currentPRIdentifier;
     private MessageIdentifier $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        ChangePRSizeHandler $changePRSizeHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        private ChangePRSizeHandler $changePRSizeHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
-        $this->changePRSizeHandler = $changePRSizeHandler;
-        $this->eventSpy = $eventSpy;
-        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**

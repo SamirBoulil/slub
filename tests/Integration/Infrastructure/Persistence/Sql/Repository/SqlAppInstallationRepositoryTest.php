@@ -15,8 +15,7 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SqlAppInstallationRepositoryTest extends KernelTestCase
 {
-    /** @var SqlAppInstallationRepository */
-    private $appInstallationRepository;
+    private SqlAppInstallationRepository $appInstallationRepository;
 
     public function setUp(): void
     {

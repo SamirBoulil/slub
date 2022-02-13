@@ -31,7 +31,7 @@ class WebTestCase extends SymfonyWebTestCase
 
         try {
             return self::$kernel->getContainer()->get($serviceOrParameterId);
-        } catch (ServiceNotFoundException $e) {
+        } catch (ServiceNotFoundException) {
             return self::$kernel->getContainer()->getParameter($serviceOrParameterId);
         }
     }

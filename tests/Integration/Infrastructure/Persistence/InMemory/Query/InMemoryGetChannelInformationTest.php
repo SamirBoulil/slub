@@ -6,12 +6,12 @@ namespace Tests\Integration\Infrastructure\Persistence\InMemory\Query;
 
 use PHPUnit\Framework\TestCase;
 use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformation;
+use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryGetChannelInformation;
 
 class InMemoryGetChannelInformationTest extends TestCase
 {
-    /** @var GetChannelInformation */
-    private $getChannelInformation;
+    private GetChannelInformationInterface $getChannelInformation;
 
     public function setUp(): void
     {

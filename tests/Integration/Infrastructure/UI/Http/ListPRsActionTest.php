@@ -13,8 +13,7 @@ use Tests\WebTestCase;
  */
 class ListPRsActionTest extends WebTestCase
 {
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
     public function setUp(): void
     {

@@ -17,8 +17,6 @@ use Slub\Infrastructure\Chat\Common\ChatHelper;
  */
 class PublishRemindersHandler
 {
-    private const RACCOONS_CHANNEL_ID = 'T031L1UKF@C02NX6YF62Y';
-
     private PRRepositoryInterface $PRRepository;
     private LoggerInterface $logger;
     private ChatClient $chatClient;
@@ -45,10 +43,17 @@ class PublishRemindersHandler
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
-            $this->publishNewReminderForChannel($channelIdentifier, $PRsInReview);
+            $this->publishReminder($channelIdentifier, $PRsInReview);
         }
 
         $this->logger->info('Reminders published');
+    }
+
+    private function publishReminder(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
+    {
+        $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
+        $blocks = $this->formatReminderInBlocks($PRsToPublish);
+        $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
     }
 
     /**
@@ -67,20 +72,6 @@ class PublishRemindersHandler
         return array_values($channelIdentifiers);
     }
 
-    private function publishReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
-    {
-        $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
-        $message = $this->formatReminders($PRsToPublish);
-        $this->chatClient->publishInChannel($channelIdentifier, $message);
-    }
-
-    private function publishNewReminderForChannel(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
-    {
-        $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
-        $blocks = $this->formatReminderInBlocks($PRsToPublish);
-        $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
-    }
-
     private function prsPutToReviewInChannel(ChannelIdentifier $expectedChannelIdentifier, array $PRsInReview): array
     {
         return array_filter(
@@ -92,6 +83,21 @@ class PublishRemindersHandler
                 )
             )
         );
+    }
+
+    private function formatReminderInBlocks(array $PRsToPublish): array
+    {
+        $prs = $this->sortPRsByNumberOfDaysInReview($PRsToPublish);
+        $reminderInBlocks = array_map(fn (PR $PR) => $this->formatReminderBlock($PR), $prs);
+        array_unshift($reminderInBlocks, [
+            'type' => 'section',
+            'text' => [
+                'type' => 'mrkdwn',
+                'text' => 'Yeee, these PRs need reviews!',
+            ],
+        ]);
+
+        return $reminderInBlocks;
     }
 
     private function formatReminderBlock(PR $PR): array
@@ -135,21 +141,6 @@ class PublishRemindersHandler
             default:
                 return sprintf('%d days ago', $PR->numberOfDaysInReview());
         }
-    }
-
-    private function formatReminderInBlocks(array $PRsToPublish)
-    {
-        $prs = $this->sortPRsByNumberOfDaysInReview($PRsToPublish);
-        $reminderInBlocks = array_map(fn (PR $PR) => $this->formatReminderBlock($PR), $prs);
-        array_unshift($reminderInBlocks, [
-            'type' => 'section',
-            'text' => [
-                'type' => 'mrkdwn',
-                'text' => 'Yeee, these PRs need reviews!',
-            ],
-        ]);
-
-        return $reminderInBlocks;
     }
 
     private function sortPRsByNumberOfDaysInReview(array $prs): array

@@ -1,8 +1,3 @@
-chat_slack_messages:
-    path: /chat/slack/messages
-    controller: slub.infrastructure.chat.slack.slub_bot_action::executeAction
-    methods: [POST]
-
 chat_slack_tr:
     path: /chat/slack/tr
     controller: slub.infrastructure.chat.slack.ok_action::executeAction

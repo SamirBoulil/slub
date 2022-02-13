@@ -77,6 +77,12 @@ class ChatClientSpy implements ChatClient
         Assert::assertContains($expectedText, $actualText);
     }
 
+    public function assertHasBeenCalledWithChannelIdentifierAndBlockMessage(ChannelIdentifier $expectedChannelIdentifier, array $expectedBlockMessage): void
+    {
+        $actualBlockMessage = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
+        Assert::assertEqualsCanonicalizing($expectedBlockMessage, $actualBlockMessage);
+    }
+
     public function assertRepliedWithOneOf(array $expectedMessages): void
     {
         $isFound = false;

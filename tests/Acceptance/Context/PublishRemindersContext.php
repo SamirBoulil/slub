@@ -73,20 +73,13 @@ class PublishRemindersContext extends FeatureContext
      */
     public function theRemindersShouldOnlyContainAReferenceToThePRsInReview(): void
     {
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessage(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
-            <<<CHAT
-Yop, these PRs need reviews!
- - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
- - *Sam*, _<https://github.com/samirboulil/slub/pull/2|"Add new feature">_ (Yesterday)
-CHAT
+            json_decode('[[{"type":"section","text":{"type":"mrkdwn","text":"Yeee, these PRs need reviews!"}},{"type":"context","elements":[{"type":"image","image_url":"https:\/\/avatars.githubusercontent.com\/Sam","alt_text":"Sam is the author of the PR"},{"type":"mrkdwn","text":"*<https:\/\/github.com\/samirboulil\/slub\/pull\/1|Add new feature>*, _Today_"}]},{"type":"context","elements":[{"type":"image","image_url":"https:\/\/avatars.githubusercontent.com\/Sam","alt_text":"Sam is the author of the PR"},{"type":"mrkdwn","text":"*<https:\/\/github.com\/samirboulil\/slub\/pull\/2|Add new feature>*, _Yesterday_"}]}]]', true)
         );
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessage(
             ChannelIdentifier::fromString(self::GENERAL),
-            <<<CHAT
-Yop, these PRs need reviews!
- - *Sam*, _<https://github.com/samirboulil/slub/pull/3|"Add new feature">_ (2 days ago)
-CHAT
+            json_decode('[[{"type":"section","text":{"type":"mrkdwn","text":"Yeee, these PRs need reviews!"}},{"type":"context","elements":[{"type":"image","image_url":"https:\/\/avatars.githubusercontent.com\/Sam","alt_text":"Sam is the author of the PR"},{"type":"mrkdwn","text":"*<https:\/\/github.com\/samirboulil\/slub\/pull\/3|Add new feature>*, _2 days ago_"}]}]]', true)
         );
     }
 
@@ -121,12 +114,9 @@ CHAT
      */
     public function theReminderShouldOnlyContainThePRInReviewHavingGTMs(): void
     {
-        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndMessage(
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessage(
             ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
-            <<<CHAT
-Yop, these PRs need reviews!
- - *Sam*, _<https://github.com/samirboulil/slub/pull/1|"Add new feature">_ (Today)
-CHAT
+            json_decode('[[{"type":"section","text":{"type":"mrkdwn","text":"Yeee, these PRs need reviews!"}},{"type":"context","elements":[{"type":"image","image_url":"https:\/\/avatars.githubusercontent.com\/Sam","alt_text":"Sam is the author of the PR"},{"type":"mrkdwn","text":"*<https:\/\/github.com\/samirboulil\/slub\/pull\/1|Add new feature>*, _Today_"}]}]]', true),
         );
     }
 

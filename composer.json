@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": "7.4.*",
+    "php": "8.0.*",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
@@ -36,16 +36,16 @@
     "webmozart/assert": "^1.4"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
     "behat/behat": "^3.5",
     "behat/symfony2-extension": "^2.1",
     "donatj/mock-webserver": "^2.0",
     "friendsofphp/php-cs-fixer": "^2.14",
-    "jangregor/phpstan-prophecy": "^0.8.0",
     "johnkary/phpunit-speedtrap": "^3.1",
-    "phpstan/phpstan": "^0.12.0",
+    "phpstan/extension-installer": "^1.1",
+    "phpstan/phpstan": "1.4.*",
     "phpunit/phpunit": "^8",
-    "rector/rector": "^0.8.56",
+    "rector/rector": "^0.12.16",
+    "roave/security-advisories": "dev-latest",
     "symfony/phpunit-bridge": "^5.2",
     "symfony/process": "4.4.*"
   },

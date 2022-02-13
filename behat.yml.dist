@@ -1,0 +1,19 @@
+default:
+  autoload:
+    '': 'tests/Acceptance/bootstrap'
+  suites:
+    default:
+      contexts:
+        - Tests\Acceptance\Context\PutPRToReviewContext
+        - Tests\Acceptance\Context\ReviewContext
+        - Tests\Acceptance\Context\CIStatusUpdateContext
+        - Tests\Acceptance\Context\ClosePRContext
+        - Tests\Acceptance\Context\PublishRemindersContext
+        - Tests\Acceptance\Context\UnpublishPRContext
+        - Tests\Acceptance\Context\GoodToMergeContext
+  extensions:
+    FriendsOfBehat\SymfonyExtension:
+      bootstrap: tests/Acceptance/bootstrap/bootstrap.php
+      kernel:
+        class: Slub\Kernel
+

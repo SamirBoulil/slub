@@ -150,6 +150,21 @@
     "firebase/php-jwt": {
         "version": "v5.2.0"
     },
+    "friends-of-behat/symfony-extension": {
+        "version": "2.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "1e012e04f573524ca83795cd19df9ea690adb604"
+        },
+        "files": [
+            "behat.yml.dist",
+            "config/services_test.yaml",
+            "features/demo.feature",
+            "tests/Behat/DemoContext.php"
+        ]
+    },
     "friendsofphp/php-cs-fixer": {
         "version": "3.6",
         "recipe": {
@@ -633,6 +648,9 @@
     },
     "symfony/process": {
         "version": "v4.0.15"
+    },
+    "symfony/proxy-manager-bridge": {
+        "version": "v5.4.3"
     },
     "symfony/psr-http-message-bridge": {
         "version": "v2.1.2"

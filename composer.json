@@ -39,6 +39,7 @@
   "require-dev": {
     "behat/behat": "^3.5",
     "donatj/mock-webserver": "^2.0",
+    "friends-of-behat/symfony-extension": "^2.0",
     "johnkary/phpunit-speedtrap": "^3.1",
     "phpstan/extension-installer": "^1.1",
     "phpstan/phpstan": "1.4.*",

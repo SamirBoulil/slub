@@ -5,9 +5,6 @@
     "behat/gherkin": {
         "version": "v4.6.2"
     },
-    "behat/symfony2-extension": {
-        "version": "2.1.5"
-    },
     "behat/transliterator": {
         "version": "v1.3.0"
     },
@@ -51,10 +48,10 @@
         "version": "1.0.1"
     },
     "composer/semver": {
-        "version": "3.2.4"
+        "version": "3.2.9"
     },
     "composer/xdebug-handler": {
-        "version": "1.4.5"
+        "version": "3.0.1"
     },
     "container-interop/container-interop": {
         "version": "1.2.0"
@@ -154,15 +151,15 @@
         "version": "v5.2.0"
     },
     "friendsofphp/php-cs-fixer": {
-        "version": "2.2",
+        "version": "3.6",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "2.2",
-            "ref": "cc05ab6abf6894bddb9bbd6a252459010ebe040b"
+            "version": "3.0",
+            "ref": "be2103eb4a20942e28a6dd87736669b757132435"
         },
         "files": [
-            ".php_cs.dist"
+            ".php-cs-fixer.dist.php"
         ]
     },
     "friendsofphp/proxy-manager-lts": {
@@ -265,7 +262,7 @@
         "version": "2.0.1"
     },
     "php-cs-fixer/diff": {
-        "version": "v1.3.1"
+        "version": "v2.0.2"
     },
     "php-http/client-common": {
         "version": "1.11.0"
@@ -339,6 +336,9 @@
         "version": "1.0.1"
     },
     "psr/container": {
+        "version": "1.0.0"
+    },
+    "psr/event-dispatcher": {
         "version": "1.0.0"
     },
     "psr/http-client": {
@@ -489,9 +489,6 @@
     "symfony/css-selector": {
         "version": "v4.2.12"
     },
-    "symfony/debug": {
-        "version": "v4.2.12"
-    },
     "symfony/dependency-injection": {
         "version": "v4.2.12"
     },
@@ -568,9 +565,6 @@
     "symfony/lock": {
         "version": "v4.2.12"
     },
-    "symfony/mime": {
-        "version": "v4.4.16"
-    },
     "symfony/monolog-bridge": {
         "version": "v4.2.12"
     },
@@ -592,6 +586,9 @@
     "symfony/options-resolver": {
         "version": "v4.2.12"
     },
+    "symfony/password-hasher": {
+        "version": "v5.4.3"
+    },
     "symfony/phpunit-bridge": {
         "version": "4.3",
         "recipe": {
@@ -606,6 +603,9 @@
             "phpunit.xml.dist",
             "tests/bootstrap.php"
         ]
+    },
+    "symfony/polyfill-intl-grapheme": {
+        "version": "v1.24.0"
     },
     "symfony/polyfill-intl-idn": {
         "version": "v1.20.0"
@@ -659,6 +659,9 @@
     },
     "symfony/stopwatch": {
         "version": "v4.2.12"
+    },
+    "symfony/string": {
+        "version": "v5.4.3"
     },
     "symfony/translation": {
         "version": "3.3",

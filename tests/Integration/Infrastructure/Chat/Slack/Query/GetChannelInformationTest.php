@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure\Chat\Slack\Query;
 
-use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -12,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\RequestInterface;
+use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformation;
 use Slub\Infrastructure\Chat\Slack\Query\GetChannelInformationInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;

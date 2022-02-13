@@ -95,7 +95,8 @@ class NewEventAction
         if (empty($secretHeader) || !is_string($secretHeader)) {
             throw new BadRequestHttpException();
         }
-        $actualSHA1 = last(explode('=', $secretHeader));
+        $headerValue = explode('=', $secretHeader);
+        $actualSHA1 = end($headerValue);
         $expectedSHA1 = hash_hmac('sha1', (string) $request->getContent(), $this->secret);
 
         if ($expectedSHA1 !== $actualSHA1) {

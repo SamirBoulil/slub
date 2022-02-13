@@ -92,7 +92,8 @@ class ClosePRContext extends FeatureContext
     public function theSquadShouldBeNotifiedThatThePRHasBeenMerged(): void
     {
         Assert::assertTrue($this->eventSpy->PRMergedDispatched(), 'Expects PRMerged event to be dispatched');
-        $messageIdentifier = last($this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers());
+        $messageIdentifiers = $this->PRRepository->getBy($this->currentPRIdentifier)->messageIdentifiers();
+        $messageIdentifier = end($messageIdentifiers);
         $this->chatClientSpy->assertOnlyReaction($messageIdentifier, NotifySquad::REACTION_PR_MERGED);
     }
 

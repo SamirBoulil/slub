@@ -8,6 +8,8 @@ use Doctrine\DBAL\Connection;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ * Note: this class has never been used, it's the foundation of PLG program that let's
+ * the bot communicate in APP news about features etc.
  */
 class ShouldCommunicateInApp
 {
@@ -17,6 +19,7 @@ class ShouldCommunicateInApp
     {
         $this->connection = $connection;
     }
+
     public function messageAboutNewSlashCommand(string $workspaceId, string $userId): bool
     {
         return 0 === $this->fetchCommunicationCount($workspaceId, $userId);

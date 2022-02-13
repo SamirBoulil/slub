@@ -140,24 +140,6 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
-    ## Chat
-    slub.infrastructure.chat.slack.slub_bot:
-        class: Slub\Infrastructure\Chat\Slack\SlubBot
-        arguments:
-            - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
-            - '@slub.application.unpublish_pr.unpublish_pr_handler'
-            - '@slub.infrastructure.chat.slack.slack_client'
-            - '@slub.infrastructure.query.get_bot_user_id'
-            - '@slub.infrastructure.query.get_channel_information'
-            - '@slub.infrastructure.vcs.github.query.get_pr_info'
-            - '@slub.infrastructure.persistence.should_communicate_in_app'
-            - '@logger'
-
-    slub.infrastructure.chat.slack.slub_bot_action:
-        class: Slub\Infrastructure\Chat\Slack\SlubBotAction
-        arguments:
-            - '@slub.infrastructure.chat.slack.slub_bot'
-
     slub.infrastructure.chat.slack.ok_action:
         class: Slub\Infrastructure\Chat\Slack\OKAction
 

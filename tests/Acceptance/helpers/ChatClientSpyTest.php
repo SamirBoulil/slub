@@ -14,8 +14,7 @@ use Slub\Domain\Entity\PR\MessageIdentifier;
  */
 class ChatClientSpyTest extends TestCase
 {
-    /** @var ChatClientSpy */
-    private $slackClientSpy;
+    private ChatClientSpy $slackClientSpy;
 
     public function setUp(): void
     {

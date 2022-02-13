@@ -6,21 +6,15 @@ namespace Slub\Domain\Event;
 
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRPutToReview extends Event
 {
-    private PRIdentifier $PRIdentifier;
-
-    private MessageIdentifier $messageIdentifier;
-
-    private function __construct(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier)
+    private function __construct(private PRIdentifier $PRIdentifier, private MessageIdentifier $messageIdentifier)
     {
-        $this->PRIdentifier = $PRIdentifier;
-        $this->messageIdentifier = $messageIdentifier;
     }
 
     public static function forPR(PRIdentifier $PRIdentifier, MessageIdentifier $messageIdentifier): self

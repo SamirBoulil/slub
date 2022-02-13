@@ -13,11 +13,8 @@ use Doctrine\DBAL\Driver\Connection;
  */
 class SqlDeliveredEventRepository
 {
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
-        $this->sqlConnection = $sqlConnection;
     }
 
     /**

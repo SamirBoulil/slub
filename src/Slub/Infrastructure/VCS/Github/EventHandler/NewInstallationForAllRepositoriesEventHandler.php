@@ -16,14 +16,8 @@ class NewInstallationForAllRepositoriesEventHandler implements EventHandlerInter
     private const EVENT_TYPE = 'installation_repositories';
     private const INSTALLATION_TYPE = 'added';
 
-    private SqlAppInstallationRepository $sqlAppInstallationRepository;
-
-    private RefreshAccessToken $refreshAccessToken;
-
-    public function __construct(SqlAppInstallationRepository $sqlAppInstallationRepository, RefreshAccessToken $refreshAccessToken)
+    public function __construct(private SqlAppInstallationRepository $sqlAppInstallationRepository, private RefreshAccessToken $refreshAccessToken)
     {
-        $this->sqlAppInstallationRepository = $sqlAppInstallationRepository;
-        $this->refreshAccessToken = $refreshAccessToken;
     }
 
     public function supports(string $eventType): bool

@@ -1,0 +1,19 @@
+default:
+  suites:
+    default:
+      paths:
+        - '%paths.base%/tests/Acceptance/features'
+      contexts:
+        - Tests\Acceptance\Context\PRSizeChangedContext
+        - Tests\Acceptance\Context\PutPRToReviewContext
+        - Tests\Acceptance\Context\ReviewContext
+        - Tests\Acceptance\Context\CIStatusUpdateContext
+        - Tests\Acceptance\Context\ClosePRContext
+        - Tests\Acceptance\Context\PublishRemindersContext
+        - Tests\Acceptance\Context\UnpublishPRContext
+        - Tests\Acceptance\Context\GoodToMergeContext
+  extensions:
+    FriendsOfBehat\SymfonyExtension:
+      kernel:
+        class: Slub\Kernel
+

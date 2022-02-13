@@ -13,13 +13,10 @@ use Slub\Application\NewReview\NewReviewHandler;
 class PullRequestReviewEventHandler implements EventHandlerInterface
 {
     private const NEW_REVIEW_EVENT_TYPE = 'pull_request_review';
-    const EDITED_ACTION_TYPE = 'edited';
+    public const EDITED_ACTION_TYPE = 'edited';
 
-    private NewReviewHandler $newReviewHandler;
-
-    public function __construct(NewReviewHandler $newReviewHandler)
+    public function __construct(private NewReviewHandler $newReviewHandler)
     {
-        $this->newReviewHandler = $newReviewHandler;
     }
 
     public function supports(string $eventType): bool
@@ -64,22 +61,17 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     {
         $PRStatus = $PRStatusUpdate['review']['state'];
 
-        switch ($PRStatus) {
-            case 'approved':
-                return 'accepted';
-            case 'request_changes':
-            case 'changes_requested':
-                return 'refused';
-            case 'commented':
-                return 'commented';
-            default:
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Unknown review status "%s", expected one of "approved", "request_changes", "commented"',
-                        $PRStatus
-                    )
-                );
-        }
+        return match ($PRStatus) {
+            'approved' => 'accepted',
+            'request_changes', 'changes_requested' => 'refused',
+            'commented' => 'commented',
+            default => throw new \InvalidArgumentException(
+                sprintf(
+                    'Unknown review status "%s", expected one of "approved", "request_changes", "commented"',
+                    $PRStatus
+                )
+            ),
+        };
     }
 
     private function authorReviewedHisOwnPR($PRStatusUpdate): bool

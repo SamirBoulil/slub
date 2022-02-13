@@ -8,6 +8,9 @@ services:
     _defaults:
         public: true
 
+    Tests\Acceptance\:
+        resource: '../tests/Acceptance/*'
+
     helpers.event_spy:
         class: Tests\Acceptance\helpers\EventsSpy
         tags:
@@ -34,3 +37,46 @@ services:
 
     slub.infrastructure.vcs.github.query.get_pr_info:
         class: Slub\Infrastructure\VCS\InMemory\InMemoryGetPRInfo
+
+    # contexts
+    Tests\Acceptance\Context\PRSizeChangedContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.change_pr_size.change_pr_size_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+
+    Tests\Acceptance\Context\PutPRToReviewContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+        - '800'
+    Tests\Acceptance\Context\ReviewContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.new_review.new_review_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+    Tests\Acceptance\Context\CIStatusUpdateContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.ci_status_update.ci_status_update_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+    Tests\Acceptance\Context\ClosePRContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.close_pr.close_pr_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'
+    Tests\Acceptance\Context\PublishRemindersContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.publish_reminders.publish_reminders_handler'
+        - '@slub.infrastructure.chat.slack.slack_client'
+        - '@slub.infrastructure.common.query.clock'
+    Tests\Acceptance\Context\UnpublishPRContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.unpublish_pr.unpublish_pr_handler'
+    Tests\Acceptance\Context\GoodToMergeContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.application.new_review.new_review_handler'
+        - '@slub.application.ci_status_update.ci_status_update_handler'
+        - '@helpers.event_spy'
+        - '@slub.infrastructure.chat.slack.slack_client'

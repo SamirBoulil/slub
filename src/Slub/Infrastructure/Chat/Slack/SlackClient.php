@@ -24,24 +24,8 @@ class SlackClient implements ChatClient
 {
     private const MAX_DESCRIPTION = 100;
 
-    private GetBotUserId $getBotUserId;
-    private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
-    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
-    private ClientInterface $client;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        GetBotUserId $getBotUserId,
-        GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser,
-        ClientInterface $client,
-        LoggerInterface $logger,
-        SqlSlackAppInstallationRepository $slackAppInstallationRepository
-    ) {
-        $this->getBotUserId = $getBotUserId;
-        $this->getBotReactionsForMessageAndUser = $getBotReactionsForMessageAndUser;
-        $this->client = $client;
-        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
-        $this->logger = $logger;
+    public function __construct(private GetBotUserId $getBotUserId, private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser, private ClientInterface $client, private LoggerInterface $logger, private SqlSlackAppInstallationRepository $slackAppInstallationRepository)
+    {
     }
 
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
@@ -138,13 +122,11 @@ class SlackClient implements ChatClient
             )
         );
 
-        $messageIdentifier = MessageIdentifierHelper::from(
+        return MessageIdentifierHelper::from(
             $response['message']['team'],
             $response['channel'],
             $response['ts']
         );
-
-        return $messageIdentifier;
     }
 
     public function explainPRURLCannotBeParsed(string $url, string $usage): void

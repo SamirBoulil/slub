@@ -13,13 +13,10 @@ use Slub\Application\ClosePR\ClosePRHandler;
 class PRClosedEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
-    const PR_CLOSED_ACTION = 'closed';
+    public const PR_CLOSED_ACTION = 'closed';
 
-    private ClosePRHandler $closePRHandler;
-
-    public function __construct(ClosePRHandler $closePRHandler)
+    public function __construct(private ClosePRHandler $closePRHandler)
     {
-        $this->closePRHandler = $closePRHandler;
     }
 
     public function supports(string $eventType): bool

@@ -23,17 +23,13 @@ class GetCIStatusTest extends WebTestCase
     private const COMMIT_REF = 'commit_ref';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
-    /** @var ObjectProphecy */
-    private $getStatusCheckStatus;
+    private ObjectProphecy $getStatusCheckStatus;
 
-    /** @var ObjectProphecy */
-    private $getCheckRunStatus;
+    private ObjectProphecy $getCheckRunStatus;
 
-    /** @var ObjectProphecy */
-    private $getCheckSuiteStatus;
+    private ObjectProphecy $getCheckSuiteStatus;
 
-    /** @var GetCIStatus */
-    private $getCIStatus;
+    private GetCIStatus $getCIStatus;
 
     public function setUp(): void
     {

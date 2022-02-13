@@ -44,7 +44,6 @@ default:
                     - '@slub.application.change_pr_size.change_pr_size_handler'
                     - '@helpers.event_spy'
                     - '@slub.infrastructure.chat.slack.slack_client'
-    extensions:
         Behat\Symfony2Extension:
             kernel:
                 bootstrap: tests/Acceptance/bootstrap/bootstrap.php

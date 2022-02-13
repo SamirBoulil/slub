@@ -22,21 +22,8 @@ use Webmozart\Assert\Assert;
  */
 class ProcessUnTRAsync
 {
-    private UnpublishPRHandler $unpublishPRHandler;
-    private ChatClient $chatClient;
-    private RouterInterface $router;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        UnpublishPRHandler $unpublishPRHandler,
-        ChatClient $chatClient,
-        RouterInterface $router,
-        LoggerInterface $logger
-    ) {
-        $this->unpublishPRHandler = $unpublishPRHandler;
-        $this->chatClient = $chatClient;
-        $this->router = $router;
-        $this->logger = $logger;
+    public function __construct(private UnpublishPRHandler $unpublishPRHandler, private ChatClient $chatClient, private RouterInterface $router, private LoggerInterface $logger)
+    {
     }
 
     public function onKernelTerminate(TerminateEvent $event): void
@@ -54,9 +41,9 @@ class ProcessUnTRAsync
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
             $this->unTR($PRIdentifier);
             $this->confirmUnTRSuccess($request);
-        } catch (ImpossibleToParseRepositoryURL $exception) {
+        } catch (ImpossibleToParseRepositoryURL) {
             $this->explainPRNotParsable($request);
-        } catch (AppNotInstalledException $exception) {
+        } catch (AppNotInstalledException) {
             $this->explainAppNotInstalled($request);
         } catch (\Exception|\Error $e) {
             $this->explainSomethingWentWrong($request);
@@ -80,9 +67,10 @@ class ProcessUnTRAsync
             preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text, $matches);
             Assert::stringNotEmpty($matches[1]);
             Assert::stringNotEmpty($matches[2]);
-            [$repositoryIdentifier, $PRNumber] = ([$matches[1], $matches[2]]);
+            $repositoryIdentifier = $matches[1];
+            $PRNumber = $matches[2];
             $PRIdentifier = GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             throw new ImpossibleToParseRepositoryURL($text);
         }
 

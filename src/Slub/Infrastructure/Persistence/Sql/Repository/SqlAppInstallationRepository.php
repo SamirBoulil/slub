@@ -14,11 +14,8 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
  */
 class SqlAppInstallationRepository
 {
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
-        $this->sqlConnection = $sqlConnection;
     }
 
     public function save(GithubAppInstallation $appInstallation): void

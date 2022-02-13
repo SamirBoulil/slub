@@ -15,11 +15,8 @@ class BuildResult
     private const GREEN = 'GREEN';
     private const RED = 'RED';
 
-    private string $status;
-
-    private function __construct(string $status)
+    private function __construct(private string $status)
     {
-        $this->status = $status;
     }
 
     public static function pending(): self

@@ -15,12 +15,9 @@ class DebugCIStatusCLI extends Command
 {
     protected static $defaultName = 'slub:debug:ci-status';
 
-    private GetPRInfo $getPRInfo;
-
-    public function __construct(GetPRInfo $getCIStatus)
+    public function __construct(private GetPRInfo $getPRInfo)
     {
         parent::__construct(self::$defaultName);
-        $this->getPRInfo = $getCIStatus;
     }
 
     protected function configure(): void

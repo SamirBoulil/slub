@@ -14,16 +14,8 @@ class CIStatus
     private const BUILD_RESULT_KEY = 'BUILD_RESULT';
     private const BUILD_LINK_KEY = 'BUILD_LINK';
 
-    private BuildResult $buildResult;
-
-    private BuildLink $buildLink;
-
-    private function __construct(
-        BuildResult $buildResult,
-        BuildLink $buildLink
-    ) {
-        $this->buildResult = $buildResult;
-        $this->buildLink = $buildLink;
+    private function __construct(private BuildResult $buildResult, private BuildLink $buildLink)
+    {
     }
 
     public static function endedWith(BuildResult $buildResult, BuildLink $buildLink): self

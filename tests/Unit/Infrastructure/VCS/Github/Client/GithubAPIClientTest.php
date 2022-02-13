@@ -18,19 +18,15 @@ class GithubAPIClientTest extends KernelTestCase
 {
     private const REPOSITORY_IDENTIFIER = 'samirboulil/slub';
     private const ACCESS_TOKEN = '1234cZA12';
-    const INSTALLATION_ID = '1234';
+    public const INSTALLATION_ID = '1234';
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    private GuzzleSpy $requestSpy;
 
-    /** @var ObjectProphecy|RefreshAccessToken */
-    private $refreshAccessToken;
+    private ObjectProphecy|RefreshAccessToken $refreshAccessToken;
 
-    /** @var ObjectProphecy|SqlAppInstallationRepository */
-    private $sqlAppInstallationRepository;
+    private ObjectProphecy|SqlAppInstallationRepository $sqlAppInstallationRepository;
 
-    /** @var GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient $githubAPIClient;
 
     public function setUp(): void
     {

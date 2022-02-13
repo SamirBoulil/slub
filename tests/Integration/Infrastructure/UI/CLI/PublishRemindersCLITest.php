@@ -18,11 +18,9 @@ class PublishRemindersCLITest extends KernelTestCase
 {
     private const COMMAND_NAME = 'slub:send-reminders';
 
-    /** @var ObjectProphecy */
-    private $publishRemindersHandlerMock;
+    private ObjectProphecy $publishRemindersHandlerMock;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     public function setUp(): void
     {

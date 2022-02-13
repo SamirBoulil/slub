@@ -17,7 +17,7 @@ class MessageIdentifierHelperTest extends TestCase
      */
     public function it_creates_a_string_out_of_a_workspace_and_channel_and_ts(): void
     {
-        $this->assertEquals('akeneo@general@12345', \Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper::from('akeneo', 'general', '12345'));
+        $this->assertEquals('akeneo@general@12345', MessageIdentifierHelper::from('akeneo', 'general', '12345'));
     }
 
     /**

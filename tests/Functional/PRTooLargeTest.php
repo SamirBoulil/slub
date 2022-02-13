@@ -23,8 +23,7 @@ class PRTooLargeTest extends WebTestCase
 {
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
     public function setUp(): void
     {

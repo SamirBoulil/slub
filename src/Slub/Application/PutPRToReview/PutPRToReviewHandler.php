@@ -18,18 +18,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
 
 class PutPRToReviewHandler
 {
-    private PRRepositoryInterface $PRRepository;
-    private LoggerInterface $logger;
-    private IsLarge $isLarge;
-
-    public function __construct(
-        PRRepositoryInterface $PRRepository,
-        IsLarge $isLarge,
-        LoggerInterface $logger
-    ) {
-        $this->PRRepository = $PRRepository;
-        $this->isLarge = $isLarge;
-        $this->logger = $logger;
+    public function __construct(private PRRepositoryInterface $PRRepository, private IsLarge $isLarge, private LoggerInterface $logger)
+    {
     }
 
     public function handle(PutPRToReview $command): void
@@ -53,7 +43,7 @@ class PutPRToReviewHandler
             $this->PRRepository->getBy(PRIdentifier::fromString($putPRToReview->PRIdentifier));
 
             return true;
-        } catch (PRNotFoundException $exception) {
+        } catch (PRNotFoundException) {
             return false;
         }
     }

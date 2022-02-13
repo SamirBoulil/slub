@@ -14,14 +14,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class ListPRsAction
 {
-    private PRRepositoryInterface $PRRepository;
-
-    private GetAverageTimeToMergeInterface $averageTimeToMerge;
-
-    public function __construct(PRRepositoryInterface $PRRepository, GetAverageTimeToMergeInterface $averageTimeToMerge)
+    public function __construct(private PRRepositoryInterface $PRRepository, private GetAverageTimeToMergeInterface $averageTimeToMerge)
     {
-        $this->PRRepository = $PRRepository;
-        $this->averageTimeToMerge = $averageTimeToMerge;
     }
 
     public function executeAction(): JsonResponse

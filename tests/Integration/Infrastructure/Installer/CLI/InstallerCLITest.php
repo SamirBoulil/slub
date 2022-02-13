@@ -22,11 +22,9 @@ class InstallerCLITest extends KernelTestCase
     /** @var Connection */
     private $connection;
 
-    /** @var string */
-    private $databaseName;
+    private string $databaseName;
 
-    /** @var PRIdentifier */
-    private $currentPRIdentifier;
+    private PRIdentifier $currentPRIdentifier;
 
     public function setUp(): void
     {

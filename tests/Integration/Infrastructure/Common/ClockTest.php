@@ -14,7 +14,7 @@ class ClockTest extends TestCase
      * @test
      * @dataProvider dates
      */
-    public function it_tells_if_we_are_on_the_week_end_or_not(\DateTime $date, bool $isOnWeekend): void
+    public function it_tells_if_we_are_on_the_week_end_or_not(\DateTime|\DateTimeImmutable $date, bool $isOnWeekend): void
     {
         /** @var Clock&MockObject $clockMock */
         $clockMock = $this->getMockBuilder(Clock::class)->setMethods(['getDate'])->getMock();

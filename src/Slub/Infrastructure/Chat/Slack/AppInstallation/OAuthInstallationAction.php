@@ -20,24 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class OAuthInstallationAction
 {
-    private ClientInterface $httpClient;
-    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
-    private string $slackClientId;
-    private string $slackClientSecret;
-    private string $githubAppHomePageURL;
-
-    public function __construct(
-        ClientInterface $httpClient,
-        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
-        string $slackClientId,
-        string $slackClientSecret,
-        string $GithubAppHomePageURL
-    ) {
-        $this->httpClient = $httpClient;
-        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
-        $this->slackClientId = $slackClientId;
-        $this->slackClientSecret = $slackClientSecret;
-        $this->githubAppHomePageURL = $GithubAppHomePageURL;
+    public function __construct(private ClientInterface $httpClient, private SqlSlackAppInstallationRepository $slackAppInstallationRepository, private string $slackClientId, private string $slackClientSecret, private string $githubAppHomePageURL)
+    {
     }
 
     public function executeAction(Request $request): Response

@@ -9,11 +9,8 @@ namespace Slub\Application\ChangePRSize;
  */
 class IsLarge
 {
-    private int $prSizeLimit;
-
-    public function __construct(int $prSizeLimit)
+    public function __construct(private int $prSizeLimit)
     {
-        $this->prSizeLimit = $prSizeLimit;
     }
 
     public function execute(int $additions, int $deletions) : bool

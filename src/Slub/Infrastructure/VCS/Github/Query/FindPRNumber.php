@@ -11,11 +11,8 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
  */
 class FindPRNumber implements FindPRNumberInterface
 {
-    private GithubAPIClient $githubAPIClient;
-
-    public function __construct(GithubAPIClient $githubAPIClient)
+    public function __construct(private GithubAPIClient $githubAPIClient)
     {
-        $this->githubAPIClient = $githubAPIClient;
     }
 
     public function fetch(string $repository, string $commitRef): ?string
@@ -51,6 +48,6 @@ class FindPRNumber implements FindPRNumberInterface
 
         preg_match('/\d+$/', $searchResult['items'][0]['pull_request']['url'], $matches);
 
-        return isset($matches[0]) ? $matches[0] : null;
+        return $matches[0] ?? null;
     }
 }

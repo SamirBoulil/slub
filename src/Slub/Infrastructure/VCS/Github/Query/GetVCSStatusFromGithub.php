@@ -15,20 +15,8 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetVCSStatusFromGithub implements GetVCSStatus
 {
-    private GetPRDetails $getPRDetails;
-
-    private FindReviews $findReviews;
-
-    private GetCIStatus $getCIStatus;
-
-    private LoggerInterface $logger;
-
-    public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus, LoggerInterface $logger)
+    public function __construct(private GetPRDetails $getPRDetails, private FindReviews $findReviews, private GetCIStatus $getCIStatus, private LoggerInterface $logger)
     {
-        $this->getPRDetails = $getPRDetails;
-        $this->findReviews = $findReviews;
-        $this->getCIStatus = $getCIStatus;
-        $this->logger = $logger;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): VCSStatus

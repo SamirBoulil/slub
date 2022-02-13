@@ -24,26 +24,13 @@ class PublishRemindersContext extends FeatureContext
     private const PR_2 = 'samirboulil/slub/2';
     private const PR_3 = 'samirboulil/slub/3';
 
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
-
-    /** @var PublishRemindersHandler */
-    private $publishRemindersHandler;
-
-    /** @var InMemoryClock */
-    private $clock;
-
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        PublishRemindersHandler $publishRemindersHandler,
-        ChatClientSpy $chatClientSpy,
-        InMemoryClock $clock
+        private PublishRemindersHandler $publishRemindersHandler,
+        private ChatClientSpy $chatClientSpy,
+        private InMemoryClock $clock
     ) {
         parent::__construct($PRRepository);
-
-        $this->chatClientSpy = $chatClientSpy;
-        $this->publishRemindersHandler = $publishRemindersHandler;
-        $this->clock = $clock;
     }
 
     /**

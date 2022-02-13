@@ -7,6 +7,5 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 
 interface GetReviewCountForPR
 {
-    /** @return int */
     public function fetch(PRIdentifier $PRIdentifier): int;
 }

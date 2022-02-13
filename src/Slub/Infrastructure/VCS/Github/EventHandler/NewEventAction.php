@@ -22,28 +22,8 @@ class NewEventAction
     private const EVENT_TYPE = 'X-GitHub-Event';
     private const DELIVERY = 'X-GitHub-Delivery';
 
-    private EventHandlerRegistry $eventHandlerRegistry;
-
-    private string $secret;
-
-    private SqlDeliveredEventRepository $sqlDeliveredEventRepository;
-
-    private SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        EventHandlerRegistry $eventHandlerRegistry,
-        SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered,
-        SqlDeliveredEventRepository $sqlDeliveredEventRepository,
-        LoggerInterface $logger,
-        string $secret
-    ) {
-        $this->eventHandlerRegistry = $eventHandlerRegistry;
-        $this->secret = $secret;
-        $this->sqlDeliveredEventRepository = $sqlDeliveredEventRepository;
-        $this->sqlHasEventAlreadyBeenDelivered = $sqlHasEventAlreadyBeenDelivered;
-        $this->logger = $logger;
+    public function __construct(private EventHandlerRegistry $eventHandlerRegistry, private SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered, private SqlDeliveredEventRepository $sqlDeliveredEventRepository, private LoggerInterface $logger, private string $secret)
+    {
     }
 
     public function executeAction(Request $request): Response
@@ -114,7 +94,7 @@ class NewEventAction
         array_map(
             static function (EventHandlerInterface $eventHandler) use ($event, $logger) {
                 try {
-                    $logger->critical('Processing logger with: '.get_class($eventHandler));
+                    $logger->critical('Processing logger with: '.$eventHandler::class);
                     $eventHandler->handle($event);
                 } catch (\Exception $e) {
                     $logger->error($e->getMessage());

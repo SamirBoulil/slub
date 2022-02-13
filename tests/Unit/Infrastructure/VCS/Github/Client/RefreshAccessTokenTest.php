@@ -12,13 +12,11 @@ use Tests\Integration\Infrastructure\VCS\Github\Query\GuzzleSpy;
 class RefreshAccessTokenTest extends KernelTestCase
 {
     private const MY_APP_ID = 'MY_APP_ID';
-    const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
+    public const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';
 
-    /** @var GuzzleSpy */
-    private $requestSpy;
+    private GuzzleSpy $requestSpy;
 
-    /** @var RefreshAccessToken */
-    private $getAccessToken;
+    private RefreshAccessToken $getAccessToken;
 
     public function setUp(): void
     {

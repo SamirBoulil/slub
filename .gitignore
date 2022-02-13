@@ -51,12 +51,6 @@
 ###> behat/symfony2-extension ###
 behat.yml
 ###< behat/symfony2-extension ###
-
-###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
-###< friendsofphp/php-cs-fixer ###
-
 ###> phpunit/phpunit ###
 /phpunit.xml
 ###< phpunit/phpunit ###
@@ -80,3 +74,11 @@ behat.yml
 # IDE
 .idea
 .discovery
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> friends-of-behat/symfony-extension ###
+/behat.yml
+###< friends-of-behat/symfony-extension ###

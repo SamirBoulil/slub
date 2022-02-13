@@ -13,11 +13,8 @@ use Webmozart\Assert\Assert;
  */
 class BuildLink
 {
-    private string $buildLink;
-
-    private function __construct(string $buildLink)
+    private function __construct(private string $buildLink)
     {
-        $this->buildLink = $buildLink;
     }
 
     public static function fromURL(string $buildLink): self

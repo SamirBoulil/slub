@@ -9,11 +9,11 @@ namespace Slub\Domain\Entity\PR;
  */
 class PutToReviewAt
 {
-    private \DateTime $putToReviewAt;
-
-    public function __construct(\DateTime $putToReviewAt)
+    /**
+     * @param \DateTime|\DateTimeImmutable $putToReviewAt
+     */
+    public function __construct(private \DateTimeInterface $putToReviewAt)
     {
-        $this->putToReviewAt = $putToReviewAt;
     }
 
     public static function create(): self

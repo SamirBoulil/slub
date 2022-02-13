@@ -18,7 +18,7 @@ use Slub\Domain\Event\PRMerged;
 use Slub\Domain\Event\PRNotGTMed;
 use Slub\Domain\Event\PRPutToReview;
 use Slub\Domain\Event\PRTooLarge;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Webmozart\Assert\Assert;
 
 class PR
@@ -41,67 +41,13 @@ class PR
     /** @var Event[] */
     private array $events = [];
 
-    private PRIdentifier $PRIdentifier;
-
-    /** @var ChannelIdentifier[] */
-    private array $channelIdentifiers;
-
-    /** @var WorkspaceIdentifier[] */
-    private array $workspaceIdentifiers;
-
-    /** @var MessageIdentifier[] */
-    private array $messageIdentifiers;
-
-    private AuthorIdentifier $authorIdentifier;
-
-    private Title $title;
-
-    private int $GTMCount;
-
-    private int $comments;
-
-    private int $notGTMCount;
-
-    private CIStatus $CIStatus;
-
-    private bool $isMerged;
-
-    private PutToReviewAt $putToReviewAt;
-
-    private ClosedAt $closedAt;
-
-    private bool $isLarge;
-
-    private function __construct(
-        PRIdentifier $PRIdentifier,
-        array $channelIdentifiers,
-        array $workspaceIdentifiers,
-        array $messageIds,
-        AuthorIdentifier $authorIdentifier,
-        Title $title,
-        int $GTMCount,
-        int $notGTMCount,
-        int $comments,
-        CIStatus $CIStatus,
-        bool $isMerged,
-        PutToReviewAt $putToReviewAt,
-        ClosedAt $closedAt,
-        bool $isLarge
-    ) {
-        $this->PRIdentifier = $PRIdentifier;
-        $this->authorIdentifier = $authorIdentifier;
-        $this->title = $title;
-        $this->GTMCount = $GTMCount;
-        $this->notGTMCount = $notGTMCount;
-        $this->comments = $comments;
-        $this->CIStatus = $CIStatus;
-        $this->channelIdentifiers = $channelIdentifiers;
-        $this->workspaceIdentifiers = $workspaceIdentifiers;
-        $this->messageIdentifiers = $messageIds;
-        $this->putToReviewAt = $putToReviewAt;
-        $this->closedAt = $closedAt;
-        $this->isMerged = $isMerged;
-        $this->isLarge = $isLarge;
+    /**
+     * @param \Slub\Domain\Entity\Channel\ChannelIdentifier[] $channelIdentifiers
+     * @param \Slub\Domain\Entity\Workspace\WorkspaceIdentifier[] $workspaceIdentifiers
+     * @param \Slub\Domain\Entity\PR\MessageIdentifier[] $messageIdentifiers
+     */
+    private function __construct(private PRIdentifier $PRIdentifier, private array $channelIdentifiers, private array $workspaceIdentifiers, private array $messageIdentifiers, private AuthorIdentifier $authorIdentifier, private Title $title, private int $GTMCount, private int $notGTMCount, private int $comments, private CIStatus $CIStatus, private bool $isMerged, private PutToReviewAt $putToReviewAt, private ClosedAt $closedAt, private bool $isLarge)
+    {
     }
 
     public static function create(

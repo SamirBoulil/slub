@@ -12,11 +12,8 @@ use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
  */
 class SqlSlackAppInstallationRepository
 {
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
-        $this->sqlConnection = $sqlConnection;
     }
 
     public function save(SlackAppInstallation $slackAppInstallation): void

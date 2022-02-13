@@ -6,21 +6,15 @@ namespace Slub\Domain\Event;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
 class PRNotGTMed extends Event
 {
-    private PRIdentifier $PRIdentifier;
-
-    private ReviewerName $reviewerName;
-
-    private function __construct(PRIdentifier $PRIdentifier, ReviewerName $reviewerName)
+    private function __construct(private PRIdentifier $PRIdentifier, private ReviewerName $reviewerName)
     {
-        $this->PRIdentifier = $PRIdentifier;
-        $this->reviewerName = $reviewerName;
     }
 
     public static function forPR(PRIdentifier $PRIdentifier, ReviewerName $reviewerName): self

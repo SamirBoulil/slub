@@ -13,16 +13,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class UnpublishPRHandler
 {
-    private PRRepositoryInterface $PRRepository;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        PRRepositoryInterface $PRRepository,
-        LoggerInterface $logger
-    ) {
-        $this->PRRepository = $PRRepository;
-        $this->logger = $logger;
+    public function __construct(private PRRepositoryInterface $PRRepository, private LoggerInterface $logger)
+    {
     }
 
     public function handle(UnpublishPR $unpublishPR): void

@@ -12,12 +12,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 abstract class FeatureContext implements Context
 {
-    /** @var PRRepositoryInterface */
-    protected $PRRepository;
-
-    public function __construct(PRRepositoryInterface $PRRepository)
+    public function __construct(protected PRRepositoryInterface $PRRepository)
     {
-        $this->PRRepository = $PRRepository;
     }
 
     /**

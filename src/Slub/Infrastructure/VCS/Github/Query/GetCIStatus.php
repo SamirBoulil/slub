@@ -15,20 +15,8 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
  */
 class GetCIStatus
 {
-    private GetCheckRunStatus $getCheckRunStatus;
-
-    private GetStatusChecksStatus $getStatusChecksStatus;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        GetCheckRunStatus $getCheckRunStatus,
-        GetStatusChecksStatus $getStatusChecksStatus,
-        LoggerInterface $logger
-    ) {
-        $this->getCheckRunStatus = $getCheckRunStatus;
-        $this->getStatusChecksStatus = $getStatusChecksStatus;
-        $this->logger = $logger;
+    public function __construct(private GetCheckRunStatus $getCheckRunStatus, private GetStatusChecksStatus $getStatusChecksStatus, private LoggerInterface $logger)
+    {
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus

@@ -13,7 +13,6 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Tests\WebTestCase;
 
@@ -24,8 +23,7 @@ class NewReviewTest extends WebTestCase
 {
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    /** @var PRRepositoryInterface */
-    private $PRRepository;
+    private PRRepositoryInterface $PRRepository;
 
     public function setUp(): void
     {
@@ -93,22 +91,22 @@ class NewReviewTest extends WebTestCase
         );
     }
 
-    private function WhenAPRIsAcceptedByAReviewer(): Client
+    private function WhenAPRIsAcceptedByAReviewer(): KernelBrowser
     {
         return $this->callAPI($this->PRAccepted());
     }
 
-    private function WhenAPRIsRefusedByAReviewer(): Client
+    private function WhenAPRIsRefusedByAReviewer(): KernelBrowser
     {
         return $this->CallAPI($this->PRRefused());
     }
 
-    private function WhenAPRIsCommentedByAReviewer(): Client
+    private function WhenAPRIsCommentedByAReviewer(): KernelBrowser
     {
         return $this->CallAPI($this->PRCommented());
     }
 
-    private function WhenAPRIsCommentedByItsOwnAuthor(): Client
+    private function WhenAPRIsCommentedByItsOwnAuthor(): KernelBrowser
     {
         return $this->CallAPI($this->PRCommentedByOwnAuthor());
     }

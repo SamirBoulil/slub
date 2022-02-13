@@ -114,7 +114,7 @@ class EventsSpy implements EventSubscriberInterface
 
     public function notifyCIPending(CIPending $CIPending): void
     {
-        $this->events[get_class($CIPending)] = true;
+        $this->events[$CIPending::class] = true;
     }
 
     public function CIPendingEventDispatched(): bool

@@ -14,20 +14,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class ChangePRSizeHandler
 {
-    private PRRepositoryInterface $PRRepository;
-
-    private LoggerInterface $logger;
-
-    private IsLarge $isLarge;
-
-    public function __construct(
-        PRRepositoryInterface $PRRepository,
-        IsLarge $isLarge,
-        LoggerInterface $logger
-    ) {
-        $this->PRRepository = $PRRepository;
-        $this->logger = $logger;
-        $this->isLarge = $isLarge;
+    public function __construct(private PRRepositoryInterface $PRRepository, private IsLarge $isLarge, private LoggerInterface $logger)
+    {
     }
 
     public function handle(ChangePRSize $changePRSize): void

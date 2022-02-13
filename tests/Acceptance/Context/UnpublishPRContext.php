@@ -24,14 +24,10 @@ class UnpublishPRContext extends FeatureContext
 {
     private const PR_IDENTIFIER_MISTAKENLY_TO_REVIEW = 'akeneo/pim-community-dev/1010';
 
-    /** @var UnpublishPRHandler */
-    private $unpublishPRHandler;
-
-    public function __construct(PRRepositoryInterface $PRRepository, UnpublishPRHandler $unpublishPRHandler)
+    public function __construct(PRRepositoryInterface $PRRepository, private UnpublishPRHandler $unpublishPRHandler)
     {
         parent::__construct($PRRepository);
         $this->PRRepository = $PRRepository;
-        $this->unpublishPRHandler = $unpublishPRHandler;
     }
 
     /**
@@ -69,7 +65,7 @@ class UnpublishPRContext extends FeatureContext
         $isFound = true;
         try {
             $this->PRRepository->getBy(PRIdentifier::fromString(self::PR_IDENTIFIER_MISTAKENLY_TO_REVIEW));
-        } catch (PRNotFoundException $e) {
+        } catch (PRNotFoundException) {
             $isFound = false;
         }
 

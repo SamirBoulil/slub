@@ -27,33 +27,16 @@ class GoodToMergeContext extends FeatureContext
 {
     private const PR_IDENTIFIER = 'akeneo/pim-community-dev/1234';
 
-    /** @var NewReviewHandler */
-    private $reviewHandler;
-
-    /** @var CIStatusUpdateHandler */
-    private $CIStatusUpdateHandler;
-
-    /** @var MessageIdentifier */
-    private $currentMessageIdentifier;
-
-    /** @var EventsSpy */
-    private $eventSpy;
-
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
+    private MessageIdentifier $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        NewReviewHandler $reviewHandler,
-        CIStatusUpdateHandler $CIStatusUpdateHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        private NewReviewHandler $reviewHandler,
+        private CIStatusUpdateHandler $CIStatusUpdateHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
-        $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
-        $this->reviewHandler = $reviewHandler;
-        $this->eventSpy = $eventSpy;
-        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**
@@ -95,7 +78,7 @@ class GoodToMergeContext extends FeatureContext
     public function theAuthorShouldBeNotifiedThatThePRIsGoodToMerge(): void
     {
         Assert::assertTrue($this->eventSpy->PRGoodToMergeDispatched(), 'Expect a Good To Merge event to be dispatched');
-        $PRLink = sprintf('https://github.com/akeneo/pim-community-dev/pull/1234');
+        $PRLink = 'https://github.com/akeneo/pim-community-dev/pull/1234';
         $goodToMergeMessage = str_replace(NotifyAuthor::PLACEHOLDER_PR_LINK, $PRLink, NotifyAuthor::MESSAGE_GOOD_TO_MERGE);
         $this->chatClientSpy->assertReaction($this->currentMessageIdentifier, $goodToMergeMessage);
     }

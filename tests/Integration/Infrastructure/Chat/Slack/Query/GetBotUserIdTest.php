@@ -20,11 +20,9 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetBotUserIdTest extends TestCase
 {
-    /** @var MockHandler */
-    private $httpMock;
+    private MockHandler $httpMock;
 
-    /** @var GetBotUserId */
-    private $getBotUserId;
+    private GetBotUserId $getBotUserId;
 
     private ObjectProphecy $slackAppInstallationRepository;
 

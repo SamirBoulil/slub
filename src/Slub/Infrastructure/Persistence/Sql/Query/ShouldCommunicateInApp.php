@@ -13,11 +13,8 @@ use Doctrine\DBAL\Connection;
  */
 class ShouldCommunicateInApp
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public function messageAboutNewSlashCommand(string $workspaceId, string $userId): bool

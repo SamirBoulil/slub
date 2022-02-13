@@ -13,8 +13,7 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SqlDeliveredEventRepositoryTest extends KernelTestCase
 {
-    /** @var SqlDeliveredEventRepository */
-    private $deliveredEventRepository;
+    private SqlDeliveredEventRepository $deliveredEventRepository;
 
     public function setUp(): void
     {

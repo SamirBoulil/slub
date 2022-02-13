@@ -21,13 +21,11 @@ class PRClosedEventHandlerTest extends TestCase
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
     /**
-     * @var PRClosedEventHandler
      * @sut
      */
-    private $PRCloseEventHandler;
+    private PRClosedEventHandler $PRCloseEventHandler;
 
-    /** @var ObjectProphecy|ClosePRHandler */
-    private $handler;
+    private ClosePRHandler|ObjectProphecy $handler;
 
     public function setUp(): void
     {

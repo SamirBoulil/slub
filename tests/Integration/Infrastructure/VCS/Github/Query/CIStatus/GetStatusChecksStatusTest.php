@@ -23,11 +23,9 @@ class GetStatusChecksStatusTest extends WebTestCase
     private const NOT_SUPPORTED_CI_STATUS = 'unsupported';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
-    /** @var GetStatusChecksStatus */
-    private $getStatusCheckStatus;
+    private GetStatusChecksStatus $getStatusCheckStatus;
 
-    /** @var ObjectProphecy|GithubAPIClient */
-    private $githubAPIClient;
+    private GithubAPIClient|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

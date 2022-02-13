@@ -27,32 +27,18 @@ class CIStatusUpdateContext extends FeatureContext
 {
     private const BUILD_LINK = 'https://my-ci.com/build/123';
 
-    /** @var CIStatusUpdateHandler */
-    private $CIStatusUpdateHandler;
+    private PRIdentifier $currentPRIdentifier;
 
-    /** @var EventsSpy */
-    private $eventSpy;
-
-    /** @var ChatClientSpy */
-    private $chatClientSpy;
-
-    /** @var PRIdentifier */
-    private $currentPRIdentifier;
-
-    /** @var MessageIdentifier */
-    private $currentMessageIdentifier;
+    private MessageIdentifier $currentMessageIdentifier;
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
-        CIStatusUpdateHandler $CIStatusUpdateHandler,
-        EventsSpy $eventSpy,
-        ChatClientSpy $chatClientSpy
+        private CIStatusUpdateHandler $CIStatusUpdateHandler,
+        private EventsSpy $eventSpy,
+        private ChatClientSpy $chatClientSpy
     ) {
         parent::__construct($PRRepository);
-        $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
-        $this->eventSpy = $eventSpy;
         $this->PRRepository = $PRRepository;
-        $this->chatClientSpy = $chatClientSpy;
     }
 
     /**

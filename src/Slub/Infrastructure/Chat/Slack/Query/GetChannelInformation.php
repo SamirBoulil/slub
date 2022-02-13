@@ -14,14 +14,8 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetChannelInformation implements GetChannelInformationInterface
 {
-    private ClientInterface $client;
-
-    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
-
-    public function __construct(ClientInterface $client, SqlSlackAppInstallationRepository $slackAppInstallationRepository)
+    public function __construct(private ClientInterface $client, private SqlSlackAppInstallationRepository $slackAppInstallationRepository)
     {
-        $this->client = $client;
-        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
     }
 
     public function fetch(string $workspaceId, string $channelIdentifier): ChannelInformation

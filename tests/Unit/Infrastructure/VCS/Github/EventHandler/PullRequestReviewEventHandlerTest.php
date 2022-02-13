@@ -21,13 +21,11 @@ class PullRequestReviewEventHandlerTest extends TestCase
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
     /**
-     * @var PullRequestReviewEventHandler
      * @sut
      */
-    private $pullRequestReviewHandler;
+    private PullRequestReviewEventHandler $pullRequestReviewHandler;
 
-    /** @var ObjectProphecy|NewReviewHandler */
-    private $handler;
+    private NewReviewHandler|ObjectProphecy $handler;
 
     public function setUp(): void
     {

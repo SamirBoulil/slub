@@ -14,11 +14,9 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class SqlHasEventAlreadyBeenDeliveredTest extends KernelTestCase
 {
-    /** @var SqlHasEventAlreadyBeenDelivered */
-    private $hasEventAlreadyBeenDelivered;
+    private SqlHasEventAlreadyBeenDelivered $hasEventAlreadyBeenDelivered;
 
-    /** @var SqlDeliveredEventRepository */
-    private $deliveredEventRepository;
+    private SqlDeliveredEventRepository $deliveredEventRepository;
 
     public function setUp(): void
     {

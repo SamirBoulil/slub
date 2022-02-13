@@ -11,11 +11,11 @@ class ClosedAt
 {
     private const EMPTY_DATE = null;
 
-    private ?\DateTime $closedAt = null;
-
-    public function __construct(?\DateTime $closedAt)
+    /**
+     * @param \DateTime|\DateTimeImmutable|null $closedAt
+     */
+    public function __construct(private ?\DateTimeInterface $closedAt)
     {
-        $this->closedAt = $closedAt;
     }
 
     public static function create(): self

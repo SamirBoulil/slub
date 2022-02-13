@@ -14,12 +14,9 @@ class PurgeDeliveredEventsCLI extends Command
 {
     protected static $defaultName = 'slub:maintenance:purge-delivered-events';
 
-    private Connection $connection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $connection)
     {
         parent::__construct(self::$defaultName);
-        $this->connection = $sqlConnection;
     }
 
     protected function configure(): void

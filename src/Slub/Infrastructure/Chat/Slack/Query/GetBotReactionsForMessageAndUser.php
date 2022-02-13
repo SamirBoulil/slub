@@ -14,20 +14,8 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetBotReactionsForMessageAndUser
 {
-    private ClientInterface $client;
-
-    private SqlSlackAppInstallationRepository $slackAppInstallationRepository;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        ClientInterface $client,
-        SqlSlackAppInstallationRepository $slackAppInstallationRepository,
-        LoggerInterface $logger
-    ) {
-        $this->client = $client;
-        $this->slackAppInstallationRepository = $slackAppInstallationRepository;
-        $this->logger = $logger;
+    public function __construct(private ClientInterface $client, private SqlSlackAppInstallationRepository $slackAppInstallationRepository, private LoggerInterface $logger)
+    {
     }
 
     public function fetch(string $workspaceId, string $channel, string $ts, string $botId): array

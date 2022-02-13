@@ -13,14 +13,8 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class PRCommented extends Event
 {
-    private PRIdentifier $PRIdentifier;
-
-    private ReviewerName $reviewerName;
-
-    private function __construct(PRIdentifier $PRIdentifier, ReviewerName $reviewerName)
+    private function __construct(private PRIdentifier $PRIdentifier, private ReviewerName $reviewerName)
     {
-        $this->PRIdentifier = $PRIdentifier;
-        $this->reviewerName = $reviewerName;
     }
 
     public static function forPR(PRIdentifier $PRIdentifier, ReviewerName $reviewerName): self

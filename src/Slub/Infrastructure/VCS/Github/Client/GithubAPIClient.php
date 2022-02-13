@@ -15,20 +15,9 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 class GithubAPIClient
 {
     private const UNAUTHORIZED_STATUS_CODE = 401;
-    private RefreshAccessToken $refreshAccessToken;
 
-    private ClientInterface $client;
-
-    private SqlAppInstallationRepository $sqlAppInstallationRepository;
-
-    public function __construct(
-        RefreshAccessToken $refreshAccessToken,
-        SqlAppInstallationRepository $sqlAppInstallationRepository,
-        ClientInterface $client
-    ) {
-        $this->refreshAccessToken = $refreshAccessToken;
-        $this->client = $client;
-        $this->sqlAppInstallationRepository = $sqlAppInstallationRepository;
+    public function __construct(private RefreshAccessToken $refreshAccessToken, private SqlAppInstallationRepository $sqlAppInstallationRepository, private ClientInterface $client)
+    {
     }
 
     public function get(string $url, array $options, $repositoryIdentifier): ResponseInterface

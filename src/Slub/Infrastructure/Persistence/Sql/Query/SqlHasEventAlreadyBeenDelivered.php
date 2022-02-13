@@ -11,11 +11,8 @@ use Doctrine\DBAL\Driver\Connection;
  */
 class SqlHasEventAlreadyBeenDelivered
 {
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
-        $this->sqlConnection = $sqlConnection;
     }
 
     public function fetch(string $deliveredEventIdentifier): bool

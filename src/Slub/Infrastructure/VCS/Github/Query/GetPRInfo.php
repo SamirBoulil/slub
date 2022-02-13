@@ -14,17 +14,8 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
  */
 class GetPRInfo implements GetPRInfoInterface
 {
-    private GetPRDetails $getPRDetails;
-
-    private FindReviews $findReviews;
-
-    private GetCIStatus $getCIStatus;
-
-    public function __construct(GetPRDetails $getPRDetails, FindReviews $findReviews, GetCIStatus $getCIStatus)
+    public function __construct(private GetPRDetails $getPRDetails, private FindReviews $findReviews, private GetCIStatus $getCIStatus)
     {
-        $this->getPRDetails = $getPRDetails;
-        $this->findReviews = $findReviews;
-        $this->getCIStatus = $getCIStatus;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): PRInfo

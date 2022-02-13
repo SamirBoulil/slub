@@ -15,11 +15,8 @@ use Slub\Domain\Repository\PRNotFoundException;
  */
 class SqlGetMessageIdsForPR implements GetMessageIdsForPR
 {
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
-        $this->sqlConnection = $sqlConnection;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): array

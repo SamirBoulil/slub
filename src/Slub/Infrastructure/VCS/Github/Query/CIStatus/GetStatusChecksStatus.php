@@ -11,22 +11,16 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetStatusChecksStatus
 {
-    private GithubAPIClient $githubAPIClient;
     /** @var string[] */
     private array $supportedCIChecks;
-    private string $domainName;
-    private LoggerInterface $logger;
 
     public function __construct(
-        GithubAPIClient $githubAPIClient,
+        private GithubAPIClient $githubAPIClient,
         string $supportedCIChecks,
-        string $domainName,
-        LoggerInterface $logger
+        private string $domainName,
+        private LoggerInterface $logger
     ) {
-        $this->githubAPIClient = $githubAPIClient;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
-        $this->domainName = $domainName;
-        $this->logger = $logger;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
@@ -120,12 +114,7 @@ class GetStatusChecksStatus
             function ($a, $b) {
                 $ad = new \DateTime($a['updated_at']);
                 $bd = new \DateTime($b['updated_at']);
-
-                if ($ad == $bd) {
-                    return 0;
-                }
-
-                return $ad < $bd ? -1 : 1;
+                return $ad <=> $bd;
             }
         );
 

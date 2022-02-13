@@ -25,24 +25,8 @@ use Webmozart\Assert\Assert;
  */
 class ProcessTRAsync
 {
-    private PutPRToReviewHandler $putPRToReviewHandler;
-    private GetPRInfoInterface $getPRInfo;
-    private ChatClient $chatClient;
-    private RouterInterface $router;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        PutPRToReviewHandler $putPRToReviewHandler,
-        GetPRInfoInterface $getPRInfo,
-        ChatClient $chatClient,
-        RouterInterface $router,
-        LoggerInterface $logger
-    ) {
-        $this->putPRToReviewHandler = $putPRToReviewHandler;
-        $this->getPRInfo = $getPRInfo;
-        $this->chatClient = $chatClient;
-        $this->router = $router;
-        $this->logger = $logger;
+    public function __construct(private PutPRToReviewHandler $putPRToReviewHandler, private GetPRInfoInterface $getPRInfo, private ChatClient $chatClient, private RouterInterface $router, private LoggerInterface $logger)
+    {
     }
 
     public function onKernelTerminate(TerminateEvent $event): void
@@ -59,9 +43,9 @@ class ProcessTRAsync
         try {
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
-        } catch (ImpossibleToParseRepositoryURL $exception) {
+        } catch (ImpossibleToParseRepositoryURL) {
             $this->explainPRNotParsable($request);
-        } catch (AppNotInstalledException $exception) {
+        } catch (AppNotInstalledException) {
             $this->explainAppNotInstalled($request);
         } catch (\Exception|\Error $e) {
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
@@ -158,9 +142,10 @@ class ProcessTRAsync
             preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text, $matches);
             Assert::stringNotEmpty($matches[1]);
             Assert::stringNotEmpty($matches[2]);
-            [$repositoryIdentifier, $PRNumber] = ([$matches[1], $matches[2]]);
+            $repositoryIdentifier = $matches[1];
+            $PRNumber = $matches[2];
             $PRIdentifier = GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             throw new ImpossibleToParseRepositoryURL($text);
         }
 

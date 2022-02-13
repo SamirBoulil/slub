@@ -12,11 +12,8 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class CIPending extends Event
 {
-    private PRIdentifier $PRIdentifier;
-
-    private function __construct(PRIdentifier $PRIdentifier)
+    private function __construct(private PRIdentifier $PRIdentifier)
     {
-        $this->PRIdentifier = $PRIdentifier;
     }
 
     public static function forPR(PRIdentifier $PRIdentifier): self

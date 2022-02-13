@@ -15,14 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SqlPRRepository implements PRRepositoryInterface
 {
-    private EventDispatcherInterface $eventDispatcher;
-
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection, EventDispatcherInterface $eventDispatcher)
+    public function __construct(private Connection $sqlConnection, private EventDispatcherInterface $eventDispatcher)
     {
-        $this->sqlConnection = $sqlConnection;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function save(PR $PR): void

@@ -17,12 +17,9 @@ class InstallerCLI extends Command
 {
     protected static $defaultName = 'slub:install';
 
-    private Connection $sqlConnection;
-
-    public function __construct(Connection $sqlConnection)
+    public function __construct(private Connection $sqlConnection)
     {
         parent::__construct(self::$defaultName);
-        $this->sqlConnection = $sqlConnection;
     }
 
     protected function configure(): void

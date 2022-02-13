@@ -11,25 +11,16 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetCheckRunStatus
 {
-    private GithubAPIClient $githubAPIClient;
-
     /** @var string[] */
     private array $supportedCIChecks;
 
-    private string $domainName;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        GithubAPIClient $githubAPIClient,
+        private GithubAPIClient $githubAPIClient,
         string $supportedCIChecks,
-        string $domainName,
-        LoggerInterface $logger
+        private string $domainName,
+        private LoggerInterface $logger
     ) {
-        $this->githubAPIClient = $githubAPIClient;
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
-        $this->domainName = $domainName;
-        $this->logger = $logger;
     }
 
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus

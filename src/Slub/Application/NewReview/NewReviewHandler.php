@@ -14,15 +14,8 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class NewReviewHandler
 {
-    private PRRepositoryInterface $PRRepository;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        PRRepositoryInterface $PRRepository,
-        LoggerInterface $logger
-    ) {
-        $this->PRRepository = $PRRepository;
-        $this->logger = $logger;
+    public function __construct(private PRRepositoryInterface $PRRepository, private LoggerInterface $logger)
+    {
     }
 
     public function handle(NewReview $review): void
@@ -58,24 +51,17 @@ class NewReviewHandler
 
     private function logIt(NewReview $review): void
     {
-        switch ($review->reviewStatus) {
-            case 'accepted':
-                $logMessage = sprintf('PR "%s" has been GTMed', $review->PRIdentifier);
-                break;
-            case 'refused':
-                $logMessage = sprintf('PR "%s" has been NOT GTMed', $review->PRIdentifier);
-                break;
-            case 'commented':
-                $logMessage = sprintf('PR "%s" has been commented', $review->PRIdentifier);
-                break;
-            default:
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'review type "%s" is not supported, supported types are "gtm", "not_gtm", "comment"',
-                        $review->reviewStatus
-                    )
-                );
-        }
+        $logMessage = match ($review->reviewStatus) {
+            'accepted' => sprintf('PR "%s" has been GTMed', $review->PRIdentifier),
+            'refused' => sprintf('PR "%s" has been NOT GTMed', $review->PRIdentifier),
+            'commented' => sprintf('PR "%s" has been commented', $review->PRIdentifier),
+            default => throw new \InvalidArgumentException(
+                sprintf(
+                    'review type "%s" is not supported, supported types are "gtm", "not_gtm", "comment"',
+                    $review->reviewStatus
+                )
+            ),
+        };
         $this->logger->info($logMessage);
     }
 }

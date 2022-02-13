@@ -13,15 +13,7 @@ class CheckStatus
 {
     use Immutable;
 
-    public string $status;
-
-    public string $buildLink;
-
-    public function __construct(
-        string $status,
-        string $buildLink = ''
-    ) {
-        $this->status = $status;
-        $this->buildLink = $buildLink;
+    public function __construct(public string $status, public string $buildLink = '')
+    {
     }
 }

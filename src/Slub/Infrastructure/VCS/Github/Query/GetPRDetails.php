@@ -12,11 +12,8 @@ use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
  */
 class GetPRDetails
 {
-    private GithubAPIClient $githubAPIClient;
-
-    public function __construct(GithubAPIClient $githubAPIClient)
+    public function __construct(private GithubAPIClient $githubAPIClient)
     {
-        $this->githubAPIClient = $githubAPIClient;
     }
 
     public function fetch(PRIdentifier $PRIdentifier): array

@@ -17,19 +17,10 @@ class RefreshAccessToken
 {
     private const ACCESS_TOKEN_URL_TEMPLATE = 'https://api.github.com/app/installations/%s/access_tokens';
 
-    private ClientInterface $httpClient;
-
-    private string $githubAppId;
-
-    private string $githubPrivateKey;
-
     private LoggerInterface $logger;
 
-    public function __construct(ClientInterface $httpClient, string $githubAppId, string $githubPrivateKey)
+    public function __construct(private ClientInterface $httpClient, private string $githubAppId, private string $githubPrivateKey)
     {
-        $this->httpClient = $httpClient;
-        $this->githubAppId = $githubAppId;
-        $this->githubPrivateKey = $githubPrivateKey;
     }
 
     public function fetch(string $installationId): string

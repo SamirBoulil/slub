@@ -33,24 +33,8 @@ class NotifyAuthor implements EventSubscriberInterface
     public const MESSAGE_GOOD_TO_MERGE = ':clap: Congratz <' . self::PLACEHOLDER_PR_LINK . '|Your PR> is good to merge! ';
     public const MESSAGE_PR_TOO_LARGE = ':warning: <' . self::PLACEHOLDER_PR_LINK . '|Your PR> might be hard to review (> %s lines).';
 
-    private GetMessageIdsForPR $getMessageIdsForPR;
-
-    private ChatClient $chatClient;
-
-    private LoggerInterface $logger;
-
-    private int $prSizeLimit;
-
-    public function __construct(
-        GetMessageIdsForPR $getMessageIdsForPR,
-        ChatClient $chatClient,
-        LoggerInterface $logger,
-        int $prSizeLimit = 500
-    ) {
-        $this->chatClient = $chatClient;
-        $this->getMessageIdsForPR = $getMessageIdsForPR;
-        $this->logger = $logger;
-        $this->prSizeLimit = $prSizeLimit;
+    public function __construct(private GetMessageIdsForPR $getMessageIdsForPR, private ChatClient $chatClient, private LoggerInterface $logger, private int $prSizeLimit = 500)
+    {
     }
 
     public static function getSubscribedEvents(): array

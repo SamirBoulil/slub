@@ -14,11 +14,8 @@ class PRSizeChangedEventHandler implements EventHandlerInterface
 {
     private const PULL_REQUEST_EVENT_TYPE = 'pull_request';
 
-    private ChangePRSizeHandler $largePRHandler;
-
-    public function __construct(ChangePRSizeHandler $largePRHandler)
+    public function __construct(private ChangePRSizeHandler $largePRHandler)
     {
-        $this->largePRHandler = $largePRHandler;
     }
 
     public function supports(string $eventType): bool

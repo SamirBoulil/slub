@@ -18,16 +18,8 @@ class CheckRunEventHandler implements EventHandlerInterface
 {
     private const CHECK_RUN_EVENT_TYPE = 'check_run';
 
-    private CIStatusUpdateHandler $CIStatusUpdateHandler;
-
-    private GetPRInfoInterface $getPRInfo;
-
-    public function __construct(
-        CIStatusUpdateHandler $CIStatusUpdateHandler,
-        GetPRInfoInterface $getPRInfo
-    ) {
-        $this->CIStatusUpdateHandler = $CIStatusUpdateHandler;
-        $this->getPRInfo = $getPRInfo;
+    public function __construct(private CIStatusUpdateHandler $CIStatusUpdateHandler, private GetPRInfoInterface $getPRInfo)
+    {
     }
 
     public function supports(string $eventType): bool

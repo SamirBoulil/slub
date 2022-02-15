@@ -143,29 +143,29 @@ SLACK;
     {
         $text = <<<SLACK
 :warning: `%s`
-:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+:thinking_face: It looks like Yeee is not installed on this repository but you can <https://github.com/apps/slub-yeee|Install it> now!
 SLACK;
         $this->answerWithEphemeralMessage($url, sprintf($text, $usage));
     }
 
-    public function explainSomethingWentWrong(string $url, string $usage, string $action): void
+    public function explainSomethingWentWrong(string $url, string $usage): void
     {
         $text = <<<SLACK
 :warning: `%s`
 
-:thinking_face: Something went wrong, %s.
+:thinking_face: Something went wrong.
 
 Can you check the pull request URL ? If this issue keeps coming, Send an email at samir.boulil(at)gmail.com.
 SLACK;
-        $message = sprintf($text, $usage, $action);
+        $message = sprintf($text, $usage);
         $this->answerWithEphemeralMessage($url, $message);
     }
 
-    public function explainBotNotAMember(string $url, string $usage): void
+    public function explainBotNotInChannel(string $url, string $usage): void
     {
         $text = <<<SLACK
 :warning: `%s`
-:thinking_face: It looks like Yeee is not a member of this channel. Try inviting him in! :door:
+:thinking_face: It looks like @Yeee is not a member of this channel. Try inviting him in! :door:
 SLACK;
         $message = sprintf($text, $usage);
         $this->answerWithEphemeralMessage($url, $message);

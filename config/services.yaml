@@ -149,6 +149,7 @@ services:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
             - '@slub.infrastructure.chat.slack.slack_client'
+            - '@slub.infrastructure.chat.slack.explain_user'
             - '@router'
             - '@logger'
         tags:
@@ -159,6 +160,7 @@ services:
         arguments:
             - '@slub.application.unpublish_pr.unpublish_pr_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
+            - '@slub.infrastructure.chat.slack.explain_user'
             - '@router'
             - '@logger'
         tags:
@@ -201,6 +203,12 @@ services:
             - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+
+    slub.infrastructure.chat.slack.explain_user:
+        class: Slub\Infrastructure\Chat\Slack\ExplainUser
+        arguments:
+            - '@slub.infrastructure.chat.slack.slack_client'
+            - '@logger'
 
     slub.infrastructure.http.guzzle_client:
         class: GuzzleHttp\Client

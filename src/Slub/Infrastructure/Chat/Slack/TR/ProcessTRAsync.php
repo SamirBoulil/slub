@@ -11,10 +11,9 @@ use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Infrastructure\Chat\Slack\Common\BotNotInChannelException;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
-use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
+use Slub\Infrastructure\Chat\Slack\ExplainUser;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -22,12 +21,18 @@ use Symfony\Component\Routing\RouterInterface;
 use Webmozart\Assert\Assert;
 
 /**
- * @author    Samir Boulil <samir.boulil@gmail.com>
+ * @author Samir Boulil <samir.boulil@gmail.com>
  */
 class ProcessTRAsync
 {
-    public function __construct(private PutPRToReviewHandler $putPRToReviewHandler, private GetPRInfoInterface $getPRInfo, private ChatClient $chatClient, private RouterInterface $router, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private PutPRToReviewHandler $putPRToReviewHandler,
+        private GetPRInfoInterface $getPRInfo,
+        private ChatClient $chatClient,
+        private ExplainUser $explainUser,
+        private RouterInterface $router,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function onKernelTerminate(TerminateEvent $event): void
@@ -44,33 +49,14 @@ class ProcessTRAsync
         try {
             $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
-        } catch (ImpossibleToParseRepositoryURL) {
-            $this->explainPRNotParsable($request);
-        } catch (AppNotInstalledException) {
-            $this->explainAppNotInstalled($request);
-        } catch (BotNotInChannelException) {
-            $this->explainBotInChannel($request);
         } catch (\Exception|\Error $e) {
-            $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
-            $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
-            $this->logger->critical($e->getTraceAsString());
+            $this->explainUser->onError($request, $e);
         }
-    }
-
-    private function getWorkspaceIdentifier(Request $request): string
-    {
-        $this->logger->critical('do you fail here?');
-        return $request->request->get('team_id');
-    }
-
-    private function getAuthorIdentifier(Request $request): string
-    {
-        return $request->request->get('user_id');
     }
 
     private function getChannelIdentifier(Request $request): string
     {
-        $workspace = $this->getWorkspaceIdentifier($request);
+        $workspace = $request->request->get('team_id');
         $channelName = $request->request->get('channel_id');
 
         return ChannelIdentifierHelper::from($workspace, $channelName);
@@ -101,11 +87,11 @@ class ProcessTRAsync
         Request $request
     ): void {
         $PRInfo = $this->getPRInfo->fetch($PRIdentifier);
-        $workspaceIdentifier = $this->getWorkspaceIdentifier($request);
+        $workspaceIdentifier = $request->request->get('team_id');
         $channelIdentifier = $this->getChannelIdentifier($request);
 
         // TODO: Should be done when PRPutToReview event has been sent
-        $authorIdentifier = $this->getAuthorIdentifier($request);
+        $authorIdentifier = $request->request->get('user_id');
         $messageIdentifier = $this->publishToReviewAnnouncement($PRInfo, $channelIdentifier, $authorIdentifier);
 
         $PRToReview = new PutPRToReview();
@@ -154,37 +140,5 @@ class ProcessTRAsync
         }
 
         return $PRIdentifier;
-    }
-
-    private function explainPRNotParsable(Request $request): void
-    {
-        $this->chatClient->explainPRURLCannotBeParsed($request->request->get('response_url'), $this->usage($request));
-    }
-
-    private function explainAppNotInstalled(Request $request): void
-    {
-        $this->chatClient->explainAppNotInstalled($request->request->get('response_url'), $this->usage($request));
-    }
-
-    private function explainAuthorPRCouldNotBeSubmittedToReview(Request $request)
-    {
-        $responseUrl = $request->request->get('response_url');
-        $this->chatClient->explainSomethingWentWrong(
-            $responseUrl,
-            $this->usage($request),
-            'I was not able to put your PR to review'
-        );
-    }
-
-    // TODO: Factorize the explain methods in a single class
-    private function explainBotInChannel(Request $request): void
-    {
-        $responseUrl = $request->request->get('response_url');
-        $this->chatClient->explainBotNotAMember($responseUrl, $this->usage($request));
-    }
-
-    private function usage(Request $request): string
-    {
-        return sprintf('/tr %s', $request->request->get('text'));
     }
 }

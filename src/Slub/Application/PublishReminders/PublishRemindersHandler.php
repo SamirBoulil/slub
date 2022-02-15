@@ -43,6 +43,34 @@ class PublishRemindersHandler
         $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
     }
 
+    private function formatReminderInBlocks(array $PRsToPublish): array
+    {
+        $prs = $this->sortPRsByNumberOfDaysInReview($PRsToPublish);
+        $reminderInBlocks = array_map(fn (PR $PR) => $this->formatReminderBlock($PR), $prs);
+        array_unshift($reminderInBlocks, [
+            'type' => 'section',
+            'text' => [
+                'type' => 'mrkdwn',
+                'text' => 'Yeee, these PRs need reviews!',
+            ],
+        ]);
+
+        return $reminderInBlocks;
+    }
+
+    private function prsPutToReviewInChannel(ChannelIdentifier $expectedChannelIdentifier, array $PRsInReview): array
+    {
+        return array_filter(
+            $PRsInReview,
+            static fn (PR $PR) => array_filter(
+                $PR->channelIdentifiers(),
+                static fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals(
+                    $actualChannelIdentifier
+                )
+            )
+        );
+    }
+
     /**
      * @return ChannelIdentifier[]
      */
@@ -59,34 +87,6 @@ class PublishRemindersHandler
         return array_values($channelIdentifiers);
     }
 
-    private function prsPutToReviewInChannel(ChannelIdentifier $expectedChannelIdentifier, array $PRsInReview): array
-    {
-        return array_filter(
-            $PRsInReview,
-            static fn (PR $PR) => array_filter(
-                $PR->channelIdentifiers(),
-                static fn (ChannelIdentifier $actualChannelIdentifier) => $expectedChannelIdentifier->equals(
-                    $actualChannelIdentifier
-                )
-            )
-        );
-    }
-
-    private function formatReminderInBlocks(array $PRsToPublish): array
-    {
-        $prs = $this->sortPRsByNumberOfDaysInReview($PRsToPublish);
-        $reminderInBlocks = array_map(fn (PR $PR) => $this->formatReminderBlock($PR), $prs);
-        array_unshift($reminderInBlocks, [
-            'type' => 'section',
-            'text' => [
-                'type' => 'mrkdwn',
-                'text' => 'Yeee, these PRs need reviews!',
-            ],
-        ]);
-
-        return $reminderInBlocks;
-    }
-
     private function formatReminderBlock(PR $PR): array
     {
         $githubLink = static function (PR $PR) {
@@ -97,7 +97,7 @@ class PublishRemindersHandler
         $author = ucfirst($PR->authorIdentifier()->stringValue());
         $title = ChatHelper::elipsisIfTooLong(
             $PR->title()->stringValue(),
-            95
+            80
         ); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);

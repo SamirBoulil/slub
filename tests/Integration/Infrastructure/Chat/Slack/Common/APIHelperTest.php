@@ -7,6 +7,7 @@ namespace Tests\Integration\Infrastructure\Chat\Slack\Common;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Slub\Infrastructure\Chat\Slack\Common\APIHelper;
+use Slub\Infrastructure\Chat\Slack\Common\BotNotInChannelException;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -29,6 +30,12 @@ class APIHelperTest extends TestCase
     {
         APIHelper::checkResponseSuccess(new Response(200, [], json_encode(['ok' => true])));
         $this->assertTrue(true, 'Response is not success, expected to be success');
+    }
+
+    public function test_it_throws_a_bot_not_in_channel_exception(): void
+    {
+        $this->expectException(BotNotInChannelException::class);
+        APIHelper::checkResponseSuccess(new Response(200, [], json_encode(['ok' => false, 'error' => 'not_in_channel'])));
     }
 
     public function test_it_throws_if_the_slack_api_response_is_not_success(): void

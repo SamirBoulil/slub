@@ -11,6 +11,7 @@ use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Slack\Common\BotNotInChannelException;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Persistence\Sql\Repository\AppNotInstalledException;
@@ -47,6 +48,8 @@ class ProcessTRAsync
             $this->explainPRNotParsable($request);
         } catch (AppNotInstalledException) {
             $this->explainAppNotInstalled($request);
+        } catch (BotNotInChannelException) {
+            $this->explainBotInChannel($request);
         } catch (\Exception|\Error $e) {
             $this->explainAuthorPRCouldNotBeSubmittedToReview($request);
             $this->logger->error(sprintf('An error occurred during a TR submission: %s', $e->getMessage()));
@@ -56,6 +59,7 @@ class ProcessTRAsync
 
     private function getWorkspaceIdentifier(Request $request): string
     {
+        $this->logger->critical('do you fail here?');
         return $request->request->get('team_id');
     }
 
@@ -170,6 +174,13 @@ class ProcessTRAsync
             $this->usage($request),
             'I was not able to put your PR to review'
         );
+    }
+
+    // TODO: Factorize the explain methods in a single class
+    private function explainBotInChannel(Request $request): void
+    {
+        $responseUrl = $request->request->get('response_url');
+        $this->chatClient->explainBotNotAMember($responseUrl, $this->usage($request));
     }
 
     private function usage(Request $request): string

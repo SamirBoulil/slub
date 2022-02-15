@@ -161,6 +161,16 @@ SLACK;
         $this->answerWithEphemeralMessage($url, $message);
     }
 
+    public function explainBotNotAMember(string $url, string $usage): void
+    {
+        $text = <<<SLACK
+:warning: `%s`
+:thinking_face: It looks like Yeee is not a member of this channel. Try inviting him in! :door:
+SLACK;
+        $message = sprintf($text, $usage);
+        $this->answerWithEphemeralMessage($url, $message);
+    }
+
     public function publishToReviewMessage(
         string $channelIdentifier,
         string $PRUrl,

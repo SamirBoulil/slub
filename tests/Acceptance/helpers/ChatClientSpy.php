@@ -134,6 +134,11 @@ class ChatClientSpy implements ChatClient
         $this->answerWithEphemeralMessage($url, $usage);
     }
 
+    public function explainBotNotAMember(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
     public function publishToReviewMessage(
         string $channelIdentifier,
         string $PRUrl,

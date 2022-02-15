@@ -16,6 +16,7 @@ interface ChatClient
     public function explainPRURLCannotBeParsed(string $url, string $usage): void;
     public function explainAppNotInstalled(string $url, string $usage): void;
     public function explainSomethingWentWrong(string $url, string $usage, string $action): void;
+    public function explainBotNotAMember(string $url, string $usage): void;
     public function publishToReviewMessage(
         string $channelIdentifier,
         string $PRUrl,

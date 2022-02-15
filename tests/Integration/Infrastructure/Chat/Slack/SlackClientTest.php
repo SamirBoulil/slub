@@ -234,7 +234,7 @@ TEXT;
         $bodyContent = $this->getBodyContent($generatedRequest);
         $expectedMessage = <<<TEXT
 :warning: `a message`
-:thinking_face: It looks like Yeee is not installed on this repository but you <https://github.com/apps/slub-yeee|Install it> now!
+:thinking_face: It looks like Yeee is not installed on this repository but you can <https://github.com/apps/slub-yeee|Install it> now!
 TEXT;
         self::assertEquals(
             [
@@ -250,7 +250,7 @@ TEXT;
         $url = 'https://slack.ephemeral.url/';
         $this->mockGuzzleWith(new Response(200, [], '{"ok": true}'));
 
-        $this->slackClient->explainSomethingWentWrong($url, 'usage', 'reason');
+        $this->slackClient->explainSomethingWentWrong($url, 'usage');
 
         $generatedRequest = $this->httpClientMock->getLastRequest();
         self::assertEquals('POST', $generatedRequest->getMethod());
@@ -259,7 +259,7 @@ TEXT;
         $expectedMessage = <<<TEXT
 :warning: `usage`
 
-:thinking_face: Something went wrong, reason.
+:thinking_face: Something went wrong.
 
 Can you check the pull request URL ? If this issue keeps coming, Send an email at samir.boulil(at)gmail.com.
 TEXT;

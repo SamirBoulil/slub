@@ -38,36 +38,9 @@ class ProcessTRAsyncTest extends WebTestCase
         // $this->assertToReviewMessageHasBeenPublished();
     }
 
-    public function test_it_tells_the_author_when_the_pr_link_is_not_detected(): void
-    {
-        $client = self::getClient();
-        $client->request('POST', '/chat/slack/tr', $this->NoPRLink());
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertNoPRToReview();
-        // TODO: For some reason the chat client spy is empty whenever we return from the request.
-        // $this->chatClientSpy->assertEphemeralMessageContains(self::EMPHEMERAL_RESPONSE_URL, ':warning:');
-    }
-
-//    public function test_it_tells_the_author_an_issue_arised_when_its_the_case(): void
-//    {
-    // Payload is valid but handler returns an exception for some reason.
-    // $this->expectException(\Exception::class);
-    // $client = self::getClient();
-    // $client->request('POST', '/chat/slack/tr', $this->payloadIsInvalid());
-    // $this->assertEquals(200, $client->getResponse()->getStatusCode());
-    // $this->assertNoPRToReview();
-    // TODO: For some reason the chat client spy is empty whenever we return from the request.
-    // $this->chatClientSpy->assertEphemeralMessageContains(self::EMPHEMERAL_RESPONSE_URL, ':warning:');
-//    }
-
     private function PRToReviewSubmission(): array
     {
         return $this->slashCommandPayload('blabla https://github.com/SamirBoulil/slub/pull/153 blabla', 'team_123');
-    }
-
-    private function NoPRLink(): array
-    {
-        return $this->slashCommandPayload('no_message', 'team_123');
     }
 
     private function assertPRHasBeenPutToReview()
@@ -82,13 +55,6 @@ class ProcessTRAsyncTest extends WebTestCase
         self::assertEquals('sam', $PRToReview->authorIdentifier()->stringValue());
     }
 
-    private function assertToReviewMessageHasBeenPublished()
-    {
-        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', 'https://github.com/SamirBoulil/slub/pull/153');
-        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', sprintf('<%s>', self::USER_ID));
-        $this->chatClientSpy->assertPublishMessageWithBlocksInChannelContains('team_123@channel_name', '[SamirBoulil/slub]');
-    }
-
     private function slashCommandPayload(string $userInput, string $workspaceIdentifier): array
     {
         return [
@@ -99,10 +65,5 @@ class ProcessTRAsyncTest extends WebTestCase
             'trigger_id' => '123123.123123',
             'response_url' => self::EMPHEMERAL_RESPONSE_URL
         ];
-    }
-
-    private function assertNoPRToReview(): void
-    {
-        $this->assertEmpty($this->PRRepository->all());
     }
 }

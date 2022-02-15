@@ -129,7 +129,12 @@ class ChatClientSpy implements ChatClient
         $this->answerWithEphemeralMessage($url, $usage);
     }
 
-    public function explainSomethingWentWrong(string $url, string $usage, string $action): void
+    public function explainSomethingWentWrong(string $url, string $usage): void
+    {
+        $this->answerWithEphemeralMessage($url, $usage);
+    }
+
+    public function explainBotNotInChannel(string $url, string $usage): void
     {
         $this->answerWithEphemeralMessage($url, $usage);
     }

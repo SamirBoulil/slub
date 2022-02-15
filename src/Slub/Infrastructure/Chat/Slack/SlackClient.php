@@ -22,7 +22,7 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class SlackClient implements ChatClient
 {
-    private const MAX_DESCRIPTION = 100;
+    private const MAX_DESCRIPTION = 80;
 
     public function __construct(private GetBotUserId $getBotUserId, private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser, private ClientInterface $client, private LoggerInterface $logger, private SqlSlackAppInstallationRepository $slackAppInstallationRepository)
     {

@@ -1,0 +1,56 @@
+name: Continuous integration
+on: [ pull_request ]
+jobs:
+  CI:
+    name: Continuous integration
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql://slub_test:db_password@127.0.0.1:3306/slub_test
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_USER: slub_test
+          MYSQL_PASSWORD: db_password
+          MYSQL_DATABASE: slub_test
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Verify unittest DB exists
+        run: mysql --host 127.0.0.1 --port 3306 -uslub_test -pdb_password -e "SHOW DATABASES LIKE 'slub_test'"
+
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          extensions: mbstring, dom, fileinfo, mysql
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          # Use composer.json for key, if composer.lock is not committed.
+          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Install the application
+        run: make install-test
+
+      - name: Run tests
+        run: make check

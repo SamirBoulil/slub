@@ -13,6 +13,7 @@ class CheckStatus
 {
     use Immutable;
 
+    // introduce green / red(build link) / pending constructors ?
     public function __construct(public string $status, public string $buildLink = '')
     {
     }

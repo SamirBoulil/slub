@@ -23,7 +23,7 @@ class GetCheckSuiteStatusTest extends WebTestCase
 
     private GetCheckSuiteStatus $getCheckSuiteStatus;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

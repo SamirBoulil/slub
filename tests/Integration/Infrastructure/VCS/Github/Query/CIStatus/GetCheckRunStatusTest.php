@@ -25,7 +25,7 @@ class GetCheckRunStatusTest extends WebTestCase
 
     private GetCheckRunStatus $getCheckRunStatus;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

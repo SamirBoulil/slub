@@ -9,6 +9,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Slub\Infrastructure\VCS\Github\Client\RefreshAccessToken;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -26,7 +27,7 @@ class GithubAPIClientTest extends KernelTestCase
 
     private ObjectProphecy|SqlAppInstallationRepository $sqlAppInstallationRepository;
 
-    private GithubAPIClient $githubAPIClient;
+    private GithubAPIClientInterface $githubAPIClient;
 
     public function setUp(): void
     {

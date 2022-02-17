@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Query;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -22,7 +22,7 @@ class FindReviews
     private const REFUSED = 'REFUSED';
     private const COMMENTED = 'COMMENTED';
 
-    public function __construct(private GithubAPIClient $githubAPIClient, private string $githubURI)
+    public function __construct(private GithubAPIClientInterface $githubAPIClient, private string $githubURI)
     {
     }
 

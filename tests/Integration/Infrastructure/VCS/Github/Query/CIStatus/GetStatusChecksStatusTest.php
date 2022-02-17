@@ -25,7 +25,7 @@ class GetStatusChecksStatusTest extends WebTestCase
 
     private GetStatusChecksStatus $getStatusCheckStatus;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

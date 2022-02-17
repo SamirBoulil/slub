@@ -6,7 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Query\CIStatus;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetStatusChecksStatus
@@ -15,7 +15,7 @@ class GetStatusChecksStatus
     private array $supportedCIChecks;
 
     public function __construct(
-        private GithubAPIClient $githubAPIClient,
+        private GithubAPIClientInterface $githubAPIClient,
         string $supportedCIChecks,
         private string $domainName,
         private LoggerInterface $logger

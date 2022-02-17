@@ -22,7 +22,7 @@ class GetPRDetailsTest extends WebTestCase
 
     private GetPRDetails $getPRDetails;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

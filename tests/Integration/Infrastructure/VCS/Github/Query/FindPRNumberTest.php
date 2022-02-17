@@ -22,7 +22,7 @@ class FindPRNumberTest extends WebTestCase
 
     private FindPRNumber $findPRNumber;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

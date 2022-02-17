@@ -1,7 +1,6 @@
 parameters:
     GITHUB_WEBHOOK_SECRET: 'my_secret'
     GITHUB_URI: '127.0.0.1:8081'
-    GITHUB_PORT: '8081'
 
 services:
     # default configuration for services in *this* file
@@ -37,6 +36,10 @@ services:
 
     slub.infrastructure.vcs.github.query.get_pr_info:
         class: Slub\Infrastructure\VCS\InMemory\InMemoryGetPRInfo
+
+    slub.infrastructure.vcs.github.client.github_api_client:
+        public: true
+        class: Tests\GithubApiClientMock
 
     # contexts
     Tests\Acceptance\Context\PRSizeChangedContext:

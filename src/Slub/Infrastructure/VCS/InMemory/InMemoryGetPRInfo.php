@@ -25,7 +25,7 @@ class InMemoryGetPRInfo implements GetPRInfoInterface
         $this->PRInfo->authorImageUrl = 'https://author_image_url';
         $this->PRInfo->title = 'Add new feature';
         $this->PRInfo->description = 'Amazing description';
-        $this->PRInfo->CIStatus = new CheckStatus('GREEN');
+        $this->PRInfo->CIStatus = CheckStatus::green();
         $this->PRInfo->comments = 0;
         $this->PRInfo->GTMCount = 0;
         $this->PRInfo->notGTMCount = 0;

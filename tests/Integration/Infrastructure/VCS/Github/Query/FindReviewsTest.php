@@ -23,7 +23,7 @@ class FindReviewsTest extends WebTestCase
 
     private FindReviews $findReviews;
 
-    private GithubAPIClient|ObjectProphecy $githubAPIClient;
+    private GithubAPIClientInterface|ObjectProphecy $githubAPIClient;
 
     public function setUp(): void
     {

@@ -46,7 +46,7 @@ class GetPRInfoTest extends TestCase
         $expectedCommentsCount = 1;
         $expectedGTMCount = 2;
         $expectedNotGTMCount = 3;
-        $checkStatus = new CheckStatus('PENDING');
+        $checkStatus = CheckStatus::pending();
         $expectedTitle = 'Add new feature';
         $expectedDescription = 'a nice description';
         $expectedAuthorIdentifier = 'sam';

@@ -20,7 +20,7 @@ class GetVCSStatusDummy implements GetVCSStatus
         $result->GTMCount = 0;
         $result->notGTMCount = 0;
         $result->comments = 0;
-        $result->checkStatus = new CheckStatus('PENDING');
+        $result->checkStatus = CheckStatus::pending();
         $result->isMerged = false;
 
         return $result;

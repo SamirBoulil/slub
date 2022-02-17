@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\Query\CIStatus;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 /**
@@ -19,7 +19,7 @@ class GetCheckSuiteStatus
     private array $supportedCIChecks;
 
     public function __construct(
-        private GithubAPIClient $githubAPIClient,
+        private GithubAPIClientInterface $githubAPIClient,
         string $supportedCIChecks,
         private string $domainName
     ) {
@@ -30,13 +30,13 @@ class GetCheckSuiteStatus
     {
         $checkSuite = $this->checkSuite($PRIdentifier, $commitRef);
         if ($this->isCheckSuiteStatus($checkSuite, 'failure')) {
-            return new CheckStatus('RED', $this->buildLink($checkSuite));
+            return CheckStatus::red('RENAME_ME', $this->buildLink($checkSuite));
         }
         if ($this->isCheckSuiteStatus($checkSuite, 'success')) {
-            return new CheckStatus('GREEN', '');
+            return CheckStatus::green('RENAME_ME');
         }
 
-        return new CheckStatus('PENDING', '');
+        return CheckStatus::pending('RENAME_ME');
     }
 
     private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool

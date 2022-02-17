@@ -24,13 +24,13 @@ class ExplainUser
     }
 
     #[Pure]
-    public function onError(Request $request, \Exception|\Error $exception): void
+    public function onError(Request $request, \Throwable $exception): void
     {
         match (get_class($exception)) {
             ImpossibleToParseRepositoryURL::class => $this->explainPRNotParsable($request),
             AppNotInstalledException::class => $this->explainAppNotInstalled($request),
             BotNotInChannelException::class => $this->explainBotInChannel($request),
-            \Exception::class, \Error::class => $this->explainSomethingWentWrong($request, $exception)
+            default => $this->explainSomethingWentWrong($request, $exception)
         };
     }
 
@@ -50,7 +50,7 @@ class ExplainUser
         $this->chatClient->explainBotNotInChannel($responseUrl, $this->usage($request));
     }
 
-    private function explainSomethingWentWrong(Request $request, \Exception $e): void
+    private function explainSomethingWentWrong(Request $request, \Throwable $e): void
     {
         $this->logger->critical('Something went wrong:');
         $this->logger->critical($e->getTraceAsString());

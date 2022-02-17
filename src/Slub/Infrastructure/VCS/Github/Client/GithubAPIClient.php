@@ -12,12 +12,15 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>
  */
-class GithubAPIClient
+class GithubAPIClient implements GithubAPIClientInterface
 {
     private const UNAUTHORIZED_STATUS_CODE = 401;
 
-    public function __construct(private RefreshAccessToken $refreshAccessToken, private SqlAppInstallationRepository $sqlAppInstallationRepository, private ClientInterface $client)
-    {
+    public function __construct(
+        private RefreshAccessToken $refreshAccessToken,
+        private SqlAppInstallationRepository $sqlAppInstallationRepository,
+        private ClientInterface $client
+    ) {
     }
 
     public function get(string $url, array $options, $repositoryIdentifier): ResponseInterface

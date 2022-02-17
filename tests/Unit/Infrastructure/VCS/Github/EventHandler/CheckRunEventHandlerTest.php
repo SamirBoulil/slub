@@ -25,8 +25,7 @@ class CheckRunEventHandlerTest extends TestCase
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    private const CI_STATUS = 'A_CI_STATUS';
-    private const BUILD_LINK = 'http://my-ci.com/build/123';
+    private const CI_STATUS = 'RED';
 
     /**
      * @sut
@@ -63,7 +62,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent): void
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus = new CheckStatus(self::CI_STATUS, self::BUILD_LINK);
+        $prInfo->CIStatus = CheckStatus::red();
         $this->getPRInfo->fetch(
             Argument::that(
                 fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
@@ -97,7 +96,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_has_a_queued_check_run_we_fetch_the_ci_status(): void
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus =  new CheckStatus(self::CI_STATUS);
+        $prInfo->CIStatus =  CheckStatus::red();
         $this->getPRInfo->fetch(
             Argument::that(
                 fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER

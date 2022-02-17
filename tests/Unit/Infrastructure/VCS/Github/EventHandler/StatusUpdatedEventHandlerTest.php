@@ -24,7 +24,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
 
-    private const CI_STATUS = 'A_CI_STATUS';
+    private const CI_STATUS = 'GREEN';
     private const COMMIT_REF = 'commit-ref';
 
     /**
@@ -75,7 +75,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
             Argument::that(
                 fn ($commitRef) => self::COMMIT_REF === $commitRef
             )
-        )->willReturn(new CheckStatus(self::CI_STATUS, ''));
+        )->willReturn(CheckStatus::green());
         $this->handler->handle(
             Argument::that(
                 fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier

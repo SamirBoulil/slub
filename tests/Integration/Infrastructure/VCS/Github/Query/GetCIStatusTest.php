@@ -22,6 +22,12 @@ class GetCIStatusTest extends WebTestCase
 {
     private const PR_IDENTIFIER = 'SamirBoulil/slub/36';
     private const COMMIT_REF = 'commit_ref';
+    private const SUPPORTED_CI_CHECK_1 = 'supported_1';
+    private const SUPPORTED_CI_CHECK_2 = 'supported_2';
+    private const SUPPORTED_CI_CHECK_3 = 'supported_3';
+    private const NOT_SUPPORTED_CI_CHECK_1 = 'unsupported_1';
+    private const NOT_SUPPORTED_CI_CHECK_2 = 'unsupported_2';
+    private const NOT_SUPPORTED_CI_CHECK_3 = 'unsupported_3';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     private ObjectProphecy $getMergeableState;
@@ -43,7 +49,8 @@ class GetCIStatusTest extends WebTestCase
             $this->getMergeableState->reveal(),
             $this->getCheckRunStatus->reveal(),
             $this->getStatusCheckStatus->reveal(),
-            new NullLogger()
+            new NullLogger(),
+            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
         );
     }
 
@@ -52,103 +59,153 @@ class GetCIStatusTest extends WebTestCase
      * @dataProvider ciStatusesExamples
      */
     public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
-        string $checkRunStatus,
-        string $statusCheckStatus,
+        array $checkRunStatuses,
+        array $statusCheckStatuses,
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
-        self::assertTrue(false);
-        $this->mockIndependentResults($checkRunStatus, $statusCheckStatus, $expectedBuildLink);
+        $prIdentifierArgument = Argument::that(
+            static fn(PRIdentifier $PRIdentifier) => $PRIdentifier->equals(
+                $PRIdentifier::fromString(self::PR_IDENTIFIER)
+            )
+        );
+        $commitRefArgument = Argument::that(
+            static fn(string $commitRef) => self::COMMIT_REF === $commitRef
+        );
 
-        $actualCIStatus = $this->getCIStatus();
+        $this->getMergeableState->fetch($prIdentifierArgument)->willReturn(false);
+        $this->getCheckRunStatus->fetch($prIdentifierArgument, $commitRefArgument)
+            ->willReturn($checkRunStatuses);
+        $this->getStatusCheckStatus->fetch($prIdentifierArgument, $commitRefArgument)
+            ->willReturn($statusCheckStatuses);
+
+        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
 
         self::assertEquals($expectedCIStatus, $actualCIStatus->status);
         self::assertEquals($expectedBuildLink, $actualCIStatus->buildLink);
     }
-
-    public function test_it_determines_a_green_ci_if_the_pr_is_mergeable(
-    ): void {
-        $prIdentifierArgument = Argument::that(
-            static fn (PRIdentifier $PRIdentifier) => $PRIdentifier->equals($PRIdentifier::fromString(self::PR_IDENTIFIER))
-        );
-        $this->getMergeableState->fetch($prIdentifierArgument)->willReturn(true);
-
-        $actualCIStatus = $this->getCIStatus();
-
-        self::assertEquals('GREEN', $actualCIStatus->status);
-    }
-
     public function ciStatusesExamples(): array
     {
         return [
-            'check run result (GREEN)'                                                         => [
-                'GREEN',
+            'CI Checks not supported' => [
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                ],
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_3),
+                ],
                 'PENDING',
-                'GREEN',
-                ''
+                '',
             ],
-            'check run result (RED)'                                                           => [
-                'RED',
+            'All unsupported CI check statuses: green' => [
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                ],
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                ],
+                'GREEN',
+                '',
+            ],
+            'Supported CI Checks not run' => [
+                [
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                ],
+                [
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+
+                ],
                 'PENDING',
-                'RED',
-                self::BUILD_LINK
+                '',
             ],
-            'check run is "PENDING", the CI result depends on the status check result (GREEN)' => [
+            'Multiple CI checks Green' => [
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                ],
+                [
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                ],
+                'GREEN',
+                '',
+            ],
+            'Multiple CI checks Red' => [
+                [
+                    CheckStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CheckStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
+                ],
+                [
+                    CheckStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CheckStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
+                ],
+                'RED',
+                self::BUILD_LINK,
+            ],
+            'Multiple CI checks Pending' => [
+                [
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                ],
+                [
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                ],
                 'PENDING',
-                'GREEN',
-                'GREEN',
-                ''
+                '',
             ],
-            'check run is "PENDING", the CI result depends on the status check result (RED)'   => [
-                'PENDING',
+            'Mixed CI checks statuses: red' => [
+                [
+                    CheckStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                ],
+                [
+                    CheckStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                ],
                 'RED',
-                'RED',
-                ''
+                self::BUILD_LINK,
             ],
-            'check run is RED then the status is RED'                                          => [
-                'RED',
+            'Mixed CI checks statuses: green' => [
+                [
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_2),
+                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                ],
+                [
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CheckStatus::green(self::SUPPORTED_CI_CHECK_2),
+                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                ],
                 'GREEN',
-                'RED',
-                self::BUILD_LINK
-            ],
-            'status check is RED then the status is RED'                                       => [
-                'GREEN',
-                'RED',
-                'RED',
-                self::BUILD_LINK
-            ],
-            'if both status check and check runs are GREEN then the status is GREEN'           => [
-                'GREEN',
-                'GREEN',
-                'GREEN',
-                ''
+                '',
             ],
         ];
     }
 
-    private function mockIndependentResults(
-        string $checkRunStatus,
-        string $statusCheckStatus,
-        string $buildLink
-    ): void {
-        $prIdentifierArgument = Argument::that(
-            static fn (PRIdentifier $PRIdentifier) => $PRIdentifier->equals($PRIdentifier::fromString(self::PR_IDENTIFIER))
-        );
-        $commitRefArgument = Argument::that(
-            static fn (string $commitRef) => self::COMMIT_REF === $commitRef
-        );
-
-        $this->getMergeableState->fetch($prIdentifierArgument)->willReturn(false);
-        $this->getCheckRunStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
-            new CheckStatus($checkRunStatus, $buildLink)
-        );
-        $this->getStatusCheckStatus->fetch($prIdentifierArgument, $commitRefArgument)->willReturn(
-            new CheckStatus($statusCheckStatus, $buildLink)
-        );
-    }
-
-    private function getCIStatus(): CheckStatus
+    public function test_it_determines_a_green_ci_if_the_pr_is_mergeable(): void
     {
-        return $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
+        $prIdentifierArgument = Argument::that(
+            static fn(PRIdentifier $PRIdentifier) => $PRIdentifier->equals(
+                $PRIdentifier::fromString(self::PR_IDENTIFIER)
+            )
+        );
+        $this->getMergeableState->fetch($prIdentifierArgument)->willReturn(true);
+
+        $actualCIStatus = $this->getCIStatus->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER), self::COMMIT_REF);
+
+        self::assertEquals('GREEN', $actualCIStatus->status);
     }
 }

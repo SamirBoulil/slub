@@ -10,6 +10,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
@@ -19,7 +20,6 @@ class GetStatusChecksStatusTest extends WebTestCase
     private const PR_COMMIT_REF = 'pr_commit_ref';
     private const SUPPORTED_CI_STATUS_1 = 'supported_1';
     private const SUPPORTED_CI_STATUS_2 = 'supported_2';
-    private const SUPPORTED_CI_CHECK_3 = 'supported_3';
     private const NOT_SUPPORTED_CI_STATUS_1 = 'unsupported_1';
     private const NOT_SUPPORTED_CI_STATUS_2 = 'unsupported_2';
     private const NOT_SUPPORTED_CI_STATUS_3 = 'unsupported_3';
@@ -35,143 +35,60 @@ class GetStatusChecksStatusTest extends WebTestCase
         $this->githubAPIClient = $this->prophesize(GithubAPIClient::class);
         $this->getStatusCheckStatus = new GetStatusChecksStatus(
             $this->githubAPIClient->reveal(),
-            implode(',', [self::SUPPORTED_CI_STATUS_1, self::SUPPORTED_CI_STATUS_2, self::SUPPORTED_CI_CHECK_3]),
-            'https://api.github.com',
-            new NullLogger()
+            new NullLogger(),
+            'https://api.github.com'
         );
     }
 
-    /**
-     * @test
-     * @dataProvider ciStatusesExamples
-     */
-    public function it_fetches_and_deducts_the_ci_status_of_ci_checks(
-        array $ciStatuses,
-        string $expectedCIStatus,
-        string $expectedBuildLink
-    ): void {
+    public function test_it_fetches_check_status_from_check_runs()
+    {
         $uri = 'https://api.github.com/repos/SamirBoulil/slub/statuses/'.self::PR_COMMIT_REF;
         $repositoryIdentifier = 'SamirBoulil/slub';
+        $expectedSuccessStatusCheck = 'check success';
+        $expectedNeutralStatusCheck = 'check neutral';
+        $expectedFailedStatusCheck = 'check faileds';
+        $expectedFailedBuildLink = 'url to failed step';
         $this->githubAPIClient->get(
             $uri,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
             $repositoryIdentifier
-        )->willReturn(new Response(200, [], (string) json_encode($ciStatuses)));
+        )->willReturn(
+            new Response(
+                200, [], (string)json_encode(
+                [
+                        [
+                            'context' => $expectedSuccessStatusCheck,
+                            'state' => 'success',
+                            'updated_at' => '2020-03-31T10:26:20Z',
+                        ],
+                        [
+                            'context' => $expectedNeutralStatusCheck,
+                            'state' => 'neutral',
+                            'updated_at' => '2020-03-31T10:26:20Z',
+                        ],
+                        [
+                            'context' => $expectedFailedStatusCheck,
+                            'state' => 'failure',
+                            'target_url' => $expectedFailedBuildLink,
+                            'updated_at' => '2020-03-31T10:26:20Z',
+                        ],
+                ],
+                JSON_THROW_ON_ERROR
+            ))
+        );
 
-        $actualCIStatus = $this->getStatusCheckStatus->fetch(
+        $actualCheckStatuses = $this->getStatusCheckStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
             self::PR_COMMIT_REF
         );
 
-        self::assertEquals($expectedCIStatus, $actualCIStatus->status);
-        self::assertEquals($expectedBuildLink, $actualCIStatus->buildLink);
+        $this->assertCount(3, $actualCheckStatuses);
+        $this->assertEquals(CheckStatus::green($expectedSuccessStatusCheck), $actualCheckStatuses[0]);
+        $this->assertEquals(CheckStatus::pending($expectedNeutralStatusCheck), $actualCheckStatuses[1]);
+        $this->assertEquals(CheckStatus::red($expectedFailedStatusCheck, $expectedFailedBuildLink), $actualCheckStatuses[2]);
     }
 
-    /**
-     * @test
-     */
-    public function it_uses_the_ci_statuses_when_the_check_suite_is_not_failed(
-    ): void {
-        $day = '2020-03-30T10:26:20Z';
-        $tomorrow = '2020-03-31T10:26:20Z';
-        $ciStatuses = [
-            ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'updated_at' => $day],
-            ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => $tomorrow],
-        ];
-        $this->githubAPIClient->get(Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(new Response(200, [], (string) json_encode($ciStatuses)));
-
-        $actualCIStatus = $this->getStatusCheckStatus->fetch(PRIdentifier::fromString('SamirBoulil/slub/36'), self::PR_COMMIT_REF);
-
-        self::assertEquals('GREEN', $actualCIStatus->status);
-    }
-
-    public function ciStatusesExamples(): array
-    {
-        return [
-            'mixed not supported: neutral' => [
-                [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_3, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'PENDING',
-                '',
-            ],
-            'mixed not supported: red' => [
-                [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_3, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'RED',
-                self::BUILD_LINK,
-            ],
-            'All unsupported: green' => [
-                [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'GREEN',
-                '',
-            ],
-            'Supported status not run' => [
-                [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'PENDING',
-                '',
-            ],
-            'Multiple Status Green' => [
-                [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'GREEN',
-                '',
-            ],
-            'Multiple status Red' => [
-                [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2,
-                     'state' => 'failure',
-                     'target_url' => 'http://my-ci.com/build/456',
-                     'updated_at' => '2020-03-31T10:26:20Z',
-                    ],
-                ],
-                'RED',
-                self::BUILD_LINK,
-            ],
-            'Multiple status Pending' => [
-                [
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'pending', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'pending', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'PENDING',
-                '',
-            ],
-            'Mixed statuses: red' => [
-                [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'RED',
-                self::BUILD_LINK,
-            ],
-            'Mixed statuses: green' => [
-                [
-                    ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                ],
-                'PENDING',
-                '',
-            ],
-        ];
-    }
+    // TODO: Add tests for sorting and uniquing
 
     /**
      * @test

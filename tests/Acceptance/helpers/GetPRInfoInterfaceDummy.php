@@ -20,7 +20,7 @@ class GetPRInfoInterfaceDummy implements GetPRInfoInterface
         $result->GTMCount = 0;
         $result->notGTMCount = 0;
         $result->comments = 0;
-        $result->CIStatus = new CheckStatus('PENDING');
+        $result->CIStatus = CheckStatus::pending();
         $result->isMerged = false;
 
         return $result;

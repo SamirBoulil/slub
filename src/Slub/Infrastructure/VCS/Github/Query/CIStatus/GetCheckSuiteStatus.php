@@ -30,13 +30,13 @@ class GetCheckSuiteStatus
     {
         $checkSuite = $this->checkSuite($PRIdentifier, $commitRef);
         if ($this->isCheckSuiteStatus($checkSuite, 'failure')) {
-            return new CheckStatus('RED', $this->buildLink($checkSuite));
+            return CheckStatus::red('RENAME_ME', $this->buildLink($checkSuite));
         }
         if ($this->isCheckSuiteStatus($checkSuite, 'success')) {
-            return new CheckStatus('GREEN', '');
+            return CheckStatus::green('RENAME_ME');
         }
 
-        return new CheckStatus('PENDING', '');
+        return CheckStatus::pending('RENAME_ME');
     }
 
     private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool

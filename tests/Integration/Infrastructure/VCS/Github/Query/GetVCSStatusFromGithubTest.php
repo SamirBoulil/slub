@@ -65,7 +65,8 @@ class GetVCSStatusFromGithubTest extends WebTestCase
             FindReviews::NOT_GTMS => self::EXPECTED_NOT_GTMS,
             FindReviews::COMMENTS => self::EXPECTED_COMMENTS,
         ]);
-        $this->getCIStatusStub->fetch($PRIdentifier, self::PR_COMMIT_REF)->willReturn(new CheckStatus(self::EXPECTED_CI_STATUS));
+        $this->getCIStatusStub->fetch($PRIdentifier, self::PR_COMMIT_REF)
+            ->willReturn(CheckStatus::green());
 
         $vcsStatus = $this->getVCSStatus->fetch($PRIdentifier);
 

@@ -38,14 +38,13 @@ class DebugCIStatusCLITest extends KernelTestCase
      */
     public function it_executes(): void
     {
-        $ciStatus = 'GREEN';
         $prInfo = $this->aPRInfo();
-        $prInfo->CIStatus = new CheckStatus($ciStatus);
+        $prInfo->CIStatus = CheckStatus::green();
 
         $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER))->willReturn($prInfo);
         $this->commandTester->execute(['command' => self::COMMAND_NAME, 'pull_request_link' => 'https://github.com/samirboulil/slub/pull/123']);
 
-        $this->assertStringContainsString($ciStatus, $this->commandTester->getDisplay());
+        $this->assertStringContainsString('GREEN', $this->commandTester->getDisplay());
     }
 
     private function setUpCommand(): void
@@ -67,7 +66,7 @@ class DebugCIStatusCLITest extends KernelTestCase
         $prInfo->GTMCount = 1;
         $prInfo->notGTMCount = 1;
         $prInfo->comments = 1;
-        $prInfo->CIStatus = new CheckStatus('success');
+        $prInfo->CIStatus = CheckStatus::green();
         $prInfo->isMerged = false;
         $prInfo->isClosed = false;
 

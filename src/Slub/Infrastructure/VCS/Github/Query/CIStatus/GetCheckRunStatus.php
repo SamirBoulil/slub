@@ -11,23 +11,21 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 class GetCheckRunStatus
 {
-    /** @var string[] */
-    private array $supportedCIChecks;
-
     public function __construct(
         private GithubAPIClientInterface $githubAPIClient,
-        string $supportedCIChecks,
         private string $domainName,
         private LoggerInterface $logger
     ) {
-        $this->supportedCIChecks = explode(',', $supportedCIChecks);
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
+    /**
+     * @return array<CheckStatus>
+     */
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): array
     {
         $checkRunsStatus = $this->checkRuns($PRIdentifier, $commitRef);
 
-        return $this->deductCIStatus($checkRunsStatus);
+        return $this->intoCheckStatuses($checkRunsStatus);
     }
 
     private function checkRuns(PRIdentifier $PRIdentifier, string $ref): array
@@ -55,37 +53,21 @@ class GetCheckRunStatus
         return $content['check_runs'];
     }
 
-    private function deductCIStatus(array $allCheckRuns): CheckStatus
+    /**
+     * @return array<CheckStatus>
+     */
+    private function intoCheckStatuses(array $checkRuns): array
     {
-        $failedCheckRun = $this->failedCheckRun($allCheckRuns);
-        if (null !== $failedCheckRun) {
-            return new CheckStatus('RED', $failedCheckRun['details_url'] ?? '');
-        }
-
-        if ($this->allCheckRunsSuccess($allCheckRuns)) {
-            return new CheckStatus('GREEN');
-        }
-
-        $supportedCheckRuns = $this->supportedCheckRuns($allCheckRuns);
-        if (empty($supportedCheckRuns)) {
-            return new CheckStatus('PENDING');
-        }
-
-        if ($this->allCheckRunsSuccess($supportedCheckRuns)) {
-            return new CheckStatus('GREEN');
-        }
-
-        return new CheckStatus('PENDING');
-    }
-
-    private function allCheckRunsSuccess(array $allCheckRuns): bool
-    {
-        $successfulCICheckRuns = array_filter(
-            $allCheckRuns,
-            static fn(array $checkRun) => $checkRun['conclusion'] === 'success'
+        return array_map(
+            static function ($checkRun) {
+                return match ($checkRun['conclusion']) {
+                    'success' => CheckStatus::green($checkRun['name']),
+                    'failure' => CheckStatus::red($checkRun['name'], $checkRun['details_url']),
+                    default =>  CheckStatus::pending($checkRun['name']),
+                };
+            },
+            $checkRuns
         );
-
-        return \count($successfulCICheckRuns) === \count($allCheckRuns);
     }
 
     private function checkRunsUrl(PRIdentifier $PRIdentifier, string $ref): string
@@ -95,29 +77,6 @@ class GetCheckRunStatus
             $this->domainName,
             GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
             $ref,
-        );
-    }
-
-    private function failedCheckRun(array $allCheckRuns): ?array
-    {
-        return array_reduce(
-            $allCheckRuns,
-            static function ($current, $checkRun) {
-                if (null !== $current) {
-                    return $current;
-                }
-
-                return 'failure' === $checkRun['conclusion'] ? $checkRun : $current;
-            },
-            null
-        );
-    }
-
-    private function supportedCheckRuns(array $allCheckRuns): array
-    {
-        return array_filter(
-            $allCheckRuns,
-            fn(array $checkRun) => \in_array($checkRun['name'], $this->supportedCIChecks, true)
         );
     }
 }

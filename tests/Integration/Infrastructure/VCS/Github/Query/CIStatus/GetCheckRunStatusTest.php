@@ -10,6 +10,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
@@ -35,141 +36,56 @@ class GetCheckRunStatusTest extends WebTestCase
 
         $this->getCheckRunStatus = new GetCheckRunStatus(
             $this->githubAPIClient->reveal(),
-            implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3]),
             'https://api.github.com',
             new NullLogger()
         );
     }
 
-    /**
-     * @test
-     * @dataProvider checkRunsExamples
-     */
-    public function it_uses_the_check_runs_status_when_the_check_suite_is_not_failed(
-        array $ciCheckRuns,
-        string $expectedCIStatus,
-        string $expectedBuildLink
-    ): void {
+    public function test_it_fetches_check_status_from_check_runs()
+    {
         $uri = 'https://api.github.com/repos/SamirBoulil/slub/commits/'.self::PR_COMMIT_REF.'/check-runs';
         $repositoryIdentifier = 'SamirBoulil/slub';
+        $expectedSuccessCheckName = 'check success';
+        $expectedNeutralCheckName = 'check neutral';
+        $expectedFailedCheckName = 'check faileds';
+        $expectedFailedBuildLink = 'url to failed step';
         $this->githubAPIClient->get(
             $uri,
             ['headers' => GithubAPIHelper::acceptPreviewEndpointsHeader()],
             $repositoryIdentifier
-        )->willReturn(new Response(200, [], (string)json_encode($ciCheckRuns)));
+        )->willReturn(
+            new Response(
+                200, [], (string)json_encode(
+                [
+                    'check_runs' => [
+                        [
+                            'name' => $expectedSuccessCheckName,
+                            'conclusion' => 'success',
+                        ],
+                        [
+                            'name' => $expectedNeutralCheckName,
+                            'conclusion' => 'neutral',
+                        ],
+                        [
+                            'name' => $expectedFailedCheckName,
+                            'details_url' => $expectedFailedBuildLink,
+                            'conclusion' => 'failure',
+                        ],
+                    ],
+                ],
+                JSON_THROW_ON_ERROR
+            ))
+        );
 
-        $actualCheckStatus = $this->getCheckRunStatus->fetch(
+        $actualCheckStatuses = $this->getCheckRunStatus->fetch(
             PRIdentifier::fromString('SamirBoulil/slub/36'),
             self::PR_COMMIT_REF
         );
 
-        $this->assertEquals($expectedCIStatus, $actualCheckStatus->status);
-        $this->assertEquals($expectedBuildLink, $actualCheckStatus->buildLink);
-    }
-
-    public function checkRunsExamples(): array
-    {
-        return [
-            'CI Checks not supported' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'failure'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                    ],
-                ],
-                'PENDING',
-                '',
-            ],
-            'All unsupported CI checks statuses: green' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                    ],
-                ],
-                'GREEN',
-                '',
-            ],
-            'Supported CI Checks not run' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                    ],
-                ],
-                'PENDING',
-                '',
-            ],
-            'Multiple CI checks Green' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                    ],
-                ],
-                'GREEN',
-                '',
-            ],
-            'Multiple CI checks Red' => [
-                [
-                    'check_runs' => [
-                        [
-                            'name' => self::SUPPORTED_CI_CHECK_1,
-                            'conclusion' => 'failure',
-                            'status' => 'completed',
-                            'details_url' => self::BUILD_LINK,
-                        ],
-                        [
-                            'name' => self::SUPPORTED_CI_CHECK_2,
-                            'conclusion' => 'failure',
-                            'status' => 'completed',
-                            'details_url' => self::BUILD_LINK,
-                        ],
-                    ],
-                ],
-                'RED',
-                self::BUILD_LINK,
-            ],
-            'Multiple CI checks Pending' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'PENDING',
-                '',
-            ],
-            'Mixed CI checks statuses: red' => [
-                [
-                    'check_runs' => [
-                        [
-                            'name' => self::NOT_SUPPORTED_CI_CHECK_1,
-                            'conclusion' => 'failure',
-                            'status' => 'completed',
-                            'details_url' => self::BUILD_LINK,
-                        ],
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'RED',
-                self::BUILD_LINK,
-            ],
-            'Mixed CI checks statuses: green' => [
-                [
-                    'check_runs' => [
-                        ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                    ],
-                ],
-                'GREEN',
-                '',
-            ],
-        ];
+        $this->assertCount(3, $actualCheckStatuses);
+        $this->assertEquals(CheckStatus::green($expectedSuccessCheckName), $actualCheckStatuses[0]);
+        $this->assertEquals(CheckStatus::pending($expectedNeutralCheckName), $actualCheckStatuses[1]);
+        $this->assertEquals(CheckStatus::red($expectedFailedCheckName, $expectedFailedBuildLink), $actualCheckStatuses[2]);
     }
 
     /**

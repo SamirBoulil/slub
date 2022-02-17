@@ -57,6 +57,7 @@ class GetCIStatusTest extends WebTestCase
         string $expectedCIStatus,
         string $expectedBuildLink
     ): void {
+        self::assertTrue(false);
         $this->mockIndependentResults($checkRunStatus, $statusCheckStatus, $expectedBuildLink);
 
         $actualCIStatus = $this->getCIStatus();

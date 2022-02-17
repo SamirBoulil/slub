@@ -1,7 +1,6 @@
 parameters:
     GITHUB_WEBHOOK_SECRET: 'my_secret'
     GITHUB_URI: '127.0.0.1:8081'
-    GITHUB_PORT: '8081'
 
 services:
     # default configuration for services in *this* file

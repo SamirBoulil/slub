@@ -20,7 +20,8 @@ class GetCheckRunStatusTest extends WebTestCase
     private const SUPPORTED_CI_CHECK_1 = 'supported_1';
     private const SUPPORTED_CI_CHECK_2 = 'supported_2';
     private const SUPPORTED_CI_CHECK_3 = 'supported_3';
-    private const NOT_SUPPORTED_CI_CHECK = 'unsupported';
+    private const NOT_SUPPORTED_CI_CHECK_1 = 'unsupported_1';
+    private const NOT_SUPPORTED_CI_CHECK_2 = 'unsupported_2';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     private GetCheckRunStatus $getCheckRunStatus;
@@ -72,12 +73,22 @@ class GetCheckRunStatusTest extends WebTestCase
             'CI Checks not supported' => [
                 [
                     'check_runs' => [
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'failure'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'failure'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
                     ],
                 ],
                 'PENDING',
+                '',
+            ],
+            'All unsupported CI checks statuses: green' => [
+                [
+                    'check_runs' => [
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
+                    ],
+                ],
+                'GREEN',
                 '',
             ],
             'Supported CI Checks not run' => [
@@ -85,7 +96,7 @@ class GetCheckRunStatusTest extends WebTestCase
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
                     ],
                 ],
                 'PENDING',
@@ -135,7 +146,7 @@ class GetCheckRunStatusTest extends WebTestCase
                 [
                     'check_runs' => [
                         [
-                            'name' => self::NOT_SUPPORTED_CI_CHECK,
+                            'name' => self::NOT_SUPPORTED_CI_CHECK_1,
                             'conclusion' => 'failure',
                             'status' => 'completed',
                             'details_url' => self::BUILD_LINK,
@@ -151,8 +162,8 @@ class GetCheckRunStatusTest extends WebTestCase
                 [
                     'check_runs' => [
                         ['name' => self::SUPPORTED_CI_CHECK_2, 'conclusion' => 'success', 'status' => 'completed'],
-                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
-                        ['name' => self::NOT_SUPPORTED_CI_CHECK, 'conclusion' => 'neutral', 'status' => 'pending'],
+                        ['name' => self::SUPPORTED_CI_CHECK_1, 'conclusion' => 'success', 'status' => 'completed'],
+                        ['name' => self::NOT_SUPPORTED_CI_CHECK_1, 'conclusion' => 'neutral', 'status' => 'pending'],
                     ],
                 ],
                 'GREEN',

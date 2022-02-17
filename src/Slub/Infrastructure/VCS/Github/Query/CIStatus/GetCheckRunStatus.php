@@ -43,42 +43,49 @@ class GetCheckRunStatus
 
         $content = json_decode($response->getBody()->getContents(), true);
         if (200 !== $response->getStatusCode() || null === $content) {
-            throw new \RuntimeException(sprintf('There was a problem when fetching the check runs for PR "%s" at %s', $PRIdentifier->stringValue(), $url));
+            throw new \RuntimeException(
+                sprintf(
+                    'There was a problem when fetching the check runs for PR "%s" at %s',
+                    $PRIdentifier->stringValue(),
+                    $url
+                )
+            );
         }
 
         return $content['check_runs'];
     }
 
-    private function deductCIStatus(array $checkRuns): CheckStatus
+    private function deductCIStatus(array $allCheckRuns): CheckStatus
     {
-        $getCheckRuns = fn (string $statusToFilterOn) => function ($current, $checkRun) use ($statusToFilterOn) {
-            if (null !== $current) {
-                return $current;
-            }
-
-            return $statusToFilterOn === $checkRun['conclusion'] ? $checkRun : $current;
-        };
-
-        $CICheckAFailure = array_reduce($checkRuns, $getCheckRuns('failure'), null);
-        if (null !== $CICheckAFailure) {
-            return new CheckStatus('RED', $CICheckAFailure['details_url'] ?? '');
+        $failedCheckRun = $this->failedCheckRun($allCheckRuns);
+        if (null !== $failedCheckRun) {
+            return new CheckStatus('RED', $failedCheckRun['details_url'] ?? '');
         }
 
-        $supportedCheckRuns = array_filter(
-            $checkRuns,
-            fn (array $checkRun) => $this->isCheckRunSupported($checkRun)
-        );
+        if ($this->allCheckRunsSuccess($allCheckRuns)) {
+            return new CheckStatus('GREEN');
+        }
 
+        $supportedCheckRuns = $this->supportedCheckRuns($allCheckRuns);
         if (empty($supportedCheckRuns)) {
             return new CheckStatus('PENDING');
         }
 
-        $CICheckSuccess = array_reduce($supportedCheckRuns, $getCheckRuns('success'), null);
-        if (null !== $CICheckSuccess) {
+        if ($this->allCheckRunsSuccess($supportedCheckRuns)) {
             return new CheckStatus('GREEN');
         }
 
         return new CheckStatus('PENDING');
+    }
+
+    private function allCheckRunsSuccess(array $allCheckRuns): bool
+    {
+        $successfulCICheckRuns = array_filter(
+            $allCheckRuns,
+            static fn(array $checkRun) => $checkRun['conclusion'] === 'success'
+        );
+
+        return \count($successfulCICheckRuns) === \count($allCheckRuns);
     }
 
     private function checkRunsUrl(PRIdentifier $PRIdentifier, string $ref): string
@@ -91,8 +98,26 @@ class GetCheckRunStatus
         );
     }
 
-    private function isCheckRunSupported(array $checkRun): bool
+    private function failedCheckRun(array $allCheckRuns): ?array
     {
-        return in_array($checkRun['name'], $this->supportedCIChecks);
+        return array_reduce(
+            $allCheckRuns,
+            static function ($current, $checkRun) {
+                if (null !== $current) {
+                    return $current;
+                }
+
+                return 'failure' === $checkRun['conclusion'] ? $checkRun : $current;
+            },
+            null
+        );
+    }
+
+    private function supportedCheckRuns(array $allCheckRuns): array
+    {
+        return array_filter(
+            $allCheckRuns,
+            fn(array $checkRun) => \in_array($checkRun['name'], $this->supportedCIChecks, true)
+        );
     }
 }

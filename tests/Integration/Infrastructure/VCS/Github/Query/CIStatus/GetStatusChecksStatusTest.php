@@ -20,7 +20,9 @@ class GetStatusChecksStatusTest extends WebTestCase
     private const SUPPORTED_CI_STATUS_1 = 'supported_1';
     private const SUPPORTED_CI_STATUS_2 = 'supported_2';
     private const SUPPORTED_CI_CHECK_3 = 'supported_3';
-    private const NOT_SUPPORTED_CI_STATUS = 'unsupported';
+    private const NOT_SUPPORTED_CI_STATUS_1 = 'unsupported_1';
+    private const NOT_SUPPORTED_CI_STATUS_2 = 'unsupported_2';
+    private const NOT_SUPPORTED_CI_STATUS_3 = 'unsupported_3';
     private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     private GetStatusChecksStatus $getStatusCheckStatus;
@@ -87,20 +89,37 @@ class GetStatusChecksStatusTest extends WebTestCase
     public function ciStatusesExamples(): array
     {
         return [
-            'Status not supported' => [
+            'mixed not supported: neutral' => [
                 [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_3, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                 ],
                 'PENDING',
+                '',
+            ],
+            'mixed not supported: red' => [
+                [
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_3, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                ],
+                'RED',
+                self::BUILD_LINK,
+            ],
+            'All unsupported: green' => [
+                [
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                ],
+                'GREEN',
                 '',
             ],
             'Supported status not run' => [
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                 ],
                 'PENDING',
                 '',
@@ -135,7 +154,7 @@ class GetStatusChecksStatusTest extends WebTestCase
             ],
             'Mixed statuses: red' => [
                 [
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'failure', 'target_url' => self::BUILD_LINK, 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
                 ],
@@ -146,9 +165,9 @@ class GetStatusChecksStatusTest extends WebTestCase
                 [
                     ['context' => self::SUPPORTED_CI_STATUS_2, 'state' => 'success', 'updated_at' => '2020-03-31T10:26:20Z'],
                     ['context' => self::SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
-                    ['context' => self::NOT_SUPPORTED_CI_STATUS, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
+                    ['context' => self::NOT_SUPPORTED_CI_STATUS_1, 'state' => 'neutral', 'updated_at' => '2020-03-31T10:26:20Z'],
                 ],
-                'GREEN',
+                'PENDING',
                 '',
             ],
         ];

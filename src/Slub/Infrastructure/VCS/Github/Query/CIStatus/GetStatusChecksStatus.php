@@ -50,35 +50,60 @@ class GetStatusChecksStatus
         return $content;
     }
 
-    private function deductCIStatus(array $statuses): CheckStatus
+    private function deductCIStatus(array $allStatuses): CheckStatus
     {
-        $getStatuses = fn (string $statusToFilterOn) => function ($current, $ciStatus) use ($statusToFilterOn) {
-            if (null !== $current) {
-                return $current;
-            }
-
-            return ($statusToFilterOn === $ciStatus['state']) ? $ciStatus : $current;
-        };
-
-        $faillingStatus = array_reduce($statuses, $getStatuses('failure'));
-        if ($faillingStatus) {
-            return new CheckStatus('RED', $faillingStatus['target_url'] ?? '');
+        $failedStatus = $this->failedStatus($allStatuses);
+        if (null !== $failedStatus) {
+            return new CheckStatus('RED', $failedStatus['target_url'] ?? '');
         }
 
-        $supportedStatuses = array_filter($statuses,
-            fn (array $status) => $this->isStatusSupported($status)
-        );
+        if ($this->allStatusesSuccess($allStatuses)) {
+            return new CheckStatus('GREEN');
+        }
 
+        $supportedStatuses = $this->supportedStatuses($allStatuses);
         if (empty($supportedStatuses)) {
             return new CheckStatus('PENDING');
         }
 
-        $successStatus = array_reduce($supportedStatuses, $getStatuses('success'));
-        if ($successStatus) {
+        if ($this->allStatusesSuccess($supportedStatuses)) {
             return new CheckStatus('GREEN');
         }
 
         return new CheckStatus('PENDING');
+    }
+
+    private function failedStatus(array $allStatuses): ?array
+    {
+        return array_reduce(
+            $allStatuses,
+            static function ($current, $ciStatus) {
+                if (null !== $current) {
+                    return $current;
+                }
+
+                return ('failure' === $ciStatus['state']) ? $ciStatus : $current;
+            },
+            null
+        );
+    }
+
+    private function allStatusesSuccess(array $allStatuses): bool
+    {
+        $successfulStatuses = array_filter(
+            $allStatuses,
+            static fn(array $status) => 'success' === $status['state']
+        );
+
+        return \count($successfulStatuses) === \count($allStatuses);
+    }
+
+    private function supportedStatuses(array $allStatuses): array
+    {
+        return array_filter(
+            $allStatuses,
+            fn(array $status) => \in_array($status['context'], $this->supportedCIChecks, true)
+        );
     }
 
     private function statusesUrl(PRIdentifier $PRIdentifier, string $ref): string
@@ -89,11 +114,6 @@ class GetStatusChecksStatus
             GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier),
             $ref
         );
-    }
-
-    private function isStatusSupported(array $status): bool
-    {
-        return in_array($status['context'], $this->supportedCIChecks);
     }
 
     private function sortAndUniqueStatuses(array $ciStatuses): array

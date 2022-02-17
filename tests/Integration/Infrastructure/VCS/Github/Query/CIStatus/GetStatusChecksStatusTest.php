@@ -18,12 +18,6 @@ use Tests\WebTestCase;
 class GetStatusChecksStatusTest extends WebTestCase
 {
     private const PR_COMMIT_REF = 'pr_commit_ref';
-    private const SUPPORTED_CI_STATUS_1 = 'supported_1';
-    private const SUPPORTED_CI_STATUS_2 = 'supported_2';
-    private const NOT_SUPPORTED_CI_STATUS_1 = 'unsupported_1';
-    private const NOT_SUPPORTED_CI_STATUS_2 = 'unsupported_2';
-    private const NOT_SUPPORTED_CI_STATUS_3 = 'unsupported_3';
-    private const BUILD_LINK = 'http://my-ci.com/build/123';
 
     private GetStatusChecksStatus $getStatusCheckStatus;
 

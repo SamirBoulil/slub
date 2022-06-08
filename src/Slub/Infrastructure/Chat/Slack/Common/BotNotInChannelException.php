@@ -9,4 +9,5 @@ namespace Slub\Infrastructure\Chat\Slack\Common;
  */
 class BotNotInChannelException extends \LogicException
 {
+    protected $message = 'Bot is not in the channel.';
 }

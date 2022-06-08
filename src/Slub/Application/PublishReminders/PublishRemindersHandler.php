@@ -26,13 +26,16 @@ class PublishRemindersHandler
         if ($this->clock->areWeOnWeekEnd()) {
             return;
         }
+        $this->publishReminders();
+    }
 
+    private function publishReminders(): void
+    {
         $PRsInReview = $this->PRRepository->findPRToReviewNotGTMed();
         $channelIdentifiers = $this->channelIdentifiers($PRsInReview);
         foreach ($channelIdentifiers as $channelIdentifier) {
             $this->publishReminder($channelIdentifier, $PRsInReview);
         }
-
         $this->logger->info('Reminders published');
     }
 
@@ -40,7 +43,11 @@ class PublishRemindersHandler
     {
         $PRsToPublish = $this->prsPutToReviewInChannel($channelIdentifier, $PRsInReview);
         $blocks = $this->formatReminderInBlocks($PRsToPublish);
-        $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
+        try {
+            $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
+        } catch (\throwable $e) {
+            $this->logger->alert(sprintf('Was not able to publish reminder, "%s"', $e->getMessage()));
+        }
     }
 
     private function formatReminderInBlocks(array $PRsToPublish): array

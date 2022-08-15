@@ -22,7 +22,13 @@ class NewEventAction
     private const EVENT_TYPE = 'X-GitHub-Event';
     private const DELIVERY = 'X-GitHub-Delivery';
 
-    public function __construct(private EventHandlerRegistry $eventHandlerRegistry, private SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered, private SqlDeliveredEventRepository $sqlDeliveredEventRepository, private LoggerInterface $logger, private string $secret)
+    public function __construct(
+        private EventHandlerRegistry $eventHandlerRegistry,
+        private SqlHasEventAlreadyBeenDelivered $sqlHasEventAlreadyBeenDelivered,
+        private SqlDeliveredEventRepository $sqlDeliveredEventRepository,
+        private LoggerInterface $logger,
+        private string $secret
+    )
     {
     }
 
@@ -30,10 +36,9 @@ class NewEventAction
     {
         $this->logger->critical((string) $request->getContent());
         $this->checkSecret($request);
-        $eventType = $this->eventTypeOrThrow($request);
-        $event = $this->event($request);
-        $this->undeliveredEventOrThrow($request);
-        $this->handle($event, $eventType);
+        if (!$this->IsEventAlreadyProcessed($request)) {
+            $this->handle($request);
+        }
 
         return new Response();
     }
@@ -53,20 +58,25 @@ class NewEventAction
     /**
      * @throws \RuntimeException
      */
-    private function undeliveredEventOrThrow(Request $request): void
+    private function IsEventAlreadyProcessed(Request $request): bool
     {
         $eventIdentifier = $request->headers->get(self::DELIVERY);
-        if (null === $eventIdentifier || !is_string($eventIdentifier)) {
+        if (!is_string($eventIdentifier)) {
             throw new BadRequestHttpException('Expected delivery to have a type string');
         }
 
+        $isEventAlreadyProcessed = false;
         $eventHasAlreadyBeenDelivered = $this->sqlHasEventAlreadyBeenDelivered->fetch($eventIdentifier);
         if ($eventHasAlreadyBeenDelivered) {
-            throw new \RuntimeException(
+            $this->logger->notice(
                 sprintf('Event has already been delivered "%s"', $eventIdentifier)
             );
+
+            $isEventAlreadyProcessed = true;
         }
         $this->sqlDeliveredEventRepository->save($eventIdentifier);
+
+        return $isEventAlreadyProcessed;
     }
 
     private function checkSecret(Request $request): void
@@ -84,12 +94,16 @@ class NewEventAction
         }
     }
 
-    private function handle(array $event, string $eventType): void
+    private function handle(Request $request): void
     {
+        $eventType = $this->eventTypeOrThrow($request);
+        $event = $this->event($request);
+
         $eventHandlers = $this->eventHandlerRegistry->get($eventType);
         if (empty($eventHandlers)) {
             throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
         }
+
         $logger = $this->logger;
         array_map(
             static function (EventHandlerInterface $eventHandler) use ($event, $logger) {

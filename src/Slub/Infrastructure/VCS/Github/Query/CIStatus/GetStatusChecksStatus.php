@@ -99,7 +99,7 @@ class GetStatusChecksStatus
             static function ($checkRun) {
                 return match ($checkRun['state']) {
                     'success' => CheckStatus::green($checkRun['context']),
-                    'failure' => CheckStatus::red($checkRun['context'], $checkRun['target_url']),
+                    'failure' => CheckStatus::red($checkRun['context'], $checkRun['target_url'] ?? ''),
                     default => CheckStatus::pending($checkRun['context']),
                 };
             },

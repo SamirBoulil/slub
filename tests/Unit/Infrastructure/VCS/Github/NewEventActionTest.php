@@ -7,7 +7,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
@@ -28,23 +28,22 @@ class NewEventActionTest extends TestCase
      * @sut
      */
     private NewEventAction $newEventAction;
-
     private EventHandlerRegistry|ObjectProphecy $eventHandlerRegistry;
-
     private ObjectProphecy|SqlDeliveredEventRepository $deliveredEventRepository;
-
     private ObjectProphecy|SqlHasEventAlreadyBeenDelivered $hasEventAlreadyBeenDelivered;
+    private ObjectProphecy|LoggerInterface $logger;
 
     public function setUp(): void
     {
         $this->eventHandlerRegistry = $this->prophesize(EventHandlerRegistry::class);
         $this->hasEventAlreadyBeenDelivered = $this->prophesize(SqlHasEventAlreadyBeenDelivered::class);
         $this->deliveredEventRepository = $this->prophesize(SqlDeliveredEventRepository::class);
+        $this->logger = $this->prophesize(LoggerInterface::class);
         $this->newEventAction = new NewEventAction(
             $this->eventHandlerRegistry->reveal(),
             $this->hasEventAlreadyBeenDelivered->reveal(),
             $this->deliveredEventRepository->reveal(),
-            new NullLogger(),
+            $this->logger->reveal(),
             self::SECRET
         );
     }
@@ -93,13 +92,14 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_event_has_already_been_delivered(): void
+    public function it_logs_if_the_event_has_already_been_delivered(): void
     {
         $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(true);
 
-        $this->expectException(\Exception::class);
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
+
+        $this->logger->notice(sprintf('Event has already been delivered "%s"', self::DELIVERY_EVENT_IDENTIFIER))->shouldBeCalled();
     }
 
     /**

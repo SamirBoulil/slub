@@ -124,13 +124,13 @@ class CheckRunEventHandlerTest extends TestCase
     "check_suite": {
       "pull_requests": [
         {
-          "number": ${prNumber}
+          "number": {$prNumber}
         }
       ]
     }
   },
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;
@@ -150,13 +150,13 @@ JSON;
     "check_suite": {
       "pull_requests": [
         {
-          "number": ${prNumber}
+          "number": {$prNumber}
         }
       ]
     }
   },
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;

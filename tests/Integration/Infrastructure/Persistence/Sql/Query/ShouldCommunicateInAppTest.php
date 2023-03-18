@@ -63,7 +63,7 @@ class ShouldCommunicateInAppTest extends KernelTestCase
         $sql = <<<SQL
 INSERT INTO `user_in_app_communication` (`WORKSPACE_ID`, `USER_ID`, `NEW_SLASH_COMMAND_RELEASE_COMMUNICATION_COUNT`)
 VALUES
-	('${worspaceId}', '${userId}', {$hasReceivedTheMessageValue});
+	('{$worspaceId}', '{$userId}', {$hasReceivedTheMessageValue});
 SQL;
         $this->connection->executeStatement($sql);
     }

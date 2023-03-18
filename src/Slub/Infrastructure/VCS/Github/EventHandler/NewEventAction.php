@@ -98,11 +98,7 @@ class NewEventAction
     {
         $eventType = $this->eventTypeOrThrow($request);
         $event = $this->event($request);
-
-        $eventHandlers = $this->eventHandlerRegistry->get($eventType);
-        if (empty($eventHandlers)) {
-            throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
-        }
+        $eventHandlers = $this->eventHandlerOrThrow($eventType);
 
         $logger = $this->logger;
         array_map(
@@ -122,4 +118,14 @@ class NewEventAction
     {
         return json_decode((string) $request->getContent(), true);
     }
+
+    private function eventHandlerOrThrow(string $eventType): array
+    {
+        $eventHandlers = $this->eventHandlerRegistry->get($eventType);
+        if (empty($eventHandlers)) {
+            throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
+        }
+
+        return $eventHandlers;
+}
 }

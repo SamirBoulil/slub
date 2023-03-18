@@ -34,11 +34,11 @@ SQL;
 INSERT INTO
   pr (IDENTIFIER, MESSAGE_IDS, CHANNEL_IDS)
 VALUES
-  ('${pr['IDENTIFIER']}', '${pr['MESSAGE_IDS']}', '${pr['CHANNEL_IDS']}')
+  ('{$pr['IDENTIFIER']}', '{$pr['MESSAGE_IDS']}', '{$pr['CHANNEL_IDS']}')
 ON DUPLICATE KEY UPDATE
-  IDENTIFIER = '${pr['IDENTIFIER']}',
-  MESSAGE_IDS = '${pr['MESSAGE_IDS']}',
-  CHANNEL_IDS = '${pr['CHANNEL_IDS']}';
+  IDENTIFIER = '{$pr['IDENTIFIER']}',
+  MESSAGE_IDS = '{$pr['MESSAGE_IDS']}',
+  CHANNEL_IDS = '{$pr['CHANNEL_IDS']}';
 SQL;
             $this->addSql($sqlUpdate);
         }

@@ -110,12 +110,12 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
-  "sha": "${commitRef}",
+  "sha": "{$commitRef}",
   "name": "travis",
   "state": "success",
-  "number": ${prNumber},
+  "number": {$prNumber},
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;
@@ -128,12 +128,12 @@ JSON;
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
-  "sha": "${commitRef}",
+  "sha": "{$commitRef}",
   "name": "UNSUPPORTED",
   "state": "failure",
-  "number": ${prNumber},
+  "number": {$prNumber},
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;
@@ -146,12 +146,12 @@ JSON;
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
 {
-  "sha": "${commitRef}",
+  "sha": "{$commitRef}",
   "name": "UNSUPPORTED",
   "state": "pending",
-  "number": ${prNumber},
+  "number": {$prNumber},
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;

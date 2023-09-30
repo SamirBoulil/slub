@@ -28,6 +28,8 @@ class CIStatusUpdatedTest extends WebTestCase
     private PRRepositoryInterface $PRRepository;
     private GithubApiClientMock $githubAPIClientMock;
 
+    private KernelBrowser $client;
+
     public function setUp(): void
     {
         parent::setUp();

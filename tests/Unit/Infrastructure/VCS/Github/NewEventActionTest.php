@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class NewEventActionTest extends TestCase
 {
+    use ProphecyTrait;
     private const SECRET = 'SECRET';
     private const DELIVERY_EVENT_IDENTIFIER = '1234';
 

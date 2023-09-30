@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
@@ -18,6 +19,7 @@ use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
  */
 class GetPRInfoTest extends TestCase
 {
+    use ProphecyTrait;
     private GetPRInfo $getPRInfo;
 
     private GetPRDetails|ObjectProphecy $getPRDetails;

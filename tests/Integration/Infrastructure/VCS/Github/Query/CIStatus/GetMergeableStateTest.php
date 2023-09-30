@@ -7,6 +7,7 @@ namespace Tests\Integration\Infrastructure\VCS\Github\Query\CIStatus;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -20,6 +21,7 @@ use Tests\WebTestCase;
 
 class GetMergeableStateTest extends TestCase
 {
+    use ProphecyTrait;
     private ObjectProphecy|GetPRDetails $getPRDetails;
     private GetMergeableState $getMergeableState;
 

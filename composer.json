@@ -41,9 +41,10 @@
     "friends-of-behat/symfony-extension": "^2.4.1",
     "johnkary/phpunit-speedtrap": "^3.3",
     "phpspec/prophecy": "^1.17",
+    "phpspec/prophecy-phpunit": "^2.0",
     "phpstan/extension-installer": "^1.1",
     "phpstan/phpstan": "1.4.*",
-    "phpunit/phpunit": "^8.5.34",
+    "phpunit/phpunit": "^9.6.13",
     "rector/rector": "^0.12.19",
     "symfony/phpunit-bridge": "^5.4.26",
     "symfony/process": "5.4.*"

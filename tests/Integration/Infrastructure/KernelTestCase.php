@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration\Infrastructure;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase as SymfonyTestCase;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class KernelTestCase extends SymfonyTestCase
 {
+    use ProphecyTrait;
+
     public function setUp(): void
     {
         self::bootKernel();

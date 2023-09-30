@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as SymfonyWebTestCase;
@@ -14,6 +15,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class WebTestCase extends SymfonyWebTestCase
 {
+    use ProphecyTrait;
+
     public function setUp(): void
     {
         self::bootKernel();

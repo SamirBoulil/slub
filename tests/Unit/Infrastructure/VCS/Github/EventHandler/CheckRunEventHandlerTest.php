@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
@@ -21,6 +22,8 @@ use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
  */
 class CheckRunEventHandlerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private const PR_NUMBER = '10';
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
@@ -124,13 +127,13 @@ class CheckRunEventHandlerTest extends TestCase
     "check_suite": {
       "pull_requests": [
         {
-          "number": ${prNumber}
+          "number": {$prNumber}
         }
       ]
     }
   },
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;
@@ -150,13 +153,13 @@ JSON;
     "check_suite": {
       "pull_requests": [
         {
-          "number": ${prNumber}
+          "number": {$prNumber}
         }
       ]
     }
   },
   "repository": {
-    "full_name": "${repositoryIdentifier}"
+    "full_name": "{$repositoryIdentifier}"
   }
 }
 JSON;

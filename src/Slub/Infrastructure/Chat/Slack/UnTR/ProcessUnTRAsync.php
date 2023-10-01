@@ -8,6 +8,7 @@ use Slub\Application\Common\ChatClient;
 use Slub\Application\UnpublishPR\UnpublishPR;
 use Slub\Application\UnpublishPR\UnpublishPRHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Chat\Slack\ExplainUser;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
@@ -58,17 +59,7 @@ class ProcessUnTRAsync
 
     private function extractPRIdentifierFromSlackCommand(string $text): PRIdentifier
     {
-        try {
-            // TODO: Move this bit into GithubApiHelper.
-            preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text, $matches);
-            Assert::stringNotEmpty($matches[1]);
-            Assert::stringNotEmpty($matches[2]);
-            $repositoryIdentifier = $matches[1];
-            $PRNumber = $matches[2];
-            $PRIdentifier = GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber);
-        } catch (\Exception) {
-            throw new ImpossibleToParseRepositoryURL($text);
-        }
+        $PRIdentifier = ChatHelper::extractPRIdentifier($text, $matches);
 
         return $PRIdentifier;
     }
@@ -78,4 +69,5 @@ class ProcessUnTRAsync
         $message = sprintf(':ok_hand: Alright, I won\'t be sending reminders for %s', $request->request->get('text'));
         $this->chatClient->answerWithEphemeralMessage($request->request->get('response_url'), $message);
     }
+
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +29,7 @@ class NewEventAction
         private SqlDeliveredEventRepository $sqlDeliveredEventRepository,
         private LoggerInterface $logger,
         private string $secret
-    )
-    {
+    ) {
     }
 
     public function executeAction(Request $request): Response
@@ -87,7 +87,7 @@ class NewEventAction
         }
         $headerValue = explode('=', $secretHeader);
         $actualSHA1 = end($headerValue);
-        $expectedSHA1 = hash_hmac('sha1', (string) $request->getContent(), $this->secret);
+        $expectedSHA1 = hash_hmac('sha1', (string)$request->getContent(), $this->secret);
 
         if ($expectedSHA1 !== $actualSHA1) {
             throw new BadRequestHttpException();
@@ -101,7 +101,9 @@ class NewEventAction
 
         $eventHandlers = $this->eventHandlerRegistry->get($eventType);
         if (empty($eventHandlers)) {
-            throw new BadRequestHttpException(sprintf('Unsupported event of type "%s"', $eventType));
+            $this->logger->log(LogLevel::NOTICE, sprintf('Unsupported event of type "%s"', $eventType));
+
+            return;
         }
 
         $logger = $this->logger;
@@ -120,6 +122,6 @@ class NewEventAction
 
     private function event(Request $request): array
     {
-        return json_decode((string) $request->getContent(), true);
+        return json_decode((string)$request->getContent(), true);
     }
 }

@@ -17,8 +17,3 @@ vcs_github_new_event:
     path: /vcs/github
     controller: slub.infrastructure.vcs.github.new_event_action::executeAction
     methods: [POST]
-
-ui_http_list_prs:
-    path: /
-    controller: slub.infrastructure.ui.http.list_prs_action::executeAction
-    methods: [GET]

@@ -9,6 +9,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
@@ -73,8 +74,11 @@ class NewEventActionTest extends TestCase
      */
     public function it_throws(Request $wrongRequest): void
     {
+        $eventType = 'EVENT_TYPE';
+        $eventPayload = ['payload'];
+        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
-        $this->eventHandlerRegistry->get(Argument::any())->willReturn([]);
+        $this->eventHandlerRegistry->get($eventType)->willReturn([]);
 
         $this->expectException(\Exception::class);
         $this->newEventAction->executeAction($wrongRequest);
@@ -83,12 +87,28 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_throws_if_the_event_type_is_unsupported(): void
+    public function it_throws_if_the_event_has_already_been_processed(): void
     {
         $alreadyDeliveredRequest = $this->supportedRequest('UNKNOWN', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
 
         $this->expectException(\TypeError::class);
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
+    }
+
+    /**
+     * @test
+     */
+    public function it_logs_if_the_event_type_is_unsupported(): void
+    {
+        $eventType = 'UNSUPPORTED_EVENT_TYPE';
+        $eventPayload = ['payload'];
+        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
+        $this->eventHandlerRegistry->get($eventType)->willReturn([]);
+        $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
+        $this->logger->critical(Argument::cetera())->shouldBeCalled();
+        $this->logger->log(LogLevel::NOTICE, Argument::any())->ShouldBeCalled();
+
+        $this->newEventAction->executeAction($supportedRequest);
     }
 
     /**
@@ -121,10 +141,6 @@ class NewEventActionTest extends TestCase
             'if the signature is missing'      => [$this->requestWithNoSignature('EVENT_TYPE', ['payload'])],
             'if the signatures does not match' => [$this->requestWithWrongSignature('EVENT_TYPE', ['payload'])],
             'if the event type is missing'     => [$this->requestWithNoEventType('EVENT_TYPE', ['payload'])],
-            'if the event type is unsupported'     => [$this->supportedRequest('EVENT_TYPE',
-                ['payload'],
-                self::DELIVERY_EVENT_IDENTIFIER
-            )],
         ];
     }
 

@@ -3,6 +3,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
          bootstrap="./tests/bootstrap.php"
          colors="true"
+         convertNoticesToExceptions="false"
 >
     <php>
         <env name="KERNEL_CLASS" value="Slub\Kernel"/>

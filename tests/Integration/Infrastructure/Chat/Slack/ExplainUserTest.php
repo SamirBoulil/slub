@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
@@ -37,6 +38,7 @@ use Tests\Integration\Infrastructure\KernelTestCase;
  */
 class ExplainUserTest extends TestCase
 {
+    use ProphecyTrait;
     private const URL = '/url';
     private const COMMAND = '/slash_command usage';
     private const COMMAND_TEXT = 'usage';

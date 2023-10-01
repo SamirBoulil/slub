@@ -10,49 +10,55 @@
     }
   ],
   "require": {
-    "php": "8.0.*",
+    "php": "8.2.*",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "ext-json": "*",
     "ext-pdo": "*",
-    "doctrine/dbal": "^2.9",
-    "doctrine/doctrine-migrations-bundle": "^2.0",
-    "firebase/php-jwt": "^5.2",
-    "friendsofphp/php-cs-fixer": "^3.6",
-    "guzzlehttp/guzzle": "~6.0",
+    "doctrine/dbal": "^2.13.9",
+    "doctrine/doctrine-migrations-bundle": "^2.2.3",
+    "firebase/php-jwt": "^5.5.1",
+    "friendsofphp/php-cs-fixer": "^3.9.5",
+    "guzzlehttp/guzzle": "^7.8.0",
     "matthiasnoback/convenient-immutability": "^0.3",
-    "ramsey/uuid": "^4.2",
-    "sentry/sentry-symfony": "^4.2",
-    "symfony/apache-pack": "^1.0",
+    "ramsey/uuid": "^4.7.4",
+    "sentry/sentry-symfony": "^4.11",
+    "symfony/apache-pack": "^1.0.1",
     "symfony/browser-kit": "5.4.*",
     "symfony/console": "5.4.*",
     "symfony/dotenv": "5.4.*",
     "symfony/event-dispatcher": "5.4.*",
-    "symfony/flex": "^1.1",
+    "symfony/flex": "^1.20.2",
     "symfony/framework-bundle": "5.4.*",
     "symfony/lock": "5.4.*",
-    "symfony/monolog-bundle": "^3.3",
+    "symfony/monolog-bundle": "^3.8",
     "symfony/translation": "5.4.*",
     "symfony/yaml": "5.4.*",
-    "webmozart/assert": "^1.4"
+    "webmozart/assert": "^1.11"
   },
   "require-dev": {
-    "behat/behat": "^3.5",
-    "friends-of-behat/symfony-extension": "^2.0",
-    "johnkary/phpunit-speedtrap": "^3.1",
+    "behat/behat": "^3.13",
+    "friends-of-behat/symfony-extension": "^2.4.1",
+    "johnkary/phpunit-speedtrap": "^3.3",
+    "phpspec/prophecy": "^1.17",
+    "phpspec/prophecy-phpunit": "^2.0",
     "phpstan/extension-installer": "^1.1",
     "phpstan/phpstan": "1.4.*",
-    "phpunit/phpunit": "^8",
-    "rector/rector": "^0.12.16",
-    "roave/security-advisories": "dev-latest",
-    "symfony/phpunit-bridge": "^5.2",
+    "phpunit/phpunit": "^9.6.13",
+    "rector/rector": "^0.12.19",
+    "symfony/phpunit-bridge": "^5.4.26",
     "symfony/process": "5.4.*"
   },
   "config": {
     "preferred-install": {
       "*": "dist"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "phpstan/extension-installer": true,
+      "symfony/flex": true,
+      "php-http/discovery": true
+    }
   },
   "autoload": {
     "psr-4": {

@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Application\NewReview\NewReview;
 use Slub\Application\NewReview\NewReviewHandler;
@@ -16,6 +17,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler;
  */
 class PullRequestReviewEventHandlerTest extends TestCase
 {
+    use ProphecyTrait;
     private const PR_NUMBER = 10;
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';

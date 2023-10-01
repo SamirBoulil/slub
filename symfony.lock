@@ -276,9 +276,6 @@
     "phar-io/version": {
         "version": "2.0.1"
     },
-    "php-cs-fixer/diff": {
-        "version": "v2.0.2"
-    },
     "php-http/client-common": {
         "version": "1.11.0"
     },
@@ -329,9 +326,6 @@
     },
     "phpunit/php-timer": {
         "version": "2.1.2"
-    },
-    "phpunit/php-token-stream": {
-        "version": "4.0.4"
     },
     "phpunit/phpunit": {
         "version": "4.7",
@@ -622,16 +616,10 @@
     "symfony/polyfill-intl-grapheme": {
         "version": "v1.24.0"
     },
-    "symfony/polyfill-intl-idn": {
-        "version": "v1.20.0"
-    },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.20.0"
     },
     "symfony/polyfill-mbstring": {
-        "version": "v1.20.0"
-    },
-    "symfony/polyfill-php72": {
         "version": "v1.20.0"
     },
     "symfony/polyfill-php73": {

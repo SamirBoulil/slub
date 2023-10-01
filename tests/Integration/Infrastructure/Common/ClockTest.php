@@ -18,7 +18,7 @@ class ClockTest extends TestCase
     {
         /** @var Clock&MockObject $clockMock */
         $clockMock = $this->getMockBuilder(Clock::class)->setMethods(['getDate'])->getMock();
-        $clockMock->expects($this->at(0))->method('getDate')->willReturn($date);
+        $clockMock->expects($this->atLeast(0))->method('getDate')->willReturn($date);
 
         $this->assertEquals($isOnWeekend, $clockMock->areWeOnWeekEnd());
     }

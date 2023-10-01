@@ -25,7 +25,7 @@ check:
 
 .PHONY: fixcs
 fixcs:
-	vendor/bin/php-cs-fixer fix --diff --config=.php_cs.php --using-cache=no
+	PHP_CS_FIXER_IGNORE_ENV=0 vendor/bin/php-cs-fixer fix --diff --config=.php_cs.php --using-cache=no
 
 .PHONY: tunnel
 tunnel:

@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
@@ -20,6 +21,8 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetBotReactionsForMessageAndUserTest extends TestCase
 {
+    use ProphecyTrait;
+
     private MockHandler $httpMock;
 
     private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser;
@@ -109,7 +112,7 @@ class GetBotReactionsForMessageAndUserTest extends TestCase
 
     private function setUpGuzzleMock(): Client
     {
-        $this->httpMock = new MockHandler([]);
+        $this->httpMock = new MockHandler();
         $handler = HandlerStack::create($this->httpMock);
 
         return new Client(['handler' => $handler]);

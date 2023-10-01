@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\RequestInterface;
 use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
@@ -21,6 +22,7 @@ use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationReposi
  */
 class GetChannelInformationTest extends TestCase
 {
+    use ProphecyTrait;
     private MockHandler $mock;
 
     private GetChannelInformationInterface $getChannelInformation;

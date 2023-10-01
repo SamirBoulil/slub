@@ -6,6 +6,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\EventHandler;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\GithubAppInstallation;
@@ -17,6 +18,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationForAllRepositorie
  */
 class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
 {
+    use ProphecyTrait;
     private const ACCESS_TOKEN_URI = '/installations/1/access_tokens';
     private const ACCESS_TOKENS_URL = 'https://api.github.com'.self::ACCESS_TOKEN_URI;
     private const ACCESS_TOKEN = 'v1.1f699f1069f60xxx';

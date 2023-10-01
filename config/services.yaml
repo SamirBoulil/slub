@@ -360,13 +360,6 @@ services:
             - '@slub.infrastructure.vcs.github.query.find_reviews'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
 
-    ## UI
-    slub.infrastructure.ui.http.list_prs_action:
-        class: Slub\Infrastructure\UI\Http\ListPRsAction
-        arguments:
-            - '@slub.infrastructure.persistence.pr_repository'
-            - '@slub.infrastructure.persistence.get_average_time_to_merge'
-
     ## CLI
     slub.infrastructure.installer.cli.InstallerCLI:
         class: Slub\Infrastructure\Installer\CLI\InstallerCLI

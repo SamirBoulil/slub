@@ -11,6 +11,7 @@ use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Chat\Slack\ExplainUser;
@@ -47,7 +48,7 @@ class ProcessTRAsync
     private function processTR(Request $request): void
     {
         try {
-            $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
+            $PRIdentifier = ChatHelper::extractPRIdentifier($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
         } catch (\Exception|\Error $e) {
             $this->explainUser->onError($request, $e);
@@ -124,21 +125,5 @@ class ProcessTRAsync
         );
 
         $this->putPRToReviewHandler->handle($PRToReview);
-    }
-
-    private function extractPRIdentifierFromSlackCommand(string $text): PRIdentifier
-    {
-        try {
-            preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text, $matches);
-            Assert::stringNotEmpty($matches[1]);
-            Assert::stringNotEmpty($matches[2]);
-            $repositoryIdentifier = $matches[1];
-            $PRNumber = $matches[2];
-            $PRIdentifier = GithubAPIHelper::PRIdentifierFrom($repositoryIdentifier, $PRNumber);
-        } catch (\Exception) {
-            throw new ImpossibleToParseRepositoryURL($text);
-        }
-
-        return $PRIdentifier;
     }
 }

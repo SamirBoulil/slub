@@ -42,7 +42,7 @@ class ProcessUnTRAsync
     private function processUnTR(Request $request): void
     {
         try {
-            $PRIdentifier = $this->extractPRIdentifierFromSlackCommand($request->request->get('text'));
+            $PRIdentifier = ChatHelper::extractPRIdentifier($request->request->get('text'));
             $this->unTR($PRIdentifier);
             $this->confirmUnTRSuccess($request);
         } catch (\Exception|\Error $e) {
@@ -55,13 +55,6 @@ class ProcessUnTRAsync
         $unpublishPR = new UnpublishPR();
         $unpublishPR->PRIdentifier = $PRIdentifier->stringValue();
         $this->unpublishPRHandler->handle($unpublishPR);
-    }
-
-    private function extractPRIdentifierFromSlackCommand(string $text): PRIdentifier
-    {
-        $PRIdentifier = ChatHelper::extractPRIdentifier($text, $matches);
-
-        return $PRIdentifier;
     }
 
     private function confirmUnTRSuccess(Request $request): void

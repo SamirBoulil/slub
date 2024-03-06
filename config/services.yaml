@@ -296,6 +296,12 @@ services:
             - '@slub.application.change_pr_size.change_pr_size_handler'
         tags: ['github.event_handler']
 
+    slub.infrastructure.vcs.github.event_handler.pr_synchronized:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\PRSynchronizedEventHandler
+        arguments:
+            - '@slub.application.ci_status_update.ci_status_update_handler'
+        tags: ['github.event_handler']
+
     slub.infrastructure.vcs.github.event_handler.new_installation:
         class: Slub\Infrastructure\VCS\Github\EventHandler\NewInstallationEventHandler
         arguments:

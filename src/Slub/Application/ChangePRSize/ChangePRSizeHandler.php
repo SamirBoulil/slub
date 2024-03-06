@@ -29,10 +29,10 @@ class ChangePRSizeHandler
         $PR = $this->PR($changePRSize);
         $isTooLarge = $this->isTooLarge($changePRSize);
         if ($isTooLarge) {
-            $this->logger->error('PR TOO LARGE');
+            // $this->logger->error('PR TOO LARGE');
             $PR->hasBecomeToolarge();
         } else {
-            $this->logger->error('it\'s okay, not too large');
+            // $this->logger->error('it\'s okay, not too large');
             $PR->hasBecomeSmall();
         }
         $this->PRRepository->save($PR);
@@ -53,7 +53,7 @@ class ChangePRSizeHandler
     private function logIt(bool $isTooLarge, ChangePRSize $changePRSize): void
     {
         if ($isTooLarge) {
-            $this->logger->info(sprintf('Author has been notified PR "%s" is too large', $changePRSize->PRIdentifier));
+            // $this->logger->info(sprintf('Author has been notified PR "%s" is too large', $changePRSize->PRIdentifier));
         }
     }
 }

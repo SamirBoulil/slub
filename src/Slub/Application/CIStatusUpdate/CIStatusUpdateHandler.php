@@ -47,7 +47,7 @@ class CIStatusUpdateHandler
         if ('PENDING' === $CIStatusUpdate->status) {
             $logMessage = sprintf('Squad has been notified PR "%s" has a pending CI', $CIStatusUpdate->PRIdentifier);
         }
-        $this->logger->info($logMessage);
+        // $this->logger->info($logMessage);
     }
 
     private function buildLink(CIStatusUpdate $CIStatusUpdate): BuildLink

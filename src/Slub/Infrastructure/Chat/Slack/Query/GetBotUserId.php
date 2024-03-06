@@ -26,7 +26,7 @@ class GetBotUserId implements GetBotUserIdInterface
             $this->cachedResult = $this->fetchBotUserId($workspaceId);
         }
 
-        $this->logger->critical(sprintf('Bot user id is "%s"', $this->cachedResult));
+        // $this->logger->critical(sprintf('Bot user id is "%s"', $this->cachedResult));
 
         return $this->cachedResult;
     }
@@ -44,7 +44,7 @@ class GetBotUserId implements GetBotUserIdInterface
             )
         );
 
-        $this->logger->critical(json_encode($response));
+        // $this->logger->critical(json_encode($response));
 
         return $response['user_id'];
     }

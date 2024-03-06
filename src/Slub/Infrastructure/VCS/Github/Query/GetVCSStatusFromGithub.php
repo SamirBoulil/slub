@@ -22,16 +22,16 @@ class GetVCSStatusFromGithub implements GetVCSStatus
     public function fetch(PRIdentifier $PRIdentifier): VCSStatus
     {
         $PRDetails = $this->getPRDetails->fetch($PRIdentifier);
-        $this->logger->critical('Fetched PR details.');
+        // $this->logger->critical('Fetched PR details.');
 
         $reviews = $this->findReviews->fetch($PRIdentifier);
-        $this->logger->critical('Fetched reviews');
+        // $this->logger->critical('Fetched reviews');
 
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
-        $this->logger->critical('Fetched ci status');
+        // $this->logger->critical('Fetched ci status');
 
         $isMerged = $this->isMerged($PRDetails);
-        $this->logger->critical('Fetched is merged');
+        // $this->logger->critical('Fetched is merged');
 
         return $this->createVCSStatus($PRIdentifier, $reviews, $ciStatus, $isMerged);
     }

@@ -54,7 +54,7 @@ class SlackClient implements ChatClient
     public function setReactionsToMessageWith(MessageIdentifier $messageIdentifier, array $reactionsToSet): void
     {
         $currentReactions = $this->getCurrentReactions($messageIdentifier);
-        $this->logger->critical(implode(',', $currentReactions));
+        // $this->logger->critical(implode(',', $currentReactions));
         $reactionsToRemove = array_diff($currentReactions, $reactionsToSet);
         $reactionsToAdd = array_diff($reactionsToSet, $currentReactions);
         $this->removeReactions($messageIdentifier, $reactionsToRemove);
@@ -100,9 +100,9 @@ class SlackClient implements ChatClient
 
     public function publishMessageWithBlocksInChannel(ChannelIdentifier $channelIdentifier, array $blocks): string
     {
-        $this->logger->critical('CHANNEL IDENTIFIER:' . $channelIdentifier->stringValue());
-        $this->logger->critical('workspaceFrom:' . ChannelIdentifierHelper::workspaceFrom($channelIdentifier));
-        $this->logger->critical('channelFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
+        // $this->logger->critical('CHANNEL IDENTIFIER:' . $channelIdentifier->stringValue());
+        // $this->logger->critical('workspaceFrom:' . ChannelIdentifierHelper::workspaceFrom($channelIdentifier));
+        // $this->logger->critical('channelFrom:' . ChannelIdentifierHelper::channelFrom($channelIdentifier));
 
         $response = APIHelper::checkResponseSuccess(
             $this->client->post(
@@ -217,10 +217,10 @@ SLACK;
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());
         $botUserId = $this->getBotUserId->fetch($messageId['workspace']);
 
-        $this->logger->critical(
-            sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId))
-        );
-        $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
+//        $this->logger->critical(
+//            sprintf('Fetching reactions for workspace "%s", channel "%s", message "%s"', ...array_values($messageId))
+//        );
+        // $this->logger->critical(sprintf('bot Id is "%s"', $botUserId));
 
         $result = $this->getBotReactionsForMessageAndUser->fetch(
             $messageId['workspace'],
@@ -229,7 +229,7 @@ SLACK;
             $botUserId
         );
 
-        $this->logger->critical(sprintf('Reactions: %s', implode(',', $result)));
+        // $this->logger->critical(sprintf('Reactions: %s', implode(',', $result)));
 
         return $result;
     }
@@ -253,13 +253,13 @@ SLACK;
                 ]
             );
         }
-        $this->logger->critical(
-            sprintf(
-                'Updating reactions of "%s", Adding: %s',
-                $messageIdentifier->stringValue(),
-                implode(',', $reactionsToAdd)
-            )
-        );
+//        $this->logger->critical(
+//            sprintf(
+//                'Updating reactions of "%s", Adding: %s',
+//                $messageIdentifier->stringValue(),
+//                implode(',', $reactionsToAdd)
+//            )
+//        );
     }
 
     private function removeReactions(MessageIdentifier $messageIdentifier, array $reactionsToRemove): void
@@ -281,13 +281,13 @@ SLACK;
                 ]
             );
         }
-        $this->logger->critical(
-            sprintf(
-                'Updating reactions of "%s", Removing: %s',
-                $messageIdentifier->stringValue(),
-                implode(',', $reactionsToRemove)
-            )
-        );
+//        $this->logger->critical(
+//            sprintf(
+//                'Updating reactions of "%s", Removing: %s',
+//                $messageIdentifier->stringValue(),
+//                implode(',', $reactionsToRemove)
+//            )
+//        );
     }
 
     private function slackToken(string $workspaceId): string

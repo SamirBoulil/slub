@@ -24,16 +24,16 @@ class PRClosedEventHandler implements EventHandlerInterface
         return self::PULL_REQUEST_EVENT_TYPE === $eventType;
     }
 
-    public function handle(array $PRClosedEvent): void
+    public function handle(array $PRSynchronizedEvent): void
     {
-        if ($this->isPRClosed($PRClosedEvent)) {
-            $this->closePR($PRClosedEvent);
+        if ($this->isPRClosed($PRSynchronizedEvent)) {
+            $this->closePR($PRSynchronizedEvent);
         }
     }
 
     private function isPRClosed(array $PRClosedEvent): bool
     {
-        return isset($PRClosedEvent['pull_request']['merged'], $PRClosedEvent['action']) && 'closed' === $PRClosedEvent['action'];
+        return isset($PRClosedEvent['pull_request']['merged'], $PRClosedEvent['action']) && self::PR_CLOSED_ACTION === $PRClosedEvent['action'];
     }
 
     private function closePR(array $PRClosedEvent): void

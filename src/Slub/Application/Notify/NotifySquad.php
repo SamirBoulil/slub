@@ -65,13 +65,13 @@ class NotifySquad implements EventSubscriberInterface
         foreach ($PR->messageIdentifiers() as $messageIdentifier) {
             $this->chatClient->setReactionsToMessageWith($messageIdentifier, $reactions);
         }
-        $this->logger->info(
-            sprintf(
-                'Squad notified for PR %s with reactions: %s',
-                $PRIdentifier->stringValue(),
-                implode(', ', $reactions)
-            )
-        );
+//        $this->logger->info(
+//            sprintf(
+//                'Squad notified for PR %s with reactions: %s',
+//                $PRIdentifier->stringValue(),
+//                implode(', ', $reactions)
+//            )
+//        );
     }
 
     /**

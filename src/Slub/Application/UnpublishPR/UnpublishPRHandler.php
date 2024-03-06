@@ -21,6 +21,6 @@ class UnpublishPRHandler
     {
         $PRIdentifierToUnpublish = PRIdentifier::fromString($unpublishPR->PRIdentifier);
         $this->PRRepository->unpublishPR($PRIdentifierToUnpublish);
-        $this->logger->info(sprintf('PR "%s" has been unpublished', $PRIdentifierToUnpublish->stringValue()));
+        // $this->logger->info(sprintf('PR "%s" has been unpublished', $PRIdentifierToUnpublish->stringValue()));
     }
 }

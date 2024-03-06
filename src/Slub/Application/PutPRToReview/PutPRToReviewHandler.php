@@ -68,7 +68,7 @@ class PutPRToReviewHandler
     private function createNewPR(PutPRToReview $putPRToReview): void
     {
         $PRIdentifier = PRIdentifier::create($putPRToReview->PRIdentifier);
-        $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
+        // $this->logger->info(sprintf('Fetched information from github (CI status: %s)', $putPRToReview->CIStatus));
 
         $channelIdentifier = ChannelIdentifier::fromString($putPRToReview->channelIdentifier);
         $isLarge = $this->isLarge->execute($putPRToReview->additions, $putPRToReview->deletions);
@@ -91,6 +91,6 @@ class PutPRToReviewHandler
 
     private function logIt(PutPRToReview $command): void
     {
-        $this->logger->info(sprintf('PR "%s" has been put to review', $command->PRIdentifier));
+        // $this->logger->info(sprintf('PR "%s" has been put to review', $command->PRIdentifier));
     }
 }

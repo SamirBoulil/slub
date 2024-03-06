@@ -52,8 +52,8 @@ class ExplainUser
 
     private function explainSomethingWentWrong(Request $request, \Throwable $e): void
     {
-        $this->logger->critical('Something went wrong:');
-        $this->logger->critical($e->getTraceAsString());
+        // $this->logger->critical('Something went wrong:');
+        // $this->logger->critical($e->getTraceAsString());
         $responseUrl = $request->request->get('response_url');
         $this->chatClient->explainSomethingWentWrong($responseUrl, $this->usage($request));
 

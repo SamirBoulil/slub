@@ -112,17 +112,17 @@ class ProcessTRAsync
         $PRToReview->additions = $PRInfo->additions;
         $PRToReview->deletions = $PRInfo->deletions;
 
-        $this->logger->debug(
-            sprintf(
-                'New PR to review - workspace "%s" - channel "%s" - repository "%s" - author "%s" - message "%s" - PR "%s".',
-                $PRToReview->workspaceIdentifier,
-                $PRToReview->channelIdentifier,
-                $PRToReview->repositoryIdentifier,
-                $PRToReview->authorIdentifier,
-                $PRToReview->messageIdentifier,
-                $PRToReview->PRIdentifier
-            )
-        );
+//        $this->logger->debug(
+//            sprintf(
+//                'New PR to review - workspace "%s" - channel "%s" - repository "%s" - author "%s" - message "%s" - PR "%s".',
+//                $PRToReview->workspaceIdentifier,
+//                $PRToReview->channelIdentifier,
+//                $PRToReview->repositoryIdentifier,
+//                $PRToReview->authorIdentifier,
+//                $PRToReview->messageIdentifier,
+//                $PRToReview->PRIdentifier
+//            )
+//        );
 
         $this->putPRToReviewHandler->handle($PRToReview);
     }

@@ -36,7 +36,7 @@ class PublishRemindersHandler
         foreach ($channelIdentifiers as $channelIdentifier) {
             $this->publishReminder($channelIdentifier, $PRsInReview);
         }
-        $this->logger->info('Reminders published');
+        // $this->logger->info('Reminders published');
     }
 
     private function publishReminder(ChannelIdentifier $channelIdentifier, array $PRsInReview): void
@@ -46,7 +46,7 @@ class PublishRemindersHandler
         try {
             $this->chatClient->publishMessageWithBlocksInChannel($channelIdentifier, $blocks);
         } catch (\throwable $e) {
-            $this->logger->alert(sprintf('Was not able to publish reminder, "%s"', $e->getMessage()));
+            // $this->logger->alert(sprintf('Was not able to publish reminder, "%s"', $e->getMessage()));
         }
     }
 

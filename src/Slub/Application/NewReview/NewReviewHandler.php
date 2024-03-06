@@ -62,6 +62,6 @@ class NewReviewHandler
                 )
             ),
         };
-        $this->logger->info($logMessage);
+        // $this->logger->info($logMessage);
     }
 }

@@ -58,9 +58,9 @@ class NotifyAuthor implements EventSubscriberInterface
             self::MESSAGE_PR_GTMED
         );
         $this->replyInThread($event->PRIdentifier(), $gtmedMessage);
-        $this->logger->info(
-            sprintf('Author has been notified PR "%s" has been GTMed', $event->PRIdentifier()->stringValue())
-        );
+//        $this->logger->info(
+//            sprintf('Author has been notified PR "%s" has been GTMed', $event->PRIdentifier()->stringValue())
+//        );
     }
 
     public function whenPRHasBeenNotGTM(PRNotGTMed $event): void
@@ -71,9 +71,9 @@ class NotifyAuthor implements EventSubscriberInterface
             self::MESSAGE_PR_NOT_GTMED
         );
         $this->replyInThread($event->PRIdentifier(), $notGtmedMessage);
-        $this->logger->info(
-            sprintf('Author has been notified PR "%s" has been NOT GTMed', $event->PRIdentifier()->stringValue())
-        );
+//        $this->logger->info(
+//            sprintf('Author has been notified PR "%s" has been NOT GTMed', $event->PRIdentifier()->stringValue())
+//        );
     }
 
     public function whenPRComment(PRCommented $event): void
@@ -84,17 +84,17 @@ class NotifyAuthor implements EventSubscriberInterface
             self::MESSAGE_PR_COMMENTED
         );
         $this->replyInThread($event->PRIdentifier(), $commentedMessage);
-        $this->logger->info(
-            sprintf('Author has been notified PR "%s" has been commented', $event->PRIdentifier()->stringValue())
-        );
+//        $this->logger->info(
+//            sprintf('Author has been notified PR "%s" has been commented', $event->PRIdentifier()->stringValue())
+//        );
     }
 
     public function whenCIIsGreen(CIGreen $event): void
     {
         $this->replyInThread($event->PRIdentifier(), self::MESSAGE_CI_GREEN);
-        $this->logger->info(
-            sprintf('Author has been notified PR "%s" has a CI Green', $event->PRIdentifier()->stringValue())
-        );
+//        $this->logger->info(
+//            sprintf('Author has been notified PR "%s" has a CI Green', $event->PRIdentifier()->stringValue())
+//        );
     }
 
     public function whenCIIsRed(CIRed $event): void
@@ -105,9 +105,9 @@ class NotifyAuthor implements EventSubscriberInterface
             self::MESSAGE_CI_RED
         );
         $this->replyInThread($event->PRIdentifier(), $redCIMessage);
-        $this->logger->info(
-            sprintf('Author has been notified PR "%s" has a CI Red', $event->PRIdentifier()->stringValue())
-        );
+//        $this->logger->info(
+//            sprintf('Author has been notified PR "%s" has a CI Red', $event->PRIdentifier()->stringValue())
+//        );
     }
 
     public function whenGoodToMerge(GoodToMerge $event): void
@@ -123,8 +123,8 @@ class NotifyAuthor implements EventSubscriberInterface
         preg_match('#(.+)\/(.+)\/(.+)#', $event->PRIdentifier()->stringValue(), $matches);
         $PRLink = sprintf('https://github.com/%s/%s/pull/%s', $matches[1], $matches[2], $matches[3]);
         $prTooLargeMessage = str_replace(self::PLACEHOLDER_PR_LINK, $PRLink, sprintf(self::MESSAGE_PR_TOO_LARGE, $this->prSizeLimit));
-        $this->logger->error('Reply in thread'); // TODO: remove me
-        $this->logger->error($prTooLargeMessage);
+        // $this->logger->error('Reply in thread'); // TODO: remove me
+        // $this->logger->error($prTooLargeMessage);
         $this->replyInThread($event->PRIdentifier(), $prTooLargeMessage);
     }
 

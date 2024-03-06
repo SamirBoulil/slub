@@ -34,7 +34,7 @@ class NewEventAction
 
     public function executeAction(Request $request): Response
     {
-        $this->logger->critical((string) $request->getContent());
+        // $this->logger->critical((string) $request->getContent());
         $this->checkSecret($request);
         if (!$this->IsEventAlreadyProcessed($request)) {
             $this->handle($request);
@@ -50,7 +50,7 @@ class NewEventAction
             throw new BadRequestHttpException('Expected event to have a type string');
         }
 
-        $this->logger->critical(sprintf('Event type:%s', $eventType));
+        // $this->logger->critical(sprintf('Event type:%s', $eventType));
 
         return $eventType;
     }
@@ -68,9 +68,9 @@ class NewEventAction
         $isEventAlreadyProcessed = false;
         $eventHasAlreadyBeenDelivered = $this->sqlHasEventAlreadyBeenDelivered->fetch($eventIdentifier);
         if ($eventHasAlreadyBeenDelivered) {
-            $this->logger->notice(
-                sprintf('Event has already been delivered "%s"', $eventIdentifier)
-            );
+//            $this->logger->notice(
+//                sprintf('Event has already been delivered "%s"', $eventIdentifier)
+//            );
 
             $isEventAlreadyProcessed = true;
         }
@@ -101,20 +101,16 @@ class NewEventAction
 
         $eventHandlers = $this->eventHandlerRegistry->get($eventType);
         if (empty($eventHandlers)) {
-            $this->logger->log(LogLevel::NOTICE, sprintf('Unsupported event of type "%s"', $eventType));
+            // $this->logger->log(LogLevel::NOTICE, sprintf('Unsupported event of type "%s"', $eventType));
 
             return;
         }
 
-        $logger = $this->logger;
+        // $logger = $this->logger;
         array_map(
-            static function (EventHandlerInterface $eventHandler) use ($event, $logger) {
-                try {
-                    $logger->critical('Processing logger with: '.$eventHandler::class);
-                    $eventHandler->handle($event);
-                } catch (\Exception $e) {
-                    $logger->error($e->getMessage());
-                }
+            static function (EventHandlerInterface $eventHandler) use ($event/**, $logger */) {
+//                $logger->critical('Processing logger with: '.$eventHandler::class);
+                $eventHandler->handle($event);
             },
             $eventHandlers
         );

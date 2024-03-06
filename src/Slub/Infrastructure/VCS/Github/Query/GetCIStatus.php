@@ -32,7 +32,7 @@ class GetCIStatus
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
     {
         $isMergeable = $this->getMergeableState->fetch($PRIdentifier);
-        $this->logger->critical('Is mergeable: ' . $isMergeable ? 'true' : 'false');
+        // $this->logger->critical('Is mergeable: ' . $isMergeable ? 'true' : 'false');
         if ($isMergeable) {
             return CheckStatus::green();
         }
@@ -42,7 +42,7 @@ class GetCIStatus
         $allCheckStatuses = array_merge($checkRunStatus, $statusCheckStatus);
         $deductCIStatus = $this->deductCIStatus($allCheckStatuses);
 
-        $this->logger->critical('Result status = ' . $deductCIStatus->status);
+        // $this->logger->critical('Result status = ' . $deductCIStatus->status);
 
         return $deductCIStatus;
     }

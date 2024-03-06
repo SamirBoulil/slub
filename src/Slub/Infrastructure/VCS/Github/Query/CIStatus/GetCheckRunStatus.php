@@ -31,7 +31,7 @@ class GetCheckRunStatus
     private function checkRuns(PRIdentifier $PRIdentifier, string $ref): array
     {
         $url = $this->checkRunsUrl($PRIdentifier, $ref);
-        $this->logger->critical($url);
+        // $this->logger->critical($url);
 
         $response = $this->githubAPIClient->get(
             $url,

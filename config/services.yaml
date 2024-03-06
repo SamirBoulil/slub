@@ -260,12 +260,21 @@ services:
             - '@slub.application.new_review.new_review_handler'
         tags: ['github.event_handler']
 
-    slub.infrastructure.vcs.github.event_handler.check_run:
-        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+#    Disabled for performance reasons this class comment.
+#    slub.infrastructure.vcs.github.event_handler.check_run:
+#        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler
+#        arguments:
+#            - '@slub.application.ci_status_update.ci_status_update_handler'
+#            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+#        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.check_suite:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
         tags: ['github.event_handler']
+
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler

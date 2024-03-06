@@ -13,15 +13,10 @@ use Webmozart\Assert\Assert;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
- *
- * Listening to Check Runs is deactivated as it can lead to Github
- * triggering way too many events and that the platform isn't able to process.
- *  - The request ends up in timeout as their number increase
- *  - The max DB call limit is reached
  */
-class CheckRunEventHandler implements EventHandlerInterface
+class CheckSuiteEventHandler implements EventHandlerInterface
 {
-    private const CHECK_RUN_EVENT_TYPE = 'check_run';
+    private const CHECK_SUITE_EVENT_TYPE = 'check_suite';
 
     public function __construct(private CIStatusUpdateHandler $CIStatusUpdateHandler, private GetPRInfoInterface $getPRInfo)
     {
@@ -29,31 +24,31 @@ class CheckRunEventHandler implements EventHandlerInterface
 
     public function supports(string $eventType): bool
     {
-        return self::CHECK_RUN_EVENT_TYPE === $eventType;
+        return self::CHECK_SUITE_EVENT_TYPE === $eventType;
     }
 
-    public function handle(array $checkRunEvent): void
+    public function handle(array $checkSuiteEvent): void
     {
-        $PRIdentifier = $this->getPRIdentifier($checkRunEvent);
+        $PRIdentifier = $this->getPRIdentifier($checkSuiteEvent);
         $PRInfo = $this->getCIStatusFromGithub($PRIdentifier);
 
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $PRIdentifier->stringValue();
-        $command->repositoryIdentifier = $checkRunEvent['repository']['full_name'];
+        $command->repositoryIdentifier = $checkSuiteEvent['repository']['full_name'];
         $command->status = $PRInfo->CIStatus->status;
         $command->buildLink = $PRInfo->CIStatus->buildLink;
         $this->CIStatusUpdateHandler->handle($command);
     }
 
-    private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
+    private function getPRIdentifier(array $checkSuiteEvent): PRIdentifier
     {
-        $pullRequests = $CIStatusUpdate['check_run']['check_suite']['pull_requests'];
+        $pullRequests = $checkSuiteEvent['check_suite']['pull_requests'];
         Assert::notEmpty($pullRequests, 'Expected to have at least one pull request, didn\'t find any.');
 
         return PRIdentifier::fromString(
             sprintf(
                 '%s/%s',
-                $CIStatusUpdate['repository']['full_name'],
+                $checkSuiteEvent['repository']['full_name'],
                 $pullRequests[0]['number']
             )
         );

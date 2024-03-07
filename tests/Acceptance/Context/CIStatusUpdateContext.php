@@ -221,4 +221,13 @@ class CIStatusUpdateContext extends FeatureContext
             NotifySquad::REACTION_CI_PENDING
         );
     }
+
+    /**
+     * @Given /^the squad should not be notified$/
+     */
+    public function theSquadShouldNotBeNotified(): void
+    {
+        Assert::assertFalse($this->eventSpy->hasEvents(), 'Expected to have no events, but found some');
+        $this->chatClientSpy->assertEmpty();
+    }
 }

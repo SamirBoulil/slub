@@ -36,7 +36,7 @@ class FindPRNumber implements FindPRNumberInterface
                     $commitRef,
                     $url,
                     (string) $response->getStatusCode(),
-                    $content
+                    $response->getBody()->getContents()
                 )
             );
         }

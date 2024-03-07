@@ -25,3 +25,9 @@ Feature: Improve the feedback delay between the squad and the continuous integra
     When the CI is being running for the PR
     Then the PR should be pending
     And the squad should be notified that the ci is pending for the PR
+
+  @nominal
+  Scenario: If the PR is not in review, it does nothing
+    Given a PR not in review
+    When the CI is being running for the PR
+    Then the squad should not be notified

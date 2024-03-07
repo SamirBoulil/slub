@@ -15,6 +15,12 @@ Feature: Improve PR reviews by warning author if their PR are too large
       | 0         | 1000      |
 
   @secondary
+  Scenario: Does nothing is the PR is not in review
+    Given a PR not in review
+    When the author updates the PR with 0 additions and 0 deletions
+    Then the author should not be notified that the PR size has changed
+
+  @secondary
   Scenario: Do not notify the author when the PR stays small
     Given a PR in review that has an acceptable size
     When the author updates the PR with 0 additions and 0 deletions

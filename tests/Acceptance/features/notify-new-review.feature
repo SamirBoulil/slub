@@ -24,3 +24,9 @@ Feature: Improve the communication between the author of the pull request (PR) a
     When the PR is commented
     Then the PR should have one comment
     And the author should be notified that the PR has one more comment
+
+  @nominal
+  Scenario: If the PR is not in review, it does nothing
+    Given a PR not in review
+    When the PR is commented
+    Then the squad should not be notified

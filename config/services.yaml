@@ -38,18 +38,21 @@ services:
         class: Slub\Application\NewReview\NewReviewHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.pr_is_in_review'
             - '@logger'
 
     slub.application.ci_status_update.ci_status_update_handler:
         class: Slub\Application\CIStatusUpdate\CIStatusUpdateHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.pr_is_in_review'
             - '@logger'
 
     slub.application.close_pr.close_pr_handler:
         class: Slub\Application\ClosePR\ClosePRHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.pr_is_in_review'
             - '@logger'
 
     slub.application.unpublish_pr.unpublish_pr_handler:
@@ -90,6 +93,7 @@ services:
         arguments:
         - '@slub.infrastructure.persistence.pr_repository'
         - '@slub.application.change_pr_size.is_large'
+        - '@slub.infrastructure.persistence.pr_is_in_review'
         - '@logger'
 
     slub.application.change_pr_size.is_large:

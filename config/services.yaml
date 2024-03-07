@@ -125,6 +125,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.pr_is_in_review:
+        class: Slub\Infrastructure\Persistence\Sql\Query\SqlPRIsInReview
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     slub.infrastructure.persistence.should_communicate_in_app:
         class: Slub\Infrastructure\Persistence\Sql\Query\ShouldCommunicateInApp
         arguments:

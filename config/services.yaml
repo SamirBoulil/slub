@@ -282,8 +282,8 @@ services:
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.persistence.pr_is_in_review'
         tags: ['github.event_handler']
-
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler

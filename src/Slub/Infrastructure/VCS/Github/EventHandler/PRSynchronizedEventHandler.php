@@ -59,9 +59,4 @@ class PRSynchronizedEventHandler implements EventHandlerInterface
             $PRSynchronizedEvent['pull_request']['number']
         ));
     }
-
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): PRInfo
-    {
-        return $this->getPRInfo->fetch($PRIdentifier);
-    }
 }

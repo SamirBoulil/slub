@@ -71,11 +71,12 @@ class CheckRunEventHandlerTest extends TestCase
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus = CheckStatus::red();
-        $this->getPRInfo->fetch(
-            Argument::that(
-                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
-            )
-        )->willReturn($prInfo);
+        $PRIdentifier = Argument::that(
+            fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+        );
+
+        $this->PRIsInReview->fetch($PRIdentifier)->willReturn(true);
+        $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
 
         $this->handler->handle(
             Argument::that(fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
@@ -124,12 +125,12 @@ class CheckRunEventHandlerTest extends TestCase
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus =  CheckStatus::red();
-        $this->getPRInfo->fetch(
-            Argument::that(
-                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
-            )
-        )->willReturn($prInfo);
+        $PRIdentifier = Argument::that(
+            fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+        );
 
+        $this->PRIsInReview->fetch($PRIdentifier)->willReturn(true);
+        $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
         $this->handler->handle(
             Argument::that(fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
                 && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier

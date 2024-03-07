@@ -8,8 +8,8 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
-use Slub\Domain\Query\PRInfo;
 use Slub\Domain\Query\IsPRInReview;
+use Slub\Domain\Query\PRInfo;
 use Webmozart\Assert\Assert;
 
 /**

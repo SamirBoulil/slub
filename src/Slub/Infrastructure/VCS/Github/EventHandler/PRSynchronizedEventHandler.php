@@ -7,8 +7,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\GetPRInfoInterface;
-use Slub\Domain\Query\PRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Symfony\Component\HttpFoundation\Request;

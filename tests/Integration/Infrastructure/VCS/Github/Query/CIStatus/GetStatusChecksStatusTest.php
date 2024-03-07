@@ -10,7 +10,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
@@ -77,9 +77,9 @@ class GetStatusChecksStatusTest extends WebTestCase
         );
 
         $this->assertCount(3, $actualCheckStatuses);
-        $this->assertEquals(CheckStatus::green($expectedSuccessStatusCheck), $actualCheckStatuses[0]);
-        $this->assertEquals(CheckStatus::pending($expectedNeutralStatusCheck), $actualCheckStatuses[1]);
-        $this->assertEquals(CheckStatus::red($expectedFailedStatusCheck, $expectedFailedBuildLink), $actualCheckStatuses[2]);
+        $this->assertEquals(CIStatus::green($expectedSuccessStatusCheck), $actualCheckStatuses[0]);
+        $this->assertEquals(CIStatus::pending($expectedNeutralStatusCheck), $actualCheckStatuses[1]);
+        $this->assertEquals(CIStatus::red($expectedFailedStatusCheck, $expectedFailedBuildLink), $actualCheckStatuses[2]);
     }
 
     // TODO: Add tests for sorting and uniquing

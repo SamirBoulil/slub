@@ -10,6 +10,8 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
+use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Webmozart\Assert\Assert;
 
 /**
@@ -21,7 +23,7 @@ class CheckSuiteEventHandler implements EventHandlerInterface
 
     public function __construct(
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
-        private GetPRInfoInterface $getPRInfo,
+        private GetCIStatus $getCIStatus,
         private IsPRInReview $IsPRInReview
     ) {
     }
@@ -42,12 +44,12 @@ class CheckSuiteEventHandler implements EventHandlerInterface
             return;
         }
 
-        $PRInfo = $this->getCIStatusFromGithub($PRIdentifier);
+        $CIStatus = $this->getCIStatusFromGithub($PRIdentifier, $checkSuiteEvent);
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $checkSuiteEvent['repository']['full_name'];
-        $command->status = $PRInfo->CIStatus->status;
-        $command->buildLink = $PRInfo->CIStatus->buildLink;
+        $command->status = $CIStatus->status;
+        $command->buildLink = $CIStatus->buildLink;
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -70,9 +72,9 @@ class CheckSuiteEventHandler implements EventHandlerInterface
         );
     }
 
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): PRInfo
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, array $checkSuiteEvent): CIStatus
     {
-        return $this->getPRInfo->fetch($PRIdentifier);
+        return $this->getCIStatus->fetch($PRIdentifier, $checkSuiteEvent['check_suite']['head_sha']);
     }
 
     /**

@@ -9,7 +9,7 @@ use ConvenientImmutability\Immutable;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class CheckStatus
+class CIStatus
 {
     private const GREEN = 'GREEN';
     private const PENDING = 'PENDING';

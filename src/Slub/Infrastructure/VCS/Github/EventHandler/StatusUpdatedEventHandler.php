@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
@@ -53,7 +53,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         return PRIdentifier::fromString(sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber));
     }
 
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): CheckStatus
+    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): CIStatus
     {
         return $this->getCIStatus->fetch($PRIdentifier, $commitRef);
     }

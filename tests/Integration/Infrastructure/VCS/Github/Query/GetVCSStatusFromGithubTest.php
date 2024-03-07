@@ -8,7 +8,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\VCSStatus;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
@@ -66,7 +66,7 @@ class GetVCSStatusFromGithubTest extends WebTestCase
             FindReviews::COMMENTS => self::EXPECTED_COMMENTS,
         ]);
         $this->getCIStatusStub->fetch($PRIdentifier, self::PR_COMMIT_REF)
-            ->willReturn(CheckStatus::green());
+            ->willReturn(CIStatus::green());
 
         $vcsStatus = $this->getVCSStatus->fetch($PRIdentifier);
 

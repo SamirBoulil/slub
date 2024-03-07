@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRDetails;
@@ -48,7 +48,7 @@ class GetPRInfoTest extends TestCase
         $expectedCommentsCount = 1;
         $expectedGTMCount = 2;
         $expectedNotGTMCount = 3;
-        $checkStatus = CheckStatus::pending();
+        $checkStatus = CIStatus::pending();
         $expectedTitle = 'Add new feature';
         $expectedDescription = 'a nice description';
         $expectedAuthorIdentifier = 'sam';

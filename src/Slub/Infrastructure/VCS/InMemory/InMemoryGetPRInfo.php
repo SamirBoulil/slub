@@ -7,7 +7,7 @@ namespace Slub\Infrastructure\VCS\InMemory;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -25,7 +25,7 @@ class InMemoryGetPRInfo implements GetPRInfoInterface
         $this->PRInfo->authorImageUrl = 'https://author_image_url';
         $this->PRInfo->title = 'Add new feature';
         $this->PRInfo->description = 'Amazing description';
-        $this->PRInfo->CIStatus = CheckStatus::green();
+        $this->PRInfo->CIStatus = CIStatus::green();
         $this->PRInfo->comments = 0;
         $this->PRInfo->GTMCount = 0;
         $this->PRInfo->notGTMCount = 0;

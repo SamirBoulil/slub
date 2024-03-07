@@ -8,7 +8,7 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetMergeableState;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
@@ -89,40 +89,40 @@ class GetCIStatusTest extends WebTestCase
         return [
             'CI Checks not supported' => [
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
                 ],
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_2),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_3),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_3),
                 ],
                 'PENDING',
                 '',
             ],
             'All unsupported CI check statuses: green' => [
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
                 ],
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
                 ],
                 'GREEN',
                 '',
             ],
             'Supported CI Checks not run' => [
                 [
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
                 ],
                 [
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
 
                 ],
                 'PENDING',
@@ -130,64 +130,64 @@ class GetCIStatusTest extends WebTestCase
             ],
             'Multiple CI checks Green' => [
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
                 ],
                 [
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::NOT_SUPPORTED_CI_CHECK_2),
                 ],
                 'GREEN',
                 '',
             ],
             'Multiple CI checks Red' => [
                 [
-                    CheckStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
-                    CheckStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
+                    CIStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CIStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
                 ],
                 [
-                    CheckStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
-                    CheckStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
+                    CIStatus::red(self::SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CIStatus::red(self::SUPPORTED_CI_CHECK_2, self::BUILD_LINK),
                 ],
                 'RED',
                 self::BUILD_LINK,
             ],
             'Multiple CI checks Pending' => [
                 [
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
                 ],
                 [
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
                 ],
                 'PENDING',
                 '',
             ],
             'Mixed CI checks statuses: red' => [
                 [
-                    CheckStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
                 ],
                 [
-                    CheckStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::pending(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::red(self::NOT_SUPPORTED_CI_CHECK_1, self::BUILD_LINK),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::pending(self::SUPPORTED_CI_CHECK_2),
                 ],
                 'RED',
                 self::BUILD_LINK,
             ],
             'Mixed CI checks statuses: green' => [
                 [
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_2),
-                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
                 ],
                 [
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_1),
-                    CheckStatus::green(self::SUPPORTED_CI_CHECK_2),
-                    CheckStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_1),
+                    CIStatus::green(self::SUPPORTED_CI_CHECK_2),
+                    CIStatus::pending(self::NOT_SUPPORTED_CI_CHECK_1),
                 ],
                 'GREEN',
                 '',

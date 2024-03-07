@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetVCSStatus;
 use Slub\Domain\Query\VCSStatus;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -49,7 +49,7 @@ class GetVCSStatusFromGithub implements GetVCSStatus
     private function createVCSStatus(
         PRIdentifier $PRIdentifier,
         array $reviews,
-        CheckStatus $ciStatus,
+        CIStatus $ciStatus,
         bool $isMerged
     ): VCSStatus {
         $result = new VCSStatus();

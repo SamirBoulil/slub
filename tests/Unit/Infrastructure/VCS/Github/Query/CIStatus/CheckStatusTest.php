@@ -11,7 +11,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
@@ -23,19 +23,19 @@ class CheckStatusTest extends TestCase
         $name = 'name';
         $buildLink = 'my link';
 
-        $green = CheckStatus::green($name);
+        $green = CIStatus::green($name);
         $this->assertEquals($name, $green->name);
         $this->assertTrue($green->isGreen());
         $this->assertFalse($green->isRed());
         $this->assertFalse($green->isPending());
 
-        $green = CheckStatus::red($name, $buildLink);
+        $green = CIStatus::red($name, $buildLink);
         $this->assertEquals($name, $green->name);
         $this->assertTrue($green->isRed());
         $this->assertFalse($green->isGreen());
         $this->assertFalse($green->isPending());
 
-        $green = CheckStatus::pending($name);
+        $green = CIStatus::pending($name);
         $this->assertEquals($name, $green->name);
         $this->assertTrue($green->isPending());
         $this->assertFalse($green->isRed());

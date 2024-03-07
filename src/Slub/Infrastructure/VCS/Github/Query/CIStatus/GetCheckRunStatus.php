@@ -19,7 +19,7 @@ class GetCheckRunStatus
     }
 
     /**
-     * @return array<CheckStatus>
+     * @return array<CIStatus>
      */
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): array
     {
@@ -54,16 +54,16 @@ class GetCheckRunStatus
     }
 
     /**
-     * @return array<CheckStatus>
+     * @return array<CIStatus>
      */
     private function intoCheckStatuses(array $checkRuns): array
     {
         return array_map(
             static function ($checkRun) {
                 return match ($checkRun['conclusion']) {
-                    'success' => CheckStatus::green($checkRun['name']),
-                    'failure' => CheckStatus::red($checkRun['name'], $checkRun['details_url'] ?? ''),
-                    default =>  CheckStatus::pending($checkRun['name']),
+                    'success' => CIStatus::green($checkRun['name']),
+                    'failure' => CIStatus::red($checkRun['name'], $checkRun['details_url'] ?? ''),
+                    default =>  CIStatus::pending($checkRun['name']),
                 };
             },
             $checkRuns

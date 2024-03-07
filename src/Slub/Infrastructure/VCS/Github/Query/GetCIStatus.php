@@ -6,7 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Query;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetMergeableState;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
@@ -29,12 +29,12 @@ class GetCIStatus
         $this->supportedCIChecks = explode(',', $supportedCiChecks);
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CIStatus
     {
         $isMergeable = $this->getMergeableState->fetch($PRIdentifier);
         // $this->logger->critical('Is mergeable: ' . $isMergeable ? 'true' : 'false');
         if ($isMergeable) {
-            return CheckStatus::green();
+            return CIStatus::green();
         }
 
         $checkRunStatus = $this->getCheckRunStatus->fetch($PRIdentifier, $commitRef);
@@ -47,7 +47,7 @@ class GetCIStatus
         return $deductCIStatus;
     }
 
-    private function deductCIStatus(array $allCheckStatuses): CheckStatus
+    private function deductCIStatus(array $allCheckStatuses): CIStatus
     {
         $failedCheckStatus = $this->failedCheckStatus($allCheckStatuses);
         if (null !== $failedCheckStatus) {
@@ -55,39 +55,39 @@ class GetCIStatus
         }
 
         if ($this->areAllSuccessful($allCheckStatuses)) {
-            return CheckStatus::green('');
+            return CIStatus::green('');
         }
 
         $supportedCheckStatuses = $this->supportedCheckStatus($allCheckStatuses);
         if (empty($supportedCheckStatuses)) {
-            return CheckStatus::pending();
+            return CIStatus::pending();
         }
 
         if ($this->areAllSuccessful($supportedCheckStatuses)) {
-            return CheckStatus::green();
+            return CIStatus::green();
         }
 
-        return CheckStatus::pending();
+        return CIStatus::pending();
     }
 
     /**
-     * @param array<CheckStatus> $allCheckStatuses
+     * @param array<CIStatus> $allCheckStatuses
      */
     private function areAllSuccessful(array $allCheckStatuses): bool
     {
         $successfulCICheckStatuses = array_filter(
             $allCheckStatuses,
-            static fn (CheckStatus $checkStatus) => $checkStatus->isGreen()
+            static fn (CIStatus $checkStatus) => $checkStatus->isGreen()
         );
 
         return \count($successfulCICheckStatuses) === \count($allCheckStatuses);
     }
 
-    private function failedCheckStatus(array $allCheckStatuses): ?CheckStatus
+    private function failedCheckStatus(array $allCheckStatuses): ?CIStatus
     {
         return array_reduce(
             $allCheckStatuses,
-            static function ($current, CheckStatus $checkStatus) {
+            static function ($current, CIStatus $checkStatus) {
                 if (null !== $current) {
                     return $current;
                 }
@@ -102,7 +102,7 @@ class GetCIStatus
     {
         return array_filter(
             $allCheckStatuses,
-            fn(CheckStatus $checkStatus) => \in_array($checkStatus->name, $this->supportedCIChecks, true)
+            fn(CIStatus $checkStatus) => \in_array($checkStatus->name, $this->supportedCIChecks, true)
         );
     }
 }

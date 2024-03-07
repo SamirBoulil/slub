@@ -47,7 +47,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
-        $this->logger->critical(sprintf('Fetching PRNumber for Status update event: %s', (string) json_encode($CIStatusUpdate)));
+//        $this->logger->critical(sprintf('Fetching PRNumber for Status update event: %s', (string) json_encode($CIStatusUpdate)));
         $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
 
         return PRIdentifier::fromString(sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber));

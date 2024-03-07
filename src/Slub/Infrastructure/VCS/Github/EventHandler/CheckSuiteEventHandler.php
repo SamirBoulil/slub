@@ -77,5 +77,5 @@ class CheckSuiteEventHandler implements EventHandlerInterface
     private function PRIsNotAlreadyInReview(PRIdentifier $PRIdentifier): bool
     {
         return !$this->PRIsInReview->fetch($PRIdentifier);
-}
+    }
 }

@@ -7,6 +7,7 @@ namespace Slub\Application\CIStatusUpdate;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\BuildLink;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -14,12 +15,16 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class CIStatusUpdateHandler
 {
-    public function __construct(private PRRepositoryInterface $PRRepository, private LoggerInterface $logger)
+    public function __construct(private PRRepositoryInterface $PRRepository, private IsPRInReview $IsPRInReview, private LoggerInterface $logger)
     {
     }
 
     public function handle(CIStatusUpdate $CIStatusUpdate): void
     {
+        if ($this->PRIsNotInReview($CIStatusUpdate)) {
+            return;
+        }
+
         $this->updateCIStatus($CIStatusUpdate);
         $this->logIt($CIStatusUpdate);
     }
@@ -56,4 +61,9 @@ class CIStatusUpdateHandler
 
         return empty($buildLink) ? BuildLink::none() : BuildLink::fromURL($CIStatusUpdate->buildLink ?? '');
     }
+
+    private function PRIsNotInReview(CIStatusUpdate $CIStatusUpdate): bool
+    {
+        return !$this->IsPRInReview->fetch(PRIdentifier::fromString($CIStatusUpdate->PRIdentifier));
+}
 }

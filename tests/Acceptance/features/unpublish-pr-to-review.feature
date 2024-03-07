@@ -8,3 +8,9 @@ Feature: Unpublish a specific pull request in review
     Given a PR has been put to review by mistake
     When an author unpublishes a PR
     Then the PR is is unpublished
+
+  @nominal
+  Scenario: If the PR is not in review, it does nothing
+    Given a PR not in review
+    When an author unpublishes a PR
+    Then the PR is is unpublished

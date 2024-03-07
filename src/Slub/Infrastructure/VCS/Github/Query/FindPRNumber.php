@@ -29,7 +29,16 @@ class FindPRNumber implements FindPRNumberInterface
 
         $content = json_decode($response->getBody()->getContents(), true);
         if (200 !== $response->getStatusCode() || null === $content) {
-            throw new \RuntimeException(sprintf('There was a problem when fetching the check runs for repository "%s" (%s) and commit ref %s', $repository, $commitRef, $url));
+            throw new \RuntimeException(
+                sprintf(
+                    'There was a problem when fetching the check runs for repository "%s" (%s) and commit ref %s. Status "%s", content "%s"',
+                    $repository,
+                    $commitRef,
+                    $url,
+                    (string) $response->getStatusCode(),
+                    $response->getBody()->getContents()
+                )
+            );
         }
 
         return $content;

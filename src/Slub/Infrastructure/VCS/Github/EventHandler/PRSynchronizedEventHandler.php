@@ -7,8 +7,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\GetPRInfoInterface;
-use Slub\Domain\Query\PRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -58,10 +56,5 @@ class PRSynchronizedEventHandler implements EventHandlerInterface
             $PRSynchronizedEvent['repository']['full_name'],
             $PRSynchronizedEvent['pull_request']['number']
         ));
-    }
-
-    private function getCIStatusFromGithub(PRIdentifier $PRIdentifier): PRInfo
-    {
-        return $this->getPRInfo->fetch($PRIdentifier);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Context;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Tester\Exception\PendingException;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**

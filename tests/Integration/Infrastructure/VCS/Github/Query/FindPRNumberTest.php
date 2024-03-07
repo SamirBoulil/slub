@@ -110,11 +110,7 @@ class FindPRNumberTest extends WebTestCase
 
     private function noResult(): string
     {
-        return (string) json_encode(
-            [
-                'items' => [],
-            ]
-        );
+        return (string) json_encode(['items' => []]);
     }
 
     private function invalidResult(): string

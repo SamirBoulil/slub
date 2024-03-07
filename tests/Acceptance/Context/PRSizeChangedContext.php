@@ -105,4 +105,12 @@ class PRSizeChangedContext extends FeatureContext
         $this->PRRepository->save($largePR);
         $this->eventSpy->reset();
     }
+
+    /**
+     * @Given a PR not in review
+     */
+    public function aPrNotInReview()
+    {
+        $this->currentPRIdentifier = PRIdentifier::fromString('akeneo/pim-community-dev/1234');
+    }
 }

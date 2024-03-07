@@ -13,13 +13,11 @@ use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
-use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\Chat\Slack\ExplainUser;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\Routing\RouterInterface;
-use Webmozart\Assert\Assert;
 
 /**
  * @author Samir Boulil <samir.boulil@gmail.com>

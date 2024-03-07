@@ -7,6 +7,7 @@ namespace Slub\Application\NewReview;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\Reviewer\ReviewerName;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -14,14 +15,25 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class NewReviewHandler
 {
-    public function __construct(private PRRepositoryInterface $PRRepository, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private PRRepositoryInterface $PRRepository,
+        private IsPRInReview $IsPRInReview,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function handle(NewReview $review): void
     {
+        if ($this->PRIsNotInReview($review)) {
+            return;
+        }
         $this->updatePRWithReview($review);
         $this->logIt($review);
+    }
+
+    private function PRIsNotInReview(NewReview $review): bool
+    {
+        return !$this->IsPRInReview->fetch(PRIdentifier::create($review->PRIdentifier));
     }
 
     private function updatePRWithReview(NewReview $review): void

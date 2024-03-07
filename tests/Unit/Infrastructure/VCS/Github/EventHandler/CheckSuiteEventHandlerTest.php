@@ -12,6 +12,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
@@ -38,13 +39,17 @@ class CheckSuiteEventHandlerTest extends TestCase
 
     private GetPRInfoInterface|ObjectProphecy $getPRInfo;
 
+    private IsPRInReview|ObjectProphecy $IsPRInReview;
+
     public function setUp(): void
     {
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->getPRInfo = $this->prophesize(GetPRInfo::class);
+        $this->IsPRInReview = $this->prophesize(IsPRInReview::class);
         $this->checkSuiteEventHandler = new CheckSuiteEventHandler(
             $this->handler->reveal(),
-            $this->getPRInfo->reveal()
+            $this->getPRInfo->reveal(),
+            $this->IsPRInReview->reveal()
         );
     }
 
@@ -65,17 +70,36 @@ class CheckSuiteEventHandlerTest extends TestCase
     {
         $prInfo = new PRInfo();
         $prInfo->CIStatus = CheckStatus::red();
-        $this->getPRInfo->fetch(
-            Argument::that(
-                fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
-            )
-        )->willReturn($prInfo);
 
+        $PRIdentifier = Argument::that(
+            fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+        );
+        $this->IsPRInReview->fetch($PRIdentifier)->willReturn(true);
+        $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
         $this->handler->handle(
             Argument::that(fn(CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
                 && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
                 && self::CI_STATUS === $command->status)
         )->shouldBeCalled();
+
+        $this->checkSuiteEventHandler->handle($checkSuiteEvent);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_nothing_if_the_pr_is_not_in_review(): void
+    {
+        $prInfo = new PRInfo();
+        $prInfo->CIStatus = CheckStatus::red();
+        $checkSuiteEvent = $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER);
+        $PRIdentifier = Argument::that(
+            fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+        );
+
+        $this->IsPRInReview->fetch($PRIdentifier)->willReturn(false);
+        $this->getPRInfo->fetch()->shouldNotBeCalled();
+        $this->handler->handle()->shouldNotBeCalled();
 
         $this->checkSuiteEventHandler->handle($checkSuiteEvent);
     }

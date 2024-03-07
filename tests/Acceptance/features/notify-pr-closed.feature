@@ -16,3 +16,9 @@ Feature: Improve the signal VS noise of the list of pull requests that needs a r
     When the author closes the PR by merging it
     Then the PR is closed and merged
     And the squad should be notified that the PR has been closed and merged
+
+  @nominal
+  Scenario: If the PR is not in review, it does nothing
+    Given a PR not in review
+    When the author closes the PR by merging it
+    And the squad should not be notified

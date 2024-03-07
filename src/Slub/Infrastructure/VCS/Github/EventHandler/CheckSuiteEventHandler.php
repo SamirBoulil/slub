@@ -33,6 +33,10 @@ class CheckSuiteEventHandler implements EventHandlerInterface
 
     public function handle(array $checkSuiteEvent): void
     {
+        // TODO: This is wierd, if there is a checksuite. There should be a pull request.
+        if ($this->noPullRequestLinked($checkSuiteEvent)) {
+            return;
+        }
         $PRIdentifier = $this->getPRIdentifier($checkSuiteEvent);
         if ($this->PRIsNotAlreadyInReview($PRIdentifier)) {
             return;
@@ -47,10 +51,15 @@ class CheckSuiteEventHandler implements EventHandlerInterface
         $this->CIStatusUpdateHandler->handle($command);
     }
 
+    private function noPullRequestLinked(array $checkSuiteEvent): bool
+    {
+        return empty($checkSuiteEvent['check_suite']['pull_requests']);
+    }
+
     private function getPRIdentifier(array $checkSuiteEvent): PRIdentifier
     {
         $pullRequests = $checkSuiteEvent['check_suite']['pull_requests'];
-        Assert::notEmpty($pullRequests, 'Expected to have at least one pull request, didn\'t find any.');
+        Assert::notEmpty($pullRequests, 'Check suite: Expected to have at least one pull request, didn\'t find any.');
 
         return PRIdentifier::fromString(
             sprintf(

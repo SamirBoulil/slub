@@ -282,7 +282,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
-            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '@slub.infrastructure.persistence.is_pr_in_review'
         tags: ['github.event_handler']
 

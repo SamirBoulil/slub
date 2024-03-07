@@ -7,7 +7,7 @@ namespace Slub\Infrastructure\VCS\Github\Query;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
@@ -102,7 +102,7 @@ class GetPRInfo implements GetPRInfoInterface
         string $title,
         string $description,
         array $reviews,
-        CheckStatus $ciStatus,
+        CIStatus $ciStatus,
         bool $isMerged,
         bool $isClosed,
         int $additions,

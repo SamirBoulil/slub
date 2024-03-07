@@ -10,7 +10,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetCheckRunStatus;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 use Tests\WebTestCase;
@@ -77,9 +77,9 @@ class GetCheckRunStatusTest extends WebTestCase
         );
 
         $this->assertCount(3, $actualCheckStatuses);
-        $this->assertEquals(CheckStatus::green($expectedSuccessCheckName), $actualCheckStatuses[0]);
-        $this->assertEquals(CheckStatus::pending($expectedNeutralCheckName), $actualCheckStatuses[1]);
-        $this->assertEquals(CheckStatus::red($expectedFailedCheckName, $expectedFailedBuildLink), $actualCheckStatuses[2]);
+        $this->assertEquals(CIStatus::green($expectedSuccessCheckName), $actualCheckStatuses[0]);
+        $this->assertEquals(CIStatus::pending($expectedNeutralCheckName), $actualCheckStatuses[1]);
+        $this->assertEquals(CIStatus::red($expectedFailedCheckName, $expectedFailedBuildLink), $actualCheckStatuses[2]);
     }
 
     /**

@@ -15,7 +15,8 @@ use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteEventHandler;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
+use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
@@ -29,6 +30,7 @@ class CheckSuiteEventHandlerTest extends TestCase
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
     private const CI_STATUS = 'RED';
+    private const HEAD_SHA = 'head_sha_b0123FAZE';
 
     /**
      * @sut
@@ -37,18 +39,18 @@ class CheckSuiteEventHandlerTest extends TestCase
 
     private CIStatusUpdateHandler|ObjectProphecy $handler;
 
-    private GetPRInfoInterface|ObjectProphecy $getPRInfo;
+    private GetCIStatus|ObjectProphecy $getCIStatus;
 
     private IsPRInReview|ObjectProphecy $IsPRInReview;
 
     public function setUp(): void
     {
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
-        $this->getPRInfo = $this->prophesize(GetPRInfo::class);
         $this->IsPRInReview = $this->prophesize(IsPRInReview::class);
+        $this->getCIStatus = $this->prophesize(GetCIStatus::class);
         $this->checkSuiteEventHandler = new CheckSuiteEventHandler(
             $this->handler->reveal(),
-            $this->getPRInfo->reveal(),
+            $this->getCIStatus->reveal(),
             $this->IsPRInReview->reveal()
         );
     }
@@ -68,14 +70,13 @@ class CheckSuiteEventHandlerTest extends TestCase
      */
     public function it_handles_check_suites_and_fetches_information_and_calls_the_handler(array $checkSuiteEvent): void
     {
-        $prInfo = new PRInfo();
-        $prInfo->CIStatus = CheckStatus::red();
-
+        $CIStatus = CIStatus::red();
         $PRIdentifier = Argument::that(
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
+
         $this->IsPRInReview->fetch($PRIdentifier)->willReturn(true);
-        $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
+        $this->getCIStatus->fetch($PRIdentifier, self::HEAD_SHA)->willReturn($CIStatus);
         $this->handler->handle(
             Argument::that(fn(CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
                 && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
@@ -90,15 +91,13 @@ class CheckSuiteEventHandlerTest extends TestCase
      */
     public function it_does_nothing_if_the_pr_is_not_in_review(): void
     {
-        $prInfo = new PRInfo();
-        $prInfo->CIStatus = CheckStatus::red();
         $checkSuiteEvent = $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER);
         $PRIdentifier = Argument::that(
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
 
         $this->IsPRInReview->fetch($PRIdentifier)->willReturn(false);
-        $this->getPRInfo->fetch()->shouldNotBeCalled();
+        $this->getCIStatus->fetch()->shouldNotBeCalled();
         $this->handler->handle()->shouldNotBeCalled();
 
         $this->checkSuiteEventHandler->handle($checkSuiteEvent);
@@ -118,11 +117,13 @@ class CheckSuiteEventHandlerTest extends TestCase
 
     private function supportedEvent(string $repositoryIdentifier, string $prNumber): array
     {
+        $headSha = self::HEAD_SHA;
         $json = <<<JSON
 {
   "action": "neutral",
   "check_suite": {
     "conclusion": "neutral",
+    "head_sha": "{$headSha}",
     "pull_requests": [{"number": {$prNumber}}]
   },
   "repository": {
@@ -136,12 +137,14 @@ JSON;
 
     private function unsupportedRedEvent(string $repositoryIdentifier, string $prNumber): array
     {
+        $headSha = self::HEAD_SHA;
         $json = <<<JSON
 {
   "action": "completed",
   "check_suite": {
     "conclusion": "UNSUPPORTED",
-    "pull_requests": [{"number": {$prNumber}}]
+    "pull_requests": [{"number": {$prNumber}}],
+    "head_sha": "{$headSha}"
   },
   "repository": {
     "full_name": "{$repositoryIdentifier}"

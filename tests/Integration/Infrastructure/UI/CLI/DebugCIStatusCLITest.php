@@ -7,7 +7,7 @@ namespace Tests\Integration\Infrastructure\UI\CLI;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\UI\CLI\DebugCIStatusCLI;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -39,7 +39,7 @@ class DebugCIStatusCLITest extends KernelTestCase
     public function it_executes(): void
     {
         $prInfo = $this->aPRInfo();
-        $prInfo->CIStatus = CheckStatus::green();
+        $prInfo->CIStatus = CIStatus::green();
 
         $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER))->willReturn($prInfo);
         $this->commandTester->execute(['command' => self::COMMAND_NAME, 'pull_request_link' => 'https://github.com/samirboulil/slub/pull/123']);
@@ -66,7 +66,7 @@ class DebugCIStatusCLITest extends KernelTestCase
         $prInfo->GTMCount = 1;
         $prInfo->notGTMCount = 1;
         $prInfo->comments = 1;
-        $prInfo->CIStatus = CheckStatus::green();
+        $prInfo->CIStatus = CIStatus::green();
         $prInfo->isMerged = false;
         $prInfo->isClosed = false;
 

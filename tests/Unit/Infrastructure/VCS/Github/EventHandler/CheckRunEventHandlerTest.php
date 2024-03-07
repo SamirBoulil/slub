@@ -15,7 +15,7 @@ use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Query\PRInfo;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
@@ -70,7 +70,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_handles_check_runs_and_fetches_information_and_calls_the_handler(array $CheckRunEvent): void
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus = CheckStatus::red();
+        $prInfo->CIStatus = CIStatus::red();
         $PRIdentifier = Argument::that(
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
@@ -93,7 +93,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_does_nothing_if_the_pr_is_not_in_review(): void
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus = CheckStatus::red();
+        $prInfo->CIStatus = CIStatus::red();
         $checkRunEvent = $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER);
         $PRIdentifier = Argument::that(
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
@@ -124,7 +124,7 @@ class CheckRunEventHandlerTest extends TestCase
     public function it_has_a_queued_check_run_we_fetch_the_ci_status(): void
     {
         $prInfo = new PRInfo();
-        $prInfo->CIStatus =  CheckStatus::red();
+        $prInfo->CIStatus =  CIStatus::red();
         $PRIdentifier = Argument::that(
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );

@@ -26,17 +26,17 @@ class GetCheckSuiteStatus
         $this->supportedCIChecks = explode(',', $supportedCIChecks);
     }
 
-    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CheckStatus
+    public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CIStatus
     {
         $checkSuite = $this->checkSuite($PRIdentifier, $commitRef);
         if ($this->isCheckSuiteStatus($checkSuite, 'failure')) {
-            return CheckStatus::red('RENAME_ME', $this->buildLink($checkSuite));
+            return CIStatus::red('RENAME_ME', $this->buildLink($checkSuite));
         }
         if ($this->isCheckSuiteStatus($checkSuite, 'success')) {
-            return CheckStatus::green('RENAME_ME');
+            return CIStatus::green('RENAME_ME');
         }
 
-        return CheckStatus::pending('RENAME_ME');
+        return CIStatus::pending('RENAME_ME');
     }
 
     private function isCheckSuiteStatus(array $checkSuites, string $expectedConclusion): bool

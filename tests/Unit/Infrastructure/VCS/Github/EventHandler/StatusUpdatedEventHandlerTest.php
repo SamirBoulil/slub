@@ -13,7 +13,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler;
-use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
+use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 
@@ -79,7 +79,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
             Argument::that(
                 fn ($commitRef) => self::COMMIT_REF === $commitRef
             )
-        )->willReturn(CheckStatus::green());
+        )->willReturn(CIStatus::green());
         $this->handler->handle(
             Argument::that(
                 fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier

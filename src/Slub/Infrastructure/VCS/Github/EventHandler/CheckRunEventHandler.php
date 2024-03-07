@@ -56,7 +56,8 @@ class CheckRunEventHandler implements EventHandlerInterface
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
         $pullRequests = $CIStatusUpdate['check_run']['check_suite']['pull_requests'];
-        Assert::notEmpty($pullRequests, 'Expected to have at least one pull request, didn\'t find any.');
+        // TODO: Wierd, checkrun webhooks are disabled.
+        Assert::notEmpty($pullRequests, 'Check run: Expected to have at least one pull request, didn\'t find any.');
 
         return PRIdentifier::fromString(
             sprintf(

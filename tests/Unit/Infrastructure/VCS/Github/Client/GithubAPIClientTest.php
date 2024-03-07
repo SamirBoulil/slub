@@ -7,6 +7,7 @@ namespace Tests\Unit\Infrastructure\VCS\Github\Client;
 use GuzzleHttp\Psr7\Response;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClient;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
@@ -38,7 +39,8 @@ class GithubAPIClientTest extends KernelTestCase
         $this->githubAPIClient = new GithubAPIClient(
             $this->refreshAccessToken->reveal(),
             $this->sqlAppInstallationRepository->reveal(),
-            $this->requestSpy->client()
+            $this->requestSpy->client(),
+            new NullLogger()
         );
     }
 

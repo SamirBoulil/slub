@@ -229,6 +229,7 @@ services:
             - '@slub.infrastructure.vcs.github.client.refresh_access_token'
             - '@slub.infrastructure.vcs.github.client.app_installation_repository'
             - '@slub.infrastructure.http.guzzle_client'
+            - '@logger'
 
     ## VCS
     slub.infrastructure.vcs.github.client.refresh_access_token:
@@ -291,6 +292,7 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '@logger'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.pr_closed:

@@ -25,8 +25,8 @@ class FindPRNumber implements FindPRNumberInterface
     private function searchResult(string $repository, string $commitRef): array
     {
         $url = $this->searchUrl($repository, $commitRef);
-        $response = $this->githubAPIClient->get($url, [], $repository);
 
+        $response = $this->githubAPIClient->get($url, [], $repository);
         $content = json_decode($response->getBody()->getContents(), true);
         if (200 !== $response->getStatusCode() || null === $content) {
             throw new \RuntimeException(

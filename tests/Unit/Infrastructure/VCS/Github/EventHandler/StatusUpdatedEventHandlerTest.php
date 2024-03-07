@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -50,7 +51,8 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->statusUpdateEventHandler = new StatusUpdatedEventHandler(
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
-            $this->getCIStatus->reveal()
+            $this->getCIStatus->reveal(),
+            new NullLogger()
         );
     }
 

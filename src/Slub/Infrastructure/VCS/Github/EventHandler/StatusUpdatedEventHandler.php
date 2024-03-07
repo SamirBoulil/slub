@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
+use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -18,8 +19,12 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 {
     private const STATUS_UPDATE_EVENT_TYPE = 'status';
 
-    public function __construct(private CIStatusUpdateHandler $CIStatusUpdateHandler, private FindPRNumberInterface $findPRNumber, private GetCIStatus $getCIStatus)
-    {
+    public function __construct(
+        private CIStatusUpdateHandler $CIStatusUpdateHandler,
+        private FindPRNumberInterface $findPRNumber,
+        private GetCIStatus $getCIStatus,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function supports(string $eventType): bool
@@ -29,6 +34,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     public function handle(array $statusUpdate): void
     {
+
         $command = new CIStatusUpdate();
         $command->PRIdentifier = $this->getPRIdentifier($statusUpdate)->stringValue();
         $command->repositoryIdentifier = $statusUpdate['repository']['full_name'];
@@ -41,6 +47,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
+        $this->logger->critical(sprintf('Fetching PRNumber for Status update event: %s', (string) json_encode($CIStatusUpdate)));
         $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
 
         return PRIdentifier::fromString(sprintf('%s/%s', $CIStatusUpdate['repository']['full_name'], $PRNumber));

@@ -6,6 +6,7 @@ namespace Slub\Infrastructure\VCS\Github\Client;
 
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlAppInstallationRepository;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
@@ -15,12 +16,15 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 class GithubAPIClient implements GithubAPIClientInterface
 {
     private const UNAUTHORIZED_STATUS_CODE = 401;
+    private LoggerInterface $logger;
 
     public function __construct(
         private RefreshAccessToken $refreshAccessToken,
         private SqlAppInstallationRepository $sqlAppInstallationRepository,
-        private ClientInterface $client
+        private ClientInterface $client,
+        LoggerInterface $logger
     ) {
+        $this->logger = $logger;
     }
 
     public function get(string $url, array $options, $repositoryIdentifier): ResponseInterface
@@ -45,7 +49,7 @@ class GithubAPIClient implements GithubAPIClientInterface
     private function fetch(string $url, array $options, GithubAppInstallation $appInstallation): ResponseInterface
     {
         $options = $this->optionsWithAuthorizationHeaders($options, $appInstallation);
-
+        $this->logger->critical(sprintf('Calling url "%s" with options "%s"', $url, (string) json_encode($options)));
         return $this->client->get($url, $options);
     }
 

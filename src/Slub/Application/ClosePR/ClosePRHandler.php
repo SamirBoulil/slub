@@ -6,7 +6,7 @@ namespace Slub\Application\ClosePR;
 
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\PRIsInReview;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -14,7 +14,7 @@ use Slub\Domain\Repository\PRRepositoryInterface;
  */
 class ClosePRHandler
 {
-    public function __construct(private PRRepositoryInterface $PRRepository, private PRIsInReview $PRIsInReview, private LoggerInterface $logger)
+    public function __construct(private PRRepositoryInterface $PRRepository, private IsPRInReview $IsPRInReview, private LoggerInterface $logger)
     {
     }
 
@@ -29,7 +29,7 @@ class ClosePRHandler
 
     private function PRIsNotInReview(ClosePR $closePR): bool
     {
-        return !$this->PRIsInReview->fetch(PRIdentifier::fromString($closePR->PRIdentifier));
+        return !$this->IsPRInReview->fetch(PRIdentifier::fromString($closePR->PRIdentifier));
     }
 
     private function closePR(ClosePR $closePR): void

@@ -9,7 +9,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Domain\Query\PRIsInReview;
+use Slub\Domain\Query\IsPRInReview;
 use Webmozart\Assert\Assert;
 
 /**
@@ -22,7 +22,7 @@ class CheckSuiteEventHandler implements EventHandlerInterface
     public function __construct(
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
         private GetPRInfoInterface $getPRInfo,
-        private PRIsInReview $PRIsInReview
+        private IsPRInReview $IsPRInReview
     ) {
     }
 
@@ -76,6 +76,6 @@ class CheckSuiteEventHandler implements EventHandlerInterface
      */
     private function PRIsNotAlreadyInReview(PRIdentifier $PRIdentifier): bool
     {
-        return !$this->PRIsInReview->fetch($PRIdentifier);
+        return !$this->IsPRInReview->fetch($PRIdentifier);
     }
 }

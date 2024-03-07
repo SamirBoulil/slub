@@ -6,7 +6,7 @@ namespace Slub\Domain\Query;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
 
-interface PRIsInReview
+interface IsPRInReview
 {
     public function fetch(PRIdentifier $PRIdentifier): bool;
 }

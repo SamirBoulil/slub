@@ -7,7 +7,7 @@ namespace Slub\Application\ChangePRSize;
 use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\PRIsInReview;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Repository\PRRepositoryInterface;
 
 /**
@@ -18,7 +18,7 @@ class ChangePRSizeHandler
     public function __construct(
         private PRRepositoryInterface $PRRepository,
         private IsLarge $isLarge,
-        private PRIsInReview $PRIsInReview,
+        private IsPRInReview $IsPRInReview,
         private LoggerInterface $logger
     ) {
     }
@@ -33,7 +33,7 @@ class ChangePRSizeHandler
 
     private function PRNotInReview(ChangePRSize $changePRSize): bool
     {
-        return !$this->PRIsInReview->fetch(PRIdentifier::fromString($changePRSize->PRIdentifier));
+        return !$this->IsPRInReview->fetch(PRIdentifier::fromString($changePRSize->PRIdentifier));
     }
 
     private function savePRTooLarge(bool $isTooLarge): void

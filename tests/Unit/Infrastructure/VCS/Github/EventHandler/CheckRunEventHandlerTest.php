@@ -13,7 +13,7 @@ use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
-use Slub\Domain\Query\PRIsInReview;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckRunEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CheckStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
@@ -40,17 +40,17 @@ class CheckRunEventHandlerTest extends TestCase
 
     private GetPRInfoInterface|ObjectProphecy $getPRInfo;
 
-    private PRIsInReview|ObjectProphecy $PRIsInReview;
+    private IsPRInReview|ObjectProphecy $IsPRInReview;
 
     public function setUp(): void
     {
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->getPRInfo = $this->prophesize(GetPRInfo::class);
-        $this->PRIsInReview = $this->prophesize(PRIsInReview::class);
+        $this->IsPRInReview = $this->prophesize(IsPRInReview::class);
         $this->checkRunEventHandler = new CheckRunEventHandler(
             $this->handler->reveal(),
             $this->getPRInfo->reveal(),
-            $this->PRIsInReview->reveal()
+            $this->IsPRInReview->reveal()
         );
     }
 
@@ -75,7 +75,7 @@ class CheckRunEventHandlerTest extends TestCase
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
 
-        $this->PRIsInReview->fetch($PRIdentifier)->willReturn(true);
+        $this->IsPRInReview->fetch($PRIdentifier)->willReturn(true);
         $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
 
         $this->handler->handle(
@@ -99,7 +99,7 @@ class CheckRunEventHandlerTest extends TestCase
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
 
-        $this->PRIsInReview->fetch($PRIdentifier)->willReturn(false);
+        $this->IsPRInReview->fetch($PRIdentifier)->willReturn(false);
         $this->getPRInfo->fetch()->shouldNotBeCalled();
         $this->handler->handle()->shouldNotBeCalled();
 
@@ -129,7 +129,7 @@ class CheckRunEventHandlerTest extends TestCase
             fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
         );
 
-        $this->PRIsInReview->fetch($PRIdentifier)->willReturn(true);
+        $this->IsPRInReview->fetch($PRIdentifier)->willReturn(true);
         $this->getPRInfo->fetch($PRIdentifier)->willReturn($prInfo);
         $this->handler->handle(
             Argument::that(fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier

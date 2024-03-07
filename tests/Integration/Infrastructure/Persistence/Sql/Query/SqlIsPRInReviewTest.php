@@ -14,23 +14,23 @@ use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
-use Slub\Infrastructure\Persistence\Sql\Query\SqlPRIsInReview;
+use Slub\Infrastructure\Persistence\Sql\Query\SqlIsPRInReview;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class SqlPRIsInReviewTest extends KernelTestCase
+class SqlIsPRInReviewTest extends KernelTestCase
 {
     private const PR_IDENTIFIER = 'samirboulil/slub/123';
-    private SqlPRIsInReview $PRIsInReview;
+    private SqlIsPRInReview $IsPRInReview;
 
     private Connection $sqlConnection;
     public function setUp(): void
     {
         parent::setUp();
-        $this->PRIsInReview = $this->get('slub.infrastructure.persistence.pr_is_in_review');
+        $this->IsPRInReview = $this->get('slub.infrastructure.persistence.is_pr_in_review');
         $this->resetDB();
     }
 
@@ -44,8 +44,8 @@ class SqlPRIsInReviewTest extends KernelTestCase
 
         $this->createPR($prIdentifierInReview);
 
-        self::assertTrue($this->PRIsInReview->fetch($prIdentifierInReview));
-        self::assertFalse($this->PRIsInReview->fetch($prIdentifierNotInReview));
+        self::assertTrue($this->IsPRInReview->fetch($prIdentifierInReview));
+        self::assertFalse($this->IsPRInReview->fetch($prIdentifierNotInReview));
     }
 
     private function resetDB(): void

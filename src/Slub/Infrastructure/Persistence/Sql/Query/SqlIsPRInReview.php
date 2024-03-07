@@ -6,7 +6,7 @@ namespace Slub\Infrastructure\Persistence\Sql\Query;
 
 use Doctrine\DBAL\Driver\Connection;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\PRIsInReview;
+use Slub\Domain\Query\IsPRInReview;
 
 /**
  * Checks a PR is in review.
@@ -14,7 +14,7 @@ use Slub\Domain\Query\PRIsInReview;
  * @copyright 2024 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class SqlPRIsInReview implements PRIsInReview
+class SqlIsPRInReview implements IsPRInReview
 {
     public function __construct(private Connection $sqlConnection)
     {
@@ -26,7 +26,7 @@ class SqlPRIsInReview implements PRIsInReview
         SELECT EXISTS (
             SELECT 1
             FROM pr
-            WHERE IDENTIFIER = :PRIdentifier
+            WHERE IDENTIFIER = :PRIdentifier 
         ) as is_existing
 SQL;
 

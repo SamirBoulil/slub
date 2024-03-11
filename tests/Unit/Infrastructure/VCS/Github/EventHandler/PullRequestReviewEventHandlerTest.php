@@ -86,8 +86,8 @@ class PullRequestReviewEventHandlerTest extends TestCase
         $authorUserId = 1;
         $authorsOwnComment = [
             'action' => 'submitted',
-            'pull_request' => ['user' => ['id' => $authorUserId]],
-            'review' => ['user' => ['id' => $authorUserId]],
+            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => $authorUserId]],
+            'review' => ['state' => 'commented', 'user' => ['id' => $authorUserId]],
         ];
 
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
@@ -105,23 +105,5 @@ class PullRequestReviewEventHandlerTest extends TestCase
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
 
         $this->pullRequestReviewHandler->handle($commentEdited);
-    }
-
-    /**
-     * @test
-     */
-    public function it_throws_if_the_status_is_not_supported(): void
-    {
-        $unsupportedReviewStatus = [
-            'action' => 'submitted',
-            'pull_request' => ['number' => self::PR_NUMBER, 'user' => ['id' => 1, 'login' => 'lucie']],
-            'repository' => ['full_name' => self::REPOSITORY_IDENTIFIER],
-            'review' => ['state' => 'UNSUPPORTED_STATUS', 'user' => ['id' => 2, 'login' => 'samir']],
-        ];
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->handler->handle(Argument::any())->shouldNotBeCalled();
-
-        $this->pullRequestReviewHandler->handle($unsupportedReviewStatus);
     }
 }

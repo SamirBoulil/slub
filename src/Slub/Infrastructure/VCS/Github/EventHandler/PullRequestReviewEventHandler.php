@@ -26,7 +26,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
 
     public function handle(array $PRStatusUpdate): void
     {
-        if ($this->reviewIsAnEdit($PRStatusUpdate)
+        if ($this->reviewIsNotSupported($PRStatusUpdate)
             || $this->authorReviewedHisOwnPR($PRStatusUpdate)
         ) {
             return;
@@ -87,5 +87,15 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     private function reviewIsAnEdit(array $PRStatusUpdate): bool
     {
         return self::EDITED_ACTION_TYPE === $PRStatusUpdate['action'];
+    }
+
+    private function reviewIsNotSupported(array $PRStatusUpdate): bool
+    {
+        return self::EDITED_ACTION_TYPE === $PRStatusUpdate['action']
+            || !in_array(
+                $PRStatusUpdate['review']['state'],
+                ['approved', 'changes_requested', 'request_changes', 'commented'],
+                true
+            );
     }
 }

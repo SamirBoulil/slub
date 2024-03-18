@@ -65,9 +65,10 @@ class GithubAPIHelper
 
     private static function breakoutPRIdentifier(PRIdentifier $PRIdentifier): array
     {
-        preg_match('/(.+)\/(.+)\/(.+)/', $PRIdentifier->stringValue(), $matches);
+        $PRIdentifierToBrekaout = $PRIdentifier->stringValue();
+        preg_match('/(.+)\/(.+)\/(.+)/', $PRIdentifierToBrekaout, $matches);
         array_shift($matches);
-        Assert::count($matches, 3);
+        Assert::count($matches, 3, sprintf('Impossible to breakout PRIdentifier "%s"', $PRIdentifierToBrekaout));
 
         return $matches;
     }

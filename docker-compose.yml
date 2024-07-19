@@ -20,9 +20,9 @@ services:
         command: '--default-authentication-plugin=mysql_native_password'
         environment:
             MYSQL_ROOT_PASSWORD: 'root'
-            MYSQL_USER: 'db_user'
+            MYSQL_USER: 'slub'
             MYSQL_DATABASE: 'slub'
-            MYSQL_PASSWORD: 'db_password'
+            MYSQL_PASSWORD: 'slub'
         ports:
             - '${DOCKER_PORT_MYSQL:-33006}:3306'
         networks:

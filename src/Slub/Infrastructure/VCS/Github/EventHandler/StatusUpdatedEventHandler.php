@@ -76,6 +76,16 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     private function isExcluded(Status $status): bool
     {
-        return in_array($status->name, $this->excludedNames);
+        if (in_array($status->name, $this->excludedNames)) {
+            return true;
+        }
+
+        foreach ($this->excludedNames as $excludedNameAsPattern) {
+            if (preg_match(sprintf('/%s/', $excludedNameAsPattern), $status->name)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

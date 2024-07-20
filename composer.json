@@ -57,7 +57,9 @@
     "allow-plugins": {
       "phpstan/extension-installer": true,
       "symfony/flex": true,
-      "php-http/discovery": true
+      "php-http/discovery": true,
+      "kylekatarnls/update-helper": true,
+      "thecodingmachine/discovery": true
     }
   },
   "autoload": {

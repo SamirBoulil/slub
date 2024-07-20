@@ -118,3 +118,28 @@ The way you unpublish a PR from the reminder is by telling Slub in the following
 *In this example, the slub bot name is @Yeee*
 
 ![Unpublishing reminders](https://miro.medium.com/max/1760/1*lKYEB13fVb1lQzvL5pVtKg.png)
+
+## Developement
+
+### With Docker
+
+Build the PHP image
+
+```bash
+docker compose build php
+```
+
+Install PHP dependencies
+
+```bash
+docker compose run --rm php composer install
+```
+
+Run the tests
+
+```bash
+# start MySQL DB for integration and acceptance tests
+APP_ENV=test docker compose up -d
+APP_ENV=test dcrun php bin/console slub:install
+APP_ENV=test docker compose run --rm php make check
+```

@@ -23,6 +23,7 @@ use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 class StatusUpdatedEventHandlerTest extends TestCase
 {
     use ProphecyTrait;
+
     private const PR_NUMBER = '10';
     private const REPOSITORY_IDENTIFIER = 'SamirBoulil/slub';
     private const PR_IDENTIFIER = 'SamirBoulil/slub/10';
@@ -48,11 +49,18 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->getCIStatus = $this->prophesize(GetCIStatus::class);
         $this->findPRNumber = $this->prophesize(FindPRNumber::class);
+
         $this->statusUpdateEventHandler = new StatusUpdatedEventHandler(
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
             $this->getCIStatus->reveal(),
-            new NullLogger()
+            new NullLogger(),
+            [
+                'excluded_foo',
+                'excluded_bar',
+                'snafu',
+                'excluded_[a-z]+_with_suffix',
+            ]
         );
     }
 
@@ -69,20 +77,23 @@ class StatusUpdatedEventHandlerTest extends TestCase
      * @test
      * @dataProvider events
      */
-    public function it_handles_ci_status___fetches_information_and_calls_the_handler(array $events, string $status): void
-    {
+    public function it_handles_ci_status___fetches_information_and_calls_the_handler(
+        array $events,
+        string $status
+    ): void {
         $this->findPRNumber->fetch($status, self::COMMIT_REF)->willReturn(self::PR_NUMBER);
         $this->getCIStatus->fetch(
             Argument::that(
-                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+                fn(PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
             ),
             Argument::that(
-                fn ($commitRef) => self::COMMIT_REF === $commitRef
+                fn($commitRef) => self::COMMIT_REF === $commitRef
             )
         )->willReturn(CIStatus::green());
+
         $this->handler->handle(
             Argument::that(
-                fn (CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
+                fn(CIStatusUpdate $command) => self::PR_IDENTIFIER === $command->PRIdentifier
                     && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
                     && self::CI_STATUS === $command->status
             )
@@ -91,12 +102,35 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->statusUpdateEventHandler->handle($events);
     }
 
+    /**
+     * @test
+     */
+    public function it_handles_excluded_status_update(): void
+    {
+        $this->findPRNumber->fetch(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $this->getCIStatus->fetch(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $this->handler->handle(Argument::any())->shouldNotBeCalled();
+
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_foo')
+        );
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_bar')
+        );
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_snafu')
+        );
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_pattern_with_suffix')
+        );
+    }
+
     public function events(): array
     {
         return [
-            'it handles supported status'       => [
+            'it handles supported status' => [
                 $this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
-                'travis'
+                'travis',
             ],
             'it handles unsupported red status' => [
                 $this->unsupportedRedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER),
@@ -113,16 +147,16 @@ class StatusUpdatedEventHandlerTest extends TestCase
     {
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
-{
-  "sha": "{$commitRef}",
-  "name": "travis",
-  "state": "success",
-  "number": {$prNumber},
-  "repository": {
-    "full_name": "{$repositoryIdentifier}"
-  }
-}
-JSON;
+        {
+          "sha": "{$commitRef}",
+          "name": "travis",
+          "state": "success",
+          "number": {$prNumber},
+          "repository": {
+            "full_name": "{$repositoryIdentifier}"
+          }
+        }
+        JSON;
 
         return json_decode($json, true);
     }
@@ -131,16 +165,16 @@ JSON;
     {
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
-{
-  "sha": "{$commitRef}",
-  "name": "UNSUPPORTED",
-  "state": "failure",
-  "number": {$prNumber},
-  "repository": {
-    "full_name": "{$repositoryIdentifier}"
-  }
-}
-JSON;
+        {
+          "sha": "{$commitRef}",
+          "name": "UNSUPPORTED",
+          "state": "failure",
+          "number": {$prNumber},
+          "repository": {
+            "full_name": "{$repositoryIdentifier}"
+          }
+        }
+        JSON;
 
         return json_decode($json, true);
     }
@@ -149,16 +183,33 @@ JSON;
     {
         $commitRef = self::COMMIT_REF;
         $json = <<<JSON
-{
-  "sha": "{$commitRef}",
-  "name": "UNSUPPORTED",
-  "state": "pending",
-  "number": {$prNumber},
-  "repository": {
-    "full_name": "{$repositoryIdentifier}"
-  }
-}
-JSON;
+        {
+          "sha": "{$commitRef}",
+          "name": "UNSUPPORTED",
+          "state": "pending",
+          "number": {$prNumber},
+          "repository": {
+            "full_name": "{$repositoryIdentifier}"
+          }
+        }
+        JSON;
+
+        return json_decode($json, true);
+    }
+
+    private function excludedEvent(string $name): array
+    {
+        $json = <<<JSON
+        {
+          "sha": "sha123",
+          "name": "{$name}",
+          "state": "failure",
+          "number": 1234,
+          "repository": {
+            "full_name": "my_repo"
+          }
+        }
+        JSON;
 
         return json_decode($json, true);
     }

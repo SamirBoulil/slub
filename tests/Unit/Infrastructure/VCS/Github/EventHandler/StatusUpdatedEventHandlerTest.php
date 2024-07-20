@@ -55,7 +55,12 @@ class StatusUpdatedEventHandlerTest extends TestCase
             $this->findPRNumber->reveal(),
             $this->getCIStatus->reveal(),
             new NullLogger(),
-            ['excluded_foo', 'excluded_bar']
+            [
+                'excluded_foo',
+                'excluded_bar',
+                'snafu',
+                'excluded_[a-z]+_with_suffix',
+            ]
         );
     }
 
@@ -100,9 +105,10 @@ class StatusUpdatedEventHandlerTest extends TestCase
     /**
      * @test
      */
-    public function it_handles_excluded_status_update(): void {
+    public function it_handles_excluded_status_update(): void
+    {
         $this->findPRNumber->fetch(Argument::any(), Argument::any())->shouldNotBeCalled();
-        $this->getCIStatus->fetch(Argument::any(),Argument::any())->shouldNotBeCalled();
+        $this->getCIStatus->fetch(Argument::any(), Argument::any())->shouldNotBeCalled();
         $this->handler->handle(Argument::any())->shouldNotBeCalled();
 
         $this->statusUpdateEventHandler->handle(
@@ -110,6 +116,12 @@ class StatusUpdatedEventHandlerTest extends TestCase
         );
         $this->statusUpdateEventHandler->handle(
             $this->excludedEvent('excluded_bar')
+        );
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_snafu')
+        );
+        $this->statusUpdateEventHandler->handle(
+            $this->excludedEvent('excluded_pattern_with_suffix')
         );
     }
 

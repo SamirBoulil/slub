@@ -21,9 +21,17 @@ class PRIdentifier
         return new self($PRIdentifier);
     }
 
+    /**
+     * @deprecated use from PR Information instead.
+     */
     public static function fromString(string $PRIdentifier): self
     {
         return new self($PRIdentifier);
+    }
+
+    public static function fromPRInfo(string $repositoryFullName, string $prNumber): self
+    {
+        return new self(sprintf('%s/%s', $repositoryFullName, $prNumber));
     }
 
     public function stringValue(): string

@@ -38,7 +38,7 @@ class FindPRNumberTest extends WebTestCase
     {
         $expectedPRNumber = self::PR_NUMBER;
         $this->githubAPIClient->get(
-            sprintf('https://api.github.com/search/issues?q=%s+%s', self::REPOSITORY_NAME, self::COMMIT_SHA),
+            $this->searchURL(),
             [],
             self::REPOSITORY_NAME
         )->willReturn(new Response(200, [], $this->successfullyFindsAPR()));
@@ -54,7 +54,7 @@ class FindPRNumberTest extends WebTestCase
     public function it_does_not_find_a_pr_number_given_a_repository_and_a_commit_sha(): void
     {
         $this->githubAPIClient->get(
-            sprintf('https://api.github.com/search/issues?q=%s+%s', self::REPOSITORY_NAME, self::COMMIT_SHA),
+            $this->searchURL(),
             [],
             self::REPOSITORY_NAME
         )->willReturn(new Response(200, [], $this->noResult()));
@@ -70,7 +70,7 @@ class FindPRNumberTest extends WebTestCase
     public function it_cannot_find_the_pr_number_in_the_search_result(): void
     {
         $this->githubAPIClient->get(
-            sprintf('https://api.github.com/search/issues?q=%s+%s', self::REPOSITORY_NAME, self::COMMIT_SHA),
+            $this->searchURL(),
             [],
             self::REPOSITORY_NAME
         )->willReturn(new Response(200, [], $this->invalidResult()));
@@ -96,13 +96,7 @@ class FindPRNumberTest extends WebTestCase
     {
         return (string) json_encode(
             [
-                'items' => [
-                    [
-                        'pull_request' => [
-                            'url' => 'https://api.github.com/whatever/path/it/is/the/number/is/always/at/the/end/'.self::PR_NUMBER,
-                        ],
-                    ],
-                ],
+                ['number' => self::PR_NUMBER]
             ],
             JSON_THROW_ON_ERROR
         );
@@ -110,7 +104,7 @@ class FindPRNumberTest extends WebTestCase
 
     private function noResult(): string
     {
-        return (string) json_encode(['items' => []]);
+        return (string) json_encode([]);
     }
 
     private function invalidResult(): string
@@ -126,5 +120,10 @@ class FindPRNumberTest extends WebTestCase
                 ],
             ]
         );
+    }
+
+    public function searchURL(): string
+    {
+        return sprintf('https://api.github.com/repos/%s/commits/%s/pulls', self::REPOSITORY_NAME, self::COMMIT_SHA);
     }
 }

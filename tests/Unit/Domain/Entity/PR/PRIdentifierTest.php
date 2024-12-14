@@ -30,6 +30,15 @@ class PRIdentifierTest extends TestCase
     /**
      * @test
      */
+    public function it_creates_an_identifier_from_pr_info(): void
+    {
+        $identifier = PRIdentifier::fromPRInfo('akeneo/pim-community-dev', '1111');
+        $this->assertEquals('akeneo/pim-community-dev/1111', $identifier->stringValue());
+    }
+
+    /**
+     * @test
+     */
     public function it_creates_an_identifier_from_its_string_value(): void
     {
         $identifier = PRIdentifier::fromString('akeneo/pim-community-dev/1111');

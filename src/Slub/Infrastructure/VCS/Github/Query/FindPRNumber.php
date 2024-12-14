@@ -46,17 +46,15 @@ class FindPRNumber implements FindPRNumberInterface
 
     private function searchUrl(string $repository, string $commitRef): string
     {
-        return sprintf('https://api.github.com/search/issues?q=%s+%s', $repository, $commitRef);
+        return sprintf('https://api.github.com/repos/%s/commits/%s/pulls', $repository, $commitRef);
     }
 
     private function prNumber(array $searchResult): ?string
     {
-        if (empty($searchResult['items'])) {
+        if (empty($searchResult)) {
             return null;
         }
 
-        preg_match('/\d+$/', $searchResult['items'][0]['pull_request']['url'], $matches);
-
-        return $matches[0] ?? null;
+        return current($searchResult)['number'] ?? null;
     }
 }

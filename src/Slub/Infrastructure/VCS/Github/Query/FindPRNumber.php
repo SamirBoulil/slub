@@ -55,6 +55,6 @@ class FindPRNumber implements FindPRNumberInterface
             return null;
         }
 
-        return current($searchResult)['number'] ?? null;
+        return isset(current($searchResult)['number']) ? (string) current($searchResult)['number'] :  null;
     }
 }

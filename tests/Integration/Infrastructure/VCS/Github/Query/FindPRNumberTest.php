@@ -33,15 +33,16 @@ class FindPRNumberTest extends WebTestCase
 
     /**
      * @test
+     * @dataProvider successfullPRs
      */
-    public function it_finds_a_pr_number_given_a_repository_and_a_commit_sha(): void
+    public function it_finds_a_pr_number_given_a_repository_and_a_commit_sha(string $response): void
     {
         $expectedPRNumber = self::PR_NUMBER;
         $this->githubAPIClient->get(
             $this->searchURL(),
             [],
             self::REPOSITORY_NAME
-        )->willReturn(new Response(200, [], $this->successfullyFindsAPR()));
+        )->willReturn(new Response(200, [], $response));
 
         $actualPRNumber = $this->findPRNumber->fetch(self::REPOSITORY_NAME, self::COMMIT_SHA);
 
@@ -125,5 +126,23 @@ class FindPRNumberTest extends WebTestCase
     public function searchURL(): string
     {
         return sprintf('https://api.github.com/repos/%s/commits/%s/pulls', self::REPOSITORY_NAME, self::COMMIT_SHA);
+    }
+
+    public function successfullPRs()
+    {
+        return [
+            'Valid String PR Number' => [(string) json_encode(
+                [
+                    ['number' => self::PR_NUMBER]
+                ],
+                JSON_THROW_ON_ERROR
+            )],
+            'valid Integer PR Number' => [(string) json_encode(
+                [
+                    ['number' => intval(self::PR_NUMBER)]
+                ],
+                JSON_THROW_ON_ERROR
+            )],
+        ];
     }
 }

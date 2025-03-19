@@ -12,6 +12,8 @@ parameters:
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
     GITHUB_APP_HOMEPAGE_URL: 'https://github.com/apps/slub-yeee-test'
+    env(GITHUB_EXCLUDED_STATUSES): '[]'
+    github.excluded_statuses: '%env(json:GITHUB_EXCLUDED_STATUSES)%'
 
 services:
     # default configuration for services in *this* file
@@ -293,6 +295,7 @@ services:
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '@logger'
+            - '%github.excluded_statuses%'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.pr_closed:

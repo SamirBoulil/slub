@@ -111,6 +111,19 @@ class NewEventActionTest extends TestCase
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
     }
 
+    /**
+     * @test
+     */
+    public function it_ignores_blacklisted_checks(): void
+    {
+        // TODO: TBC
+        $blacklistedEvent = $this->supportedRequest('UNKNOWN', ['payload'], self::DELIVERY_EVENT_IDENTIFIER);
+
+        $this->expectException(\TypeError::class);
+        $this->newEventAction->executeAction($blacklistedEvent);
+    }
+
+
 //    /**
 //     * @test
 //     */
@@ -167,6 +180,17 @@ class NewEventActionTest extends TestCase
     }
 
     private function supportedRequest(string $eventType, array $payload, $eventIdentifier): Request
+    {
+        $content = (string) json_encode($payload);
+        $request = new Request([], [], [], [], [], [], $content);
+        $request->headers->set('X-GitHub-Event', $eventType);
+        $request->headers->set('X-Hub-Signature', hash_hmac('sha1', $content, self::SECRET));
+        $request->headers->set('X-GitHub-Delivery', $eventIdentifier);
+
+        return $request;
+    }
+
+    private function blacklistedCheck(string $eventType, array $payload, $eventIdentifier): Request
     {
         $content = (string) json_encode($payload);
         $request = new Request([], [], [], [], [], [], $content);

@@ -21,7 +21,7 @@ final class Version20250406113449 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE user_in_app_communication;');
+        $this->addSql('DROP TABLE vcs_events_recordings;');
     }
 
     private function addStatsTable(): void

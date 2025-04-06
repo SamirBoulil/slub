@@ -41,7 +41,12 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     public function handle(array $statusUpdate): void
     {
         $command = new CIStatusUpdate();
-        $PRIdentifier = $this->getPRIdentifier($statusUpdate);
+        try {
+            $PRIdentifier = $this->getPRIdentifier($statusUpdate);
+        } catch (NoPRNumberException) {
+            return;
+        }
+
         $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $statusUpdate['repository']['full_name'];
         $checkStatus = $this->getCIStatusFromGithub($PRIdentifier, $statusUpdate['sha']);
@@ -54,10 +59,9 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier
     {
-//        $this->logger->critical(sprintf('Fetching PRNumber for Status update event: %s', (string) json_encode($CIStatusUpdate)));
         $PRNumber = $this->findPRNumber->fetch($CIStatusUpdate['name'], $CIStatusUpdate['sha']);
         if ($PRNumber === null) {
-            throw new \RuntimeException(sprintf('Impossible to fetch PR number for commit on repository %s', $CIStatusUpdate['name']));
+            throw new NoPRNumberException(sprintf('Impossible to fetch PR number for commit on repository %s', $CIStatusUpdate['name']));
         }
 
         return PRIdentifier::fromPRInfo($CIStatusUpdate['repository']['full_name'], $PRNumber);

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\EventHandler;
 
+use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\IsPRInReview;
-use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 use Webmozart\Assert\Assert;
@@ -24,7 +24,9 @@ class CheckSuiteEventHandler implements EventHandlerInterface
     public function __construct(
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
         private GetCIStatus $getCIStatus,
-        private IsPRInReview $IsPRInReview
+        private IsPRInReview $IsPRInReview,
+        private VCSEventRecorder $eventRecorder,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -35,8 +37,8 @@ class CheckSuiteEventHandler implements EventHandlerInterface
 
     public function handle(array $checkSuiteEvent): void
     {
-        // TODO: This is wierd, if there is a checksuite. There should be a pull request.
         if ($this->noPullRequestLinked($checkSuiteEvent)) {
+            // TODO: This is wierd, if there is a checksuite. There should be a pull request no ?
             return;
         }
         $PRIdentifier = $this->getPRIdentifier($checkSuiteEvent);
@@ -50,6 +52,7 @@ class CheckSuiteEventHandler implements EventHandlerInterface
         $command->repositoryIdentifier = $checkSuiteEvent['repository']['full_name'];
         $command->status = $CIStatus->status;
         $command->buildLink = $CIStatus->buildLink;
+        $this->recordEvent($command, $checkSuiteEvent);
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -88,5 +91,26 @@ class CheckSuiteEventHandler implements EventHandlerInterface
     private function PRIsNotAlreadyInReview(PRIdentifier $PRIdentifier): bool
     {
         return !$this->IsPRInReview->fetch($PRIdentifier);
+    }
+
+    private function recordEvent(CIStatusUpdate $command, array $checkSuiteEvent): void
+    {
+        try {
+            $this->eventRecorder->recordEvent(
+                $command->repositoryIdentifier,
+                $checkSuiteEvent['check_suite']['app']['name'],
+                self::CHECK_SUITE_EVENT_TYPE,
+            );
+        } catch (\Exception|\Error $e) {
+            $this->logger->error(
+                sprintf(
+                    'Unable to log event (%s, %s, %s): %s',
+                    $command->repositoryIdentifier,
+                    $checkSuiteEvent['check_suite']['app']['name'],
+                    self::CHECK_SUITE_EVENT_TYPE,
+                    $e->getMessage()
+                )
+            );
+        }
     }
 }

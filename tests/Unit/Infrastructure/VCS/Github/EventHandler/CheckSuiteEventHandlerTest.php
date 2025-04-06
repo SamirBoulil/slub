@@ -8,12 +8,14 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\IsPRInReview;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\EventHandler\CheckSuiteEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
@@ -42,16 +44,22 @@ class CheckSuiteEventHandlerTest extends TestCase
     private GetCIStatus|ObjectProphecy $getCIStatus;
 
     private IsPRInReview|ObjectProphecy $IsPRInReview;
+    private ObjectProphecy|VCSEventRecorder $eventRecorder;
+    private LoggerInterface|ObjectProphecy $logger;
 
     public function setUp(): void
     {
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->IsPRInReview = $this->prophesize(IsPRInReview::class);
         $this->getCIStatus = $this->prophesize(GetCIStatus::class);
+        $this->eventRecorder = $this->prophesize(VCSEventRecorder::class);
+        $this->logger = $this->prophesize(LoggerInterface::class);
         $this->checkSuiteEventHandler = new CheckSuiteEventHandler(
             $this->handler->reveal(),
             $this->getCIStatus->reveal(),
-            $this->IsPRInReview->reveal()
+            $this->IsPRInReview->reveal(),
+            $this->eventRecorder->reveal(),
+            $this->logger->reveal(),
         );
     }
 
@@ -82,6 +90,7 @@ class CheckSuiteEventHandlerTest extends TestCase
                 && self::REPOSITORY_IDENTIFIER === $command->repositoryIdentifier
                 && self::CI_STATUS === $command->status)
         )->shouldBeCalled();
+        $this->eventRecorder->recordEvent('SamirBoulil/slub', 'travis', 'check_suite')->shouldBeCalled();
 
         $this->checkSuiteEventHandler->handle($checkSuiteEvent);
     }
@@ -99,6 +108,7 @@ class CheckSuiteEventHandlerTest extends TestCase
         $this->IsPRInReview->fetch($PRIdentifier)->willReturn(false);
         $this->getCIStatus->fetch()->shouldNotBeCalled();
         $this->handler->handle()->shouldNotBeCalled();
+        $this->eventRecorder->recordEvent()->shouldNotBeCalled();
 
         $this->checkSuiteEventHandler->handle($checkSuiteEvent);
     }
@@ -124,8 +134,8 @@ class CheckSuiteEventHandlerTest extends TestCase
   "check_suite": {
     "conclusion": "neutral",
     "head_sha": "{$headSha}",
-    "pull_requests": [{"number": {$prNumber}}]
-  },
+    "pull_requests": [{"number": {$prNumber}}],
+    "app": { "name": "travis" } },
   "repository": {
     "full_name": "{$repositoryIdentifier}"
   }
@@ -144,7 +154,8 @@ JSON;
   "check_suite": {
     "conclusion": "UNSUPPORTED",
     "pull_requests": [{"number": {$prNumber}}],
-    "head_sha": "{$headSha}"
+    "head_sha": "{$headSha}",
+    "app": { "name": "travis" }
   },
   "repository": {
     "full_name": "{$repositoryIdentifier}"
@@ -163,7 +174,7 @@ JSON;
   "check_suite": {
     "status": "queued",
     "conclusion": "WRONG_CONCLUSION",
-    "name": "travis",
+    "app": { "name": "travis" },
     "check_suite": {
       "pull_requests": [
         {

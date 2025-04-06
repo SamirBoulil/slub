@@ -20,6 +20,7 @@ use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
 
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
+ * @deprecated Class unused
  */
 class CheckRunEventHandlerTest extends TestCase
 {

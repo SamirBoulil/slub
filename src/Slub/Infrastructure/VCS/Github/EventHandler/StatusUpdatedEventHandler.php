@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
@@ -18,7 +19,6 @@ use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
 class StatusUpdatedEventHandler implements EventHandlerInterface
 {
     private const STATUS_NAME = 'context';
-
     private const STATUS_UPDATE_EVENT_TYPE = 'status';
     private array $checksBlacklist;
 
@@ -26,6 +26,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
         private FindPRNumberInterface $findPRNumber,
         private GetCIStatus $getCIStatus,
+        private VCSEventRecorder $eventRecorder,
         private LoggerInterface $logger,
         string $checksBlacklist,
     ) {
@@ -47,6 +48,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         $command->status = $checkStatus->status;
         $command->buildLink = $checkStatus->buildLink;
 
+        $this->recordEvent($command, $statusUpdate);
         $this->CIStatusUpdateHandler->handle($command);
     }
 
@@ -77,5 +79,26 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
                 )
             )
         );
+    }
+
+    private function recordEvent(CIStatusUpdate $command, array $statusUpdate): void
+    {
+        try {
+            $this->eventRecorder->recordEvent(
+                $command->repositoryIdentifier,
+                $statusUpdate[self::STATUS_NAME],
+                self::STATUS_UPDATE_EVENT_TYPE
+            );
+        } catch (\Exception|\Error $e) {
+            $this->logger->error(
+                sprintf(
+                    'Unable to log event (%s, %s, %s): %s',
+                    $command->repositoryIdentifier,
+                    $statusUpdate[self::STATUS_NAME],
+                    self::STATUS_UPDATE_EVENT_TYPE,
+                    $e->getMessage(),
+                )
+            );
+        }
     }
 }

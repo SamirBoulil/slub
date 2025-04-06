@@ -29,6 +29,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
 
     private const CI_STATUS = 'GREEN';
     private const COMMIT_REF = 'commit-ref';
+    private const BLACKLISTED_CHECK = 'checks1';
 
     /**
      * @sut
@@ -52,7 +53,8 @@ class StatusUpdatedEventHandlerTest extends TestCase
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
             $this->getCIStatus->reveal(),
-            new NullLogger()
+            new NullLogger(),
+            implode(',', [self::BLACKLISTED_CHECK, 'checks2'])
         );
     }
 
@@ -61,8 +63,10 @@ class StatusUpdatedEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_status_update_review_events(): void
     {
-        self::assertTrue($this->statusUpdateEventHandler->supports('status'));
-        self::assertFalse($this->statusUpdateEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->statusUpdateEventHandler->supports('status', ['context' => 'whitelisted_check']));
+        self::assertFalse($this->statusUpdateEventHandler->supports('status', ['context' => self::BLACKLISTED_CHECK]));
+        self::assertFalse($this->statusUpdateEventHandler->supports('unsupported_event', []));
+
     }
 
     /**

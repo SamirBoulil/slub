@@ -8,7 +8,7 @@ use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
 
 class DummyEventHandler implements EventHandlerInterface
 {
-    public function supports(string $eventType): bool
+    public function supports(string $eventType, array $eventPayload): bool
     {
         return $eventType === 'dummy_event_type';
     }

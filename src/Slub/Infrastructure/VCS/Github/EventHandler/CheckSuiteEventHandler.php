@@ -28,7 +28,7 @@ class CheckSuiteEventHandler implements EventHandlerInterface
     ) {
     }
 
-    public function supports(string $eventType): bool
+    public function supports(string $eventType, array $eventPayload): bool
     {
         return self::CHECK_SUITE_EVENT_TYPE === $eventType;
     }

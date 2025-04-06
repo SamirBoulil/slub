@@ -144,6 +144,7 @@ class CIStatusUpdatedTest extends WebTestCase
         return <<<JSON
 {
   "sha": "commit-ref",
+  "context": "travis - phpunit",
   "name": "travis",
   "state": "success",
   "number": 10,

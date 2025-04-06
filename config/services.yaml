@@ -12,6 +12,7 @@ parameters:
     slub.infrastructure.persistence.file_database: '%kernel.project_dir%/var/persistence/%kernel.environment%/pr_repository.json'
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
     GITHUB_APP_HOMEPAGE_URL: 'https://github.com/apps/slub-yeee-test'
+    CHECKS_BLACKLIST: 'check1,check2'
 
 services:
     # default configuration for services in *this* file
@@ -47,6 +48,7 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@slub.infrastructure.persistence.is_pr_in_review'
             - '@logger'
+            - '%env(CHECKS_BLACKLIST)%'
 
     slub.application.close_pr.close_pr_handler:
         class: Slub\Application\ClosePR\ClosePRHandler
@@ -293,6 +295,7 @@ services:
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '@logger'
+            - '%env(CHECKS_BLACKLIST)%'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.pr_closed:

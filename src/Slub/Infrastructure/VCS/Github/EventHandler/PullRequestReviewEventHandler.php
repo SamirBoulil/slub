@@ -19,7 +19,7 @@ class PullRequestReviewEventHandler implements EventHandlerInterface
     {
     }
 
-    public function supports(string $eventType): bool
+    public function supports(string $eventType, array $eventPayload): bool
     {
         return self::NEW_REVIEW_EVENT_TYPE === $eventType;
     }

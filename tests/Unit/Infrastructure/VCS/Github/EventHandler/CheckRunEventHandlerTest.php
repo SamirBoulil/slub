@@ -59,8 +59,8 @@ class CheckRunEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_check_run_events(): void
     {
-        self::assertTrue($this->checkRunEventHandler->supports('check_run'));
-        self::assertFalse($this->checkRunEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->checkRunEventHandler->supports('check_run', []));
+        self::assertFalse($this->checkRunEventHandler->supports('unsupported_event', []));
     }
 
     /**

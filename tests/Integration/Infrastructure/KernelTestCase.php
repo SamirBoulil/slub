@@ -18,9 +18,7 @@ class KernelTestCase extends SymfonyTestCase
     public function setUp(): void
     {
         self::bootKernel();
-
         parent::setUp();
-
         $this->resetDatabase();
     }
 

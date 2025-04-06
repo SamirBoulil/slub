@@ -1,43 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
-         bootstrap="./tests/bootstrap.php"
-         colors="true"
->
-    <php>
-        <env name="KERNEL_CLASS" value="Slub\Kernel"/>
-    </php>
-    <testsuites>
-        <testsuite name="Unit tests">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration tests">
-            <directory suffix="Test.php">./tests/Integration</directory>
-        </testsuite>
-        <testsuite name="Functional tests">
-            <directory suffix="Test.php">./tests/Functional</directory>
-        </testsuite>
-        <testsuite name="Acceptance helper unit tests">
-            <directory suffix="Test.php">./tests/Acceptance</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory>src/Slub/Domain</directory>
-            <directory>src/Slub/Infrastructure</directory>
-            <exclude>
-                <directory suffix="Interface.php">src/Slub/Domain</directory>
-                <directory suffix="Interface.php">src/Slub/Infrastructure</directory>
-                <directory>src/Slub/Infrastructure/Common/SlubApplicationContainer.php</directory>
-                <directory>./vendor</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
-    <listeners>
-        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
-    </listeners>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" bootstrap="./tests/bootstrap.php" colors="true">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory>src/Slub/Domain</directory>
+      <directory>src/Slub/Infrastructure</directory>
+    </include>
+    <exclude>
+      <directory suffix="Interface.php">src/Slub/Domain</directory>
+      <directory suffix="Interface.php">src/Slub/Infrastructure</directory>
+      <directory>src/Slub/Infrastructure/Common/SlubApplicationContainer.php</directory>
+      <directory>./vendor</directory>
+    </exclude>
+    <report>
+      <clover outputFile="build/logs/clover.xml"/>
+    </report>
+  </coverage>
+  <php>
+    <env name="KERNEL_CLASS" value="Slub\Kernel"/>
+  </php>
+  <testsuites>
+    <testsuite name="Unit tests">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Integration tests">
+      <directory suffix="Test.php">./tests/Integration</directory>
+    </testsuite>
+    <testsuite name="Functional tests">
+      <directory suffix="Test.php">./tests/Functional</directory>
+    </testsuite>
+    <testsuite name="Acceptance helper unit tests">
+      <directory suffix="Test.php">./tests/Acceptance</directory>
+    </testsuite>
+  </testsuites>
+  <logging/>
+  <listeners>
+    <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener"/>
+  </listeners>
 </phpunit>
-

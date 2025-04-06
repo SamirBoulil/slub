@@ -61,9 +61,26 @@ class NewEventActionTest extends TestCase
         $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $eventHandler = $this->prophesize(EventHandlerInterface::class);
         $eventHandler->handle($eventPayload)->shouldBeCalled();
-        $this->eventHandlerRegistry->get($eventType)->willReturn([$eventHandler->reveal()]);
+        $this->eventHandlerRegistry->get($eventType, $eventPayload)->willReturn([$eventHandler->reveal()]);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
         $this->deliveredEventRepository->save(self::DELIVERY_EVENT_IDENTIFIER)->shouldBeCalled();
+
+        $this->newEventAction->executeAction($supportedRequest);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_check_if_event_process_when_no_handlers_are_compatible(): void
+    {
+        $eventType = 'EVENT_TYPE';
+        $eventPayload = ['payload'];
+        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
+        $eventHandler = $this->prophesize(EventHandlerInterface::class);
+        $this->eventHandlerRegistry->get($eventType, $eventPayload)->willReturn([]);
+
+        $eventHandler->handle($eventPayload)->shouldNotBeCalled();
+        $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->shouldNotBeCalled();
 
         $this->newEventAction->executeAction($supportedRequest);
     }
@@ -76,9 +93,8 @@ class NewEventActionTest extends TestCase
     {
         $eventType = 'EVENT_TYPE';
         $eventPayload = ['payload'];
-        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
-        $this->eventHandlerRegistry->get($eventType)->willReturn([]);
+        $this->eventHandlerRegistry->get($eventType, [])->willReturn([]);
 
         $this->expectException(\Exception::class);
         $this->newEventAction->executeAction($wrongRequest);
@@ -129,9 +145,15 @@ class NewEventActionTest extends TestCase
      */
     public function it_throws_if_the_event_identifier_is_not_set(): void
     {
-        $alreadyDeliveredRequest = $this->supportedRequest('EVENT_TYPE', ['payload'], null);
+        $eventType = 'EVENT_TYPE';
+        $eventPayload = ['payload'];
+        $alreadyDeliveredRequest = $this->supportedRequest($eventType, $eventPayload, null);
+        $eventHandler = $this->prophesize(EventHandlerInterface::class);
+        $this->eventHandlerRegistry->get($eventType, $eventPayload)->willReturn([$eventHandler->reveal()]);
 
         $this->expectException(BadRequestHttpException::class);
+        $eventHandler->handle($eventPayload)->shouldNotBeCalled();
+
         $this->newEventAction->executeAction($alreadyDeliveredRequest);
     }
 

@@ -24,7 +24,7 @@ class EventHandlerRegistryTest extends TestCase
 
         $eventHandlerRegistry = new EventHandlerRegistry($eventHandlers);
 
-        self::assertEmpty($eventHandlerRegistry->get('unknown'));
-        self::assertEquals([$expectedEventHandler], $eventHandlerRegistry->get('dummy_event_type'));
+        self::assertEmpty($eventHandlerRegistry->get('unknown', []));
+        self::assertEquals([$expectedEventHandler], $eventHandlerRegistry->get('dummy_event_type', []));
     }
 }

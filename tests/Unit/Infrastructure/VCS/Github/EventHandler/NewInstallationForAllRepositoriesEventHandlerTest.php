@@ -44,8 +44,8 @@ class NewInstallationForAllRepositoriesEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_new_installation_events(): void
     {
-        self::assertTrue($this->newInstallationEventHandler->supports('installation_repositories'));
-        self::assertFalse($this->newInstallationEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->newInstallationEventHandler->supports('installation_repositories', []));
+        self::assertFalse($this->newInstallationEventHandler->supports('unsupported_event', []));
     }
 
     /** @test */

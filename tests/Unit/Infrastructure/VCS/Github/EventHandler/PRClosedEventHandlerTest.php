@@ -40,8 +40,8 @@ class PRClosedEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_check_run_events(): void
     {
-        self::assertTrue($this->PRCloseEventHandler->supports('pull_request'));
-        self::assertFalse($this->PRCloseEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->PRCloseEventHandler->supports('pull_request', []));
+        self::assertFalse($this->PRCloseEventHandler->supports('unsupported_event', []));
     }
 
     /**

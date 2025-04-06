@@ -60,8 +60,8 @@ class CheckSuiteEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_check_suite_events(): void
     {
-        self::assertTrue($this->checkSuiteEventHandler->supports('check_suite'));
-        self::assertFalse($this->checkSuiteEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->checkSuiteEventHandler->supports('check_suite', []));
+        self::assertFalse($this->checkSuiteEventHandler->supports('unsupported_event', []));
     }
 
     /**

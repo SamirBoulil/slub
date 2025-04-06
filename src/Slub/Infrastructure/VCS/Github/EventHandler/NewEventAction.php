@@ -35,8 +35,13 @@ class NewEventAction
     {
         // $this->logger->critical((string) $request->getContent());
         $this->checkSecret($request);
-        if (!$this->IsEventAlreadyProcessed($request)) {
-            $this->handle($request);
+
+        $eventType = $this->eventTypeOrThrow($request);
+        $eventPayload = $this->eventPayload($request);
+        $eventHandlers = $this->eventHandlerRegistry->get($eventType, $eventPayload);
+
+        if (!empty($eventHandlers) && !$this->IsEventAlreadyProcessed($request)) {
+            $this->handle($eventPayload, $eventHandlers);
         }
 
         return new Response();
@@ -93,19 +98,13 @@ class NewEventAction
         }
     }
 
-    private function handle(Request $request): void
+    private function eventPayload(Request $request): array
     {
-        $eventType = $this->eventTypeOrThrow($request);
-        $event = $this->event($request);
+        return json_decode((string)$request->getContent(), true);
+    }
 
-        $eventHandlers = $this->eventHandlerRegistry->get($eventType);
-        if (empty($eventHandlers)) {
-            // $this->logger->log(LogLevel::NOTICE, sprintf('Unsupported event of type "%s"', $eventType));
-
-            return;
-        }
-
-        // $logger = $this->logger;
+    public function handle(array $event, array $eventHandlers): void
+    {
         array_map(
             static function (EventHandlerInterface $eventHandler) use ($event/**, $logger */) {
 //                $logger->critical('Processing logger with: '.$eventHandler::class);
@@ -113,10 +112,5 @@ class NewEventAction
             },
             $eventHandlers
         );
-    }
-
-    private function event(Request $request): array
-    {
-        return json_decode((string)$request->getContent(), true);
     }
 }

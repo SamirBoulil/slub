@@ -19,14 +19,11 @@ class EventHandlerRegistry
         }
     }
 
-    /**
-     * @return array<EventHandlerInterface>
-     */
-    public function get(string $eventType): array
+    public function get(string $eventType, array $eventPayload): array
     {
         $handlers = array_filter(
             $this->eventHandlers,
-            static fn (EventHandlerInterface $eventHandler): bool => $eventHandler->supports($eventType)
+            static fn (EventHandlerInterface $eventHandler): bool => $eventHandler->supports($eventType, $eventPayload)
         );
 
         if (empty($handlers)) {

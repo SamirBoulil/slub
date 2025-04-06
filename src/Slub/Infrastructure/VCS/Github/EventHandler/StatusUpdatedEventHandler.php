@@ -17,19 +17,24 @@ use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
  */
 class StatusUpdatedEventHandler implements EventHandlerInterface
 {
+    private const STATUS_NAME = 'context';
+
     private const STATUS_UPDATE_EVENT_TYPE = 'status';
+    private array $checksBlacklist;
 
     public function __construct(
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
         private FindPRNumberInterface $findPRNumber,
         private GetCIStatus $getCIStatus,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        string $checksBlacklist,
     ) {
+        $this->checksBlacklist = explode(',', $checksBlacklist);
     }
 
-    public function supports(string $eventType): bool
+    public function supports(string $eventType, array $eventPayload): bool
     {
-        return self::STATUS_UPDATE_EVENT_TYPE === $eventType;
+        return self::STATUS_UPDATE_EVENT_TYPE === $eventType && $this->isNotBlacklisted($eventPayload);
     }
 
     public function handle(array $statusUpdate): void
@@ -59,5 +64,18 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
     private function getCIStatusFromGithub(PRIdentifier $PRIdentifier, $commitRef): CIStatus
     {
         return $this->getCIStatus->fetch($PRIdentifier, $commitRef);
+    }
+
+    private function isNotBlacklisted(array $eventPayload): bool
+    {
+        return empty(
+            \array_filter(
+                $this->checksBlacklist,
+                static fn(string $blacklistedCheck) => \preg_match(
+                    sprintf('/%s/', $eventPayload[self::STATUS_NAME] ?? ''),
+                    $blacklistedCheck
+                )
+            )
+        );
     }
 }

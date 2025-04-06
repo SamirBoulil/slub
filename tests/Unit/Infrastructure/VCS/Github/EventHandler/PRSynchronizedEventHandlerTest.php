@@ -49,8 +49,8 @@ class PRSynchronizedEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_pull_request_events(): void
     {
-        self::assertTrue($this->PRSynchronizedEventHandler->supports('pull_request'));
-        self::assertFalse($this->PRSynchronizedEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->PRSynchronizedEventHandler->supports('pull_request', []));
+        self::assertFalse($this->PRSynchronizedEventHandler->supports('unsupported_event', []));
     }
 
     /**

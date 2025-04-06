@@ -40,9 +40,9 @@ class PRSizeChangedEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_pull_request_events(): void
     {
-        self::assertTrue($this->prLargeEventHandler->supports('pull_request'));
-        self::assertFalse($this->prLargeEventHandler->supports('pull_request_review'));
-        self::assertFalse($this->prLargeEventHandler->supports('unsupported_event'));
+        self::assertTrue($this->prLargeEventHandler->supports('pull_request', []));
+        self::assertFalse($this->prLargeEventHandler->supports('pull_request_review', []));
+        self::assertFalse($this->prLargeEventHandler->supports('unsupported_event', []));
     }
 
     /**

@@ -40,8 +40,8 @@ class PullRequestReviewEventHandlerTest extends TestCase
      */
     public function it_only_listens_to_pull_request_review_events(): void
     {
-        self::assertTrue($this->pullRequestReviewHandler->supports('pull_request_review'));
-        self::assertFalse($this->pullRequestReviewHandler->supports('unsupported_event'));
+        self::assertTrue($this->pullRequestReviewHandler->supports('pull_request_review', []));
+        self::assertFalse($this->pullRequestReviewHandler->supports('unsupported_event', []));
     }
 
     /**

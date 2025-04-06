@@ -9,6 +9,6 @@ namespace Slub\Infrastructure\VCS\Github\EventHandler;
 */
 interface EventHandlerInterface
 {
-    public function supports(string $eventType): bool;
+    public function supports(string $eventType, array $eventPayload): bool;
     public function handle(array $request): void;
 }

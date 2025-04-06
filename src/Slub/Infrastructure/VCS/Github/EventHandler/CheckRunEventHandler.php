@@ -31,7 +31,7 @@ class CheckRunEventHandler implements EventHandlerInterface
     ) {
     }
 
-    public function supports(string $eventType): bool
+    public function supports(string $eventType, array $eventPayload): bool
     {
         return self::CHECK_RUN_EVENT_TYPE === $eventType;
     }

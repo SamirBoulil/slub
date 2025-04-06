@@ -13,6 +13,7 @@ parameters:
     slub.infrastructure.chat.slack.base_uri: 'https://slack.com'
     GITHUB_APP_HOMEPAGE_URL: 'https://github.com/apps/slub-yeee-test'
     CHECKS_BLACKLIST: 'check1,check2'
+    FF_RECORD_EVENTS: false
 
 services:
     # default configuration for services in *this* file
@@ -114,6 +115,12 @@ services:
         factory: 'Slub\Infrastructure\Persistence\Sql\ConnectionFactory::create'
         arguments:
             - '%env(DATABASE_URL)%'
+
+    slub.infrastructure.persistence.vcs_event_recorder:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+            - '%env(FF_RECORD_EVENTS)%'
 
     slub.infrastructure.persistence.pr_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlPRRepository
@@ -286,6 +293,8 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '@slub.infrastructure.persistence.is_pr_in_review'
+            - '@slub.infrastructure.persistence.vcs_event_recorder'
+            - '@logger'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.status_updated:
@@ -294,6 +303,7 @@ services:
             - '@slub.application.ci_status_update.ci_status_update_handler'
             - '@slub.infrastructure.vcs.github.query.find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '@slub.infrastructure.persistence.vcs_event_recorder'
             - '@logger'
             - '%env(CHECKS_BLACKLIST)%'
         tags: ['github.event_handler']

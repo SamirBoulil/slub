@@ -36,6 +36,7 @@ class InstallerCLI extends Command
         $this->createAppInstallationTableIfNotExists();
         $this->createSlackAppInstallationTableIfNotExists();
         $this->createInAppCommunicationTableIfNotExists();
+        $this->createVCSEventRecorderIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
         return 0;
     }
@@ -122,6 +123,20 @@ CREATE TABLE IF NOT EXISTS user_in_app_communication (
     USER_ID VARCHAR(255),
     NEW_SLASH_COMMAND_RELEASE_COMMUNICATION_COUNT INTEGER,
     PRIMARY KEY(USER_ID, WORKSPACE_ID)
+);
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createVCSEventRecorderIfNotExists(): void
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS vcs_events_recordings (
+    REPOSITORY_IDENTIFIER VARCHAR(255),
+    EVENT_NAME VARCHAR(255),
+    EVENT_TYPE VARCHAR(255),
+    NUMBER_OF_CALLS INT,
+    PRIMARY KEY(REPOSITORY_IDENTIFIER, EVENT_NAME, EVENT_TYPE)
 );
 SQL;
         $this->sqlConnection->executeUpdate($createTable);

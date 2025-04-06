@@ -12,6 +12,7 @@ use Psr\Log\NullLogger;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumber;
@@ -41,6 +42,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private GetCIStatus|ObjectProphecy $getCIStatus;
 
     private FindPRNumber|ObjectProphecy $findPRNumber;
+    private ObjectProphecy|VCSEventRecorder $eventRecoder;
 
     public function setUp(): void
     {
@@ -49,10 +51,12 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->getCIStatus = $this->prophesize(GetCIStatus::class);
         $this->findPRNumber = $this->prophesize(FindPRNumber::class);
+        $this->eventRecoder = $this->prophesize(VCSEventRecorder::class);
         $this->statusUpdateEventHandler = new StatusUpdatedEventHandler(
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
             $this->getCIStatus->reveal(),
+            $this->eventRecoder->reveal(),
             new NullLogger(),
             implode(',', [self::BLACKLISTED_CHECK, 'checks2'])
         );
@@ -91,6 +95,11 @@ class StatusUpdatedEventHandlerTest extends TestCase
                     && self::CI_STATUS === $command->status
             )
         )->shouldBeCalled();
+        $this->eventRecoder->recordEvent(
+            "SamirBoulil/slub",
+            "ci/circleci: build_applications/[dev] start?",
+            "status",
+        )->shouldBeCalled();
 
         $this->statusUpdateEventHandler->handle($events);
     }
@@ -122,6 +131,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
   "name": "travis",
   "state": "success",
   "number": {$prNumber},
+  "context": "ci/circleci: build_applications/[dev] start?",
   "repository": {
     "full_name": "{$repositoryIdentifier}"
   }
@@ -140,6 +150,7 @@ JSON;
   "name": "UNSUPPORTED",
   "state": "failure",
   "number": {$prNumber},
+  "context": "ci/circleci: build_applications/[dev] start?",
   "repository": {
     "full_name": "{$repositoryIdentifier}"
   }
@@ -158,6 +169,7 @@ JSON;
   "name": "UNSUPPORTED",
   "state": "pending",
   "number": {$prNumber},
+  "context": "ci/circleci: build_applications/[dev] start?",
   "repository": {
     "full_name": "{$repositoryIdentifier}"
   }

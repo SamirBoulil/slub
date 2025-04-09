@@ -49,6 +49,7 @@ class ProcessTRAsync
             $PRIdentifier = ChatHelper::extractPRIdentifier($request->request->get('text'));
             $this->putPRToReview($PRIdentifier, $request);
         } catch (\Exception|\Error $e) {
+            $this->logger->critical($e->getMessage());
             $this->explainUser->onError($request, $e);
         }
     }

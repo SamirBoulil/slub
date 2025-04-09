@@ -78,7 +78,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
             \array_filter(
                 $this->checksBlacklist,
                 static fn(string $blacklistedCheck) => \preg_match(
-                    sprintf('/%s/', $eventPayload[self::STATUS_NAME] ?? ''),
+                    sprintf('#%s#', $eventPayload[self::STATUS_NAME] ?? ''),
                     $blacklistedCheck
                 )
             )

@@ -10,6 +10,9 @@
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/your-username)
 
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/SamirBoulil)
+
+
 
 # tldr;
 - If you found a bug, open an issue ticket [here](https://github.com/SamirBoulil/slub/issues/new).

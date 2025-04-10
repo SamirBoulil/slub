@@ -4,6 +4,10 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub?ref=badge_shield)
 
 <iframe src="https://github.com/sponsors/SamirBoulil/card" title="Sponsor SamirBoulil" height="225" width="600" style="border: 0;"></iframe>
+<a href="https://github.com/sponsors/SamirBoulil">
+  <img src="https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors&logoColor=#EA4AAA&style=for-the-badge" alt="Sponsor" />
+</a>
+
 
 # tldr;
 - If you found a bug, open an issue ticket [here](https://github.com/SamirBoulil/slub/issues/new).

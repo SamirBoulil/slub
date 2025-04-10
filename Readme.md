@@ -1,7 +1,15 @@
-[![Build Status](https://travis-ci.com/SamirBoulil/slub.svg?branch=master)](https://travis-ci.com/SamirBoulil/slub)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/SamirBoulil)
+
+<iframe src="https://github.com/sponsors/maheshj01/card" title="Sponsor maheshj01" height="225" width="600" style="border: 0;"></iframe>
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/afb6042b14df680869f2/maintainability)](https://codeclimate.com/github/SamirBoulil/slub/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/afb6042b14df680869f2/test_coverage)](https://codeclimate.com/github/SamirBoulil/slub/test_coverage)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub?ref=badge_shield)
+
+
+
+
+
 
 # tldr;
 - If you found a bug, open an issue ticket [here](https://github.com/SamirBoulil/slub/issues/new).

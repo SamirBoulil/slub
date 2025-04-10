@@ -7,6 +7,8 @@
 <a href="https://github.com/sponsors/SamirBoulil">
   <img src="https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors&logoColor=#EA4AAA&style=for-the-badge" alt="Sponsor" />
 </a>
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/your-username)
+
 
 
 # tldr;

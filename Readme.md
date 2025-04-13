@@ -1,4 +1,12 @@
-[![Build Status](https://travis-ci.com/SamirBoulil/slub.svg?branch=master)](https://travis-ci.com/SamirBoulil/slub)
+👋 Hey! I'm Samir, I have been building and maintaining Yeee on my free time for the last 6 years.
+
+If you like Yeee and want to support this project or simply say thank you 💌
+
+You can now [Sponsor me on GitHub]([url](https://github.com/sponsors/SamirBoulil)).
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/samirboulil)
+
+---
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/afb6042b14df680869f2/maintainability)](https://codeclimate.com/github/SamirBoulil/slub/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/afb6042b14df680869f2/test_coverage)](https://codeclimate.com/github/SamirBoulil/slub/test_coverage)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FSamirBoulil%2Fslub?ref=badge_shield)

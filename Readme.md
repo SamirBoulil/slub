@@ -2,7 +2,8 @@
 
 If you like Yeee and want to support this project or simply want to say thank you 💌
 
-You can now Sponsor me on GitHub: [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/samirboulil)
+You can now Sponsor me on GitHub!
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/samirboulil)
 
 ---
 

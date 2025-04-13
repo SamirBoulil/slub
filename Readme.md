@@ -1,8 +1,8 @@
 👋 Hey! I'm Samir, I have been building and maintaining Yeee on my free time for the last 6 years.
 
-If you like Yeee and want to support this project or simply say thank you 💌
+If you like Yeee and want to support this project or simply want to say thank you 💌
 
-You can now [Sponsor me on GitHub](https://github.com/sponsors/SamirBoulil).
+You can now [Sponsor me on GitHub](https://github.com/sponsors/SamirBoulil)!
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa.svg)](https://github.com/sponsors/samirboulil)
 

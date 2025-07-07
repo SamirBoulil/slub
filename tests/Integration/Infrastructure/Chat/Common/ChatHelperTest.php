@@ -41,4 +41,21 @@ class ChatHelperTest extends TestCase
         $this->expectException(ImpossibleToParseRepositoryURL::class);
         ChatHelper::extractPRIdentifier('pada yala yada yada');
     }
+
+    public function test_it_escapes_slack_mrkdwn_characters()
+    {
+        $this->assertEquals('&amp;', ChatHelper::escapeHtmlChars('&'));
+        $this->assertEquals('&lt;', ChatHelper::escapeHtmlChars('<'));
+        $this->assertEquals('&gt;', ChatHelper::escapeHtmlChars('>'));
+    }
+
+    public function test_it_escapes_multiple_slack_mrkdwn_characters()
+    {
+        $this->assertEquals('Fix &gt; issue &amp; update &lt;component&gt;', ChatHelper::escapeHtmlChars('Fix > issue & update <component>'));
+    }
+
+    public function test_it_preserves_safe_characters()
+    {
+        $this->assertEquals('Fix PR title with safe characters', ChatHelper::escapeHtmlChars('Fix PR title with safe characters'));
+    }
 }

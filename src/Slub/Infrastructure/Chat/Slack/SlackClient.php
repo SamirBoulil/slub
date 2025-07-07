@@ -190,12 +190,12 @@ SLACK;
                     'text' => sprintf(
                         "*<%s|%s>*\n%s *(+%s -%s)*\n<@%s>\n\n%s",
                         $PRUrl,
-                        ChatHelper::elipsisIfTooLong($title, self::MAX_DESCRIPTION),
+                        ChatHelper::escapeHtmlChars(ChatHelper::elipsisIfTooLong($title, self::MAX_DESCRIPTION)),
                         $repositoryIdentifier,
                         $additions,
                         $deletions,
                         $authorIdentifier,
-                        ChatHelper::elipsisIfTooLong($description, self::MAX_DESCRIPTION)
+                        ChatHelper::escapeHtmlChars(ChatHelper::elipsisIfTooLong($description, self::MAX_DESCRIPTION))
                     ),
                 ],
                 'accessory' => [

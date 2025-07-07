@@ -102,9 +102,11 @@ class PublishRemindersHandler
             return sprintf('https://github.com/%s/%s/pull/%s', ...$split);
         };
         $author = ucfirst($PR->authorIdentifier()->stringValue());
-        $title = ChatHelper::elipsisIfTooLong(
-            $PR->title()->stringValue(),
-            80
+        $title = ChatHelper::escapeHtmlChars(
+            ChatHelper::elipsisIfTooLong(
+                $PR->title()->stringValue(),
+                80
+            )
         ); // TODO: Big no no here, Apps -> Infra 😱
         $githubLink = $githubLink($PR);
         $timeInReview = $this->formatDuration($PR);

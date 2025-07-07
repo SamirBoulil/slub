@@ -23,9 +23,11 @@ class ChatHelper
             : $firstLine;
     }
 
-    /**
-     *
-     */
+    public static function escapeHtmlChars(string $text): string
+    {
+        return str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $text);
+    }
+
     public static function extractPRIdentifier(string $text): PRIdentifier
     {
         try {

@@ -250,6 +250,10 @@ class PR
         if ($this->CIStatus->isRedWithLink($buildLink)) {
             return;
         }
+        // Don't create event if we're PENDING with this same link (stale webhook from old CI run)
+        if ($this->CIStatus->isPendingWithLink($buildLink)) {
+            return;
+        }
 
         $this->CIStatus = CIStatus::endedWith(BuildResult::red(), $buildLink);
         $this->events[] = CIRed::ForPR($this->PRIdentifier, $buildLink);
@@ -265,9 +269,10 @@ class PR
             return;
         }
 
+        $previousBuildLink = $this->CIStatus->buildLink();
         $this->CIStatus = CIStatus::endedWith(
             BuildResult::pending(),
-            BuildLink::none()
+            $previousBuildLink
         );
         $this->events[] = CIPending::ForPR($this->PRIdentifier);
     }

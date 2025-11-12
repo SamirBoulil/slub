@@ -360,6 +360,69 @@ class PRTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_creates_event_if_the_pr_is_already_red_with_same_build_link(): void
+    {
+        $buildLink = 'https://build_link';
+        $pr = $this->pendingPR();
+
+        // First time: should create event (PENDING -> RED)
+        $pr->red(BuildLink::fromURL($buildLink));
+        self::assertCount(1, $pr->getEvents());
+        $firstEvent = current($pr->getEvents());
+        self::assertInstanceOf(CIRed::class, $firstEvent);
+
+        // Second time with same link: should NOT create a new event
+        $pr->red(BuildLink::fromURL($buildLink));
+        self::assertCount(1, $pr->getEvents(), 'Should still have only 1 event, not 2');
+    }
+
+    /**
+     * @test
+     */
+    public function it_creates_new_event_if_the_pr_is_red_with_different_build_link(): void
+    {
+        $firstBuildLink = 'https://build_link_1';
+        $secondBuildLink = 'https://build_link_2';
+        $pr = $this->pendingPR();
+
+        // First time: RED with link 1
+        $pr->red(BuildLink::fromURL($firstBuildLink));
+        self::assertCount(1, $pr->getEvents());
+
+        // Second time: RED with different link 2 - should create new event
+        $pr->red(BuildLink::fromURL($secondBuildLink));
+        self::assertCount(2, $pr->getEvents(), 'Should have 2 events for different build links');
+        $events = $pr->getEvents();
+        $secondEvent = end($events);
+        self::assertInstanceOf(CIRed::class, $secondEvent);
+        self::assertEquals($secondBuildLink, $secondEvent->buildLink()->stringValue());
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_create_event_when_stale_webhook_reports_old_failure_after_new_commit(): void
+    {
+        $oldBuildLink = 'https://old_build_link';
+        $pr = $this->pendingPR();
+
+        // Old commit: PR was RED
+        $pr->red(BuildLink::fromURL($oldBuildLink));
+        self::assertCount(1, $pr->getEvents());
+
+        // New commit pushed: PR becomes PENDING
+        $pr->pending();
+        self::assertCount(2, $pr->getEvents());
+
+        // Stale/duplicate webhook reports RED with same old link
+        // This should NOT create a new event (it's the old failure, not a new one)
+        $pr->red(BuildLink::fromURL($oldBuildLink));
+        self::assertCount(2, $pr->getEvents(), 'Should not report old failure as new failure');
+    }
+
+    /**
+     * @test
+     */
     public function it_can_become_pending(): void
     {
         $pr = $this->greenPR();

@@ -104,6 +104,11 @@ services:
         arguments:
             - '%env(PR_SIZE_LIMIT)%'
 
+    slub.application.put_document_to_review.put_document_to_review_handler:
+        class: Slub\Application\PutDocumentToReview\PutDocumentToReviewHandler
+        arguments:
+            - '@slub.infrastructure.persistence.document_repository'
+
     # Infrastructure
     ## Common
     slub.infrastructure.common.query.clock:
@@ -153,6 +158,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.document_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\PRAdapterDocumentRepository
+        arguments:
+            - '@slub.infrastructure.persistence.pr_repository'
+
     slub.infrastructure.persistence.has_event_already_been_delivered:
         class: Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered
         arguments:
@@ -166,6 +176,7 @@ services:
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
             - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.application.put_document_to_review.put_document_to_review_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@slub.infrastructure.chat.slack.explain_user'
             - '@router'

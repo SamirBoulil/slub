@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\Chat\Common;
 
+use Slub\Domain\Entity\Document\DocumentURL;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
@@ -43,5 +44,23 @@ class ChatHelper
         }
 
         return $PRIdentifier;
+    }
+
+    public static function isGithubPR(string $text): bool
+    {
+        $text = trim($text);
+
+        return 1 === preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text);
+    }
+
+    public static function extractURL(string $text): DocumentURL
+    {
+        $text = trim($text);
+        $res = preg_match('#(https?://\S*)#', $text, $matches);
+        if (1 !== $res) {
+            throw new ImpossibleToParseRepositoryURL($text);
+        }
+
+        return new DocumentURL($matches[0]);
     }
 }

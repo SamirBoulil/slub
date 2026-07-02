@@ -31,16 +31,26 @@ class ProcessTRAsyncTest extends WebTestCase
     public function test_it_handles_pr_to_review_submission(): void
     {
         $client = self::getClient();
-        $client->request('POST', '/chat/slack/tr', $this->PRToReviewSubmission());
+        $client->request('POST', '/chat/slack/tr', $this->PRToReviewSubmission('https://github.com/SamirBoulil/slub/pull/153'));
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertPRHasBeenPutToReview();
         // TODO: For some reason the chat client spy is empty whenever we return from the request.
         // $this->assertToReviewMessageHasBeenPublished();
     }
 
-    private function PRToReviewSubmission(): array
+    public function test_it_handles_pr_to_review_submission_with_shorten_url(): void
     {
-        return $this->slashCommandPayload('blabla https://github.com/SamirBoulil/slub/pull/153 blabla', 'team_123');
+        $client = self::getClient();
+        $client->request('POST', '/chat/slack/tr', $this->PRToReviewSubmission('github.com/SamirBoulil/slub/pull/153'));
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertPRHasBeenPutToReview();
+        // TODO: For some reason the chat client spy is empty whenever we return from the request.
+        // $this->assertToReviewMessageHasBeenPublished();
+    }
+
+    private function PRToReviewSubmission(string $url): array
+    {
+        return $this->slashCommandPayload('blabla '.$url.' blabla', 'team_123');
     }
 
     private function assertPRHasBeenPutToReview()

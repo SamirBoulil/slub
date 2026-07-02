@@ -32,7 +32,7 @@ class ChatHelper
     {
         try {
             $text = trim($text);
-            preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text, $matches);
+            preg_match('#.*(?:https://)?github\.com/(.*)/pull/(\d+).*$#', $text, $matches);
             Assert::stringNotEmpty($matches[1]);
             Assert::stringNotEmpty($matches[2]);
             $repositoryIdentifier = $matches[1];

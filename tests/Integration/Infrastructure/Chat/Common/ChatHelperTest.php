@@ -34,6 +34,8 @@ class ChatHelperTest extends TestCase
     {
         $this->assertEquals('SamirBoulil/slub/1234', ChatHelper::extractPRIdentifier('https://github.com/SamirBoulil/slub/pull/1234')->stringValue());
         $this->assertEquals('SamirBoulil/slub/1234', ChatHelper::extractPRIdentifier('  https://github.com/SamirBoulil/slub/pull/1234  ')->stringValue());
+        $this->assertEquals('SamirBoulil/slub/1234', ChatHelper::extractPRIdentifier('github.com/SamirBoulil/slub/pull/1234')->stringValue());
+        $this->assertEquals('SamirBoulil/slub/1234', ChatHelper::extractPRIdentifier('  github.com/SamirBoulil/slub/pull/1234  ')->stringValue());
     }
 
     public function test_it_throws_if_the_pr_identifier_cannot_be_extracted()

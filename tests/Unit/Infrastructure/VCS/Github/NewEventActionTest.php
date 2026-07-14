@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlDeliveredEventRepository;
 use Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerInterface;
@@ -34,19 +32,16 @@ class NewEventActionTest extends TestCase
     private EventHandlerRegistry|ObjectProphecy $eventHandlerRegistry;
     private ObjectProphecy|SqlDeliveredEventRepository $deliveredEventRepository;
     private ObjectProphecy|SqlHasEventAlreadyBeenDelivered $hasEventAlreadyBeenDelivered;
-    private ObjectProphecy|LoggerInterface $logger;
 
     public function setUp(): void
     {
         $this->eventHandlerRegistry = $this->prophesize(EventHandlerRegistry::class);
         $this->hasEventAlreadyBeenDelivered = $this->prophesize(SqlHasEventAlreadyBeenDelivered::class);
         $this->deliveredEventRepository = $this->prophesize(SqlDeliveredEventRepository::class);
-        $this->logger = $this->prophesize(LoggerInterface::class);
         $this->newEventAction = new NewEventAction(
             $this->eventHandlerRegistry->reveal(),
             $this->hasEventAlreadyBeenDelivered->reveal(),
             $this->deliveredEventRepository->reveal(),
-            $this->logger->reveal(),
             self::SECRET
         );
     }
@@ -54,18 +49,38 @@ class NewEventActionTest extends TestCase
     /**
      * @test
      */
-    public function it_successfully_processes_supported_events(): void
+    public function it_flags_supported_events_to_be_processed_after_the_response_is_sent(): void
     {
         $eventType = 'EVENT_TYPE';
         $eventPayload = ['payload'];
         $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
         $eventHandler = $this->prophesize(EventHandlerInterface::class);
-        $eventHandler->handle($eventPayload)->shouldBeCalled();
+        $eventHandler->handle($eventPayload)->shouldNotBeCalled();
         $this->eventHandlerRegistry->get($eventType, $eventPayload)->willReturn([$eventHandler->reveal()]);
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(false);
         $this->deliveredEventRepository->save(self::DELIVERY_EVENT_IDENTIFIER)->shouldBeCalled();
 
         $this->newEventAction->executeAction($supportedRequest);
+
+        self::assertTrue($supportedRequest->attributes->get(NewEventAction::PROCESS_EVENT_ATTRIBUTE));
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_flag_events_that_have_already_been_delivered(): void
+    {
+        $eventType = 'EVENT_TYPE';
+        $eventPayload = ['payload'];
+        $supportedRequest = $this->supportedRequest($eventType, $eventPayload, self::DELIVERY_EVENT_IDENTIFIER);
+        $eventHandler = $this->prophesize(EventHandlerInterface::class);
+        $this->eventHandlerRegistry->get($eventType, $eventPayload)->willReturn([$eventHandler->reveal()]);
+        $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->willReturn(true);
+        $this->deliveredEventRepository->save(self::DELIVERY_EVENT_IDENTIFIER)->shouldBeCalled();
+
+        $this->newEventAction->executeAction($supportedRequest);
+
+        self::assertFalse($supportedRequest->attributes->has(NewEventAction::PROCESS_EVENT_ATTRIBUTE));
     }
 
     /**
@@ -83,6 +98,8 @@ class NewEventActionTest extends TestCase
         $this->hasEventAlreadyBeenDelivered->fetch(self::DELIVERY_EVENT_IDENTIFIER)->shouldNotBeCalled();
 
         $this->newEventAction->executeAction($supportedRequest);
+
+        self::assertFalse($supportedRequest->attributes->has(NewEventAction::PROCESS_EVENT_ATTRIBUTE));
     }
 
     /**

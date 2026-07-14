@@ -12,6 +12,7 @@ use Psr\Log\NullLogger;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
@@ -42,6 +43,7 @@ class StatusUpdatedEventHandlerTest extends TestCase
     private GetCIStatus|ObjectProphecy $getCIStatus;
 
     private FindPRNumber|ObjectProphecy $findPRNumber;
+    private IsPRInReview|ObjectProphecy $isPRInReview;
     private ObjectProphecy|VCSEventRecorder $eventRecoder;
 
     public function setUp(): void
@@ -51,11 +53,13 @@ class StatusUpdatedEventHandlerTest extends TestCase
         $this->handler = $this->prophesize(CIStatusUpdateHandler::class);
         $this->getCIStatus = $this->prophesize(GetCIStatus::class);
         $this->findPRNumber = $this->prophesize(FindPRNumber::class);
+        $this->isPRInReview = $this->prophesize(IsPRInReview::class);
         $this->eventRecoder = $this->prophesize(VCSEventRecorder::class);
         $this->statusUpdateEventHandler = new StatusUpdatedEventHandler(
             $this->handler->reveal(),
             $this->findPRNumber->reveal(),
             $this->getCIStatus->reveal(),
+            $this->isPRInReview->reveal(),
             $this->eventRecoder->reveal(),
             new NullLogger(),
             implode(',', [self::BLACKLISTED_CHECK, 'checks2'])
@@ -80,6 +84,11 @@ class StatusUpdatedEventHandlerTest extends TestCase
     public function it_handles_ci_status___fetches_information_and_calls_the_handler(array $events, string $status): void
     {
         $this->findPRNumber->fetch($status, self::COMMIT_REF)->willReturn(self::PR_NUMBER);
+        $this->isPRInReview->fetch(
+            Argument::that(
+                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+            )
+        )->willReturn(true);
         $this->getCIStatus->fetch(
             Argument::that(
                 fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
@@ -102,6 +111,28 @@ class StatusUpdatedEventHandlerTest extends TestCase
         )->shouldBeCalled();
 
         $this->statusUpdateEventHandler->handle($events);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_fetch_the_ci_status_when_the_pr_is_not_in_review(): void
+    {
+        $this->findPRNumber->fetch('travis', self::COMMIT_REF)->willReturn(self::PR_NUMBER);
+        $this->isPRInReview->fetch(
+            Argument::that(
+                fn (PRIdentifier $PRIdentifier) => $PRIdentifier->stringValue() === self::PR_IDENTIFIER
+            )
+        )->willReturn(false);
+        $this->eventRecoder->recordEvent(
+            "SamirBoulil/slub",
+            "ci/circleci: build_applications/[dev] start?",
+            "status",
+        )->shouldBeCalled();
+        $this->getCIStatus->fetch(Argument::cetera())->shouldNotBeCalled();
+        $this->handler->handle(Argument::cetera())->shouldNotBeCalled();
+
+        $this->statusUpdateEventHandler->handle($this->supportedEvent(self::REPOSITORY_IDENTIFIER, self::PR_NUMBER));
     }
 
     public function events(): array

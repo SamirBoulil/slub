@@ -37,6 +37,8 @@ class InstallerCLI extends Command
         $this->createSlackAppInstallationTableIfNotExists();
         $this->createInAppCommunicationTableIfNotExists();
         $this->createVCSEventRecorderIfNotExists();
+        $this->createPRCommitsTableIfNotExists();
+        $this->createGithubApiResponseCacheTableIfNotExists();
         $output->writeln(sprintf('Slub installed on database "%s".', $this->sqlConnection->getDatabase()));
         return 0;
     }
@@ -137,6 +139,34 @@ CREATE TABLE IF NOT EXISTS vcs_events_recordings (
     EVENT_TYPE VARCHAR(255),
     NUMBER_OF_CALLS INT,
     PRIMARY KEY(REPOSITORY_IDENTIFIER, EVENT_NAME, EVENT_TYPE)
+);
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createPRCommitsTableIfNotExists(): void
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS pr_commits (
+    REPOSITORY_IDENTIFIER VARCHAR(255) NOT NULL,
+    COMMIT_SHA VARCHAR(64) NOT NULL,
+    PR_NUMBER VARCHAR(255) NULL,
+    CREATED_AT DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(REPOSITORY_IDENTIFIER, COMMIT_SHA)
+);
+SQL;
+        $this->sqlConnection->executeUpdate($createTable);
+    }
+
+    private function createGithubApiResponseCacheTableIfNotExists(): void
+    {
+        $createTable = <<<SQL
+CREATE TABLE IF NOT EXISTS github_api_response_cache (
+    URL_HASH CHAR(64) PRIMARY KEY,
+    URL TEXT NOT NULL,
+    ETAG VARCHAR(255) NOT NULL,
+    RESPONSE_BODY MEDIUMTEXT NOT NULL,
+    REFRESHED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 SQL;
         $this->sqlConnection->executeUpdate($createTable);

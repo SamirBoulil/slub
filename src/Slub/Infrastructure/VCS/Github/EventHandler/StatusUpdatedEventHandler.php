@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Slub\Application\CIStatusUpdate\CIStatusUpdate;
 use Slub\Application\CIStatusUpdate\CIStatusUpdateHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Domain\Query\IsPRInReview;
 use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindPRNumberInterface;
@@ -26,6 +27,7 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
         private FindPRNumberInterface $findPRNumber,
         private GetCIStatus $getCIStatus,
+        private IsPRInReview $isPRInReview,
         private VCSEventRecorder $eventRecorder,
         private LoggerInterface $logger,
         string $checksBlacklist,
@@ -49,12 +51,29 @@ class StatusUpdatedEventHandler implements EventHandlerInterface
 
         $command->PRIdentifier = $PRIdentifier->stringValue();
         $command->repositoryIdentifier = $statusUpdate['repository']['full_name'];
+        $this->recordEvent($command, $statusUpdate);
+        if ($this->PRIsNotAlreadyInReview($PRIdentifier)) {
+            return;
+        }
+
         $checkStatus = $this->getCIStatusFromGithub($PRIdentifier, $statusUpdate['sha']);
         $command->status = $checkStatus->status;
         $command->buildLink = $checkStatus->buildLink;
 
-        $this->recordEvent($command, $statusUpdate);
         $this->CIStatusUpdateHandler->handle($command);
+    }
+
+    /**
+     * This check is done in the application layer as it should.
+     * But since, deducting a PR CI status requires to fetch all the information from a PR and
+     * performing multiple API and complicated calls to the github API.
+     *
+     * We'll save ourselves the hassle of by checking in the infra layer if the PR is already
+     * in review before going further in the CI status update.
+     */
+    private function PRIsNotAlreadyInReview(PRIdentifier $PRIdentifier): bool
+    {
+        return !$this->isPRInReview->fetch($PRIdentifier);
     }
 
     private function getPRIdentifier(array $CIStatusUpdate): PRIdentifier

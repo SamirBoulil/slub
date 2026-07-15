@@ -237,21 +237,14 @@ services:
         class: GuzzleHttp\Client
 
     # Add missing service definitions
-    slub.infrastructure.vcs.github.client.github_api_client.raw:
+    slub.infrastructure.vcs.github.client.github_api_client:
         class: Slub\Infrastructure\VCS\Github\Client\GithubAPIClient
         arguments:
             - '@slub.infrastructure.vcs.github.client.refresh_access_token'
             - '@slub.infrastructure.vcs.github.client.app_installation_repository'
             - '@slub.infrastructure.http.guzzle_client'
-            - '@logger'
-
-    slub.infrastructure.vcs.github.client.github_api_client:
-        class: Slub\Infrastructure\VCS\Github\Client\CachedGithubAPIClient
-        arguments:
-            - '@slub.infrastructure.vcs.github.client.github_api_client.raw'
             - '@slub.infrastructure.persistence.github_api_response_cache_repository'
             - '@logger'
-            - '%env(bool:FF_GITHUB_ETAG_CACHE)%'
 
     slub.infrastructure.persistence.github_api_response_cache_repository:
         class: Slub\Infrastructure\Persistence\Sql\Repository\SqlGithubAPIResponseCacheRepository

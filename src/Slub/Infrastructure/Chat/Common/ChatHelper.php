@@ -50,7 +50,7 @@ class ChatHelper
     {
         $text = trim($text);
 
-        return 1 === preg_match('#.*https://github.com/(.*)/pull/(\d+).*$#', $text);
+        return 1 === preg_match('#.*(?:https://)?github\.com/(.*)/pull/(\d+).*$#', $text);
     }
 
     public static function extractURL(string $text): DocumentURL

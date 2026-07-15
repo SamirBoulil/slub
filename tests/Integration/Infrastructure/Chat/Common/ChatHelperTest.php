@@ -66,6 +66,7 @@ class ChatHelperTest extends TestCase
     {
         self::assertTrue(ChatHelper::isGithubPR('https://github.com/SamirBoulil/slub/pull/1234'));
         self::assertTrue(ChatHelper::isGithubPR('test  https://github.com/SamirBoulil/slub/pull/1234'));
+        self::assertTrue(ChatHelper::isGithubPR('github.com/SamirBoulil/slub/pull/1234'));
 
         self::assertFalse(ChatHelper::isGithubPR('https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top'));;
     }

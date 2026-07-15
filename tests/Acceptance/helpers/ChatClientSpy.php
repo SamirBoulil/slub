@@ -152,4 +152,12 @@ class ChatClientSpy implements ChatClient
     ): string {
         return $this->publishMessageWithBlocksInChannel(ChannelIdentifier::fromString($channelIdentifier), ['to review messages']);
     }
+
+    public function publishDocumentToReviewMessage(
+        string $channelIdentifier,
+        string $documentURL,
+        string $slackUserId
+    ): string {
+        return $this->publishMessageWithBlocksInChannel(ChannelIdentifier::fromString($channelIdentifier), ['document to review messages']);
+    }
 }

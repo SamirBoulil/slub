@@ -212,6 +212,31 @@ SLACK;
         );
     }
 
+    public function publishDocumentToReviewMessage(
+        string $channelIdentifier,
+        string $documentURL,
+        string $slackUserId
+    ): string {
+        $message = [
+            [
+                'type' => 'section',
+                'text' => [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf(
+                        "*<%s|Document>* put to review by <@%s>",
+                        $documentURL,
+                        $slackUserId
+                    ),
+                ],
+            ],
+        ];
+
+        return $this->publishMessageWithBlocksInChannel(
+            ChannelIdentifier::fromString($channelIdentifier),
+            $message
+        );
+    }
+
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array
     {
         $messageId = MessageIdentifierHelper::split($messageIdentifier->stringValue());

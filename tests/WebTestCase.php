@@ -50,6 +50,9 @@ class WebTestCase extends SymfonyWebTestCase
     {
         $fileBasedPRRepository = $this->get('slub.infrastructure.persistence.pr_repository');
         $fileBasedPRRepository->reset();
+
+        $documentRepository = $this->get('slub.infrastructure.persistence.document_repository');
+        $documentRepository->reset();
     }
 
     private function addDefaultGithubAppInstallation(): void

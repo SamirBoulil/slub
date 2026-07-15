@@ -142,8 +142,14 @@ class ProcessTRAsync
 
         $documentURL = ChatHelper::extractURL($text);
 
+        $messageIdentifier = $this->chatClient->publishDocumentToReviewMessage(
+            $channelIdentifier,
+            $documentURL->asString(),
+            $userId
+        );
+
         $this->putDocumentToReviewHandler->handle(
-            new PutDocumentToReview($documentURL->asString(), $channelIdentifier, $workspaceIdentifier, $userId),
+            new PutDocumentToReview($documentURL->asString(), $channelIdentifier, $workspaceIdentifier, $userId, $messageIdentifier),
         );
     }
 }

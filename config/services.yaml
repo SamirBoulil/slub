@@ -159,9 +159,9 @@ services:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
     slub.infrastructure.persistence.document_repository:
-        class: Slub\Infrastructure\Persistence\Sql\Repository\PRAdapterDocumentRepository
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlDocumentRepository
         arguments:
-            - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.sql.database_connection'
 
     slub.infrastructure.persistence.has_event_already_been_delivered:
         class: Slub\Infrastructure\Persistence\Sql\Query\SqlHasEventAlreadyBeenDelivered

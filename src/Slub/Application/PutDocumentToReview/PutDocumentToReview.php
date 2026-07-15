@@ -11,6 +11,7 @@ final readonly class PutDocumentToReview
         public string $channelIdentifier,
         public string $workspaceIdentifier,
         public string $slackUserId,
+        public string $messageIdentifier,
     ) {
     }
 }

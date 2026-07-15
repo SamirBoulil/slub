@@ -28,4 +28,9 @@ interface ChatClient
         string $authorImageUrl,
         string $description
     ): string;
+    public function publishDocumentToReviewMessage(
+        string $channelIdentifier,
+        string $documentURL,
+        string $slackUserId
+    ): string;
 }

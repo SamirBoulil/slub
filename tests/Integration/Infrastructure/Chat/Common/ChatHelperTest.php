@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration\Infrastructure\Chat\Common;
 
 use PHPUnit\Framework\TestCase;
+use Slub\Domain\Entity\Document\DocumentURL;
 use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\Common\ImpossibleToParseRepositoryURL;
 
@@ -59,5 +60,33 @@ class ChatHelperTest extends TestCase
     public function test_it_preserves_safe_characters()
     {
         $this->assertEquals('Fix PR title with safe characters', ChatHelper::escapeHtmlChars('Fix PR title with safe characters'));
+    }
+
+    public function test_it_returns_if_its_a_github_pr_or_not()
+    {
+        self::assertTrue(ChatHelper::isGithubPR('https://github.com/SamirBoulil/slub/pull/1234'));
+        self::assertTrue(ChatHelper::isGithubPR('test  https://github.com/SamirBoulil/slub/pull/1234'));
+        self::assertTrue(ChatHelper::isGithubPR('github.com/SamirBoulil/slub/pull/1234'));
+
+        self::assertFalse(ChatHelper::isGithubPR('https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top'));;
+    }
+
+    public function test_it_returns_a_document_url()
+    {
+        self::assertEquals(
+            new DocumentURL('https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top'),
+            ChatHelper::extractURL('https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top')
+        );
+        self::assertEquals(
+            new DocumentURL('https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top'),
+            ChatHelper::extractURL('hello https://www.notion.so/xxx/my-super-doc?p=12345678901234567890123456789012#top world')
+        );
+    }
+
+    public function test_it_cannot_return_a_document_url()
+    {
+        self::expectException(ImpossibleToParseRepositoryURL::class);
+
+        ChatHelper::extractURL('whatever://not an url');
     }
 }

@@ -6,6 +6,8 @@ namespace Slub\Infrastructure\Chat\Slack\TR;
 
 use Psr\Log\LoggerInterface;
 use Slub\Application\Common\ChatClient;
+use Slub\Application\PutDocumentToReview\PutDocumentToReview;
+use Slub\Application\PutDocumentToReview\PutDocumentToReviewHandler;
 use Slub\Application\PutPRToReview\PutPRToReview;
 use Slub\Application\PutPRToReview\PutPRToReviewHandler;
 use Slub\Domain\Entity\PR\PRIdentifier;
@@ -27,6 +29,7 @@ class ProcessTRAsync
     public function __construct(
         private PutPRToReviewHandler $putPRToReviewHandler,
         private GetPRInfoInterface $getPRInfo,
+        private PutDocumentToReviewHandler $putDocumentToReviewHandler,
         private ChatClient $chatClient,
         private ExplainUser $explainUser,
         private RouterInterface $router,
@@ -45,9 +48,14 @@ class ProcessTRAsync
 
     private function processTR(Request $request): void
     {
+        $text = $request->request->get('text');
         try {
-            $PRIdentifier = ChatHelper::extractPRIdentifier($request->request->get('text'));
-            $this->putPRToReview($PRIdentifier, $request);
+            if (ChatHelper::isGithubPR($text)) {
+                $PRIdentifier = ChatHelper::extractPRIdentifier($text);
+                $this->putPRToReview($PRIdentifier, $request);
+            } else {
+                $this->putDocumentToReview($text, $request);
+            }
         } catch (\Exception|\Error $e) {
             $this->logger->critical($e->getMessage());
             $this->explainUser->onError($request, $e);
@@ -124,5 +132,24 @@ class ProcessTRAsync
 //        );
 
         $this->putPRToReviewHandler->handle($PRToReview);
+    }
+
+    private function putDocumentToReview(string $text, Request $request): void
+    {
+        $workspaceIdentifier = $request->request->get('team_id');
+        $userId = $request->request->get('user_id');
+        $channelIdentifier = $this->getChannelIdentifier($request);
+
+        $documentURL = ChatHelper::extractURL($text);
+
+        $messageIdentifier = $this->chatClient->publishDocumentToReviewMessage(
+            $channelIdentifier,
+            $documentURL->asString(),
+            $userId
+        );
+
+        $this->putDocumentToReviewHandler->handle(
+            new PutDocumentToReview($documentURL->asString(), $channelIdentifier, $workspaceIdentifier, $userId, $messageIdentifier),
+        );
     }
 }

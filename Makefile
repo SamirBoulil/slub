@@ -1,31 +1,38 @@
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+DOCKER := docker compose
+PHP := $(DOCKER) -f ./docker-compose.yml -f docker-compose.override.yml run --rm php php
+BIN_CONSOLE := $(PHP) bin/console
+
+.PHONY: up
+up:
+	$(DOCKER) up -d
 
 .PHONY: install
 install:
-	bin/console --env=prod cache:clear
-	bin/console --env=prod slub:install
+	$(BIN_CONSOLE) --env=prod cache:clear
+	$(BIN_CONSOLE) --env=prod slub:install
 
 .PHONY: migrate
 migrate:
-	bin/console --env=prod cache:clear
-	bin/console --env=prod doctrine:migrations:migrate --no-interaction
+	$(BIN_CONSOLE) --env=prod cache:clear
+	$(BIN_CONSOLE) --env=prod doctrine:migrations:migrate --no-interaction
 
 .PHONY: install-test
 install-test:
-	bin/console --env=test cache:clear
-	bin/console --env=test slub:install -vvv
+	$(BIN_CONSOLE) --env=test cache:clear
+	$(BIN_CONSOLE) --env=test slub:install -vvv
 
 .PHONY: check
 check:
-	bin/console cache:clear --env=test
-	vendor/bin/behat -f progress
-	vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml
-# 	vendor/bin/phpstan analyse --level max src tests
-	vendor/bin/php-cs-fixer fix --diff --dry-run --config=.php_cs.php --using-cache=no
+	$(BIN_CONSOLE) cache:clear --env=test
+	APP_ENV=test $(PHP) vendor/bin/behat -f progress
+	APP_ENV=test $(PHP) vendor/bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml
+# 	($PHP) vendor/bin/phpstan analyse --level max src tests
+	$(PHP) vendor/bin/php-cs-fixer fix --diff --dry-run --config=.php_cs.php --using-cache=no
 
 .PHONY: fixcs export PHP_CS_FIXER_IGNORE_ENV=1
 fixcs:
-	PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --diff --config=.php_cs.php --using-cache=no
+	PHP_CS_FIXER_IGNORE_ENV=1 $(PHP) vendor/bin/php-cs-fixer fix --diff --config=.php_cs.php --using-cache=no
 
 .PHONY: tunnel
 tunnel:
@@ -62,4 +69,4 @@ status-check-success: # Create a status check failure for a spectif sha given in
 
 .PHONY: send-reminders
 send-reminders:
-	heroku run --app slub-test bin/console slub:send-reminders
+	heroku run --app slub-test $(BIN_CONSOLE) slub:send-reminders

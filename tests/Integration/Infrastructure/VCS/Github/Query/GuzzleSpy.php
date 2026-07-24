@@ -61,4 +61,9 @@ class GuzzleSpy
     {
         return $this->mockHandler->getLastRequest();
     }
+
+    public function getRequestOptions(): array
+    {
+        return $this->mockHandler->getLastOptions();
+    }
 }

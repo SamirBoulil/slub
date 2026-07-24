@@ -36,7 +36,11 @@ class RefreshAccessToken
         $headers = GithubAPIHelper::acceptMachineManPreviewHeader();
         $jwt = $this->jwt();
         $headers = array_merge($headers, GithubAPIHelper::authorizationHeaderWithJWT($jwt));
-        $response = $this->httpClient->post($accessTokenUrl, ['headers' => $headers]);
+        $response = $this->httpClient->post($accessTokenUrl, [
+            'headers' => $headers,
+            'connect_timeout' => GithubAPIClient::CONNECT_TIMEOUT_SECONDS,
+            'timeout' => GithubAPIClient::TIMEOUT_SECONDS,
+        ]);
         if (201 !== $response->getStatusCode()) {
             throw new \RuntimeException(
                 sprintf(

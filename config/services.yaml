@@ -158,6 +158,11 @@ services:
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
 
+    slub.infrastructure.persistence.pr_commits_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlPRCommitsRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
+
     slub.infrastructure.chat.slack.ok_action:
         class: Slub\Infrastructure\Chat\Slack\OKAction
 
@@ -238,7 +243,13 @@ services:
             - '@slub.infrastructure.vcs.github.client.refresh_access_token'
             - '@slub.infrastructure.vcs.github.client.app_installation_repository'
             - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.persistence.github_api_response_cache_repository'
             - '@logger'
+
+    slub.infrastructure.persistence.github_api_response_cache_repository:
+        class: Slub\Infrastructure\Persistence\Sql\Repository\SqlGithubAPIResponseCacheRepository
+        arguments:
+            - '@slub.infrastructure.persistence.sql.database_connection'
 
     ## VCS
     slub.infrastructure.vcs.github.client.refresh_access_token:
@@ -265,13 +276,21 @@ services:
             - '@slub.infrastructure.vcs.github.event_handler_registry'
             - '@slub.infrastructure.persistence.has_event_already_been_delivered'
             - '@slub.infrastructure.persistence.delivered_event_repository'
-            - '@logger'
             - '%env(GITHUB_WEBHOOK_SECRET)%'
 
     slub.infrastructure.vcs.github.event_handler_registry:
         class: Slub\Infrastructure\VCS\Github\EventHandler\EventHandlerRegistry
         arguments:
             - !tagged github.event_handler
+
+    slub.infrastructure.vcs.github.event_handler.process_github_events_async:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\ProcessGithubEventsAsync
+        arguments:
+            - '@slub.infrastructure.vcs.github.event_handler_registry'
+            - '@Sentry\State\HubInterface'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: kernel.terminate }
 
     slub.infrastructure.vcs.github.event_handler.new_review:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PullRequestReviewEventHandler
@@ -301,8 +320,9 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\StatusUpdatedEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
-            - '@slub.infrastructure.vcs.github.query.find_pr_number'
+            - '@slub.infrastructure.vcs.github.query.cached_find_pr_number'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '@slub.infrastructure.persistence.is_pr_in_review'
             - '@slub.infrastructure.persistence.vcs_event_recorder'
             - '@logger'
             - '%env(CHECKS_BLACKLIST)%'
@@ -324,6 +344,13 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\PRSynchronizedEventHandler
         arguments:
             - '@slub.application.ci_status_update.ci_status_update_handler'
+        tags: ['github.event_handler']
+
+    slub.infrastructure.vcs.github.event_handler.record_pr_commit:
+        class: Slub\Infrastructure\VCS\Github\EventHandler\RecordPRCommitEventHandler
+        arguments:
+            - '@slub.infrastructure.persistence.pr_commits_repository'
+            - '@logger'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation:
@@ -392,12 +419,21 @@ services:
         arguments:
             - '@slub.infrastructure.vcs.github.client.github_api_client'
 
+    slub.infrastructure.vcs.github.query.cached_find_pr_number:
+        class: Slub\Infrastructure\VCS\Github\Query\CachedFindPRNumber
+        arguments:
+            - '@slub.infrastructure.persistence.pr_commits_repository'
+            - '@slub.infrastructure.vcs.github.query.find_pr_number'
+            - '@logger'
+
     slub.infrastructure.vcs.github.query.get_pr_info:
         class: Slub\Infrastructure\VCS\Github\Query\GetPRInfo
         arguments:
             - '@slub.infrastructure.vcs.github.query.get_pr_details'
             - '@slub.infrastructure.vcs.github.query.find_reviews'
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
+            - '@slub.infrastructure.persistence.pr_commits_repository'
+            - '@logger'
 
     ## CLI
     slub.infrastructure.installer.cli.InstallerCLI:
@@ -418,6 +454,14 @@ services:
         class: Slub\Infrastructure\UI\CLI\PurgeDeliveredEventsCLI
         arguments:
             - '@slub.infrastructure.persistence.sql.database_connection'
+        tags:
+            - { name: console.command }
+
+    slub.infrastructure.installer.cli.purge_github_api_cache:
+        class: Slub\Infrastructure\UI\CLI\PurgeGithubApiCacheCLI
+        arguments:
+            - '@slub.infrastructure.persistence.github_api_response_cache_repository'
+            - '@slub.infrastructure.persistence.pr_commits_repository'
         tags:
             - { name: console.command }
 

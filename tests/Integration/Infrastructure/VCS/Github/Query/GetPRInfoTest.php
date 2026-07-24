@@ -7,7 +7,9 @@ namespace Tests\Integration\Infrastructure\VCS\Github\Query;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlPRCommitsRepository;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\FindReviews;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
@@ -28,13 +30,22 @@ class GetPRInfoTest extends TestCase
 
     private FindReviews|ObjectProphecy $findReviews;
 
+    private SqlPRCommitsRepository|ObjectProphecy $prCommitsRepository;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->getPRDetails = $this->prophesize(GetPRDetails::class);
         $this->findReviews = $this->prophesize(FindReviews::class);
         $this->getCIStatus = $this->prophesize(GetCIStatus::class);
-        $this->getPRInfo = new GetPRInfo($this->getPRDetails->reveal(), $this->findReviews->reveal(), $this->getCIStatus->reveal());
+        $this->prCommitsRepository = $this->prophesize(SqlPRCommitsRepository::class);
+        $this->getPRInfo = new GetPRInfo(
+            $this->getPRDetails->reveal(),
+            $this->findReviews->reveal(),
+            $this->getCIStatus->reveal(),
+            $this->prCommitsRepository->reveal(),
+            new NullLogger()
+        );
     }
 
     /**
@@ -78,6 +89,9 @@ class GetPRInfoTest extends TestCase
         $this->getCIStatus
             ->fetch($PRIdentifier, $commitSHA)
             ->willReturn($checkStatus);
+        $this->prCommitsRepository
+            ->saveHeadCommit($expectedRepositoryIdentifier, $commitSHA, '1212')
+            ->shouldBeCalled();
 
         $actualPRInfo = $this->getPRInfo->fetch($PRIdentifier);
 

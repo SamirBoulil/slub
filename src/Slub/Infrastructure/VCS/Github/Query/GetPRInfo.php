@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query;
 
+use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\GetPRInfoInterface;
 use Slub\Domain\Query\PRInfo;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlPRCommitsRepository;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 
 /**
@@ -14,14 +16,20 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
  */
 class GetPRInfo implements GetPRInfoInterface
 {
-    public function __construct(private GetPRDetails $getPRDetails, private FindReviews $findReviews, private GetCIStatus $getCIStatus)
-    {
+    public function __construct(
+        private GetPRDetails $getPRDetails,
+        private FindReviews $findReviews,
+        private GetCIStatus $getCIStatus,
+        private SqlPRCommitsRepository $prCommitsRepository,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function fetch(PRIdentifier $PRIdentifier): PRInfo
     {
         $PRDetails = $this->getPRDetails->fetch($PRIdentifier);
         $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
+        $this->recordPRHeadCommit($PRIdentifier, $repositoryIdentifier, $PRDetails);
         $reviews = $this->findReviews->fetch($PRIdentifier);
         $ciStatus = $this->getCIStatus->fetch($PRIdentifier, $this->getPRCommitRef($PRDetails));
         $isMerged = $this->isMerged($PRDetails);
@@ -52,6 +60,26 @@ class GetPRInfo implements GetPRInfoInterface
     private function getPRCommitRef(array $PRDetails): string
     {
         return $PRDetails['head']['sha'];
+    }
+
+    /**
+     * Warms the pr_commits table so that "status" events for this PR can be resolved
+     * without calling the Github API (see CachedFindPRNumber). Best effort only:
+     * fetching the PR info should never fail because of it.
+     */
+    private function recordPRHeadCommit(PRIdentifier $PRIdentifier, string $repositoryIdentifier, array $PRDetails): void
+    {
+        try {
+            $this->prCommitsRepository->saveHeadCommit(
+                $repositoryIdentifier,
+                $this->getPRCommitRef($PRDetails),
+                GithubAPIHelper::PRNumber($PRIdentifier)
+            );
+        } catch (\Exception|\Error $e) {
+            $this->logger->error(
+                sprintf('Unable to record the head commit of PR "%s": %s', $PRIdentifier->stringValue(), $e->getMessage())
+            );
+        }
     }
 
     private function isMerged(array $PRDetails): bool

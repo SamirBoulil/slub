@@ -14,6 +14,12 @@ final class Version20260710120000 extends AbstractMigration
         return 'Add table to associate commits to the PR they belong to, so status events do not need the Github API to resolve PR numbers';
     }
 
+    /** MySQL DDL commits implicitly, so this migration cannot run in a transaction. */
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+
     public function up(Schema $schema): void
     {
         $createTable = <<<SQL

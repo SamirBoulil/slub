@@ -14,6 +14,12 @@ final class Version20260710130000 extends AbstractMigration
         return 'Add table to cache Github API responses with their ETag so they can be revalidated with conditional requests that do not count against the rate limit';
     }
 
+    /** MySQL DDL commits implicitly, so this migration cannot run in a transaction. */
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+
     public function up(Schema $schema): void
     {
         $createTable = <<<SQL

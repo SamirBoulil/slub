@@ -1,2 +1,9 @@
 sentry:
     dsn: '%env(SENTRY_DSN)%'
+    tracing:
+        # The DBAL tracing wrapper hides the PDO connection from doctrine/migrations'
+        # TransactionHelper, making migrations fail with "There is no active transaction"
+        # after a MySQL DDL implicit commit. No traces are sampled anyway (no
+        # traces_sample_rate configured), so the wrapper only adds overhead.
+        dbal:
+            enabled: false

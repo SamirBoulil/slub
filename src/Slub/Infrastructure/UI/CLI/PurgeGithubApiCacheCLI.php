@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\UI\CLI;
 
-use Doctrine\DBAL\Driver\Connection;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlGithubAPIResponseCacheRepository;
+use Slub\Infrastructure\Persistence\Sql\Repository\SqlPRCommitsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +14,10 @@ class PurgeGithubApiCacheCLI extends Command
 {
     protected static $defaultName = 'slub:maintenance:purge-github-api-cache';
 
-    private const RESPONSE_CACHE_RETENTION_IN_DAYS = 7;
-    private const PR_COMMITS_RETENTION_IN_DAYS = 30;
-
-    public function __construct(private Connection $connection)
-    {
+    public function __construct(
+        private SqlGithubAPIResponseCacheRepository $responseCacheRepository,
+        private SqlPRCommitsRepository $prCommitsRepository
+    ) {
         parent::__construct(self::$defaultName);
     }
 
@@ -31,18 +31,8 @@ class PurgeGithubApiCacheCLI extends Command
     {
         $output->writeln('<info>Starting to purge the stale github API caches from the database</info>');
 
-        $numberOfPurgedResponses = $this->connection->executeUpdate(
-            sprintf(
-                'DELETE FROM github_api_response_cache WHERE REFRESHED_AT < NOW() - INTERVAL %d DAY;',
-                self::RESPONSE_CACHE_RETENTION_IN_DAYS
-            )
-        );
-        $numberOfPurgedPRCommits = $this->connection->executeUpdate(
-            sprintf(
-                'DELETE FROM pr_commits WHERE CREATED_AT < NOW() - INTERVAL %d DAY;',
-                self::PR_COMMITS_RETENTION_IN_DAYS
-            )
-        );
+        $numberOfPurgedResponses = $this->responseCacheRepository->evictStale();
+        $numberOfPurgedPRCommits = $this->prCommitsRepository->evictStale();
 
         $output->writeln('');
         $output->writeln(

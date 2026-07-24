@@ -38,8 +38,13 @@ class GithubAPIClient implements GithubAPIClientInterface
     private const EXPECTED_STATUS_CODES = [self::OK_STATUS_CODE, self::NOT_MODIFIED_STATUS_CODE, self::UNAUTHORIZED_STATUS_CODE];
     private const RATE_LIMITED_STATUS_CODES = [403, 429];
 
+    /** Bodies larger than this are not cached, to keep the database size minimal. */
+    private const MAX_CACHEABLE_BODY_BYTES = 32768;
+
     /** @var array<string, string> */
     private array $memoizedResponseBodies = [];
+
+    private bool $staleCacheEvicted = false;
 
     private LoggerInterface $logger;
 
@@ -86,7 +91,7 @@ class GithubAPIClient implements GithubAPIClientInterface
             $response->getBody()->rewind();
             $this->memoizedResponseBodies[$url] = $responseBody;
             $etag = $response->getHeaderLine('ETag');
-            if ('' !== $etag) {
+            if ('' !== $etag && strlen($responseBody) <= self::MAX_CACHEABLE_BODY_BYTES) {
                 $this->cacheResponse($url, $etag, $responseBody);
             }
         }
@@ -194,11 +199,25 @@ class GithubAPIClient implements GithubAPIClientInterface
     {
         try {
             $this->responseCacheRepository->save($url, $etag, $responseBody);
+            $this->evictStaleCacheOnFirstWrite();
         } catch (\Exception|\Error $e) {
             $this->logger->warning(
                 sprintf('Unable to write the github response cache for "%s": %s', $url, $e->getMessage())
             );
         }
+    }
+
+    /**
+     * The first cache write of the request also evicts the stale cache entries, so
+     * the cache size stays bounded even when the purge command is not scheduled.
+     */
+    private function evictStaleCacheOnFirstWrite(): void
+    {
+        if ($this->staleCacheEvicted) {
+            return;
+        }
+        $this->staleCacheEvicted = true;
+        $this->responseCacheRepository->evictStale();
     }
 
     private function newJsonResponse(string $responseBody): ResponseInterface

@@ -14,6 +14,8 @@ use Doctrine\DBAL\Connection;
  */
 class SqlGithubAPIResponseCacheRepository
 {
+    public const RETENTION_IN_DAYS = 3;
+
     public function __construct(private Connection $sqlConnection)
     {
     }
@@ -74,6 +76,17 @@ SQL;
         }
 
         return ['ETAG' => (string) $result['ETAG'], 'RESPONSE_BODY' => (string) $result['RESPONSE_BODY']];
+    }
+
+    /**
+     * Evicts the cached responses that have not been served for a while, to keep the
+     * table size minimal. Returns the number of evicted responses.
+     */
+    public function evictStale(): int
+    {
+        return (int) $this->sqlConnection->executeStatement(
+            sprintf('DELETE FROM github_api_response_cache WHERE REFRESHED_AT < NOW() - INTERVAL %d DAY;', self::RETENTION_IN_DAYS)
+        );
     }
 
     private function urlHash(string $url): string

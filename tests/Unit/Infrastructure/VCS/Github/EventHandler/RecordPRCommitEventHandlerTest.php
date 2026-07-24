@@ -64,7 +64,7 @@ class RecordPRCommitEventHandlerTest extends TestCase
      */
     public function it_records_the_head_commit_of_the_pr(): void
     {
-        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, self::COMMIT_SHA, '10')->shouldBeCalled();
+        $this->prCommitsRepository->saveHeadCommit(self::REPOSITORY_IDENTIFIER, self::COMMIT_SHA, '10')->shouldBeCalled();
 
         $this->recordPRCommitEventHandler->handle($this->event('opened'));
     }
@@ -74,7 +74,7 @@ class RecordPRCommitEventHandlerTest extends TestCase
      */
     public function it_only_logs_a_warning_when_recording_the_head_commit_fails(): void
     {
-        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, self::COMMIT_SHA, '10')
+        $this->prCommitsRepository->saveHeadCommit(self::REPOSITORY_IDENTIFIER, self::COMMIT_SHA, '10')
             ->willThrow(new \RuntimeException('pr_commits is not writable'));
         $this->logger->warning(Argument::containingString('SamirBoulil/slub/10'))->shouldBeCalled();
 

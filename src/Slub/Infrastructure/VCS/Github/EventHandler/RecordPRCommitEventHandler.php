@@ -43,7 +43,7 @@ class RecordPRCommitEventHandler implements EventHandlerInterface
     public function handle(array $PREvent): void
     {
         try {
-            $this->prCommitsRepository->save(
+            $this->prCommitsRepository->saveHeadCommit(
                 $PREvent['repository']['full_name'],
                 $PREvent['pull_request']['head']['sha'],
                 (string) $PREvent['pull_request']['number']

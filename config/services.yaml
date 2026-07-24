@@ -460,7 +460,8 @@ services:
     slub.infrastructure.installer.cli.purge_github_api_cache:
         class: Slub\Infrastructure\UI\CLI\PurgeGithubApiCacheCLI
         arguments:
-            - '@slub.infrastructure.persistence.sql.database_connection'
+            - '@slub.infrastructure.persistence.github_api_response_cache_repository'
+            - '@slub.infrastructure.persistence.pr_commits_repository'
         tags:
             - { name: console.command }
 

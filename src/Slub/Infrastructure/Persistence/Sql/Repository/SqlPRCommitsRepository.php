@@ -10,12 +10,39 @@ use Doctrine\DBAL\Connection;
  * Persists the association between a commit and the PR it belongs to (if any),
  * so that "status" events can be resolved to a PR number without calling the Github API.
  *
+ * Only the head commit of a PR matters for resolving future "status" events, so
+ * saveHeadCommit() evicts the other commits of the PR to keep the table minimal.
+ *
  * @author Samir Boulil <samir.boulil@gmail.com>
  */
 class SqlPRCommitsRepository
 {
+    public const RETENTION_IN_DAYS = 30;
+
     public function __construct(private Connection $sqlConnection)
     {
+    }
+
+    /**
+     * Records the head commit of a PR and evicts the PR's previous commits: the table
+     * converges to one row per PR instead of one row per push.
+     */
+    public function saveHeadCommit(string $repositoryIdentifier, string $headCommitSha, string $PRNumber): void
+    {
+        $evictPreviousCommits = <<<SQL
+DELETE FROM pr_commits
+WHERE REPOSITORY_IDENTIFIER = :repository_identifier AND PR_NUMBER = :pr_number AND COMMIT_SHA != :commit_sha
+;
+SQL;
+        $this->sqlConnection->executeStatement(
+            $evictPreviousCommits,
+            [
+                'repository_identifier' => $repositoryIdentifier,
+                'commit_sha' => $headCommitSha,
+                'pr_number' => $PRNumber,
+            ]
+        );
+        $this->save($repositoryIdentifier, $headCommitSha, $PRNumber);
     }
 
     public function save(string $repositoryIdentifier, string $commitSha, ?string $PRNumber): void
@@ -64,5 +91,16 @@ SQL;
         }
 
         return ['PR_NUMBER' => null !== $result['PR_NUMBER'] ? (string) $result['PR_NUMBER'] : null];
+    }
+
+    /**
+     * Evicts the commits that have not been recorded for a while, to keep the table
+     * size minimal. Returns the number of evicted commits.
+     */
+    public function evictStale(): int
+    {
+        return (int) $this->sqlConnection->executeStatement(
+            sprintf('DELETE FROM pr_commits WHERE CREATED_AT < NOW() - INTERVAL %d DAY;', self::RETENTION_IN_DAYS)
+        );
     }
 }

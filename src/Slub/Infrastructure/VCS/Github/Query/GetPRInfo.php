@@ -70,7 +70,7 @@ class GetPRInfo implements GetPRInfoInterface
     private function recordPRHeadCommit(PRIdentifier $PRIdentifier, string $repositoryIdentifier, array $PRDetails): void
     {
         try {
-            $this->prCommitsRepository->save(
+            $this->prCommitsRepository->saveHeadCommit(
                 $repositoryIdentifier,
                 $this->getPRCommitRef($PRDetails),
                 GithubAPIHelper::PRNumber($PRIdentifier)

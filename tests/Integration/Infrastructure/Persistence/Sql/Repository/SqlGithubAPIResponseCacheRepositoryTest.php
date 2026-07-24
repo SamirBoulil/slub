@@ -77,6 +77,25 @@ class SqlGithubAPIResponseCacheRepositoryTest extends KernelTestCase
     }
 
     /** @test */
+    public function it_evicts_the_stale_cached_responses(): void
+    {
+        $staleUrl = 'https://api.github.com/repos/samirboulil/slub/pulls/13';
+        $freshUrl = 'https://api.github.com/repos/samirboulil/slub/pulls/14';
+        $this->responseCacheRepository->save($staleUrl, 'W/"an_etag"', '{"title": "A stale PR"}');
+        $this->responseCacheRepository->save($freshUrl, 'W/"an_etag"', '{"title": "A fresh PR"}');
+        $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
+        $connection->executeUpdate(
+            'UPDATE github_api_response_cache SET REFRESHED_AT = :stale WHERE URL = :url',
+            ['stale' => '2020-01-01 00:00:00', 'url' => $staleUrl]
+        );
+
+        $this->responseCacheRepository->evictStale();
+
+        self::assertNull($this->responseCacheRepository->find($staleUrl));
+        self::assertNotNull($this->responseCacheRepository->find($freshUrl));
+    }
+
+    /** @test */
     public function it_updates_a_cached_response(): void
     {
         $url = 'https://api.github.com/repos/samirboulil/slub/pulls/11';

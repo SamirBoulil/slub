@@ -60,6 +60,36 @@ class SqlPRCommitsRepositoryTest extends KernelTestCase
     }
 
     /** @test */
+    public function it_keeps_only_the_head_commit_of_a_pr(): void
+    {
+        $this->prCommitsRepository->saveHeadCommit(self::REPOSITORY_IDENTIFIER, 'head_of_another_pr', '99');
+        $this->prCommitsRepository->saveHeadCommit(self::REPOSITORY_IDENTIFIER, 'first_head_sha', '77');
+
+        $this->prCommitsRepository->saveHeadCommit(self::REPOSITORY_IDENTIFIER, 'new_head_sha', '77');
+
+        self::assertNull($this->prCommitsRepository->find(self::REPOSITORY_IDENTIFIER, 'first_head_sha'));
+        self::assertSame(['PR_NUMBER' => '77'], $this->prCommitsRepository->find(self::REPOSITORY_IDENTIFIER, 'new_head_sha'));
+        self::assertSame(['PR_NUMBER' => '99'], $this->prCommitsRepository->find(self::REPOSITORY_IDENTIFIER, 'head_of_another_pr'));
+    }
+
+    /** @test */
+    public function it_evicts_the_stale_commits(): void
+    {
+        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, 'stale_commit_sha', '11');
+        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, 'fresh_commit_sha', '12');
+        $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
+        $connection->executeUpdate(
+            'UPDATE pr_commits SET CREATED_AT = :stale WHERE REPOSITORY_IDENTIFIER = :repository_identifier AND COMMIT_SHA = :commit_sha',
+            ['stale' => '2020-01-01 00:00:00', 'repository_identifier' => self::REPOSITORY_IDENTIFIER, 'commit_sha' => 'stale_commit_sha']
+        );
+
+        $this->prCommitsRepository->evictStale();
+
+        self::assertNull($this->prCommitsRepository->find(self::REPOSITORY_IDENTIFIER, 'stale_commit_sha'));
+        self::assertSame(['PR_NUMBER' => '12'], $this->prCommitsRepository->find(self::REPOSITORY_IDENTIFIER, 'fresh_commit_sha'));
+    }
+
+    /** @test */
     public function it_refreshes_the_creation_date_when_saving_an_already_known_commit(): void
     {
         $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, 'commit_sha_still_in_use', '42');

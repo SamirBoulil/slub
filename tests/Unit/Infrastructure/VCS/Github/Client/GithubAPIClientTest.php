@@ -44,6 +44,8 @@ class GithubAPIClientTest extends KernelTestCase
         $this->refreshAccessToken = $this->prophesize(RefreshAccessToken::class);
         $this->sqlAppInstallationRepository = $this->prophesize(SqlAppInstallationRepository::class);
         $this->responseCacheRepository = $this->prophesize(SqlGithubAPIResponseCacheRepository::class);
+        $this->responseCacheRepository->find(Argument::any())->willReturn(null);
+        $this->responseCacheRepository->evictStale()->willReturn(0);
         $this->sqlAppInstallationRepository->getBy(self::REPOSITORY_IDENTIFIER)->willReturn($this->appInstallation());
         $this->githubAPIClient = $this->createGithubAPIClient(new NullLogger());
     }
@@ -246,6 +248,35 @@ class GithubAPIClientTest extends KernelTestCase
         $response = $this->githubAPIClient->get(self::URL, [], self::REPOSITORY_IDENTIFIER);
 
         self::assertEquals(self::RESPONSE_BODY, $response->getBody()->getContents());
+    }
+
+    /** @test */
+    public function it_evicts_the_stale_cache_entries_on_the_first_cache_write_only(): void
+    {
+        $anotherUrl = 'https://api.github.com/repos/samirboulil/slub/pulls/11';
+        $this->responseCacheRepository->find(self::URL)->willReturn(null);
+        $this->responseCacheRepository->find($anotherUrl)->willReturn(null);
+        $this->requestSpy->stubResponse(new Response(200, ['ETag' => self::ETAG], self::RESPONSE_BODY));
+        $this->requestSpy->stubResponse(new Response(200, ['ETag' => self::ETAG], self::RESPONSE_BODY));
+        $this->responseCacheRepository->save(Argument::cetera())->shouldBeCalledTimes(2);
+        $this->responseCacheRepository->evictStale()->willReturn(0)->shouldBeCalledTimes(1);
+
+        $this->githubAPIClient->get(self::URL, [], self::REPOSITORY_IDENTIFIER);
+        $this->githubAPIClient->get($anotherUrl, [], self::REPOSITORY_IDENTIFIER);
+    }
+
+    /** @test */
+    public function it_does_not_cache_responses_larger_than_the_size_limit(): void
+    {
+        $largeResponseBody = sprintf('{"title": "%s"}', str_repeat('a', 33000));
+        $this->responseCacheRepository->find(self::URL)->willReturn(null);
+        $this->requestSpy->stubResponse(new Response(200, ['ETag' => self::ETAG], $largeResponseBody));
+        $this->responseCacheRepository->save(Argument::cetera())->shouldNotBeCalled();
+
+        $response = $this->githubAPIClient->get(self::URL, [], self::REPOSITORY_IDENTIFIER);
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals($largeResponseBody, $response->getBody()->getContents());
     }
 
     /** @test */

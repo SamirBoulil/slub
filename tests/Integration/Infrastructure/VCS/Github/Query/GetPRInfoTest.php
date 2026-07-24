@@ -90,7 +90,7 @@ class GetPRInfoTest extends TestCase
             ->fetch($PRIdentifier, $commitSHA)
             ->willReturn($checkStatus);
         $this->prCommitsRepository
-            ->save($expectedRepositoryIdentifier, $commitSHA, '1212')
+            ->saveHeadCommit($expectedRepositoryIdentifier, $commitSHA, '1212')
             ->shouldBeCalled();
 
         $actualPRInfo = $this->getPRInfo->fetch($PRIdentifier);

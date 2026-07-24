@@ -58,4 +58,25 @@ class SqlPRCommitsRepositoryTest extends KernelTestCase
 
         self::assertSame(['PR_NUMBER' => '42'], $actual);
     }
+
+    /** @test */
+    public function it_refreshes_the_creation_date_when_saving_an_already_known_commit(): void
+    {
+        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, 'commit_sha_still_in_use', '42');
+        $connection = $this->get('slub.infrastructure.persistence.sql.database_connection');
+        $connection->executeUpdate(
+            'UPDATE pr_commits SET CREATED_AT = :stale WHERE REPOSITORY_IDENTIFIER = :repository_identifier AND COMMIT_SHA = :commit_sha',
+            ['stale' => '2020-01-01 00:00:00', 'repository_identifier' => self::REPOSITORY_IDENTIFIER, 'commit_sha' => 'commit_sha_still_in_use']
+        );
+
+        $this->prCommitsRepository->save(self::REPOSITORY_IDENTIFIER, 'commit_sha_still_in_use', '42');
+
+        $createdAt = $connection
+            ->executeQuery(
+                'SELECT CREATED_AT FROM pr_commits WHERE REPOSITORY_IDENTIFIER = :repository_identifier AND COMMIT_SHA = :commit_sha',
+                ['repository_identifier' => self::REPOSITORY_IDENTIFIER, 'commit_sha' => 'commit_sha_still_in_use']
+            )
+            ->fetch(\PDO::FETCH_COLUMN);
+        self::assertGreaterThan('2020-01-01 00:00:00', $createdAt);
+    }
 }

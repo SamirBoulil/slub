@@ -350,6 +350,7 @@ services:
         class: Slub\Infrastructure\VCS\Github\EventHandler\RecordPRCommitEventHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_commits_repository'
+            - '@logger'
         tags: ['github.event_handler']
 
     slub.infrastructure.vcs.github.event_handler.new_installation:

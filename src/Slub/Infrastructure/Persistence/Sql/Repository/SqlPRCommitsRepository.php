@@ -24,7 +24,8 @@ class SqlPRCommitsRepository
 INSERT INTO pr_commits (REPOSITORY_IDENTIFIER, COMMIT_SHA, PR_NUMBER)
 VALUES (:repository_identifier, :commit_sha, :pr_number)
 ON DUPLICATE KEY UPDATE
-    PR_NUMBER = :pr_number
+    PR_NUMBER = :pr_number,
+    CREATED_AT = CURRENT_TIMESTAMP
 ;
 SQL;
         $this->sqlConnection->executeStatement(

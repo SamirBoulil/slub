@@ -101,6 +101,36 @@ class GetPRInfoViaGraphQLTest extends TestCase
     /**
      * @test
      */
+    public function it_suffixes_bot_author_logins_like_the_rest_api_does(): void
+    {
+        $pullRequestNode = $this->pullRequestNode();
+        $pullRequestNode['author'] = ['__typename' => 'Bot', 'login' => 'dependabot', 'avatarUrl' => 'https://a_bot_image'];
+        $this->stubGraphQLCall($this->graphqlResponse($pullRequestNode));
+        $this->prCommitsRepository->saveHeadCommit(Argument::cetera())->shouldBeCalled();
+
+        $actualPRInfo = $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER));
+
+        self::assertEquals('dependabot[bot]', $actualPRInfo->authorIdentifier);
+    }
+
+    /**
+     * @test
+     */
+    public function it_falls_back_to_the_ghost_author_when_the_author_is_deleted(): void
+    {
+        $pullRequestNode = $this->pullRequestNode();
+        $pullRequestNode['author'] = null;
+        $this->stubGraphQLCall($this->graphqlResponse($pullRequestNode));
+        $this->prCommitsRepository->saveHeadCommit(Argument::cetera())->shouldBeCalled();
+
+        $actualPRInfo = $this->getPRInfo->fetch(PRIdentifier::fromString(self::PR_IDENTIFIER));
+
+        self::assertEquals('ghost', $actualPRInfo->authorIdentifier);
+    }
+
+    /**
+     * @test
+     */
     public function it_still_returns_the_PR_info_when_recording_the_head_commit_fails(): void
     {
         $this->stubGraphQLCall($this->graphqlResponse($this->pullRequestNode()));
@@ -136,7 +166,7 @@ class GetPRInfoViaGraphQLTest extends TestCase
             'title' => 'Add new feature',
             'body' => 'a nice description',
             'state' => 'CLOSED',
-            'author' => ['login' => 'sam', 'avatarUrl' => 'https://a_nice_url_image'],
+            'author' => ['__typename' => 'User', 'login' => 'sam', 'avatarUrl' => 'https://a_nice_url_image'],
             'additions' => 10,
             'deletions' => 5,
             'headRefOid' => self::COMMIT_SHA,

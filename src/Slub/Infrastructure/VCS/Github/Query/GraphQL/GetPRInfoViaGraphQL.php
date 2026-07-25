@@ -28,6 +28,8 @@ class GetPRInfoViaGraphQL implements GetPRInfoInterface
     private const REFUSED = 'REFUSED';
     private const COMMENTED = 'COMMENTED';
     private const OPEN = 'OPEN';
+    private const BOT_TYPENAME = 'Bot';
+    private const GHOST_AUTHOR = 'ghost';
 
     private const QUERY = <<<'GRAPHQL'
         query PRInfo($owner: String!, $name: String!, $number: Int!) {
@@ -36,7 +38,7 @@ class GetPRInfoViaGraphQL implements GetPRInfoInterface
               title
               body
               state
-              author { login avatarUrl }
+              author { __typename login avatarUrl }
               additions
               deletions
               headRefOid
@@ -81,7 +83,7 @@ class GetPRInfoViaGraphQL implements GetPRInfoInterface
         $result = new PRInfo();
         $result->PRIdentifier = $PRIdentifier->stringValue();
         $result->repositoryIdentifier = $repositoryIdentifier;
-        $result->authorIdentifier = $pullRequestNode['author']['login'] ?? '';
+        $result->authorIdentifier = $this->authorIdentifier($pullRequestNode);
         $result->authorImageUrl = $pullRequestNode['author']['avatarUrl'] ?? '';
         $result->title = $pullRequestNode['title'];
         $result->description = $pullRequestNode['body'] ?? '';
@@ -100,6 +102,26 @@ class GetPRInfoViaGraphQL implements GetPRInfoInterface
     private function isClosed(array $pullRequestNode): bool
     {
         return self::OPEN !== $pullRequestNode['state'];
+    }
+
+    /**
+     * The REST path returns "ghost" for deleted authors and suffixed logins for
+     * apps ("dependabot[bot]"), while GraphQL returns a null author and the bare
+     * bot slug. Aligns on the REST representation so the flag does not change
+     * what is persisted and displayed.
+     */
+    private function authorIdentifier(array $pullRequestNode): string
+    {
+        $author = $pullRequestNode['author'] ?? null;
+        if (null === $author) {
+            return self::GHOST_AUTHOR;
+        }
+
+        if (self::BOT_TYPENAME === ($author['__typename'] ?? null)) {
+            return sprintf('%s[bot]', $author['login']);
+        }
+
+        return $author['login'];
     }
 
     private function countReviews(array $pullRequestNode, string $state): int

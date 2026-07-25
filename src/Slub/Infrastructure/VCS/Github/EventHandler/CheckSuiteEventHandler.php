@@ -11,7 +11,7 @@ use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Query\IsPRInReview;
 use Slub\Infrastructure\Persistence\Sql\Repository\VCSEventRecorder;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
-use Slub\Infrastructure\VCS\Github\Query\GetCIStatus;
+use Slub\Infrastructure\VCS\Github\Query\GetCIStatusInterface;
 use Webmozart\Assert\Assert;
 
 /**
@@ -23,7 +23,7 @@ class CheckSuiteEventHandler implements EventHandlerInterface
 
     public function __construct(
         private CIStatusUpdateHandler $CIStatusUpdateHandler,
-        private GetCIStatus $getCIStatus,
+        private GetCIStatusInterface $getCIStatus,
         private IsPRInReview $IsPRInReview,
         private VCSEventRecorder $eventRecorder,
         private LoggerInterface $logger,

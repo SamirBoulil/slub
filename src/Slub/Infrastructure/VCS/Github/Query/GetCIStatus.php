@@ -14,7 +14,7 @@ use Slub\Infrastructure\VCS\Github\Query\CIStatus\GetStatusChecksStatus;
 /**
  * @author    Samir Boulil <samir.boulil@gmail.com>
  */
-class GetCIStatus
+class GetCIStatus implements GetCIStatusInterface
 {
     /** @var string[] */
     private array $supportedCIChecks;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\UI\CLI;
 
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Query\GetPRInfo;
+use Slub\Domain\Query\GetPRInfoInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +15,7 @@ class DebugCIStatusCLI extends Command
 {
     protected static $defaultName = 'slub:debug:ci-status';
 
-    public function __construct(private GetPRInfo $getPRInfo)
+    public function __construct(private GetPRInfoInterface $getPRInfo)
     {
         parent::__construct(self::$defaultName);
     }

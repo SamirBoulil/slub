@@ -171,7 +171,7 @@ services:
         class: Slub\Infrastructure\Chat\Slack\TR\ProcessTRAsync
         arguments:
             - '@slub.application.put_pr_to_review.put_pr_to_review_handler'
-            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.vcs.github.query.feature_flagged_get_pr_info'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@slub.infrastructure.chat.slack.explain_user'
             - '@router'
@@ -396,7 +396,14 @@ services:
             - '@logger'
             - '%env(SUPPORTED_CI_CHECKS)%'
 
-    # Single-GraphQL-query CI status computation, activated with FF_GITHUB_GRAPHQL
+    # Single-GraphQL-query PR status and PR info, activated with FF_GITHUB_GRAPHQL
+    slub.infrastructure.vcs.github.query.graphql.fetch_pull_request_node:
+        class: Slub\Infrastructure\VCS\Github\Query\GraphQL\FetchPullRequestNode
+        arguments:
+            - '@slub.infrastructure.vcs.github.client.github_api_client'
+            - '%GITHUB_URI%'
+            - '@logger'
+
     slub.infrastructure.vcs.github.query.graphql.ci_status_from_pull_request_node:
         class: Slub\Infrastructure\VCS\Github\Query\GraphQL\CIStatusFromPullRequestNode
         arguments:
@@ -405,16 +412,29 @@ services:
     slub.infrastructure.vcs.github.query.graphql.get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\GraphQL\GetCIStatusViaGraphQL
         arguments:
-            - '@slub.infrastructure.vcs.github.client.github_api_client'
+            - '@slub.infrastructure.vcs.github.query.graphql.fetch_pull_request_node'
             - '@slub.infrastructure.vcs.github.query.graphql.ci_status_from_pull_request_node'
-            - '%GITHUB_URI%'
-            - '@logger'
 
     slub.infrastructure.vcs.github.query.feature_flagged_get_ci_status:
         class: Slub\Infrastructure\VCS\Github\Query\FeatureFlaggedGetCIStatus
         arguments:
             - '@slub.infrastructure.vcs.github.query.get_ci_status'
             - '@slub.infrastructure.vcs.github.query.graphql.get_ci_status'
+            - '%env(bool:FF_GITHUB_GRAPHQL)%'
+
+    slub.infrastructure.vcs.github.query.graphql.get_pr_info:
+        class: Slub\Infrastructure\VCS\Github\Query\GraphQL\GetPRInfoViaGraphQL
+        arguments:
+            - '@slub.infrastructure.vcs.github.query.graphql.fetch_pull_request_node'
+            - '@slub.infrastructure.vcs.github.query.graphql.ci_status_from_pull_request_node'
+            - '@slub.infrastructure.persistence.pr_commits_repository'
+            - '@logger'
+
+    slub.infrastructure.vcs.github.query.feature_flagged_get_pr_info:
+        class: Slub\Infrastructure\VCS\Github\Query\FeatureFlaggedGetPRInfo
+        arguments:
+            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.vcs.github.query.graphql.get_pr_info'
             - '%env(bool:FF_GITHUB_GRAPHQL)%'
 
     slub.infrastructure.vcs.github.query.ci_status.get_mergeable_state:
@@ -490,6 +510,6 @@ services:
     slub.infrastructure.installer.cli.debug_ci_status:
         class: Slub\Infrastructure\UI\CLI\DebugCIStatusCLI
         arguments:
-            - '@slub.infrastructure.vcs.github.query.get_pr_info'
+            - '@slub.infrastructure.vcs.github.query.feature_flagged_get_pr_info'
         tags:
             - { name: console.command }

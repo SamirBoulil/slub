@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Slub\Infrastructure\VCS\Github\Query\GraphQL;
 
-use Psr\Log\LoggerInterface;
 use Slub\Domain\Entity\PR\PRIdentifier;
-use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 use Slub\Infrastructure\VCS\Github\Query\CIStatus\CIStatus;
 use Slub\Infrastructure\VCS\Github\Query\GetCIStatusInterface;
-use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
 
 /**
  * Computes the CI status of a PR with a single GraphQL query: the status check
@@ -48,10 +45,8 @@ class GetCIStatusViaGraphQL implements GetCIStatusInterface
         GRAPHQL;
 
     public function __construct(
-        private GithubAPIClientInterface $githubAPIClient,
+        private FetchPullRequestNode $fetchPullRequestNode,
         private CIStatusFromPullRequestNode $ciStatusFromPullRequestNode,
-        private string $domainName,
-        private LoggerInterface $logger,
     ) {
     }
 
@@ -61,52 +56,8 @@ class GetCIStatusViaGraphQL implements GetCIStatusInterface
      */
     public function fetch(PRIdentifier $PRIdentifier, string $commitRef): CIStatus
     {
-        return $this->ciStatusFromPullRequestNode->fromPullRequestNode($this->pullRequestNode($PRIdentifier));
-    }
-
-    private function pullRequestNode(PRIdentifier $PRIdentifier): array
-    {
-        $repositoryIdentifier = GithubAPIHelper::repositoryIdentifierFrom($PRIdentifier);
-        [$owner, $name] = explode('/', $repositoryIdentifier);
-        $response = $this->githubAPIClient->post(
-            sprintf('%s/graphql', $this->domainName),
-            [
-                'json' => [
-                    'query' => self::QUERY,
-                    'variables' => [
-                        'owner' => $owner,
-                        'name' => $name,
-                        'number' => (int) GithubAPIHelper::PRNumber($PRIdentifier),
-                    ],
-                ],
-            ],
-            $repositoryIdentifier
+        return $this->ciStatusFromPullRequestNode->fromPullRequestNode(
+            $this->fetchPullRequestNode->fetch($PRIdentifier, self::QUERY)
         );
-
-        $content = json_decode($response->getBody()->getContents(), true);
-        if (200 !== $response->getStatusCode()
-            || null === $content
-            || isset($content['errors'])
-            || !isset($content['data']['repository']['pullRequest'])
-        ) {
-            $this->logger->error(
-                sprintf(
-                    'Unexpected GraphQL response when fetching the CI status for PR "%s": status %d, body "%s"',
-                    $PRIdentifier->stringValue(),
-                    $response->getStatusCode(),
-                    (string) json_encode($content)
-                )
-            );
-
-            throw new \RuntimeException(
-                sprintf(
-                    'There was a problem when fetching the CI status for PR "%s" (status %d)',
-                    $PRIdentifier->stringValue(),
-                    $response->getStatusCode()
-                )
-            );
-        }
-
-        return $content['data']['repository']['pullRequest'];
     }
 }

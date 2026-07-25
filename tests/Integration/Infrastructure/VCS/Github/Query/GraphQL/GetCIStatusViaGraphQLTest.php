@@ -13,6 +13,7 @@ use Psr\Log\NullLogger;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\VCS\Github\Client\GithubAPIClientInterface;
 use Slub\Infrastructure\VCS\Github\Query\GraphQL\CIStatusFromPullRequestNode;
+use Slub\Infrastructure\VCS\Github\Query\GraphQL\FetchPullRequestNode;
 use Slub\Infrastructure\VCS\Github\Query\GraphQL\GetCIStatusViaGraphQL;
 
 /**
@@ -45,12 +46,10 @@ class GetCIStatusViaGraphQLTest extends TestCase
         parent::setUp();
         $this->githubAPIClient = $this->prophesize(GithubAPIClientInterface::class);
         $this->getCIStatus = new GetCIStatusViaGraphQL(
-            $this->githubAPIClient->reveal(),
+            new FetchPullRequestNode($this->githubAPIClient->reveal(), 'https://api.github.com', new NullLogger()),
             new CIStatusFromPullRequestNode(
                 implode(',', [self::SUPPORTED_CI_CHECK_1, self::SUPPORTED_CI_CHECK_2, self::SUPPORTED_CI_CHECK_3])
-            ),
-            'https://api.github.com',
-            new NullLogger()
+            )
         );
     }
 

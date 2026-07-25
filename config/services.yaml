@@ -64,6 +64,11 @@ services:
             - '@slub.infrastructure.persistence.pr_repository'
             - '@logger'
 
+    slub.application.unpublish_document.unpublish_document_handler:
+        class: Slub\Application\UnpublishDocument\UnpublishDocumentHandler
+        arguments:
+            - '@slub.infrastructure.persistence.document_repository'
+
     slub.application.notify.notify_author:
         class: Slub\Application\Notify\NotifyAuthor
         arguments:
@@ -87,6 +92,7 @@ services:
         class: Slub\Application\PublishReminders\PublishRemindersHandler
         arguments:
             - '@slub.infrastructure.persistence.pr_repository'
+            - '@slub.infrastructure.persistence.document_repository'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@logger'
             - '@slub.infrastructure.common.query.clock'
@@ -188,10 +194,10 @@ services:
         class: Slub\Infrastructure\Chat\Slack\UnTR\ProcessUnTRAsync
         arguments:
             - '@slub.application.unpublish_pr.unpublish_pr_handler'
+            - '@slub.application.unpublish_document.unpublish_document_handler'
             - '@slub.infrastructure.chat.slack.slack_client'
             - '@slub.infrastructure.chat.slack.explain_user'
             - '@router'
-            - '@logger'
         tags:
             - { name: kernel.event_listener, event: kernel.terminate }
 
@@ -217,6 +223,18 @@ services:
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
             - '@logger'
 
+    slub.infrastructure.query.get_reactions_for_message:
+        class: Slub\Infrastructure\Chat\Slack\Query\GetReactionsForMessage
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+
+    slub.infrastructure.query.get_message_permalink:
+        class: Slub\Infrastructure\Chat\Slack\Query\GetMessagePermalink
+        arguments:
+            - '@slub.infrastructure.http.guzzle_client'
+            - '@slub.infrastructure.chat.slack.slack_app_installation_repository'
+
     slub.infrastructure.query.get_bot_user_id:
         class: Slub\Infrastructure\Chat\Slack\Query\GetBotUserId
         arguments:
@@ -229,6 +247,8 @@ services:
         arguments:
             - '@slub.infrastructure.query.get_bot_user_id'
             - '@slub.infrastructure.query.get_bot_reactions_for_message_and_user'
+            - '@slub.infrastructure.query.get_reactions_for_message'
+            - '@slub.infrastructure.query.get_message_permalink'
             - '@slub.infrastructure.http.guzzle_client'
             - '@logger'
             - '@slub.infrastructure.chat.slack.slack_app_installation_repository'

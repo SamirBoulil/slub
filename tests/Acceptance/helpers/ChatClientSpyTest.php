@@ -134,4 +134,44 @@ class ChatClientSpyTest extends TestCase
             'another_text'
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_stubbed_reaction_count_and_zero_by_default(): void
+    {
+        $messageIdentifier = MessageIdentifier::fromString('general@12345');
+
+        self::assertEquals(0, $this->slackClientSpy->getReactionCountForMessage($messageIdentifier, 'white_check_mark'));
+
+        $this->slackClientSpy->stubReactionCount('general@12345', 'white_check_mark', 3);
+
+        self::assertEquals(3, $this->slackClientSpy->getReactionCountForMessage($messageIdentifier, 'white_check_mark'));
+        self::assertEquals(0, $this->slackClientSpy->getReactionCountForMessage($messageIdentifier, 'rocket'));
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_the_stubbed_exception_when_fetching_the_reaction_count(): void
+    {
+        $this->slackClientSpy->stubReactionCount('general@12345', 'white_check_mark', new \RuntimeException('Slack API failure'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->slackClientSpy->getReactionCountForMessage(
+            MessageIdentifier::fromString('general@12345'),
+            'white_check_mark'
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_a_deterministic_permalink(): void
+    {
+        self::assertEquals(
+            'https://slack.example.com/permalink/general@12345',
+            $this->slackClientSpy->getMessagePermalink(MessageIdentifier::fromString('general@12345'))
+        );
+    }
 }

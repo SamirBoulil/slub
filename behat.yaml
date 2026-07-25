@@ -11,6 +11,7 @@ default:
         - Tests\Acceptance\Context\ClosePRContext
         - Tests\Acceptance\Context\PublishRemindersContext
         - Tests\Acceptance\Context\UnpublishPRContext
+        - Tests\Acceptance\Context\UnpublishDocumentContext
         - Tests\Acceptance\Context\GoodToMergeContext
   extensions:
     FriendsOfBehat\SymfonyExtension:

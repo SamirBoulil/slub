@@ -17,6 +17,8 @@ use Slub\Infrastructure\Chat\Slack\AppInstallation\SlackAppInstallation;
 use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
+use Slub\Infrastructure\Chat\Slack\Query\GetMessagePermalink;
+use Slub\Infrastructure\Chat\Slack\Query\GetReactionsForMessage;
 use Slub\Infrastructure\Chat\Slack\SlackClient;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 use Tests\Integration\Infrastructure\KernelTestCase;
@@ -30,6 +32,10 @@ class SlackClientTest extends KernelTestCase
 
     private ObjectProphecy $getBotReactionsForMessageAndUser;
 
+    private ObjectProphecy $getReactionsForMessage;
+
+    private ObjectProphecy $getMessagePermalink;
+
     private MockHandler $httpClientMock;
 
     private SlackClient $slackClient;
@@ -42,6 +48,8 @@ class SlackClientTest extends KernelTestCase
         $client = $this->setUpGuzzleMock();
         $this->getBotUserId = $this->prophesize(GetBotUserId::class);
         $this->getBotReactionsForMessageAndUser = $this->prophesize(GetBotReactionsForMessageAndUser::class);
+        $this->getReactionsForMessage = $this->prophesize(GetReactionsForMessage::class);
+        $this->getMessagePermalink = $this->prophesize(GetMessagePermalink::class);
 
         $slackAppInstallationRepository = $this->prophesize(SqlSlackAppInstallationRepository::class);
         $this->mockSlackAppInstallation($slackAppInstallationRepository);
@@ -49,6 +57,8 @@ class SlackClientTest extends KernelTestCase
         $this->slackClient = new SlackClient(
             $this->getBotUserId->reveal(),
             $this->getBotReactionsForMessageAndUser->reveal(),
+            $this->getReactionsForMessage->reveal(),
+            $this->getMessagePermalink->reveal(),
             $client,
             $this->prophesize(LoggerInterface::class)->reveal(),
             $slackAppInstallationRepository->reveal()
@@ -383,6 +393,61 @@ TEXT;
 
         $this->expectException(\RuntimeException::class);
         $this->slackClient->replyInThread(MessageIdentifier::fromString('workspace@channel@message'), 'hello world');
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_reaction_count_for_a_message(): void
+    {
+        $this->getReactionsForMessage->fetch('workspace', 'channel', 'message')
+            ->shouldBeCalled()
+            ->willReturn([
+                ['count' => 3, 'name' => 'white_check_mark', 'users' => ['user_1', 'user_2', 'user_3']],
+                ['count' => 1, 'name' => 'rocket', 'users' => ['user_1']],
+            ]);
+
+        $count = $this->slackClient->getReactionCountForMessage(
+            MessageIdentifier::fromString('workspace@channel@message'),
+            'white_check_mark'
+        );
+
+        self::assertEquals(3, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_zero_when_the_reaction_is_not_present(): void
+    {
+        $this->getReactionsForMessage->fetch('workspace', 'channel', 'message')
+            ->shouldBeCalled()
+            ->willReturn([
+                ['count' => 1, 'name' => 'rocket', 'users' => ['user_1']],
+            ]);
+
+        $count = $this->slackClient->getReactionCountForMessage(
+            MessageIdentifier::fromString('workspace@channel@message'),
+            'white_check_mark'
+        );
+
+        self::assertEquals(0, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function it_returns_the_permalink_of_a_message(): void
+    {
+        $this->getMessagePermalink->fetch('workspace', 'channel', 'message')
+            ->shouldBeCalled()
+            ->willReturn('https://my-workspace.slack.com/archives/channel/p123456');
+
+        $permalink = $this->slackClient->getMessagePermalink(
+            MessageIdentifier::fromString('workspace@channel@message')
+        );
+
+        self::assertEquals('https://my-workspace.slack.com/archives/channel/p123456', $permalink);
     }
 
     // It publishes messages in block and returns the message identifier associated

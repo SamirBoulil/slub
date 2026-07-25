@@ -15,6 +15,8 @@ use Slub\Infrastructure\Chat\Slack\Common\ChannelIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Common\MessageIdentifierHelper;
 use Slub\Infrastructure\Chat\Slack\Query\GetBotReactionsForMessageAndUser;
 use Slub\Infrastructure\Chat\Slack\Query\GetBotUserId;
+use Slub\Infrastructure\Chat\Slack\Query\GetMessagePermalink;
+use Slub\Infrastructure\Chat\Slack\Query\GetReactionsForMessage;
 use Slub\Infrastructure\Persistence\Sql\Repository\SqlSlackAppInstallationRepository;
 
 /**
@@ -24,7 +26,7 @@ class SlackClient implements ChatClient
 {
     private const MAX_DESCRIPTION = 80;
 
-    public function __construct(private GetBotUserId $getBotUserId, private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser, private ClientInterface $client, private LoggerInterface $logger, private SqlSlackAppInstallationRepository $slackAppInstallationRepository)
+    public function __construct(private GetBotUserId $getBotUserId, private GetBotReactionsForMessageAndUser $getBotReactionsForMessageAndUser, private GetReactionsForMessage $getReactionsForMessage, private GetMessagePermalink $getMessagePermalinkQuery, private ClientInterface $client, private LoggerInterface $logger, private SqlSlackAppInstallationRepository $slackAppInstallationRepository)
     {
     }
 
@@ -235,6 +237,26 @@ SLACK;
             ChannelIdentifier::fromString($channelIdentifier),
             $message
         );
+    }
+
+    public function getReactionCountForMessage(MessageIdentifier $messageIdentifier, string $reactionName): int
+    {
+        $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
+        $reactions = $this->getReactionsForMessage->fetch($message['workspace'], $message['channel'], $message['ts']);
+        foreach ($reactions as $reaction) {
+            if ($reactionName === $reaction['name']) {
+                return $reaction['count'];
+            }
+        }
+
+        return 0;
+    }
+
+    public function getMessagePermalink(MessageIdentifier $messageIdentifier): string
+    {
+        $message = MessageIdentifierHelper::split($messageIdentifier->stringValue());
+
+        return $this->getMessagePermalinkQuery->fetch($message['workspace'], $message['channel'], $message['ts']);
     }
 
     private function getCurrentReactions(MessageIdentifier $messageIdentifier): array

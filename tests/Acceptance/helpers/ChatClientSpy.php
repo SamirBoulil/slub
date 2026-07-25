@@ -16,6 +16,8 @@ class ChatClientSpy implements ChatClient
 {
     private array $recordedMessages = [];
 
+    private array $stubbedReactionCounts = [];
+
     public function replyInThread(MessageIdentifier $messageIdentifier, string $text): void
     {
         $this->recordedMessages[$messageIdentifier->stringValue()][] = $text;
@@ -82,6 +84,12 @@ class ChatClientSpy implements ChatClient
         Assert::assertEqualsCanonicalizing($expectedBlockMessage, $actualBlockMessage);
     }
 
+    public function assertHasBeenCalledWithChannelIdentifierAndBlockMessageInOrder(ChannelIdentifier $expectedChannelIdentifier, array $expectedBlockMessage): void
+    {
+        $actualBlockMessage = $this->reactionsForIdentifier($expectedChannelIdentifier->stringValue());
+        Assert::assertEquals($expectedBlockMessage, $actualBlockMessage);
+    }
+
     public function assertRepliedWithOneOf(array $expectedMessages): void
     {
         $isFound = false;
@@ -96,9 +104,30 @@ class ChatClientSpy implements ChatClient
         Assert::assertTrue($isFound, 'Did not find any of the messages');
     }
 
+    public function getReactionCountForMessage(MessageIdentifier $messageIdentifier, string $reactionName): int
+    {
+        $stub = $this->stubbedReactionCounts[$messageIdentifier->stringValue()][$reactionName] ?? 0;
+        if ($stub instanceof \Throwable) {
+            throw $stub;
+        }
+
+        return $stub;
+    }
+
+    public function getMessagePermalink(MessageIdentifier $messageIdentifier): string
+    {
+        return sprintf('https://slack.example.com/permalink/%s', $messageIdentifier->stringValue());
+    }
+
+    public function stubReactionCount(string $messageIdentifier, string $reactionName, int|\Throwable $countOrThrowable): void
+    {
+        $this->stubbedReactionCounts[$messageIdentifier][$reactionName] = $countOrThrowable;
+    }
+
     public function reset(): void
     {
         $this->recordedMessages = [];
+        $this->stubbedReactionCounts = [];
     }
 
     public function assertEmpty(): void

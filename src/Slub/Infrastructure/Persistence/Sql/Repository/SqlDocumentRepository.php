@@ -8,6 +8,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Types\Type;
 use Slub\Domain\Entity\Document\Document;
+use Slub\Domain\Entity\Document\DocumentIdentifier;
 use Slub\Domain\Repository\DocumentRepositoryInterface;
 
 class SqlDocumentRepository implements DocumentRepositoryInterface
@@ -52,6 +53,14 @@ SQL;
             fn (array $normalizedDocument) => $this->hydrate($normalizedDocument),
             $this->fetchAll()
         );
+    }
+
+    public function unpublishDocument(DocumentIdentifier $documentIdentifier): void
+    {
+        $sql = <<<SQL
+DELETE FROM documents WHERE IDENTIFIER=:IDENTIFIER;
+SQL;
+        $this->sqlConnection->executeUpdate($sql, ['IDENTIFIER' => $documentIdentifier->stringValue()]);
     }
 
     public function reset(): void

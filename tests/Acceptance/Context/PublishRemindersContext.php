@@ -5,12 +5,14 @@ namespace Tests\Acceptance\Context;
 use Ramsey\Uuid\Uuid;
 use Slub\Application\PublishReminders\PublishRemindersHandler;
 use Slub\Domain\Entity\Channel\ChannelIdentifier;
+use Slub\Domain\Entity\Document\Document;
 use Slub\Domain\Entity\PR\AuthorIdentifier;
 use Slub\Domain\Entity\PR\MessageIdentifier;
 use Slub\Domain\Entity\PR\PR;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Domain\Entity\PR\Title;
 use Slub\Domain\Entity\Workspace\WorkspaceIdentifier;
+use Slub\Domain\Repository\DocumentRepositoryInterface;
 use Slub\Domain\Repository\PRRepositoryInterface;
 use Slub\Infrastructure\Persistence\InMemory\Query\InMemoryClock;
 use Tests\Acceptance\helpers\ChatClientSpy;
@@ -23,14 +25,28 @@ class PublishRemindersContext extends FeatureContext
     private const PR_1 = 'samirboulil/slub/1';
     private const PR_2 = 'samirboulil/slub/2';
     private const PR_3 = 'samirboulil/slub/3';
+    private const DOC_URL_1 = 'https://www.notion.so/xxx/my-doc';
+    private const DOC_MSG_1 = 'akeneo@squad-raccoons@1111.2222';
+    private const DOC_URL_2 = 'https://www.notion.so/xxx/my-doc-2';
+    private const DOC_MSG_2 = 'akeneo@squad-raccoons@3333.4444';
+    private const CHECK_MARK = 'white_check_mark';
 
     public function __construct(
         PRRepositoryInterface $PRRepository,
         private PublishRemindersHandler $publishRemindersHandler,
         private ChatClientSpy $chatClientSpy,
-        private InMemoryClock $clock
+        private InMemoryClock $clock,
+        private DocumentRepositoryInterface $documentRepository
     ) {
         parent::__construct($PRRepository);
+    }
+
+    /**
+     * @BeforeScenario
+     */
+    public function cleanDocuments(): void
+    {
+        $this->documentRepository->reset();
     }
 
     /**
@@ -203,5 +219,197 @@ class PublishRemindersContext extends FeatureContext
     public function theReminderShouldBeEmpty(): void
     {
         $this->chatClientSpy->assertEmpty();
+    }
+
+    /**
+     * @Given /^a document in review having (\d+) check mark reactions$/
+     */
+    public function aDocumentInReviewHavingCheckMarkReactions(int $numberOfCheckMarks): void
+    {
+        $this->createInReviewDocument(self::DOC_URL_1, self::DOC_MSG_1, self::SQUAD_RACCOONS, 0);
+        $this->chatClientSpy->stubReactionCount(self::DOC_MSG_1, self::CHECK_MARK, $numberOfCheckMarks);
+    }
+
+    /**
+     * @Given /^a document put in review (\d+) days ago$/
+     */
+    public function aDocumentPutInReviewDaysAgo(int $numberOfDaysAgo): void
+    {
+        $this->createInReviewDocument(self::DOC_URL_2, self::DOC_MSG_2, self::SQUAD_RACCOONS, $numberOfDaysAgo);
+    }
+
+    /**
+     * @Given /^a document in review for which Slack fails$/
+     */
+    public function aDocumentInReviewForWhichSlackFails(): void
+    {
+        $this->createInReviewDocument(self::DOC_URL_2, self::DOC_MSG_2, self::SQUAD_RACCOONS, 1);
+        $this->chatClientSpy->stubReactionCount(
+            self::DOC_MSG_2,
+            self::CHECK_MARK,
+            new \RuntimeException('Slack API failure')
+        );
+    }
+
+    /**
+     * @Then /^the reminder should only contain the document in review$/
+     */
+    public function theReminderShouldOnlyContainTheDocumentInReview(): void
+    {
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessageInOrder(
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            [
+                [
+                    $this->documentsHeaderBlock(),
+                    $this->documentBlock(self::DOC_URL_1, self::DOC_MSG_1, 2, 'Today'),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @Then /^the reminder should contain both the PR and the document in review$/
+     */
+    public function theReminderShouldContainBothThePRAndTheDocumentInReview(): void
+    {
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessageInOrder(
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            [
+                [
+                    $this->prsHeaderBlock(),
+                    $this->prBlock('https://github.com/samirboulil/slub/pull/1', 'Today'),
+                    $this->documentsHeaderBlock(),
+                    $this->documentBlock(self::DOC_URL_1, self::DOC_MSG_1, 2, 'Today'),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @Then /^the reminder should contain the document in review and a degraded line for the failing document$/
+     */
+    public function theReminderShouldContainTheDocumentInReviewAndADegradedLineForTheFailingDocument(): void
+    {
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessageInOrder(
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            [
+                [
+                    $this->documentsHeaderBlock(),
+                    $this->documentBlock(self::DOC_URL_1, self::DOC_MSG_1, 2, 'Today'),
+                    $this->degradedDocumentBlock(self::DOC_URL_2, 'Yesterday'),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @Then /^the reminder should contain the documents ordered by the number of days in review$/
+     */
+    public function theReminderShouldContainTheDocumentsOrderedByTheNumberOfDaysInReview(): void
+    {
+        $this->chatClientSpy->assertHasBeenCalledWithChannelIdentifierAndBlockMessageInOrder(
+            ChannelIdentifier::fromString(self::SQUAD_RACCOONS),
+            [
+                [
+                    $this->documentsHeaderBlock(),
+                    $this->documentBlock(self::DOC_URL_1, self::DOC_MSG_1, 2, 'Today'),
+                    $this->documentBlock(self::DOC_URL_2, self::DOC_MSG_2, 0, '2 days ago'),
+                ],
+            ]
+        );
+    }
+
+    private function createInReviewDocument(
+        string $url,
+        string $messageId,
+        string $channelIdentifier,
+        int $putInReviewDaysAgo
+    ): void {
+        $putToReviewTimestamp = (string) (new \DateTime('now', new \DateTimeZone('UTC')))
+            ->modify(sprintf('-%d day', $putInReviewDaysAgo))
+            ->getTimestamp();
+        $this->documentRepository->save(
+            Document::fromNormalized([
+                'IDENTIFIER' => md5($url),
+                'URL' => $url,
+                'AUTHOR_IDENTIFIER' => 'sam',
+                'CHANNEL_IDS' => [$channelIdentifier],
+                'WORKSPACE_IDS' => ['akeneo'],
+                'MESSAGE_IDS' => [$messageId],
+                'PUT_TO_REVIEW_AT' => $putToReviewTimestamp,
+            ])
+        );
+    }
+
+    private function prsHeaderBlock(): array
+    {
+        return [
+            'type' => 'section',
+            'text' => [
+                'type' => 'mrkdwn',
+                'text' => 'Yeee, these PRs need reviews!',
+            ],
+        ];
+    }
+
+    private function documentsHeaderBlock(): array
+    {
+        return [
+            'type' => 'section',
+            'text' => [
+                'type' => 'mrkdwn',
+                'text' => 'Yeee, these documents need reviews!',
+            ],
+        ];
+    }
+
+    private function prBlock(string $githubLink, string $timeInReview): array
+    {
+        return [
+            'type' => 'context',
+            'elements' => [
+                [
+                    'type' => 'image',
+                    'image_url' => 'https://avatars.githubusercontent.com/Sam',
+                    'alt_text' => 'Sam is the author of the PR',
+                ],
+                [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf('*<%s|Add new feature>*, _%s_', $githubLink, $timeInReview),
+                ],
+            ],
+        ];
+    }
+
+    private function documentBlock(string $url, string $messageId, int $numberOfCheckMarks, string $timeInReview): array
+    {
+        return [
+            'type' => 'context',
+            'elements' => [
+                [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf(
+                        '*<%s|Document>* (<https://slack.example.com/permalink/%s|View message>), %d :white_check_mark:, _%s_',
+                        $url,
+                        $messageId,
+                        $numberOfCheckMarks,
+                        $timeInReview
+                    ),
+                ],
+            ],
+        ];
+    }
+
+    private function degradedDocumentBlock(string $url, string $timeInReview): array
+    {
+        return [
+            'type' => 'context',
+            'elements' => [
+                [
+                    'type' => 'mrkdwn',
+                    'text' => sprintf('*<%s|Document>*, _%s_', $url, $timeInReview),
+                ],
+            ],
+        ];
     }
 }

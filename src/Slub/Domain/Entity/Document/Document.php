@@ -143,4 +143,9 @@ class Document
     {
         return $this->messageIdentifiers;
     }
+
+    public function numberOfDaysInReview(): int
+    {
+        return $this->putToReviewAt->numberOfDaysInReview();
+    }
 }

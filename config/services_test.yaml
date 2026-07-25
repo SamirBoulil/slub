@@ -74,9 +74,14 @@ services:
         - '@slub.application.publish_reminders.publish_reminders_handler'
         - '@slub.infrastructure.chat.slack.slack_client'
         - '@slub.infrastructure.common.query.clock'
+        - '@slub.infrastructure.persistence.document_repository'
     Tests\Acceptance\Context\UnpublishPRContext:
         - '@slub.infrastructure.persistence.pr_repository'
         - '@slub.application.unpublish_pr.unpublish_pr_handler'
+    Tests\Acceptance\Context\UnpublishDocumentContext:
+        - '@slub.infrastructure.persistence.pr_repository'
+        - '@slub.infrastructure.persistence.document_repository'
+        - '@slub.application.unpublish_document.unpublish_document_handler'
     Tests\Acceptance\Context\GoodToMergeContext:
         - '@slub.infrastructure.persistence.pr_repository'
         - '@slub.application.new_review.new_review_handler'

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Slub\Infrastructure\Chat\Slack\UnTR;
 
 use Slub\Application\Common\ChatClient;
+use Slub\Application\UnpublishDocument\UnpublishDocument;
+use Slub\Application\UnpublishDocument\UnpublishDocumentHandler;
 use Slub\Application\UnpublishPR\UnpublishPR;
 use Slub\Application\UnpublishPR\UnpublishPRHandler;
+use Slub\Domain\Entity\Document\DocumentURL;
 use Slub\Domain\Entity\PR\PRIdentifier;
 use Slub\Infrastructure\Chat\Common\ChatHelper;
 use Slub\Infrastructure\Chat\Slack\ExplainUser;
@@ -21,6 +24,7 @@ class ProcessUnTRAsync
 {
     public function __construct(
         private UnpublishPRHandler $unpublishPRHandler,
+        private UnpublishDocumentHandler $unpublishDocumentHandler,
         private ChatClient $chatClient,
         private ExplainUser $explainUser,
         private RouterInterface $router,
@@ -38,9 +42,13 @@ class ProcessUnTRAsync
 
     private function processUnTR(Request $request): void
     {
+        $text = $request->request->get('text');
         try {
-            $PRIdentifier = ChatHelper::extractPRIdentifier($request->request->get('text'));
-            $this->unTR($PRIdentifier);
+            if (ChatHelper::isGithubPR($text)) {
+                $this->unTR(ChatHelper::extractPRIdentifier($text));
+            } else {
+                $this->unTRDocument(ChatHelper::extractURL($text));
+            }
             $this->confirmUnTRSuccess($request);
         } catch (\Exception|\Error $e) {
             $this->explainUser->onError($request, $e);
@@ -52,6 +60,11 @@ class ProcessUnTRAsync
         $unpublishPR = new UnpublishPR();
         $unpublishPR->PRIdentifier = $PRIdentifier->stringValue();
         $this->unpublishPRHandler->handle($unpublishPR);
+    }
+
+    private function unTRDocument(DocumentURL $documentURL): void
+    {
+        $this->unpublishDocumentHandler->handle(new UnpublishDocument($documentURL->asString()));
     }
 
     private function confirmUnTRSuccess(Request $request): void

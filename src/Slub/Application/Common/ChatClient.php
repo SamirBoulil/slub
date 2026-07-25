@@ -33,4 +33,6 @@ interface ChatClient
         string $documentURL,
         string $slackUserId
     ): string;
+    public function getReactionCountForMessage(MessageIdentifier $messageIdentifier, string $reactionName): int;
+    public function getMessagePermalink(MessageIdentifier $messageIdentifier): string;
 }

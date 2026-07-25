@@ -16,11 +16,12 @@ use Slub\Infrastructure\VCS\Github\Query\GithubAPIHelper;
  * Calls the Github API on behalf of an app installation, refreshing the access token
  * when it expires.
  *
- * Responses are cached with their ETag and revalidated with conditional requests
+ * GET responses are cached with their ETag and revalidated with conditional requests
  * (If-None-Match): 304 responses do not count against the Github API rate limit, and
  * the data served is always fresh by construction of the HTTP semantics. Bodies are
  * also memoized for the duration of the request, so fetching the same url twice within
- * one operation costs a single HTTP call.
+ * one operation costs a single HTTP call. POST responses (e.g. GraphQL queries) are
+ * never cached.
  *
  * The cache is best effort only: any cache failure falls back to calling the Github
  * API exactly as if the cache did not exist.
@@ -72,10 +73,10 @@ class GithubAPIClient implements GithubAPIClientInterface
         }
 
         $appInstallation = $this->sqlAppInstallationRepository->getBy($repositoryIdentifier);
-        $response = $this->fetch($url, $this->withDefaultRequestOptions($options), $appInstallation);
+        $response = $this->send('GET', $url, $this->withDefaultRequestOptions($options), $appInstallation);
         if (self::UNAUTHORIZED_STATUS_CODE === $response->getStatusCode()) {
             $appInstallation = $this->refreshAndSaveAccessToken($appInstallation);
-            $response = $this->fetch($url, $this->withDefaultRequestOptions($options), $appInstallation);
+            $response = $this->send('GET', $url, $this->withDefaultRequestOptions($options), $appInstallation);
         }
 
         if (self::NOT_MODIFIED_STATUS_CODE === $response->getStatusCode() && null !== $cachedResponse) {
@@ -99,6 +100,18 @@ class GithubAPIClient implements GithubAPIClientInterface
         return $response;
     }
 
+    public function post(string $url, array $options, $repositoryIdentifier): ResponseInterface
+    {
+        $appInstallation = $this->sqlAppInstallationRepository->getBy($repositoryIdentifier);
+        $response = $this->send('POST', $url, $this->withDefaultRequestOptions($options), $appInstallation);
+        if (self::UNAUTHORIZED_STATUS_CODE === $response->getStatusCode()) {
+            $appInstallation = $this->refreshAndSaveAccessToken($appInstallation);
+            $response = $this->send('POST', $url, $this->withDefaultRequestOptions($options), $appInstallation);
+        }
+
+        return $response;
+    }
+
     private function optionsWithAuthorizationHeaders(array $options, GithubAppInstallation $appInstallation): array
     {
         $options['headers'] = array_merge($options['headers'] ?? [], GithubAPIHelper::authorizationHeader($appInstallation->accessToken));
@@ -106,14 +119,14 @@ class GithubAPIClient implements GithubAPIClientInterface
         return $options;
     }
 
-    private function fetch(string $url, array $options, GithubAppInstallation $appInstallation): ResponseInterface
+    private function send(string $method, string $url, array $options, GithubAppInstallation $appInstallation): ResponseInterface
     {
         $options = $this->optionsWithAuthorizationHeaders($options, $appInstallation);
         $loggableOptions = $options;
         unset($loggableOptions['headers']['Authorization']);
         $this->logger->debug(sprintf('Calling url "%s" with options "%s"', $url, (string) json_encode($loggableOptions)));
 
-        $response = $this->client->get($url, $options);
+        $response = $this->client->request($method, $url, $options);
 
         $this->logger->debug(sprintf(
             'GitHub API response for "%s": status %d, rate limit remaining %s/%s (used %s, resets at %s)',

@@ -357,6 +357,74 @@ class GithubAPIClientTest extends KernelTestCase
         self::assertEquals(self::RESPONSE_BODY, $secondResponse->getBody()->getContents());
     }
 
+    /** @test */
+    public function it_posts_with_the_access_token(): void
+    {
+        $url = 'https://api.github.com/graphql';
+        $responseContent = '{"data": {"repository": {}}}';
+        $this->requestSpy->stubResponse(new Response(200, [], $responseContent));
+
+        $response = $this->githubAPIClient->post($url, ['json' => ['query' => 'query {}']], self::REPOSITORY_IDENTIFIER);
+
+        self::assertEquals($responseContent, $response->getBody()->getContents());
+        self::assertEquals(200, $response->getStatusCode());
+
+        $request = $this->requestSpy->getRequest();
+        $this->requestSpy->assertMethod('POST', $request);
+        $this->requestSpy->assertURI('/graphql', $request);
+        $this->requestSpy->assertAuthToken(self::ACCESS_TOKEN, $request);
+        self::assertEquals('{"query":"query {}"}', $request->getBody()->getContents());
+
+        $requestOptions = $this->requestSpy->getRequestOptions();
+        self::assertFalse($requestOptions['http_errors']);
+        self::assertEquals(5, $requestOptions['connect_timeout']);
+        self::assertEquals(10, $requestOptions['timeout']);
+    }
+
+    /** @test */
+    public function it_refreshes_and_saves_the_access_token_when_it_expires_before_posting(): void
+    {
+        $url = 'https://api.github.com/graphql';
+        $responseContent = '{"data": {"repository": {}}}';
+        $newAccessToken = 'new_access_token';
+
+        // First, unauthorized then authorized
+        $this->requestSpy->stubResponse(new Response(401, [], ''));
+        $this->requestSpy->stubResponse(new Response(200, [], $responseContent));
+
+        $this->refreshAccessToken->fetch(self::INSTALLATION_ID)->willReturn($newAccessToken);
+        $this->sqlAppInstallationRepository->save(
+            Argument::that(
+                fn (GithubAppInstallation $appInstallation) => $appInstallation->accessToken === $newAccessToken
+                    && self::INSTALLATION_ID === $appInstallation->installationId
+                    && self::REPOSITORY_IDENTIFIER === $appInstallation->repositoryIdentifier
+            )
+        )->shouldBeCalled();
+
+        $response = $this->githubAPIClient->post($url, [], self::REPOSITORY_IDENTIFIER);
+
+        self::assertEquals($responseContent, $response->getBody()->getContents());
+        self::assertEquals(200, $response->getStatusCode());
+
+        $request = $this->requestSpy->getRequest();
+        $this->requestSpy->assertMethod('POST', $request);
+        $this->requestSpy->assertAuthToken($newAccessToken, $request);
+    }
+
+    /** @test */
+    public function it_never_reads_nor_writes_the_response_cache_for_post_requests(): void
+    {
+        $url = 'https://api.github.com/graphql';
+        $this->requestSpy->stubResponse(new Response(200, ['ETag' => self::ETAG], '{"data": {}}'));
+        $this->responseCacheRepository->find(Argument::cetera())->shouldNotBeCalled();
+        $this->responseCacheRepository->save(Argument::cetera())->shouldNotBeCalled();
+
+        $response = $this->githubAPIClient->post($url, [], self::REPOSITORY_IDENTIFIER);
+
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertFalse($this->requestSpy->getRequest()->hasHeader('If-None-Match'));
+    }
+
     private function createGithubAPIClient(LoggerInterface $logger): GithubAPIClient
     {
         return new GithubAPIClient(

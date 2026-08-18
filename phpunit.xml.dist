@@ -17,6 +17,8 @@
   </coverage>
   <php>
     <env name="KERNEL_CLASS" value="Slub\Kernel"/>
+    <!-- Vendor-internal (indirect) deprecations must not fail the build: on PHP 8.4 the pinned sentry SDK triggers implicit-nullable deprecations. Deprecations from our own code still fail. -->
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=0"/>
   </php>
   <testsuites>
     <testsuite name="Unit tests">

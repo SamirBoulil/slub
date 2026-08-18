@@ -100,7 +100,7 @@ SQL;
 CREATE TABLE IF NOT EXISTS app_installation (
     REPOSITORY_IDENTIFIER VARCHAR(255) PRIMARY KEY,
     INSTALLATION_ID VARCHAR(255),
-    ACCESS_TOKEN VARCHAR(255)
+    ACCESS_TOKEN TEXT
 );
 SQL;
         $this->sqlConnection->executeUpdate($createTable);

@@ -19,7 +19,7 @@ class GetPRInfo implements GetPRInfoInterface
     public function __construct(
         private GetPRDetails $getPRDetails,
         private FindReviews $findReviews,
-        private GetCIStatus $getCIStatus,
+        private GetCIStatusInterface $getCIStatus,
         private SqlPRCommitsRepository $prCommitsRepository,
         private LoggerInterface $logger
     ) {

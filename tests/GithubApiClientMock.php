@@ -26,6 +26,13 @@ class GithubApiClientMock implements GithubAPIClientInterface
         return $this->stubs[$url];
     }
 
+    public function post(string $url, array $options, $repositoryIdentifier): ResponseInterface
+    {
+        $this->calledUrls[] = $url;
+
+        return $this->stubs[$url];
+    }
+
     public function stubUrlWith($url, ResponseInterface $response): void
     {
         $this->stubs[$url] = $response;
